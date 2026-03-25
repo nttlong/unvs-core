@@ -1,0 +1,61 @@
+using Cysharp.Threading.Tasks;
+using UnityEngine;
+using unvs.actions;
+using unvs.ext;
+using unvs.interfaces;
+using unvs.interfaces.teleport;
+using unvs.manager;
+using unvs.sys;
+namespace unvs.actionsbasics
+{
+    public class EntranceEnter : actions.ActionBase
+    {
+        public async override UniTask ExecuteAsync(ActionBaseSender Sender)
+        {
+            var actor= Sender.Target.GetComponent<IActorObject>();
+            if(actor==null)
+            {
+                Sender.Cancel();
+                return;
+            }
+            var entrance=Sender.Target.GetComponent<IEntrance>();
+            if (entrance==null)
+            {
+                await actor.Speaker.SayICanNotDoThatAsync();
+                Sender.Cancel();
+                return;
+            }
+            var interact= (entrance as MonoBehaviour).GetComponent<IInteractableObject>();
+            if(interact!=null && interact.IsTempEntrance)
+            {
+                EntranceStackObject.Pop();
+            }
+            EntranceStackObject.Push(new EntrancePointInfo
+            {
+                Point = entrance.Position,
+                Path = entrance.ScenePath
+            });
+            IScenePrefab scene = null;
+            if(entrance.IsNewWorld)
+            {
+                scene=await ChunkSceneLoaderUtils.LoadNewAsync(entrance.PathTo, entrance.SpawnPos, actor);
+            }
+            else
+            {
+                scene=await ChunkSceneLoaderUtils.LoadInteriorAsync(entrance.PathTo, entrance.SpawnPos, actor);
+            }
+            var spawn = scene.FindSpawnTargetByName(entrance.SpawnPos);
+            if(spawn!=null)
+            {
+                spawn.IsTempEntrance = true;
+            }
+            var door = (scene as MonoBehaviour).GetComponentInChildrenByName<IInteractableObject>(entrance.SpawnPos);
+            if(door!=null)
+            {
+                door.IsTempEntrance = true;
+            }
+            
+        }
+    }
+}
+

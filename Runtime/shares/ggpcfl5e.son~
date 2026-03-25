@@ -1,0 +1,148 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using Unity.VisualScripting;
+using Unity.VisualScripting.YamlDotNet.Core;
+using UnityEngine;
+using unvs.ext;
+using unvs.interfaces;
+
+namespace unvs.shares
+{
+   
+    public struct WorldBoundGameInfo
+    {
+        public Vector2[] Points;
+
+        public FacetInfo Left;
+        public FacetInfo Right;
+        public FacetInfo Top;
+        public FacetInfo Bottom;
+        public IScenePrefab Owner;
+        public bool IsClockWiseVertialCalculate
+        {
+            get
+            {
+                return Left.GetMax()>Right.GetMax();
+            }
+        }
+
+        
+    }
+    public class WorldBoundingUtils
+    {
+        public static bool IsClockWise(Vector2[] points)
+        {
+            float sum = 0;
+            for (int i = 0; i < points.Length; i++)
+            {
+                Vector2 p1 = points[i];
+                Vector2 p2 = points[(i + 1) % points.Length];
+                sum += (p2.x - p1.x) * (p2.y + p1.y);
+            }
+            return sum > 0;
+        }
+        public static WorldBoundGameInfo Create(IScenePrefab scene)
+        {
+            var worldFacets = scene.JoinInfo.WorldJoinInfo.WorldFacets;
+            var ret=new WorldBoundGameInfo();
+            ret.Points = CloneToNew( scene.WorldBound.Coll.points, 
+                scene.WorldBound.Coll.transform.position,
+                scene.WorldBound.Coll.transform.rotation);
+            ret.Left = worldFacets.Left.CloneToNew();
+            ret.Right = worldFacets.Right.CloneToNew();
+            ret.Top=worldFacets.Top.CloneToNew();
+            ret.Bottom = worldFacets.Bottom.CloneToNew();
+            ret.Owner = scene;
+            //ret.IsClockWiseVertialCalculate = scene.JoinInfo.WorldJoinInfo.IsClockWiseVertialCalculate;
+            return ret;
+        }
+        public static WorldBoundGameInfo JoinLeftRight_Fixed(
+            WorldBoundGameInfo leftBound, 
+            WorldBoundGameInfo rightBound)
+        {
+            var A = leftBound.Points;
+            var B = rightBound.Points;
+
+            int aStart = leftBound.Right.Start; // Điểm bắt đầu cạnh giáp lai của A
+            int aEnd = leftBound.Right.End;     // Điểm kết thúc cạnh giáp lai của A
+
+            int bStart = rightBound.Left.Start; // Điểm tương ứng với aEnd
+            int bEnd = rightBound.Left.End;     // Điểm tương ứng với aStart
+
+            int aCount = A.Length;
+            int bCount = B.Length;
+
+            var result = new List<Vector2>(aCount + bCount);
+
+            // --- 1. ĐI TOÀN BỘ CHU VI A (Nguoc chieu) ---
+            
+            int stepA = leftBound.Right.GetStep();
+            int currA = (stepA>0)? aStart:aEnd;
+            
+            for (int i = 0; i < aCount; i++)
+            {
+                result.Add(A[currA]);
+                currA = (currA - stepA + aCount) % aCount;
+            }
+
+            // --- 2. ĐI TOÀN BỘ CHU VI B (Thuan chieu voi da giac) ---
+            // Để không bị xoắn, nếu A đi CW thì B phải đi CCW trong chuỗi kết quả
+            
+            int stepB =  rightBound.Left.GetStep() ; // ĐẢO CHIỀU bước đi của B
+            int currB = bEnd ;
+            
+            for (int i = 0; i < bCount; i++)
+            {
+                result.Add(B[currB]);
+                currB = (currB - stepB + bCount) % bCount;
+            }
+            var ret = new WorldBoundGameInfo();
+            ret.Points=result.ToArray();
+            int start, end;
+            ret.Points.LeftVerticalFacet(out start, out end);
+            ret.Left = new FacetInfo()
+            {
+                End = end,Start=start
+            };
+            ret.Points.RightVerticalFacet(out start, out end);
+            ret.Right = new FacetInfo()
+            {
+                End = end,
+                Start = start
+            };
+            ret.Points.TopHorizontalFacet(out start, out end);
+            ret.Top = new FacetInfo()
+            {
+                End = end,
+                Start = start
+            };
+            ret.Points.BottomHorizontalFacet(out start, out end);
+            ret.Bottom = new FacetInfo()
+            {
+                End = end,
+                Start = start
+            };
+            // HUONG TIN CHO PHRASE SAU PHU THUOC VAO HUONG TINH CAU leftBound
+            //ret.IsClockWiseVertialCalculate = ret.Left.Start<ret.Left.End;
+            return ret;
+        }
+ 
+
+        private static Vector2[] CloneToNew(Vector2[] points, Vector3 position, Quaternion rotation)
+        {
+            var ret = new Vector2[points.Length];   
+            for(var i=0; i<points.Length; i++)
+            {
+                ret[i]= (Vector2)position + (Vector2)(rotation * points[i]);
+            }
+            return ret;
+        }
+
+        public static Vector2[] ClonePoint(PolygonCollider2D coll)
+        {
+            
+            return CloneToNew(coll.points, coll.transform.position, coll.transform.rotation);
+        }
+    }
+}

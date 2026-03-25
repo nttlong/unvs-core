@@ -1,0 +1,177 @@
+﻿using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
+
+#if UNITY_EDITOR
+using UnityEditor.Animations;
+#endif
+using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.U2D.Animation;
+using UnityEngine.U2D.IK;
+using UnityEngine.XR;
+using unvs.shares;
+namespace unvs.ext
+{
+    public static class AnimExt
+    {
+        public static List<AnimationLayerInfo> LayersIndices(this Animator anim)
+        {
+            List<AnimationLayerInfo> indices = new List<AnimationLayerInfo>();
+            for (int i = 0; i < anim.layerCount; i++)
+            {
+                indices.Add(new AnimationLayerInfo
+                {
+                    Index = i,
+                    Name = anim.GetLayerName(i),
+                });
+
+            }
+            return indices;
+        }
+        public static List<AnimationClip> ClipNames(this Animator anim)
+        {
+            if (anim.runtimeAnimatorController == null) return new List<AnimationClip>();
+
+            // Lấy tất cả các clip có trong Controller
+            AnimationClip[] clips = anim.runtimeAnimatorController.animationClips;
+
+            return clips.ToList();
+        }
+        public static void CrossFadeMotion(this Animator animator, string layerName, string clipName, float normalizedTransitionDuration = 1f)
+        {
+
+            if (animator == null) return;
+            //animator.TurnOffAllLayers();
+            // 1. Lấy index của layer từ tên
+
+            //animator.SetLayerWeightByLayerName(layerName, 1);
+            animator.CrossFade($"{layerName}.{clipName}", normalizedTransitionDuration);
+
+        }
+        public static void CrossFadeMotion(this Animator animator, string clipName, float normalizedTransitionDuration = 0.25f)
+        {
+
+            if (animator == null) return;
+            //animator.TurnOffAllLayers();
+            // 1. Lấy index của layer từ tên
+
+            animator.CrossFade(clipName, normalizedTransitionDuration);
+
+        }
+        public static void SetLayerWeightByLayerName(this Animator anim, string layerName, float w = 1f)
+        {
+            anim.SetLayerWeight(anim.GetLayerIndex(layerName), w);
+        }
+        public static void Motion(this Animator animator, string clipName)
+        {
+
+            animator.PlayInFixedTime(clipName);
+
+
+        }
+        public static void Motion(this Animator animator, string layerName, string clipName, float percent = 1)
+        {
+
+            animator.Play(clipName, animator.GetLayerIndex(layerName), percent);
+
+
+        }
+#if UNITY_EDITOR
+        public static List<BlendTreeInfo> EditorGetListOfAnimInfo(this Animator anim)
+        {
+            var ret = new List<BlendTreeInfo>();
+            var controller = anim.runtimeAnimatorController as AnimatorController;
+            foreach (var layer in controller.layers)
+            {
+                // 3. Duyệt qua các State trong StateMachine của mỗi Layer
+                foreach (var stateInMachine in layer.stateMachine.states)
+                {
+                    var state = stateInMachine.state;
+
+                    // 4. Kiểm tra xem Motion của State này có phải là Blend Tree không
+                    if (state.motion is BlendTree blendTree)
+                    {
+
+
+                        // 5. Lấy danh sách các Motion con
+                        ChildMotion[] children = blendTree.children;
+                        foreach (var child in children)
+                        {
+                            if (child.motion != null)
+                            {
+                                ret.Add(new BlendTreeInfo
+                                {
+                                    motionName = child.motion.name,
+                                    value = child.threshold,
+                                });
+
+
+
+                            }
+                        }
+                    }
+                }
+            }
+            return ret;
+        }
+
+
+#endif
+        
+        public static void CreateAllIK(this Animator anim)
+        {
+            
+            if (anim == null) return;
+            var sp = anim.ExtractAllSpriteSkins();
+            var bones = sp.SelectMany(p => p.boneTransforms);
+            Transform rootBone= TransformExt.GetRoot(bones);
+            
+            var ik=rootBone.AddComponentIfNotExist<IKManager2D>();
+            
+            
+            //IKManager2D ret= ik.AddChildIfNotExist<LimbSolver2D>(nameOfSover);
+            //var ls=rootBone.transform.CreateIfNoExist<LimbSolver2D>(nameOfSover);
+            var leafs = bones.GetAllLeafBones();
+            foreach (var bone in leafs)
+            {
+                var nameOfSover = $"{bone.name}_solver";
+                var nameOfTarget = $"{bone.name}_target";
+                //if (ik.solvers.FirstOrDefault(p => p.name == nameOfTarget) != null) continue;
+                var ret = ik.AddChildIfNotExist<LimbSolver2D>(nameOfSover);
+              
+
+                ik.AddSolver(ret);
+                
+                var ch = ret.GetChain(0);
+                
+                if (ch.target == null)
+                {
+                    ch.target=ret.transform.AddChildIfNotExist<Transform>(nameOfTarget);
+
+                }
+                ch.effector = bone;
+                Debug.Log($"CreateAllIK {rootBone.name}->{nameOfSover} {nameOfTarget}");
+                
+            }
+            
+        }
+        public static void CreateAllSortingGroup(this Animator anim,string sortingLayerName)
+        {
+           
+            
+            var st = anim.GetComponentInParent<SortingGroup>();
+            if(st == null) return;
+            st.sortingLayerName = sortingLayerName;
+            var lst = anim.ExtractAllSpriteSkins();
+            foreach (SpriteSkin s in lst)
+            {
+                var sg = s.transform.AddComponentIfNotExist<SortingGroup>();
+                sg.sortingLayerName = sortingLayerName;
+                sg.sortingOrder = s.GetComponent<SpriteRenderer>().sortingOrder;
+                Debug.Log($"{s.transform.name}");
+            }
+        }
+    }
+}
+

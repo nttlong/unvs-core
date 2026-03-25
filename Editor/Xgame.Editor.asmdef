@@ -1,0 +1,31 @@
+{
+    "name": "Xgame.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:45b625fa1fad1c04c8d9fe0d1d5ba20f",
+        "GUID:41707694d1608c141961a8cfdadc816f",
+        "GUID:eec0964c48f6f4e40bc3ec2257ccf8c5",
+        "GUID:516a5277b8c3b4f4c8cc86b77b1591ff",
+        "GUID:71872915d7faaaf47a5587bce19d5214",
+        "GUID:1e12dfed92b55ee4ebdd1c9f56734514",
+        "GUID:a80267e42bf6e7948a24b39f6ab133bb",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:593a5b492d29ac6448b1ebf7f035ef33",
+        "GUID:69448af7b92c7f342b298e06a37122aa",
+        "GUID:9e24947de15b9834991c9d8411ea37cf",
+        "GUID:f74a06c672039f045a9c16e2f9ced36e"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Ntreev.Library.Psd.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,142 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEngine;
+using unvs.interfaces;
+
+namespace unvs.shares
+{
+   
+    public struct WorldBoundGameInfo
+    {
+        public Vector2[] Points;
+
+        public FacetInfo Left;
+        public FacetInfo Right;
+        public FacetInfo Top;
+        public FacetInfo Bottom;
+        public IScenePrefab Owner;
+        public bool IsClockWise;
+    }
+    public class WorldBoundingUtils
+    {
+        public static WorldBoundGameInfo Create(IScenePrefab scene)
+        {
+            var worldFacets = scene.JoinInfo.WorldJoinInfo.WorldFacets;
+            var ret=new WorldBoundGameInfo();
+            ret.Points = CloneToNew( scene.WorldBound.Coll.points, 
+                scene.WorldBound.Coll.transform.position,
+                scene.WorldBound.Coll.transform.rotation);
+            ret.Left = worldFacets.Left.CloneToNew();
+            ret.Right = worldFacets.Right.CloneToNew();
+            ret.Top=worldFacets.Top.CloneToNew();
+            ret.Bottom = worldFacets.Bottom.CloneToNew();
+            ret.Owner = scene;
+            ret.IsClockWise = scene.JoinInfo.WorldJoinInfo.IsClockWise;
+            return ret;
+        }
+        public static Vector2[] JoinLeftRight_Fixed(
+            WorldBoundGameInfo leftBound, 
+            WorldBoundGameInfo rightBound)
+        {
+            var A = leftBound.Points;
+            var B = rightBound.Points;
+
+            int aStart = leftBound.Right.Start; // Điểm bắt đầu cạnh giáp lai của A
+            int aEnd = leftBound.Right.End;     // Điểm kết thúc cạnh giáp lai của A
+
+            int bStart = rightBound.Left.Start; // Điểm tương ứng với aEnd
+            int bEnd = rightBound.Left.End;     // Điểm tương ứng với aStart
+
+            int aCount = A.Length;
+            int bCount = B.Length;
+
+            var result = new List<Vector2>(aCount + bCount);
+
+            // --- 1. ĐI TOÀN BỘ CHU VI A (Thuận chiều) ---
+            int currA = aStart;
+            int stepA = leftBound.IsClockWise ? 1 : -1;
+
+            for (int i = 0; i < aCount; i++)
+            {
+                result.Add(A[currA]);
+                currA = (currA + stepA + aCount) % aCount;
+            }
+
+            // --- 2. ĐI TOÀN BỘ CHU VI B (NGƯỢC CHIỀU SO VỚI A) ---
+            // Để không bị xoắn, nếu A đi CW thì B phải đi CCW trong chuỗi kết quả
+            int currB = bStart;
+            int stepB = rightBound.IsClockWise ? -1 : 1; // ĐẢO CHIỀU bước đi của B
+
+            for (int i = 0; i < bCount; i++)
+            {
+                // Tránh trùng điểm tại mối nối (A[aEnd] có thể trùng tọa độ với B[bStart])
+                if (Vector2.Distance(result[result.Count - 1], B[currB]) > 0.001f)
+                {
+                    result.Add(B[currB]);
+                }
+                currB = (currB + stepB + bCount) % bCount;
+            }
+
+            return result.ToArray();
+        }
+        public static Vector2[] JoinLeftRight_NoCollapse(
+    WorldBoundGameInfo leftBound,
+    WorldBoundGameInfo rightBound)
+        {
+            var A = leftBound.Points;
+            var B = rightBound.Points;
+
+            int aStart = leftBound.Right.Start;
+            int aEnd = leftBound.Right.End;
+
+            int bStart = rightBound.Left.Start;
+            int bEnd = rightBound.Left.End;
+
+            int aCount = A.Length;
+            int bCount = B.Length;
+
+            var result = new List<Vector2>(aCount + bCount + 2);
+
+            int stepA = leftBound.IsClockWise ? 1 : -1;
+            int stepB = rightBound.IsClockWise ? 1 : -1;
+
+            // --- 1. đi toàn bộ A (vỏ ngoài từ aEnd về aStart)
+            int i = aEnd;
+            while (true)
+            {
+                result.Add(A[i]);
+                if (i == aStart) break;
+                i = (i + stepA + aCount) % aCount;
+            }
+
+            // --- 2. bridge A -> B
+            result.Add(B[bStart]); 
+
+            // --- 3. đi toàn bộ B (vỏ ngoài từ bStart về bEnd)
+            i = bStart;
+            while (true)
+            {
+                result.Add(B[i]);
+                if (i == bEnd) break;
+                i = (i + stepB + bCount) % bCount;
+            }
+
+            // --- 4. bridge B -> A
+            result.Add(A[aEnd]); 
+
+            return result.ToArray();
+        }
+
+        private static Vector2[] CloneToNew(Vector2[] points, Vector3 position, Quaternion rotation)
+        {
+            var ret = new Vector2[points.Length];   
+            for(var i=0; i<points.Length; i++)
+            {
+                ret[i]= (Vector2)position + (Vector2)(rotation * points[i]);
+            }
+            return ret;
+        }
+    }
+}

@@ -1,0 +1,283 @@
+﻿using System;
+using System.Collections;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Linq;
+using Unity.Cinemachine;
+using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.UIElements;
+using unvs.ext;
+using unvs.interfaces;
+using unvs.shares;
+namespace unvs.gameword
+{
+    [RequireComponent(typeof(PolygonCollider2D))]
+    public class GlobalWorldBound : MonoBehaviour, IGlobalWorldBound
+    {
+        public PolygonCollider2D coll;
+        public Rigidbody2D rigiBody;
+
+        public PolygonCollider2D Coll => coll;
+        public static GlobalWorldBound Instance;
+        //public Rigidbody2D Rigidbody => rigiBody;
+        //Dictionary<IScenePrefab,PolygonCollider2D> storage=new Dictionary<IScenePrefab, PolygonCollider2D> ();
+        List<WorldBoundGameInfo> bounding = new List<WorldBoundGameInfo>();
+        WorldBoundGameInfo currentBound;
+        public void SetBound(IScenePrefab newScenePrefab)
+        {
+            var instace = SingleScene.Instance;
+            Clear();
+            newScenePrefab.WorldBound.Owner = newScenePrefab;
+            newScenePrefab.WorldBound.refColl = newScenePrefab.WorldBound.Coll;
+            newScenePrefab.WorldBound.Coll.isTrigger = true;
+            //coll.transform.position = newScenePrefab.WorldBound.Coll.transform.position;
+            //coll.transform.rotation = newScenePrefab.WorldBound.Coll.transform.rotation;
+
+
+            WorldBoundGameInfo info = WorldBoundingUtils.Create(
+                newScenePrefab
+
+                );
+            bounding.Add(info);
+            coll.points = info.Points;
+            currentBound=info;
+            instace.Confiner.InvalidateBoundingShapeCache();
+
+
+        }
+        public void AddBoundRight(IScenePrefab newScenePrefab)
+        {
+            //newScenePrefab.WorldBound.Coll.transform.SetParent(coll.transform, true);
+            var list = coll.points.ToList();
+            var rightBound = WorldBoundingUtils.Create(newScenePrefab);
+            newScenePrefab.WorldBound.Coll.isTrigger = true;
+            var leftBound= bounding.FirstOrDefault(p=>p.Owner== newScenePrefab.Left);
+            
+            currentBound = WorldBoundingUtils.JoinLeftRight_Fixed(currentBound, rightBound);
+            bounding.Add(rightBound);
+            coll.points = currentBound.Points;
+            
+            SingleScene.Instance.Confiner.InvalidateBoundingShapeCache();
+            SingleScene.Instance.Confiner.InvalidateLensCache();
+
+
+        }
+        public void AddBoundLeft(IScenePrefab newScenePrefab)
+        {
+            var instance = SingleScene.Instance;
+            newScenePrefab.WorldBound.refColl = newScenePrefab.WorldBound.Coll;
+            PolygonCollider2D newBounds = newScenePrefab.WorldBound.Coll;
+            newBounds.isTrigger = true;
+            newScenePrefab.WorldBound.Owner = newScenePrefab;
+            if (newBounds == null) return;
+            newBounds.compositeOperation = Collider2D.CompositeOperation.Merge;
+            newBounds.transform.SetParent(transform, true);
+
+
+            // Tắt Renderer để ẩn vùng Bound (nếu nó có hiển thị) nhưng giữ Collider hoạt động
+            //var renderer = newBounds.GetComponent<Renderer>();
+            //if (renderer != null) renderer.enabled = false;
+
+            // Force regenerate Composite Collider
+            //coll.GenerateGeometry(); // Thay vì disable/enable, dùng hàm này chuyên dụng hơn
+
+
+            var track = newScenePrefab.WorldBound.Coll.Clone(Constants.ObjectsConst.SCENE_TRACKER);
+
+            track.transform.SetParent((newScenePrefab as MonoBehaviour).transform, true);
+
+            track.AddComponent<WorldTrackerObject>();
+            Instance.ClearOrphanBound();
+            //SingleScene.Instance.VCam.UpdateDamping();
+            //var vcom = SingleScene.Instance.VCam.GetComponent<CompositeCollider2D>();
+            //vcom.geometryType = CompositeCollider2D.GeometryType.Outlines;
+            //vcom.vertexDistance = 5;
+            //vcom.offsetDistance = 0;
+            //vcom.edgeRadius = 5;
+            //coll.geometryType = vcom.geometryType;
+            //coll.vertexDistance = vcom.vertexDistance;
+            //coll.offsetDistance = vcom.offsetDistance;
+            //coll.edgeRadius = vcom.edgeRadius;
+            ;
+
+            //vcom.GenerateGeometry();
+            instance.Confiner.Damping = 5;
+            //var positionComposer = instance.VCam.GetComponent<CinemachinePositionComposer>();
+            //positionComposer.enabled = true;
+            //positionComposer.Damping.x = 5f;
+            //positionComposer.Damping.y = 5f;
+            //instance.VCam.GetComponent<CinemachineConfiner2D>().InvalidateBoundingShapeCache();
+            //coll.GenerateGeometry();
+            instance.Confiner.InvalidateBoundingShapeCache();
+            instance.Confiner.InvalidateLensCache();
+
+
+        }
+        public void ClearOrphanBound()
+        {
+            foreach (var item in coll.GetComponentsInChildren<IScenePrefabWorldBound>(true).Where(p => p.TrOWner.IsDestroyed()))
+            {
+                UnityEngine.Object.Destroy((item as MonoBehaviour).gameObject);
+            }
+        }
+
+        private IEnumerator DelayedRefresh()
+        {
+            yield return new WaitForEndOfFrame();
+            coll.enabled = false;
+            coll.enabled = true;
+            SingleScene.Instance.Confiner.InvalidateBoundingShapeCache();
+        }
+
+
+        public void RemoveBoundRight(IScenePrefab newScenePrefab)
+        {
+            var wb = coll.GetComponentsInChildren<IScenePrefabWorldBound>(true).FirstOrDefault(p => p.Owner == newScenePrefab);
+            if (wb == null)
+            {
+                //  UnityEngine.Object.Destroy(tr.gameObject);
+                return;
+            }
+            var tr = (wb as MonoBehaviour);
+            if (wb.Owner == newScenePrefab)
+            {
+                tr.gameObject.transform.SetParent(newScenePrefab.GoWorld.transform);
+            }
+            if (wb.Owner.IsDestroying || (wb.Owner as MonoBehaviour).IsDestroyed())
+            {
+                UnityEngine.Object.Destroy(tr.gameObject);
+            }
+            //foreach (Transform tr in coll.GetComponentsInChildren<Transform>())
+            //{
+            //    var wb = tr.gameObject.GetComponent<IScenePrefabWorldBound>();
+            //    if (wb == null)
+            //    {
+            //        //  UnityEngine.Object.Destroy(tr.gameObject);
+            //        continue;
+            //    }
+            //    if (wb.Owner == newScenePrefab)
+            //    {
+            //        tr.gameObject.transform.SetParent(newScenePrefab.GoWorld.transform);
+            //    }
+            //    if (wb.Owner.IsDestroying || (wb.Owner as MonoBehaviour).IsDestroyed())
+            //    {
+            //        UnityEngine.Object.Destroy(tr.gameObject);
+            //    }
+            //}
+            //if (!newScenePrefab.GoWorld.IsDestroyed() && !newScenePrefab.WorldBound.Coll.IsDestroyed())
+            //{
+            //    newScenePrefab.WorldBound.Coll.transform.SetParent(newScenePrefab.GoWorld.transform, true);
+            //    //newScenePrefab.WorldBound.Coll.isTrigger = false;
+            //    SingleScene.Instance.Confiner.InvalidateBoundingShapeCache();
+            //}
+            SingleScene.Instance.Confiner.InvalidateBoundingShapeCache();
+
+        }
+        public void RemoveBoundLeft(IScenePrefab newScenePrefab)
+        {
+            var wb = coll.GetComponentsInChildren<IScenePrefabWorldBound>(true).FirstOrDefault(p => p.Owner == newScenePrefab);
+            if (wb == null)
+            {
+                //  UnityEngine.Object.Destroy(tr.gameObject);
+                return;
+            }
+            var tr = (wb as MonoBehaviour);
+            if (wb.Owner == newScenePrefab)
+            {
+                tr.gameObject.transform.SetParent(newScenePrefab.GoWorld.transform);
+            }
+            if (wb.Owner.IsDestroying || (wb.Owner as MonoBehaviour).IsDestroyed())
+            {
+                UnityEngine.Object.Destroy(tr.gameObject);
+            }
+            //foreach (Transform tr in coll.GetComponentsInChildren<Transform>())
+            //{
+            //    var wb = tr.gameObject.GetComponent<IScenePrefabWorldBound>();
+            //    if (wb == null)
+            //    {
+            //        //  UnityEngine.Object.Destroy(tr.gameObject);
+            //        continue;
+            //    }
+            //    if (wb.Owner == newScenePrefab)
+            //    {
+            //        tr.gameObject.transform.SetParent(newScenePrefab.GoWorld.transform);
+            //    }
+            //    if (wb.Owner.IsDestroying || (wb.Owner as MonoBehaviour).IsDestroyed())
+            //    {
+            //        UnityEngine.Object.Destroy(tr.gameObject);
+            //    }
+            //}
+            //if (!newScenePrefab.GoWorld.IsDestroyed() && !newScenePrefab.WorldBound.Coll.IsDestroyed())
+            //{
+            //    newScenePrefab.WorldBound.Coll.transform.SetParent(newScenePrefab.GoWorld.transform, true);
+            //    //newScenePrefab.WorldBound.Coll.isTrigger = false;
+            //    SingleScene.Instance.Confiner.InvalidateBoundingShapeCache();
+            //}
+            SingleScene.Instance.Confiner.InvalidateBoundingShapeCache();
+
+        }
+        private void Start()
+        {
+            if (Instance != null)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
+            if (SingleScene.Instance != null)
+            {
+                SingleScene.Instance.Confiner.BoundingShape2D = coll;
+                SingleScene.Instance.Confiner.InvalidateBoundingShapeCache();
+            }
+            DontDestroyOnLoad(gameObject);
+            SingleScene.Instance.VCam.UpdateDamping();
+        }
+        private void Awake()
+        {
+            coll = GetComponent<PolygonCollider2D>();
+            coll.isTrigger = true;
+            //coll.geometryType = CompositeCollider2D.GeometryType.Polygons; // Hợp nhất diện tích
+            //coll.vertexDistance = 0.01f; // Hàn kín các đỉnh
+            //coll.edgeRadius = 0.02f; // Chỉ để một chút để tránh kẹt, không để bằng
+
+            //rigiBody = GetComponent<Rigidbody2D>();
+            //rigiBody.bodyType = RigidbodyType2D.Kinematic;
+
+            //// Đảm bảo nó vẫn tham gia tính toán vật lý
+            //rigiBody.simulated = true;
+            //coll.isTrigger = true;
+
+        }
+       
+
+        public void Clear()
+        {
+            foreach (Transform tr in GetComponentInChildren<Transform>())
+            {
+                //tr.SetParent(tr.GetComponent<IScenePrefabWorldBound>().Owner.GoWorld.transform);
+                Destroy(tr.gameObject);
+            }
+        }
+
+        public IScenePrefabWorldBound FindByOwner(IScenePrefab chunk)
+        {
+            return coll.GetComponentsInChildren<IScenePrefabWorldBound>(true).FirstOrDefault(p => p.Owner == chunk);
+        }
+#if UNITY_EDITOR
+        private void OnDrawGizmos()
+        {
+            if (currentBound.Points.Length == 0) return;
+            GizmosExtension.DrawLine(
+                currentBound.Points[currentBound.Left.Start],
+                currentBound.Points[currentBound.Left.End]);
+            
+        }
+        //private void OnDestroy()
+        //{
+        //    Debug.Log("loi");
+        //}
+    }
+#endif
+}

@@ -1,0 +1,66 @@
+﻿using System.Collections;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using UnityEngine;
+using UnityEngine.U2D.Animation;
+using UnityEngine.U2D.IK;
+
+namespace unvs.ext
+{
+    public static class SpriteSkinExtension
+    {
+        public static void CreateIK(this SpriteSkin[] sprites)
+        {
+            
+            var bones = sprites.SelectMany(p => p.boneTransforms);
+            foreach (var bone in bones)
+            {
+                Debug.Log($"ExtractAllSpriteSkins {bone.name}");
+            }
+            Transform rootBone = TransformExt.GetRoot(bones);
+
+            var ik = rootBone.AddComponentIfNotExist<IKManager2D>();
+
+
+            //IKManager2D ret= ik.AddChildIfNotExist<LimbSolver2D>(nameOfSover);
+            //var ls=rootBone.transform.CreateIfNoExist<LimbSolver2D>(nameOfSover);
+            var leafs = bones.GetAllLeafBones();
+            foreach (var bone in leafs)
+            {
+                Debug.Log($"ExtractAllSpriteSkins.GetAllLeafBones {bone.name}");
+            }
+            foreach (var bone in leafs)
+            {
+                var nameOfSover = $"{bone.name}_solver";
+                var nameOfTarget = $"{bone.name}_target";
+                //if (ik.solvers.FirstOrDefault(p => p.name == nameOfTarget) != null) continue;
+                var ret = rootBone.AddChildIfNotExist<LimbSolver2D>(nameOfSover);
+                if (ret == null)
+                {
+                    throw new System.Exception($"ik.AddChildIfNotExist<LimbSolver2D>({nameOfSover}) fail");
+                }
+                if (ik.solvers.FirstOrDefault(p => p.name == nameOfTarget) == null)
+                {
+                    ik.AddSolver(ret);
+                }
+                //ik.AddSolver(ret);
+
+                var ch = ret.GetChain(0);
+                if (ch == null)
+                {
+                    Debug.LogError($"{ret.name} GetChain is null");
+                    return;
+                }
+                if (ch.target == null)
+                {
+                    ch.target = ret.AddChildIfNotExist<Transform>(nameOfTarget);
+
+                }
+                ch.target.transform.position = bone.transform.position;
+                ch.effector = bone;
+                //Debug.Log($"CreateAllIK {rootBone.name}->{nameOfSover} {nameOfTarget}");
+
+            }
+        }
+    }
+}

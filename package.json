@@ -1,0 +1,15 @@
+{
+  "name": "com.unvs.core",
+  "version": "1.0.0",
+  "displayName": "UNVS Game Core",
+  "description": "Cung cấp các tính năng cốt lõi cho game 2.5D",
+  "unity": "2021.3",
+  "author": {
+    "name": "nttlong"
+  },
+"dependencies": {
+	"com.unity.cinemachine": "3.1.6",
+"com.unity.localization": "1.5.11",
+"com.unity.textmeshpro": "3.0.6"
+}
+} 

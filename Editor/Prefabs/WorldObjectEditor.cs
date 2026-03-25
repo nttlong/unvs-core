@@ -1,0 +1,101 @@
+﻿#if UNITY_EDITOR
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEditor;
+
+using UnityEditor.AddressableAssets.Settings;
+using UnityEngine;
+using UnityEditor.AddressableAssets;
+using System;
+using unvs.interfaces;
+using unvs.shares;
+
+public class WorldObjectEditor
+{
+    // Thêm lựa chọn vào menu chuột phải của Hierarchy
+    // Priority 10 giúp nó nằm ở nhóm trên cùng
+    [MenuItem("Assets/Play This World", false, 100)]
+    private static void PlayWorldFromAsset(MenuCommand menuCommand)
+    {
+
+        GameObject selectedPrefab = Selection.activeObject as GameObject;
+
+        // Kiểm tra xem có phải là Prefab và có gắn IScene không
+        if (selectedPrefab != null)
+        {
+            IScenePrefab sceneObj = selectedPrefab.GetComponent<IScenePrefab>();
+            if (sceneObj != null)
+            {
+                // 2. Lấy Addressable Path hoặc Path thông thường
+                // Ở đây mình ví dụ lấy path đơn giản để nạp
+                string assetPath = AssetDatabase.GetAssetPath(selectedPrefab);
+
+                // Lưu vào EditorPrefs để SingleSceneController đọc
+                EditorPrefs.SetString("PendingWorldPath", assetPath);
+
+                // 3. Mở scene Single và Play
+                OpenSingleSceneAndPlay();
+            }
+            else
+            {
+                EditorUtility.DisplayDialog("Lỗi", "Prefab này không có Component IScene!", "OK");
+            }
+        }
+    }
+
+    [MenuItem("Assets/Play This World", true)]
+    private static bool ValidatePlayWorldFromProject()
+    {
+        return Selection.activeObject is GameObject go && go.GetComponent<IScenePrefab>() != null;
+    }
+
+    private static void OpenSingleSceneAndPlay()
+    {
+        if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+        {
+            var sceneName = Constants.Scenes.MAIN_SCENE;
+            string[] guids = AssetDatabase.FindAssets($"{sceneName} t:Scene");
+            if (guids.Length > 0)
+            {
+                string scenePath = AssetDatabase.GUIDToAssetPath(guids[0]);
+                EditorSceneManager.OpenScene(scenePath);
+                EditorApplication.isPlaying = true;
+            }
+        }
+    }
+    
+}
+
+
+
+public static class AddressableHelper
+{
+    public static string GetAddressablePath(GameObject prefab)
+    {
+        if (prefab == null) return string.Empty;
+
+        // Tìm GUID của Asset dựa trên đối tượng GameObject
+        string path = AssetDatabase.GetAssetPath(prefab);
+        string guid = AssetDatabase.AssetPathToGUID(path);
+
+        // Truy cập cài đặt Addressables hiện tại của dự án
+        AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
+        if (settings != null)
+        {
+            // Tìm kiếm Entry (thông tin đăng ký) của Asset này trong Addressables
+            AddressableAssetEntry entry = settings.FindAssetEntry(guid);
+
+            if (entry != null)
+            {
+                return entry.address; // Đây chính là Addressable Path bạn cần
+            }
+        }
+
+        Debug.LogWarning("Object này chưa được đánh dấu là Addressable!");
+        return string.Empty;
+    }
+}
+// --- PHẦN TỰ ĐỘNG MỞ LẠI PREFAB SAU KHI STOP ---
+
+#endif
