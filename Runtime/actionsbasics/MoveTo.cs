@@ -23,7 +23,8 @@ namespace unvs.actionsbasics
             var actor = target.GetComponent<IActorObject>();
             if (actor != null)
             {
-                await actor.MoveToAsync(iteractSource.GetPosition(), sender.Cts);
+                actor.Motion.Walk();
+                await actor.MoveToAsync(iteractSource.GetPosition(), sender.Cts.Token);
             }
             else
             {

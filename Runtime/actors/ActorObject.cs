@@ -10,6 +10,7 @@ using UnityEngine.Rendering;
 using UnityEngine.U2D.Animation;
 using unvs.actors.actions;
 using unvs.ext;
+using unvs.gameobjects;
 using unvs.interfaces;
 using unvs.shares;
 using unvs.sys;
@@ -129,7 +130,7 @@ namespace unvs.actors
         {
             _ = CamWacher;
             if (!Application.isPlaying) return;
-           
+
             instance = this;
             motion = GetComponent<IActorMotion>();
             movable = GetComponent<ActorMovableObject>();
@@ -145,8 +146,8 @@ namespace unvs.actors
                 InitActionController();
             if (!IsActive)
             {
-                this.SetMeOnLayer(Constants.Layers.NPC,true);
-                
+                this.SetMeOnLayer(Constants.Layers.NPC, true);
+
 
             }
             else
@@ -166,7 +167,7 @@ namespace unvs.actors
                 this.Cts = this.Cts.Refresh();
                 controller.IsMoving = true;
                 controller.Direction = dir;
-                
+
                 Motion.Anim.Play("Motions.Walk");
 
                 Motion.Flip(dir.x);
@@ -176,7 +177,7 @@ namespace unvs.actors
             controller.OnStop = () =>
             {
                 this.Cts = this.Cts.Refresh();
-                
+
                 Motion.Idle();
                 //direction = Vector2.negativeInfinity;
                 controller.Speed = 0;
@@ -185,7 +186,7 @@ namespace unvs.actors
             controller.OnSprint = (dir) =>
             {
                 this.Cts = this.Cts.Refresh();
-             
+
                 controller.Speed = Movable.RunSpeed;
                 controller.Direction = dir;
                 Motion.Anim.Play("Motions.Run");
@@ -195,8 +196,14 @@ namespace unvs.actors
                 var interactObject = go.GetComponent<IInteractableObject>();
                 if (interactObject != null)
                 {
+                    var oldSpeed = controller.Speed;
+                    controller.Speed = 0;
                     this.Cts = this.Cts.Refresh();
-                    interactObject.ExecAsync(this, this.Cts).Forget();
+                    interactObject.ExecAsync(this, this.Cts).ContinueWith(p =>
+                    {
+                        controller.IsInteracting = false;
+                        controller.Speed = oldSpeed;
+                    }).Forget();
                 }
                 //Speaker.SayText($"OnInteract {go.name}");
             };
@@ -226,14 +233,15 @@ namespace unvs.actors
 
 
 
-        public async UniTask MoveToAsync(Vector2 Pos, CancellationTokenSource ct)
+        public async UniTask MoveToAsync(Vector2 Pos, CancellationToken ct)
         {
             if (ct == null)
             {
                 return;
             }
+           
             if (ct.IsCancellationRequested) return;
-            ct.Token.ThrowIfCancellationRequested();
+            ct.ThrowIfCancellationRequested();
             var speaker = GetComponent<ISpeakableObject>();
 
             try
@@ -251,7 +259,8 @@ namespace unvs.actors
                     Physical.Direction = p.Direction > 0 ? DirectionEnum.Forward : DirectionEnum.Backward;
 
                 }, ct);
-                this.Motion.Anim.Play("Motions.Idle");
+                if (!ct.IsCancellationRequested) // if not cancel -> finished routine
+                    this.Motion.Anim.Play("Motions.Idle");
             }
             catch (System.OperationCanceledException)
             {
@@ -279,8 +288,9 @@ namespace unvs.actors
         }
         void FixedUpdate()
         {
+            Speaker.SayText($"IsInteracting={controller.IsInteracting}");
             if (rb == null || controller == null) return;
-
+            if (controller.IsInteracting ) return;
             int contactCount = rb.GetContacts(floorFilter, contacts);
             bool isGrounded = false;
             Vector2 groundNormal = Vector2.up;

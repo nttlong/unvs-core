@@ -1,12 +1,18 @@
 using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks.Triggers;
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 using unvs.ext;
+using unvs.gameobjects;
 using unvs.interfaces;
 namespace unvs.actors.actions
 {
     public class ActorsControllers : MonoBehaviour
     {
+        private GameObject currentTaget;
+        public bool isMouseButtonIsDowning;
+
         public Action<Vector2> OnMoving { get; set; }
         public Action OnStop { get; set; }
 
@@ -17,7 +23,8 @@ namespace unvs.actors.actions
         public float Speed { get; set; }
         public Action<GameObject> OnInteract { get; set; }
         public bool IsSprint { get; set; }
-        public bool IsInteracting { get; private set; }
+        
+        public bool IsInteracting { get;  set; }
 
         public Vector2 CalculateDiection(Vector2 v)
         {
@@ -38,6 +45,7 @@ namespace unvs.actors.actions
         /// <param name="vector2"></param>
         public void ControlsPlayerMoveStart(Vector2 vector2)
         {
+           
             Direction = CalculateDiection(vector2);
             IsMoving = true;
             if (IsSprint) OnSprint?.Invoke(Direction);
@@ -105,25 +113,17 @@ namespace unvs.actors.actions
             GameObject scanResult = null;
             if (isUsingMouse)
             {
-                /*
-                 * If is mouse using use 
-                 */
+                isMouseButtonIsDowning = true;
+                
                 var input = vector2ScreenCoordinate.ToWorld();
-                //If is mouse using use 
-                scanResult = interactable.GetObject(input);
-
-                if (scanResult == null)
-                {
-                    var actorPos = actor.Coll.bounds.center;
-                    Direction = new Vector2(actorPos.x > input.x ? -1 : 1, 0);
-                    IsMoving = true;
-                    if (IsSprint)
-                    {
-                        OnSprint?.Invoke(Direction);
-                    }
-                    OnMoving?.Invoke(Direction);
-                    return;
-                }
+                
+                if (IsMoving) return;
+                IsInteracting = false;
+                var actorPos = actor.Coll.bounds.center;
+                Direction = new Vector2(actorPos.x > input.x ? -1 : 1, 0);
+                IsMoving = true;
+                OnMoving?.Invoke(Direction);
+               
 
             }
             else
@@ -149,20 +149,38 @@ namespace unvs.actors.actions
         /// </code>
         /// </summary>
         /// <param name="IsUsingMouse"></param>
-        public void ControlsPlayerInteractCanceled(bool IsUsingMouse)
+        public void ControlsPlayerInteractCanceled(Vector2 vector2ScreenCoordinate, bool IsUsingMouse)
         {
             if (IsUsingMouse)
             {
-                if (IsInteracting)
+                isMouseButtonIsDowning = false;
+                var actor = GetComponent<IActorObject>();
+                var interactable = actor.Interactable;
+                var input = vector2ScreenCoordinate.ToWorld();
+                //If is mouse using use 
+                var scanResult = interactable.GetObject(input);
+               
+                if (scanResult != null)
                 {
-                    IsInteracting = false;
+                    IsInteracting = true;
+                    IsMoving = false;
+                    IsSprint = false;
+                    OnInteract?.Invoke(scanResult);
+                   
+                    this.currentTaget = scanResult;
                     return;
+                } else
+                {
+                    IsInteracting=false;
+                    IsMoving = false;
+                    IsSprint = false;
+                    OnStop?.Invoke();
                 }
-
+                
             }
-            IsMoving = false;
-            IsSprint = false;
-            OnStop?.Invoke();
+           
+            
+            
         }
     }
 }

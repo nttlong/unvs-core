@@ -97,5 +97,145 @@ namespace unvs.ext
             intersect.y = p1.y + u * (p2.y - p1.y);
             return true;
         }
+
+        /// <summary>
+        /// Thiết lập kích thước cho BoxCollider2D một cách nhanh chóng.
+        /// </summary>
+        /// <param name="coll">Đối tượng Collider cần chỉnh</param>
+        /// <param name="width">Chiều rộng (x)</param>
+        /// <param name="height">Chiều cao (y)</param>
+        public static void SetSize(this BoxCollider2D coll, float width, float height)
+        {
+            if (coll == null)
+            {
+                Debug.LogError("SetSize: BoxCollider2D is null!");
+                return;
+            }
+
+            // Gán trực tiếp Vector2 vào size
+            coll.size = new Vector2(width, height);
+        }
+        public static void SetSizeWorld(this SpriteRenderer renderer, float targetWidth, float targetHeight)
+        {
+            if (renderer == null || renderer.sprite == null) return;
+
+            // Kích thước thực tế của Sprite trong không gian World (chưa tính Scale)
+            float worldWidth = renderer.sprite.bounds.size.x;
+            float worldHeight = renderer.sprite.bounds.size.y;
+
+            // Tính toán tỷ lệ Scale cần thiết
+            float newScaleX = targetWidth / worldWidth;
+            float newScaleY = targetHeight / worldHeight;
+
+            renderer.transform.localScale = new Vector3(newScaleX, newScaleY, 1f);
+        }
+        public static void SyncColliderSize(this BoxCollider2D coll, SpriteRenderer renderer)
+        {
+            if (coll == null || renderer == null || renderer.sprite == null) return;
+
+            // Lấy kích thước của Sprite (đã tính đến Pixels Per Unit - PPU)
+            // renderer.sprite.bounds.size trả về kích thước gốc của sprite trong World Space
+            Vector2 spriteSize = renderer.sprite.bounds.size;
+
+            // Gán size cho Collider (Lưu ý: size của Collider là Local)
+            // Ta phải chia cho scale của chính nó để bù trừ nếu transform có scale != 1
+            Vector3 localScale = coll.transform.localScale;
+            coll.size = new Vector2(spriteSize.x / localScale.x, spriteSize.y / localScale.y);
+
+            // Nếu bạn muốn tâm của Collider khớp với tâm của Sprite
+            coll.offset = renderer.sprite.bounds.center - coll.transform.position;
+        }
+        /// <summary>
+        /// Ép SpriteRenderer phải co giãn vừa khít với kích thước của BoxCollider2D.
+        /// Chỉ nên dùng trong Editor Mode.
+        /// </summary>
+        public static void SyncSpriteToCollider(this BoxCollider2D coll, SpriteRenderer renderer)
+        {
+            if (coll == null || renderer == null || renderer.sprite == null) return;
+
+            // 1. Lấy kích thước thực tế của Sprite gốc (World Units - chưa tính scale)
+            // Sprite.bounds.size cho biết tấm ảnh này to bao nhiêu unit nếu scale = 1
+            Vector2 spriteOriginalSize = renderer.sprite.bounds.size;
+
+            // 2. Lấy kích thước mong muốn từ BoxCollider2D (Local Size)
+            Vector2 targetSize = coll.size;
+
+            // 3. Tính toán LocalScale mới cho Transform
+            // Tỷ lệ = Kích thước Collider / Kích thước gốc của Sprite
+            float newScaleX = targetSize.x / spriteOriginalSize.x;
+            float newScaleY = targetSize.y / spriteOriginalSize.y;
+
+            renderer.transform.localScale = new Vector3(newScaleX, newScaleY, 1f);
+
+            // 4. Đồng bộ vị trí (Offset) nếu cần
+            // Nếu Pivot của Sprite không nằm ở giữa, bạn cần chỉnh thêm localPosition
+            renderer.transform.localPosition = coll.offset;
+
+            Debug.Log($"[Editor] Resized Sprite to match Collider: {targetSize}");
+        }
+        public static void FitSpriteToBoxCollider(this SpriteRenderer renderer, BoxCollider2D coll)
+        {
+            if (renderer == null || coll == null || renderer.sprite == null) return;
+
+            // 1. Lấy kích thước thực tế của cái ảnh (tính bằng Unit trong World)
+            // Ví dụ: Ảnh 100px, PPU 100 => Size = 1 Unit.
+            Vector2 spriteUnitSize = renderer.sprite.rect.size / renderer.sprite.pixelsPerUnit;
+
+            // 2. Lấy kích thước bạn đã kéo trong BoxCollider2D (Local Size)
+            Vector2 targetSize = coll.size;
+
+            // 3. Tính toán tỷ lệ Scale cần thiết để "ép" ảnh giãn ra
+            float newScaleX = targetSize.x / spriteUnitSize.x;
+            float newScaleY = targetSize.y / spriteUnitSize.y;
+
+            // 4. Áp vào Scale của Transform
+            renderer.transform.localScale = new Vector3(newScaleX, newScaleY, 1f);
+
+            // 5. Căn chỉnh tâm (Offset)
+            renderer.transform.localPosition = coll.offset;
+        }
+        public static void ForceFitSpriteToCollider(this SpriteRenderer renderer, BoxCollider2D coll)
+        {
+            if (renderer == null || coll == null || renderer.sprite == null) return;
+
+            // 1. Tính toán kích thước chuẩn của Sprite Asset (đơn vị World Unit)
+            // sprite.bounds.size trả về kích thước dựa trên PPU và Rect gốc
+            Vector2 spriteOriginalSize = renderer.sprite.bounds.size;
+
+            // 2. Tính toán tỷ lệ Scale cần thiết dựa trên Size của Collider
+            // Chúng ta dùng coll.size (Local) vì ta đang chỉnh Scale của chính nó
+            float newScaleX = coll.size.x / spriteOriginalSize.x;
+            float newScaleY = coll.size.y / spriteOriginalSize.y;
+
+            renderer.transform.localScale = new Vector3(newScaleX, newScaleY, 1f);
+
+            // 3. Xử lý phần lệch tâm (Quan trọng nhất)
+            // BoxCollider2D có thuộc tính offset, nếu offset khác (0,0) nó sẽ bị lệch như hình của bạn
+            // Ta dịch chuyển Local Position của Transform để bù trừ vào cái Offset đó
+            renderer.transform.localPosition = (Vector3)coll.offset;
+
+            // Nếu Sprite và Collider nằm trên 2 Object khác nhau (cha-con), 
+            // bạn cần đảm bảo tọa độ được tính toán trong cùng một Space.
+        }
+        public static void FitSpriteToColliderCorrect(this SpriteRenderer renderer, BoxCollider2D coll)
+        {
+            if (renderer == null || coll == null || renderer.sprite == null) return;
+
+            // 1. Lấy size thực tế của Sprite gốc (World Units)
+            Vector2 spriteUnitSize = renderer.sprite.rect.size / renderer.sprite.pixelsPerUnit;
+
+            // 2. Tính Scale dựa trên Size của Collider
+            // Chỉ chỉnh Scale, KHÔNG chỉnh Position của chính nó nếu chung 1 Object
+            float newScaleX = coll.size.x / spriteUnitSize.x;
+            float newScaleY = coll.size.y / spriteUnitSize.y;
+
+            renderer.transform.localScale = new Vector3(newScaleX, newScaleY, 1f);
+
+            // 3. Xử lý Offset: Chỉ chỉnh Offset của Collider về 0 để khớp với Tâm Sprite
+            // Thay vì bắt Sprite chạy theo Collider, hãy bắt Collider nằm giữa Sprite
+            coll.offset = Vector2.zero;
+
+            Debug.Log("Success: Sprite and Collider are now perfectly aligned at Center.");
+        }
     }
 }

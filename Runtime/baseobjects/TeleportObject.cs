@@ -7,6 +7,7 @@ using UnityEngine.Rendering;
 using unvs.actions;
 using unvs.ext;
 using unvs.interfaces;
+using unvs.shares;
 namespace unvs.baseobjects
 {
     [ExecuteInEditMode]
@@ -91,24 +92,53 @@ namespace unvs.baseobjects
 
         private void Awake()
         {
-            GetComponent<SpriteRenderer>()?.ApplyTextureIfEmptySprite(texT);
+            if(spriteRenderer==null) spriteRenderer=GetComponent<SpriteRenderer>();
+            if (sprite == null)
+            {
+                sprite = Commons.LoadAsset<Sprite>("Packages/com.unvs.core/Runtime/Sprites/Square.png");
+                
+                spriteRenderer.sprite = sprite;
+            }
+            if (coll == null)
+            {
+                GetComponent<BoxCollider2D>().SetSize(2.5f, 2.5f);
+                spriteRenderer.SetSizeWorld(2.5f, 2.5f);
+            }
             coll = GetComponent<BoxCollider2D>();
            // coll?.Resize(transform);
             if (coll!=null) 
             coll.isTrigger = true;
+            
+            if(Application.isPlaying)
             this.SetMeOnLayer(unvs.shares.Constants.Layers.INTERACT_OBJECT);
         }
 #if UNITY_EDITOR
+        private void OnDrawGizmos()
+        {
+            if (Application.isPlaying)
+            {
+                return;
+            }
+            spriteRenderer = GetComponent<SpriteRenderer>();
+            coll = GetComponent<BoxCollider2D>();
+            if (spriteRenderer != null && coll != null)
+            {
+                spriteRenderer.FitSpriteToColliderCorrect(coll);
+            }
+        }
         private void OnValidate()
         {
 #if UNITY_EDITOR
            this.sprite= GetComponent<SpriteRenderer>()?.ApplyTextureIfEmptySprite(texT);
-            UnityEditor.EditorUtility.SetDirty(this);
-#endif
             
+            
+            UnityEditor.EditorUtility.SetDirty(this);
+            
+#endif
+
             //if(!Application.isPlaying)
             //GetComponent<BoxCollider2D>()?.Resize(transform);
-            
+
         }
 #endif
     }

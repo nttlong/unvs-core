@@ -22,7 +22,7 @@ namespace unvs.actionsbasics
             var dir = actor.Coll.bounds.center.x < pos.x ? 1 : -1;
             pos = new Vector2(pos.x-dir*armLen,pos.y);
             if(Mathf.Abs( actor.Coll.bounds.center.x- pos.x)> PreciseDistance){
-                await actor.MoveToAsync(pos, Sender.Cts);
+                await actor.MoveToAsync(pos, Sender.Cts.Token);
             }
            
             actor.Physical.Direction = dir > 0 ? DirectionEnum.Forward : DirectionEnum.Backward;

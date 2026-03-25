@@ -22,7 +22,7 @@ namespace unvs.interfaces
         ActorsControllers Controller { get; }
         bool IsActive { get; set; }
 
-        UniTask MoveToAsync(Vector2 Pos, CancellationTokenSource ct);
+        UniTask MoveToAsync(Vector2 Pos, CancellationToken ct);
        
 
         Action OnDestroying { get; set; }

@@ -9,5 +9,6 @@ namespace unvs.interfaces
 
         void Flip(float x);
         void Idle();
+        void Walk();
     }
 }

@@ -71,7 +71,7 @@ namespace unvs.ext
             return Math.Abs(dx);
 
         }
-        public static async UniTask<MoveInfo2D> MoveToAsync(this Transform transform, float Speed, Vector2 target, Action<MoveInfo2D> OnMoving, CancellationTokenSource ct)
+        public static async UniTask<MoveInfo2D> MoveToAsync(this Transform transform, float Speed, Vector2 target, Action<MoveInfo2D> OnMoving, CancellationToken ct)
         {
 
             var ret = new MoveInfo2D();
@@ -80,7 +80,7 @@ namespace unvs.ext
                 return ret;
             }
             if (ct.IsCancellationRequested) return ret;
-            ct.Token.ThrowIfCancellationRequested();
+            ct.ThrowIfCancellationRequested();
             try
             {
 
@@ -101,7 +101,7 @@ namespace unvs.ext
                         return ret;
                     }
                     // Chờ đến frame tiếp theo
-                    await UniTask.Yield(PlayerLoopTiming.Update, ct.Token);
+                    await UniTask.Yield(PlayerLoopTiming.Update, ct);
 
                     // Tiếp tục di chuyển và cập nhật ds
                     ds = transform.MoveStep(target, Speed, out dir);

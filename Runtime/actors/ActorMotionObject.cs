@@ -76,6 +76,11 @@ namespace unvs.actors
             if(Application.isPlaying) return;
             EditorTimeSetup();
         }
+
+        public void Walk()
+        {//"Motions.Walk"
+            anim.Play("Motions.Walk");
+        }
 #endif
     }
 }
