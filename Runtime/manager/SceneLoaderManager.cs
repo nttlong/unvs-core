@@ -176,10 +176,7 @@ namespace unvs.manager
             await ClearAsync();
             var scene = await Commons.LoadPrefabsAsync<IScenePrefab>(pathToWord, this.tempLoader);
             OnLoadBegin?.Invoke(scene,LoadTypeEnum.New);
-            //if (scene.Actor != null)
-            //{
-            //    (scene.Actor as MonoBehaviour).enabled = false;
-            //}
+            
 
             scene.TrimEdge();
             Instance.SetupLayout(scene);
@@ -194,10 +191,7 @@ namespace unvs.manager
             OnLoadComplete?.Invoke(scene,LoadTypeEnum.New);
             
             LightManagerObject.Add(scene);
-            //if (scene.Actor != null)
-            //{
-            //    (scene.Actor as MonoBehaviour).enabled = true;
-            //}
+           
             this.InitActor(scene, targetName);
             await GlobalApplication.FadeScreenController.FadeOutAsync();
             
@@ -296,7 +290,7 @@ namespace unvs.manager
 
         public void SetUpCam(IScenePrefab scene)
         {
-            SingleScene.Instance.Cam.GetComponent<ICam>().UpdateSizeByOrthoGraphicSize(scene.OrthographicSize);
+            SingleScene.Instance.Cam.GetComponent<ICam>().Body.UpdateSizeByLensSettings(SingleScene.Instance.VCam.Lens);
         }
 
         public async UniTask<IScenePrefab> LoadChunksAsync(ITriggerZone triggerZone)

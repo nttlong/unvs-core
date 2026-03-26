@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using Unity.Burst;
+using Unity.Cinemachine;
 using UnityEngine;
 
 namespace unvs.ext
@@ -236,6 +237,24 @@ namespace unvs.ext
             coll.offset = Vector2.zero;
 
             Debug.Log("Success: Sprite and Collider are now perfectly aligned at Center.");
+        }
+        public static void UpdateSizeByLensSettings(this BoxCollider2D box, LensSettings lens)
+        {
+            //if (cam == null || box == null) return;
+            //if (!cam.orthographic)
+            //{
+            //    Debug.LogError("Camera must be Orthographic");
+            //    return;
+            //}
+
+            float height = lens.OrthographicSize * 2f;
+            float width = height * lens.Aspect;
+            float depth = lens.FarClipPlane - lens.NearClipPlane;
+
+            box.size = new Vector3(width, height, depth);
+
+            // Đưa collider nằm đúng vùng nhìn của camera (center theo camera)
+            box.offset = new Vector3(0f, 0f, lens.NearClipPlane + depth * 0.5f);
         }
     }
 }

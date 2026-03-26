@@ -72,7 +72,11 @@ namespace unvs.ext
                 // Nếu không có confiner, chỉ cần ForcePosition là đủ
                 vcam.ForceCameraPosition(vcam.transform.position, vcam.transform.rotation);
             }
-
+            var bodyCam = Camera.main.GetComponentInChildren<ICamBody>();
+            if(bodyCam != null)
+            {
+                bodyCam.UpdateSizeByLensSettings(vcam.Lens);
+            }
         }
         public static void UpdateDamping(this CinemachineCamera vcam, float DampingValue = 5f)
         {
@@ -162,6 +166,11 @@ namespace unvs.ext
                 {
                     confiner.InvalidateBoundingShapeCache();
                     confiner.Damping = originalDamping;
+                }
+                var body = Camera.main.GetComponentInChildren<ICamBody>();
+                if (body != null)
+                {
+                    body.UpdateSizeByLensSettings(vcam.Lens);
                 }
             }
             catch (System.OperationCanceledException) { throw; }

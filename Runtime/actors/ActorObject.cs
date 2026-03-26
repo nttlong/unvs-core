@@ -11,6 +11,7 @@ using UnityEngine.U2D.Animation;
 using unvs.actors.actions;
 using unvs.ext;
 using unvs.gameobjects;
+using unvs.gameword;
 using unvs.interfaces;
 using unvs.shares;
 using unvs.sys;
@@ -258,9 +259,12 @@ namespace unvs.actors
                 {
                     Physical.Direction = p.Direction > 0 ? DirectionEnum.Forward : DirectionEnum.Backward;
 
-                }, ct);
-                if (!ct.IsCancellationRequested) // if not cancel -> finished routine
+                }, p =>
+                {
                     this.Motion.Anim.Play("Motions.Idle");
+                }, ct);
+                //if (!ct.IsCancellationRequested) // if not cancel -> finished routine
+                    
             }
             catch (System.OperationCanceledException)
             {
@@ -288,6 +292,7 @@ namespace unvs.actors
         }
         void FixedUpdate()
         {
+            if(controller!=null)
             Speaker.SayText($"IsInteracting={controller.IsInteracting}");
             if (rb == null || controller == null) return;
             if (controller.IsInteracting ) return;

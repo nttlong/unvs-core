@@ -899,13 +899,29 @@ namespace unvs.ext
             }
             return ret; 
         }
-        public static void ClearRotaionAndScale(this PolygonCollider2D coll, float scaleRatio = 1.03f)
+        public enum AxisScaleEnum
+        {
+            x=1, y=2,both=3
+        }
+        public static void ClearRotaionAndScale(this PolygonCollider2D coll, float scaleRatio = 1.03f, AxisScaleEnum axis=AxisScaleEnum.y)
         {
             var ret = new Vector2[coll.points.Length];
             for (var i = 0; i < ret.Length; i++)
             {
                 ret[i] = coll.transform.rotation * (coll.points[i] );
-                ret[i] = (scaleRatio * coll.transform.localScale)* ret[i];
+                switch (axis)
+                {
+                    case AxisScaleEnum.both:
+                        ret[i] = (scaleRatio * coll.transform.localScale) * ret[i];
+                        break;
+                        case AxisScaleEnum.x:
+                        ret[i] = (new  Vector2(coll.transform.localScale.x * scaleRatio, coll.transform.localScale.y )) * ret[i];
+                        break;
+                        case AxisScaleEnum.y:
+                        ret[i] = (new Vector2(coll.transform.localScale.x , coll.transform.localScale.y * scaleRatio)) * ret[i];
+                        break;
+                }
+                
             }
             coll.points = ret;
             coll.transform.localScale = new Vector3(1, 1, 1);

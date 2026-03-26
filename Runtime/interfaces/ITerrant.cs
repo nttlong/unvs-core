@@ -1,3 +1,4 @@
+using Unity.Cinemachine;
 using UnityEditor;
 using UnityEngine;
 namespace unvs.interfaces
@@ -37,7 +38,9 @@ namespace unvs.interfaces
 
     public interface ICamBody
     {
-
+        ICamCenterCamTracking Tracker { get; }
+        //void AlignCeter(BoxCollider2D master, float watcherSize = 0.1f);
+        void UpdateSizeByLensSettings(LensSettings lens);
     }
 
 }

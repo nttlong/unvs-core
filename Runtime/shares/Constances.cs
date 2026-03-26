@@ -82,6 +82,8 @@ namespace unvs.shares
             public const string MY_WORLD_BOUND  = "MyWorldBound";
 
             public const string CAM_WATCHER = "cam-watcher";
+            public const string CAM_TRACKER = "CAM-TRACKER";
+            public const string CAM_TRACKER_BODY = "CAM-TRACKER-BODY";
         }
     }
 }

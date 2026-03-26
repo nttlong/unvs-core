@@ -59,18 +59,18 @@ namespace unvs.gameword
             if (camWacher.Coll.bounds.center != lastPos && !this.stop && nearestScene!=null)
             {
                 this.stop = true;
-                //lastScenesTracking = Clone(tracker.ScensHit);
+                
 
                 var ascynValue = SingleScene.Instance.VCam.SetOrthoSizeSmoothlyAsync(nearestScene.OrthographicSize, 2f);
 
-                ascynValue.ContinueWith(async () =>
+                ascynValue.ContinueWith(() =>
                 {
                     if (nearestScene == null || nearestScene.IsDestroying) return;
                     this.stop = false;
                     tracker.Clear();
                     currentSceneWatch = nearestScene;
+
                     
-                    //await WorldMonitorManager.RaiseChangeSceneAsync(nearestScene);
 
 
                 }).Forget();

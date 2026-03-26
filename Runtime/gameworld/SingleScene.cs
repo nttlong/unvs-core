@@ -164,12 +164,12 @@ namespace unvs.gameword
 
             _ = Instance.Cam;
             _ = Instance.VCam;
-            if (cam == null)
-            {
-                cam = Camera.main;
-                if (cam != null)
-                    cam.AddComponentIfNotExist<CamObject>();
-            }
+            //if (cam == null)
+            //{
+            //    cam = Camera.main;
+            //    if (cam != null)
+            //        cam.AddComponentIfNotExist<CamObject>();
+            //}
             unvs.shares.GlobalApplication.SingleScene = this;
             if (goSceneLoader == null)
             {
