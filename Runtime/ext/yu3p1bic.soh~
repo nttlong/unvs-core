@@ -116,7 +116,6 @@ namespace unvs.ext
 
                 case DockDirection.Top:
                     // Anchor dính lề trên, trải dài từ trái sang phải
-                    panel.SetPosition(0, heightOrWidthInPx, Commons.GetScreenSize().x, heightOrWidthInPx);
                     rect.anchorMin = new Vector2(0, 1);
                     rect.anchorMax = new Vector2(1, 1);
                     rect.pivot = new Vector2(0.5f, 1);

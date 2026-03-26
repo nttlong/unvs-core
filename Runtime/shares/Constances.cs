@@ -84,6 +84,12 @@ namespace unvs.shares
             public const string CAM_WATCHER = "cam-watcher";
             public const string CAM_TRACKER = "CAM-TRACKER";
             public const string CAM_TRACKER_BODY = "CAM-TRACKER-BODY";
+            public const string HUB_CANVAS = "HUB-CANVAS";
+            public const string HUB_PANEL = "HUB-PANEL";
+        }
+        public class Settings
+        {
+            public const float DEFAULT_WORLD_BOUND_SCALE = 1.1f;
         }
     }
 }

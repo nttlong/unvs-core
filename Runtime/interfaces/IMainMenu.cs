@@ -19,6 +19,7 @@ namespace unvs.interfaces
     }
     public interface IUIHub
     {
+        float Height { get; }
         Canvas HubCanvas { get; }
         Image HubPanel { get; }
         void Hide();

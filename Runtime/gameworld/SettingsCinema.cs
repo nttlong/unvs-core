@@ -6,6 +6,7 @@ using UnityEngine;
 using unvs.ext;
 using unvs.gameword;
 using unvs.interfaces;
+using static Unity.Cinemachine.CinemachineBrain;
 
 namespace unvs.gameworld
 {
@@ -48,7 +49,16 @@ namespace unvs.gameworld
             vCam.Lens.OrthographicSize = 20f;
             vCam.Lens.NearClipPlane = 0.5f;
             vCam.Lens.FarClipPlane = 1000f;
+            vCam.Lens.ModeOverride = LensSettings.OverrideModes.Orthographic;
+            brain.LensModeOverride = new LensModeOverrideSettings
+            {
+                
+                Enabled = true,
+            };
             vCam.transform.position = new Vector3(0, 0, -10);
+            vCam.Priority = new PrioritySettings {
+                Enabled = true,
+            };
         }
         private void Start()
         {

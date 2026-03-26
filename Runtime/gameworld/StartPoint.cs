@@ -47,7 +47,7 @@ namespace unvs.gameword
         private void Start()
         {
 
-            sprite.gameObject.HideWhenPlaying();
+            gameObject.HideWhenPlaying();
         }
         private void OnValidate()
         {

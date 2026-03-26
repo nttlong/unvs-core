@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using unvs.ext;
+using unvs.gameword;
 using unvs.interfaces;
 using unvs.shares;
 namespace unvs.ui
@@ -15,10 +16,13 @@ namespace unvs.ui
     {
         private Canvas hubCanvas;
         private Image hubPanel;
+        public float height=-1;
 
         public Canvas HubCanvas => hubCanvas;
 
         public Image HubPanel => hubPanel;
+
+        public float Height => height;
 
         public void Hide()
         {
@@ -40,15 +44,33 @@ namespace unvs.ui
 
         private void Awake()
         {
-            hubCanvas = this.AddChildComponentIfNotExist<Canvas>("HubCanvas");
-            hubPanel = hubCanvas.transform.AddChildComponentIfNotExist<Image>("HubPanel");
+            hubCanvas = this.AddChildComponentIfNotExist<Canvas>(Constants.ObjectsConst.HUB_CANVAS);
+            hubPanel = hubCanvas.transform.AddChildComponentIfNotExist<Image>(Constants.ObjectsConst.HUB_PANEL);
 
         }
         private void Start()
         {
-            if(Application.isPlaying)
-            GlobalApplication.UIHub = this as IUIHub;
-            this.Hide();
+            if (Application.isPlaying) {
+                this.Hide();
+                this.HubCanvas.FullSize();
+                GlobalApplication.UIHub = this as IUIHub;
+
+                if (Commons.IsAndroid())
+                {
+                    if (this.height == -1)
+                    {
+                        this.height = Commons.GetScreenSize().y / 6;
+                    }
+                    this.HubPanel.DockTop(this.height);
+                } else
+                { 
+                    if (this.height == -1)
+                    {
+                        this.height = Commons.GetScreenSize().y / 9;
+                    }
+                    this.HubPanel.Dock(PanelExtension.DockDirection.Bottom, this.height);
+                }
+            }
         }
     }
 }

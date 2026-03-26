@@ -13,7 +13,7 @@ namespace unvs.gameword
     public class GlobalWorldBound : MonoBehaviour, IGlobalWorldBound
     {
         [Header("Settings")]
-        public float scaleOut=1.07f;
+        //public float scaleOut=2f;
         public bool autoGenerateGeometry = true;
         public bool autoInvalidateBoundingShapeCache=true;
         public bool fixDampling = true;
@@ -48,7 +48,7 @@ namespace unvs.gameword
             }
 
 
-                newScenePrefab.WorldBound.DoScaleOnce(scaleOut);
+                newScenePrefab.WorldBound.DoScaleOnce(Constants.Settings.DEFAULT_WORLD_BOUND_SCALE);
             PolygonCollider2D newBounds = newScenePrefab.WorldBound.Coll;
             newBounds.useDelaunayMesh = DefautlUseDelaunayMesh;
             newBounds.SetMeOnLayer(Constants.Layers.WORLD_BOUND);
@@ -116,29 +116,7 @@ namespace unvs.gameword
             {
                 UnityEngine.Object.Destroy(tr.gameObject);
             }
-            //foreach (Transform tr in coll.GetComponentsInChildren<Transform>())
-            //{
-            //    var wb = tr.gameObject.GetComponent<IScenePrefabWorldBound>();
-            //    if (wb == null)
-            //    {
-            //        //  UnityEngine.Object.Destroy(tr.gameObject);
-            //        continue;
-            //    }
-            //    if (wb.Owner == newScenePrefab)
-            //    {
-            //        tr.gameObject.transform.SetParent(newScenePrefab.GoWorld.transform);
-            //    }
-            //    if (wb.Owner.IsDestroying || (wb.Owner as MonoBehaviour).IsDestroyed())
-            //    {
-            //        UnityEngine.Object.Destroy(tr.gameObject);
-            //    }
-            //}
-            //if (!newScenePrefab.GoWorld.IsDestroyed() && !newScenePrefab.WorldBound.Coll.IsDestroyed())
-            //{
-            //    newScenePrefab.WorldBound.Coll.transform.SetParent(newScenePrefab.GoWorld.transform, true);
-            //    //newScenePrefab.WorldBound.Coll.isTrigger = false;
-            //    SingleScene.Instance.Confiner.InvalidateBoundingShapeCache();
-            //}
+           
             SingleScene.Instance.Confiner.InvalidateBoundingShapeCache();
 
         }
@@ -162,9 +140,10 @@ namespace unvs.gameword
         {
             coll = GetComponent<CompositeCollider2D>();
             coll.geometryType = CompositeCollider2D.GeometryType.Polygons; // Hợp nhất diện tích
-            coll.vertexDistance = 0.01f; // Hàn kín các đỉnh
-            coll.edgeRadius = 0.02f; // Chỉ để một chút để tránh kẹt, không để bằng
-
+            coll.vertexDistance = 0.0005f; // Hàn kín các đỉnh
+            //coll.edgeRadius = 0.02f; // Chỉ để một chút để tránh kẹt, không để bằng
+            coll.offsetDistance = 15f;
+           
             rigiBody = GetComponent<Rigidbody2D>();
             rigiBody.bodyType = RigidbodyType2D.Static;
 
@@ -186,7 +165,7 @@ namespace unvs.gameword
                 track.AddComponent<WorldTrackerObject>();
             }
             
-            newScenePrefab.WorldBound.DoScaleOnce(scaleOut);
+            newScenePrefab.WorldBound.DoScaleOnce(Constants.Settings.DEFAULT_WORLD_BOUND_SCALE);
             PolygonCollider2D newBounds = newScenePrefab.WorldBound.Coll;
             newBounds.useDelaunayMesh = DefautlUseDelaunayMesh;
             newBounds.SetMeOnLayer(Constants.Layers.WORLD_BOUND);

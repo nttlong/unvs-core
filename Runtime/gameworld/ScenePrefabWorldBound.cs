@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Unity.VisualScripting;
 using UnityEngine;
 using unvs.ext;
@@ -78,7 +78,7 @@ namespace unvs.gameword
         public void DoScaleOnce(float scale)
         {
             if (IsScale) return;
-            this.coll.ClearRotaionAndScale(scale);
+            this.coll.ClearRotationAndScale(scale, PolygonCollider2Extension.AxisScaleEnum.y);
         }
     }
 }

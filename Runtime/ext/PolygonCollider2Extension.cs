@@ -106,8 +106,8 @@ namespace unvs.ext
             for (int i = 0; i < points.Length; i++)
             {
                 int next = (i + 1) % points.Length;
-                Vector2 p1 = worldBound.transform.TransformPoint(points[i]);
-                Vector2 p2 = worldBound.transform.TransformPoint(points[next]);
+                Vector2 p1 = worldBound.transform.TransformPoint(points[i] + worldBound.offset);
+                Vector2 p2 = worldBound.transform.TransformPoint(points[next] + worldBound.offset);
 
                 float avgX = (p1.x + p2.x) / 2f;
                 float absDX = Mathf.Abs(p2.x - p1.x);
@@ -126,12 +126,12 @@ namespace unvs.ext
             if (bestEdgeStart != -1) // no, we are sure that we found the most vertical edge and biggest X
             {
                 int next = (bestEdgeStart + 1) % points.Length;
-                Vector2 p1 = worldBound.transform.TransformPoint(points[bestEdgeStart]);
-                Vector2 p2 = worldBound.transform.TransformPoint(points[next]);
+                Vector2 p1 = worldBound.transform.TransformPoint(points[bestEdgeStart] + worldBound.offset);
+                Vector2 p2 = worldBound.transform.TransformPoint(points[next] + worldBound.offset);
 
                 // Both points of the selected edge are aligned to targetX
-                points[bestEdgeStart] = worldBound.transform.InverseTransformPoint(new Vector2(targetX, p1.y));
-                points[next] = worldBound.transform.InverseTransformPoint(new Vector2(targetX, p2.y));
+                points[bestEdgeStart] = (Vector2)worldBound.transform.InverseTransformPoint(new Vector2(targetX, p1.y)) - worldBound.offset;
+                points[next] = (Vector2)worldBound.transform.InverseTransformPoint(new Vector2(targetX, p2.y)) - worldBound.offset;
                 worldBound.points = points;
             }
         }
@@ -147,8 +147,8 @@ namespace unvs.ext
             for (int i = 0; i < points.Length; i++)
             {
                 int next = (i + 1) % points.Length;
-                Vector2 p1 = worldBound.transform.TransformPoint(points[i]);
-                Vector2 p2 = worldBound.transform.TransformPoint(points[next]);
+                Vector2 p1 = worldBound.transform.TransformPoint(points[i] + worldBound.offset);
+                Vector2 p2 = worldBound.transform.TransformPoint(points[next] + worldBound.offset);
 
                 float avgX = (p1.x + p2.x) / 2f;
                 float absDX = Mathf.Abs(p2.x - p1.x);
@@ -167,12 +167,12 @@ namespace unvs.ext
             if (bestEdgeStart != -1) // no, we are sure that we found the most vertical edge and biggest X
             {
                 int next = (bestEdgeStart + 1) % points.Length;
-                Vector2 p1 = worldBound.transform.TransformPoint(points[bestEdgeStart]);
-                Vector2 p2 = worldBound.transform.TransformPoint(points[next]);
+                Vector2 p1 = worldBound.transform.TransformPoint(points[bestEdgeStart] + worldBound.offset);
+                Vector2 p2 = worldBound.transform.TransformPoint(points[next] + worldBound.offset);
 
                 // Both points of the selected edge are aligned to targetX
-                points[bestEdgeStart] = worldBound.transform.InverseTransformPoint(new Vector2(targetX, p1.y));
-                points[next] = worldBound.transform.InverseTransformPoint(new Vector2(targetX, p2.y));
+                points[bestEdgeStart] = (Vector2)worldBound.transform.InverseTransformPoint(new Vector2(targetX, p1.y)) - worldBound.offset;
+                points[next] = (Vector2)worldBound.transform.InverseTransformPoint(new Vector2(targetX, p2.y)) - worldBound.offset;
                 worldBound.points = points;
             }
         }
@@ -200,8 +200,8 @@ namespace unvs.ext
             for (int i = 0; i < points.Length; i++)
             {
                 int next = (i + 1) % points.Length;
-                Vector2 p1 = worldBound.transform.TransformPoint(points[i]);
-                Vector2 p2 = worldBound.transform.TransformPoint(points[next]);
+                Vector2 p1 = worldBound.transform.TransformPoint(points[i] + worldBound.offset);
+                Vector2 p2 = worldBound.transform.TransformPoint(points[next] + worldBound.offset);
 
                 float avgX = (p1.x + p2.x) / 2f;
                 float absDX = Mathf.Abs(p2.x - p1.x);
@@ -220,12 +220,12 @@ namespace unvs.ext
             if (bestEdgeStart != -1)
             {
                 int next = (bestEdgeStart + 1) % points.Length;
-                Vector2 p1 = worldBound.transform.TransformPoint(points[bestEdgeStart]);
-                Vector2 p2 = worldBound.transform.TransformPoint(points[next]);
+                Vector2 p1 = worldBound.transform.TransformPoint(points[bestEdgeStart] + worldBound.offset);
+                Vector2 p2 = worldBound.transform.TransformPoint(points[next] + worldBound.offset);
 
                 // Both points of the selected edge are aligned to targetX
-                points[bestEdgeStart] = worldBound.transform.InverseTransformPoint(new Vector2(targetX, p1.y));
-                points[next] = worldBound.transform.InverseTransformPoint(new Vector2(targetX, p2.y));
+                points[bestEdgeStart] = (Vector2)worldBound.transform.InverseTransformPoint(new Vector2(targetX, p1.y)) - worldBound.offset;
+                points[next] = (Vector2)worldBound.transform.InverseTransformPoint(new Vector2(targetX, p2.y)) - worldBound.offset;
                 worldBound.points = points;
             }
         }
@@ -241,8 +241,8 @@ namespace unvs.ext
             for (int i = 0; i < points.Length; i++)
             {
                 int next = (i + 1) % points.Length;
-                Vector2 p1 = worldBound.transform.TransformPoint(points[i]);
-                Vector2 p2 = worldBound.transform.TransformPoint(points[next]);
+                Vector2 p1 = worldBound.transform.TransformPoint(points[i] + worldBound.offset);
+                Vector2 p2 = worldBound.transform.TransformPoint(points[next] + worldBound.offset);
 
                 float avgX = (p1.x + p2.x) / 2f;
                 float absDX = Mathf.Abs(p2.x - p1.x);
@@ -261,12 +261,12 @@ namespace unvs.ext
             if (bestEdgeStart != -1)
             {
                 int next = (bestEdgeStart + 1) % points.Length;
-                Vector2 p1 = worldBound.transform.TransformPoint(points[bestEdgeStart]);
-                Vector2 p2 = worldBound.transform.TransformPoint(points[next]);
+                Vector2 p1 = worldBound.transform.TransformPoint(points[bestEdgeStart] + worldBound.offset);
+                Vector2 p2 = worldBound.transform.TransformPoint(points[next] + worldBound.offset);
 
                 // Both points of the selected edge are aligned to targetX
-                points[bestEdgeStart] = worldBound.transform.InverseTransformPoint(new Vector2(targetX, p1.y));
-                points[next] = worldBound.transform.InverseTransformPoint(new Vector2(targetX, p2.y));
+                points[bestEdgeStart] = (Vector2)worldBound.transform.InverseTransformPoint(new Vector2(targetX, p1.y)) - worldBound.offset;
+                points[next] = (Vector2)worldBound.transform.InverseTransformPoint(new Vector2(targetX, p2.y)) - worldBound.offset;
                 worldBound.points = points;
             }
         }
@@ -642,8 +642,8 @@ namespace unvs.ext
             Vector2[] points = polygon.points;
             if (points.Length < 3) return;
 
-            // 1. Chuyển targetX từ World Space về Local Space của Polygon
-            float localTargetX = polygon.transform.InverseTransformPoint(new Vector3(targetX, 0, 0)).x;
+            // 1. Chuyển targetX từ World Space về Local Space của Polygon và trừ đi offset
+            float localTargetX = polygon.transform.InverseTransformPoint(new Vector3(targetX, 0, 0)).x - polygon.offset.x;
 
             // 2. Tìm điểm có X lớn nhất (Local)
             int maxXIndex = 0;
@@ -679,7 +679,8 @@ namespace unvs.ext
             Vector2[] points = polygon.points;
             if (points.Length < 3) return;
 
-            float localTargetX = polygon.transform.InverseTransformPoint(new Vector3(targetX, 0, 0)).x;
+            // 1. Chuyển targetX từ World Space về Local Space của Polygon và trừ đi offset
+            float localTargetX = polygon.transform.InverseTransformPoint(new Vector3(targetX, 0, 0)).x - polygon.offset.x;
 
             // Tìm điểm có X nhỏ nhất
             int minXIndex = 0;
@@ -722,8 +723,8 @@ namespace unvs.ext
 
             // 1. Lấy 2 điểm đầu mút của cạnh và chuyển sang World Space
             int nextIndex = (edgeIndex + 1) % pointCount;
-            Vector3 p1 = polygon.transform.TransformPoint(points[edgeIndex]);
-            Vector3 p2 = polygon.transform.TransformPoint(points[nextIndex]);
+            Vector3 p1 = polygon.transform.TransformPoint(points[edgeIndex] + polygon.offset);
+            Vector3 p2 = polygon.transform.TransformPoint(points[nextIndex] + polygon.offset);
 
             // 2. Xác định phạm vi X của cạnh
             float minX = Mathf.Min(p1.x, p2.x);
@@ -750,9 +751,7 @@ namespace unvs.ext
         /// <summary>
         /// Procedure Breakdown
         ///Locate A as the polygon vertex where x is minimized.
-
         ///Compute slopes: slope_AB = (y_B - y_A) / (x_B - x_A); slope_AC = (y_C - y_A) / (x_C - x_A).
-
         ///Choose the edge(AB or AC) with max |slope| value, as higher magnitude means closer to vertical(infinite slope).
         ///The indices of the two points (A and the endpoint of the most vertical edge, say B) 
         ///define the left supporting edge—the edge from the leftmost point 
@@ -846,28 +845,21 @@ namespace unvs.ext
             if (Mathf.Abs(ab.y * ac.x) <= Mathf.Abs(ac.y * ab.x)) { start = a; end = b; }
             else { start = a; end = c; }
         }
-        /// <summary>
-        /// This function will move 2 points (detemine by start and end) to x
-        /// 
-        /// </summary>
-        /// <param name="poly"></param>
-        /// <param name="start"></param>
-        /// <param name="end"></param>
-        /// <param name="x"></param>
-        public static void VerticalFacetAlign(this PolygonCollider2D poly, int start,  int end, float x)
+
+        public static void VerticalFacetAlign(this PolygonCollider2D poly, int start, int end, float x)
         {
             if (poly == null || start < 0 || end < 0) return;
             Vector2[] points = poly.points;
             if (start >= points.Length || end >= points.Length) return;
 
-            // Xử lý từng điểm để đảm bảo tính đúng đắn khi có Scale/Rotation
-            Vector3 worldStart = poly.transform.TransformPoint(points[start]);
+            // Xử lý từng điểm để đảm bảo tính đúng đắn khi có Scale/Rotation/Offset
+            Vector3 worldStart = poly.transform.TransformPoint(points[start] + poly.offset);
             worldStart.x = x;
-            points[start] = poly.transform.InverseTransformPoint(worldStart);
+            points[start] = (Vector2)poly.transform.InverseTransformPoint(worldStart) - poly.offset;
 
-            Vector3 worldEnd = poly.transform.TransformPoint(points[end]);
+            Vector3 worldEnd = poly.transform.TransformPoint(points[end] + poly.offset);
             worldEnd.x = x;
-            points[end] = poly.transform.InverseTransformPoint(worldEnd);
+            points[end] = (Vector2)poly.transform.InverseTransformPoint(worldEnd) - poly.offset;
 
             poly.points = points;
         }
@@ -877,55 +869,168 @@ namespace unvs.ext
             Vector2[] points = poly.points;
             if (start >= points.Length || end >= points.Length) return;
 
-            // Xử lý từng điểm để đảm bảo tính đúng đắn khi có Scale/Rotation
-            Vector3 worldStart = poly.transform.TransformPoint(points[start]);
+            // Xử lý từng điểm để đảm bảo tính đúng đắn khi có Scale/Rotation/Offset
+            Vector3 worldStart = poly.transform.TransformPoint(points[start] + poly.offset);
             worldStart.y = y;
-            points[start] = poly.transform.InverseTransformPoint(worldStart);
+            points[start] = (Vector2)poly.transform.InverseTransformPoint(worldStart) - poly.offset;
 
-            Vector3 worldEnd = poly.transform.TransformPoint(points[end]);
+            Vector3 worldEnd = poly.transform.TransformPoint(points[end] + poly.offset);
             worldEnd.y = y;
-            points[end] = poly.transform.InverseTransformPoint(worldEnd);
+            points[end] = (Vector2)poly.transform.InverseTransformPoint(worldEnd) - poly.offset;
 
             poly.points = points;
         }
 
-        public static Vector2[] CreateNewFromPoints(this PolygonCollider2D coll,float scaleRatio=1.3f)
+        public static Vector2[] CreateNewFromPoints(this PolygonCollider2D coll, float scaleRatio = 1.3f)
         {
-            var ret= new Vector2[coll.points.Length];
-            for(var i=0; i<ret.Length; i++)
-            {
-                ret[i] = coll.transform.rotation*(coll.points[i] + (Vector2) coll.transform.position);
-                ret[i] = scaleRatio * coll.transform.localScale;
-            }
-            return ret; 
-        }
-        public enum AxisScaleEnum
-        {
-            x=1, y=2,both=3
-        }
-        public static void ClearRotaionAndScale(this PolygonCollider2D coll, float scaleRatio = 1.03f, AxisScaleEnum axis=AxisScaleEnum.y)
-        {
-            var ret = new Vector2[coll.points.Length];
+            var points = coll.points;
+            var ret = new Vector2[points.Length];
             for (var i = 0; i < ret.Length; i++)
             {
-                ret[i] = coll.transform.rotation * (coll.points[i] );
-                switch (axis)
-                {
-                    case AxisScaleEnum.both:
-                        ret[i] = (scaleRatio * coll.transform.localScale) * ret[i];
-                        break;
-                        case AxisScaleEnum.x:
-                        ret[i] = (new  Vector2(coll.transform.localScale.x * scaleRatio, coll.transform.localScale.y )) * ret[i];
-                        break;
-                        case AxisScaleEnum.y:
-                        ret[i] = (new Vector2(coll.transform.localScale.x , coll.transform.localScale.y * scaleRatio)) * ret[i];
-                        break;
-                }
-                
+                // Convert to world space (including offset) and then apply scaleRatio
+                Vector2 worldPoint = coll.transform.TransformPoint(points[i] + coll.offset);
+                ret[i] = worldPoint * scaleRatio;
             }
-            coll.points = ret;
-            coll.transform.localScale = new Vector3(1, 1, 1);
-            coll.transform.rotation=Quaternion.identity;
+            return ret;
+        }
+
+        public enum AxisScaleEnum
+        {
+            x = 1, y = 2, both = 3
+        }
+
+        public static void ClearRotationAndScale(this PolygonCollider2D coll, float scaleRatio = 1.03f, AxisScaleEnum axis = AxisScaleEnum.y)
+        {
+
+            //Vector2 oldOffset = coll.offset;
+            //Vector2[] points = coll.points;
+            //Vector2[] ret = new Vector2[points.Length];
+
+            //Vector3 localScale = coll.transform.localScale;
+            //Quaternion localRotation = coll.transform.localRotation;
+
+            //// Calculate overall scale factor including transform scale and scaleRatio
+            //Vector2 scaleFactor = new Vector2(localScale.x, localScale.y);
+            switch (axis)
+            {
+                case AxisScaleEnum.both:
+                    coll.ScalePolygonCollider2D_KeepCentroid(scaleRatio);
+                    break;
+                case AxisScaleEnum.x:
+                    coll.ScalePolygonCollider2D_KeepCentroid_X(scaleRatio);
+                    break;
+                case AxisScaleEnum.y:
+                    coll.ScalePolygonCollider2D_KeepCentroid_Y(scaleRatio);
+                    break;
+            }
+
+            //// 1. Bake rotation and scale into the offset (center)
+            //coll.offset = localRotation * Vector2.Scale(oldOffset, scaleFactor);
+
+            //// 2. Bake rotation and scale into each point
+            //for (var i = 0; i < points.Length; i++)
+            //{
+            //    ret[i] = localRotation * Vector2.Scale(points[i], scaleFactor);
+            //}
+
+            //coll.points = ret;
+
+            // 3. Reset local transform
+            //var samplePoint = coll.points[0] * 1;
+            //coll.transform.localScale = coll.transform.localScale*scaleRatio;
+
+            //var sampleNewPoint = coll.points[0] * 1;
+            //var dis=Vector2.Distance(samplePoint, sampleNewPoint * scaleRatio);
+            //coll.offset = new Vector2(dis, dis)*scaleRatio;
+            //coll.transform.localRotation = Quaternion.identity;
+            //Vector3 oldCenter = coll.bounds.center;
+
+            //coll.transform.localScale *= scaleRatio;
+
+            //Vector3 newCenter = coll.bounds.center;
+            //Vector3 offset = oldCenter - newCenter;
+
+            //coll.transform.position += offset;
+            
+        }
+        public static void ScalePolygonCollider2D_KeepCentroid(this PolygonCollider2D col, float scale)
+        {
+            var pts = col.points;
+
+            // Tính centroid polygon chuẩn (shoelace formula)
+            Vector2 centroid = ComputePolygonCentroid(pts);
+
+            for (int i = 0; i < pts.Length; i++)
+            {
+                pts[i] = centroid + (pts[i] - centroid) * scale;
+            }
+
+            col.points = pts;
+        }
+        public static void ScalePolygonCollider2D_KeepCentroid_Y(this PolygonCollider2D col, float scaleY)
+        {
+            var pts = col.points;
+
+            Vector2 centroid = ComputePolygonCentroid(pts);
+
+            for (int i = 0; i < pts.Length; i++)
+            {
+                Vector2 p = pts[i];
+                float newY = centroid.y + (p.y - centroid.y) * scaleY;
+
+                pts[i] = new Vector2(p.x, newY);
+            }
+
+            col.points = pts;
+        }
+        public static void ScalePolygonCollider2D_KeepCentroid_X(this PolygonCollider2D col, float scaleX)
+        {
+            var pts = col.points;
+
+            Vector2 centroid = ComputePolygonCentroid(pts);
+
+            for (int i = 0; i < pts.Length; i++)
+            {
+                Vector2 p = pts[i];
+                float newX = centroid.x + (p.x - centroid.x) * scaleX;
+
+                pts[i] = new Vector2(newX, p.y);
+            }
+
+            col.points = pts;
+        }
+        private static Vector2 ComputePolygonCentroid(this Vector2[] pts)
+        {
+            float signedArea = 0f;
+            float cx = 0f;
+            float cy = 0f;
+
+            for (int i = 0; i < pts.Length; i++)
+            {
+                Vector2 p0 = pts[i];
+                Vector2 p1 = pts[(i + 1) % pts.Length];
+
+                float a = p0.x * p1.y - p1.x * p0.y;
+                signedArea += a;
+
+                cx += (p0.x + p1.x) * a;
+                cy += (p0.y + p1.y) * a;
+            }
+
+            signedArea *= 0.5f;
+
+            if (Mathf.Abs(signedArea) < 0.00001f)
+            {
+                // fallback nếu polygon degenerate
+                Vector2 avg = Vector2.zero;
+                foreach (var p in pts) avg += p;
+                return avg / pts.Length;
+            }
+
+            cx /= (6f * signedArea);
+            cy /= (6f * signedArea);
+
+            return new Vector2(cx, cy);
         }
     }
 }
