@@ -238,6 +238,86 @@ namespace unvs.ext
 
             Debug.Log("Success: Sprite and Collider are now perfectly aligned at Center.");
         }
+        public static void FitSpriteToBoxCollider2D_WorldCorrect(this SpriteRenderer renderer, BoxCollider2D coll)
+        {
+            if (renderer == null || coll == null || renderer.sprite == null) return;
+
+            Vector2 spriteLocalSize = renderer.sprite.bounds.size;
+
+            // Sprite size phải hợp lệ
+            if (spriteLocalSize.x <= 0.00001f || spriteLocalSize.y <= 0.00001f)
+            {
+                Debug.LogError($"Sprite bounds size invalid: {spriteLocalSize}");
+                return;
+            }
+
+            Vector2 colliderLocalSize = coll.size;
+
+            // Collider size phải hợp lệ
+            if (colliderLocalSize.x <= 0.00001f || colliderLocalSize.y <= 0.00001f)
+            {
+                Debug.LogError($"Collider size invalid: {colliderLocalSize}");
+                return;
+            }
+
+            Vector3 spriteLossy = renderer.transform.lossyScale;
+            Vector3 colliderLossy = coll.transform.lossyScale;
+
+            // Nếu scale cha bị 0 -> không thể fit
+            if (Mathf.Abs(spriteLossy.x) <= 0.00001f || Mathf.Abs(spriteLossy.y) <= 0.00001f)
+            {
+                Debug.LogError($"Renderer lossyScale invalid: {spriteLossy}");
+                return;
+            }
+
+            if (Mathf.Abs(colliderLossy.x) <= 0.00001f || Mathf.Abs(colliderLossy.y) <= 0.00001f)
+            {
+                Debug.LogError($"Collider lossyScale invalid: {colliderLossy}");
+                return;
+            }
+
+            Vector2 colliderWorldSize = new Vector2(
+                colliderLocalSize.x * Mathf.Abs(colliderLossy.x),
+                colliderLocalSize.y * Mathf.Abs(colliderLossy.y)
+            );
+
+            Vector2 spriteWorldSizeCurrent = new Vector2(
+                spriteLocalSize.x * Mathf.Abs(spriteLossy.x),
+                spriteLocalSize.y * Mathf.Abs(spriteLossy.y)
+            );
+
+            if (spriteWorldSizeCurrent.x <= 0.00001f || spriteWorldSizeCurrent.y <= 0.00001f)
+            {
+                Debug.LogError($"spriteWorldSizeCurrent invalid: {spriteWorldSizeCurrent}");
+                return;
+            }
+
+            float ratioX = colliderWorldSize.x / spriteWorldSizeCurrent.x;
+            float ratioY = colliderWorldSize.y / spriteWorldSizeCurrent.y;
+
+            // clamp tránh scale điên
+            ratioX = Mathf.Clamp(ratioX, 0.0001f, 10000f);
+            ratioY = Mathf.Clamp(ratioY, 0.0001f, 10000f);
+
+            Vector3 localScale = renderer.transform.localScale;
+            localScale.x *= ratioX;
+            localScale.y *= ratioY;
+            renderer.transform.localScale = localScale;
+
+            // Align offset theo pivot thật
+            Vector2 spriteLocalCenter = renderer.sprite.bounds.center;
+
+            if (renderer.transform == coll.transform)
+            {
+                coll.offset = spriteLocalCenter;
+            }
+            else
+            {
+                Vector3 spriteCenterWorld = renderer.transform.TransformPoint(spriteLocalCenter);
+                Vector3 spriteCenterLocalToCollider = coll.transform.InverseTransformPoint(spriteCenterWorld);
+                coll.offset = (Vector2)spriteCenterLocalToCollider;
+            }
+        }
         public static void UpdateSizeByLensSettings(this BoxCollider2D box, LensSettings lens)
         {
             //if (cam == null || box == null) return;

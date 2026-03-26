@@ -15,7 +15,7 @@ namespace unvs.interfaces
         string PathToWord { get; }
         bool IsNew { get; }
         Texture2D TextT { get; }
-        Sprite Sprite { get; }
+        //Sprite Sprite { get; }
         SpriteRenderer SpriteRenderer { get; }
         string TargetName { get; }
         bool HideSpriteWhenPlaying { get; }

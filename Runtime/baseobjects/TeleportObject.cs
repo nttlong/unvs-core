@@ -93,12 +93,13 @@ namespace unvs.baseobjects
         private void Awake()
         {
             if(spriteRenderer==null) spriteRenderer=GetComponent<SpriteRenderer>();
-            if (sprite == null)
+            if (texT == null)
             {
-                sprite = Commons.LoadAsset<Sprite>("Packages/com.unvs.core/Runtime/Sprites/Square.png");
+                texT = Commons.LoadAsset<Texture2D>("Packages/com.unvs.core/Runtime/Sprites/Square.png");
                 
-                spriteRenderer.sprite = sprite;
+                 
             }
+            spriteRenderer.ApplyTexture(texT);
             if (coll == null)
             {
                 GetComponent<BoxCollider2D>().SetSize(2.5f, 2.5f);
@@ -115,26 +116,27 @@ namespace unvs.baseobjects
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
-            if (Application.isPlaying)
-            {
-                return;
-            }
-            spriteRenderer = GetComponent<SpriteRenderer>();
-            coll = GetComponent<BoxCollider2D>();
-            if (spriteRenderer != null && coll != null)
-            {
-                spriteRenderer.FitSpriteToColliderCorrect(coll);
-            }
+            
         }
+#endif
         private void OnValidate()
         {
 #if UNITY_EDITOR
            this.sprite= GetComponent<SpriteRenderer>()?.ApplyTextureIfEmptySprite(texT);
-            
-            
+
+            //if (Application.isPlaying)
+            //{
+            //    return;
+            //}
+            //spriteRenderer = GetComponent<SpriteRenderer>();
+            //coll = GetComponent<BoxCollider2D>();
+            //if (spriteRenderer != null && coll != null)
+            //{
+            //    spriteRenderer.FitSpriteToBoxCollider2D_WorldCorrect(coll);
+            //}
             UnityEditor.EditorUtility.SetDirty(this);
             
-#endif
+
 
             //if(!Application.isPlaying)
             //GetComponent<BoxCollider2D>()?.Resize(transform);

@@ -4,6 +4,7 @@ using System.Collections;
 using System.Threading;
 using Unity.Cinemachine;
 using UnityEngine;
+using unvs.gameword;
 using unvs.interfaces;
 
 namespace unvs.ext
@@ -17,18 +18,27 @@ namespace unvs.ext
         public static void Watch(this CinemachineCamera vcam, Transform camWatcher)
         {
 
-
-            vcam.Target.TrackingTarget = camWatcher;
+           
             vcam.Follow = camWatcher;
             vcam.LookAt = camWatcher;
-            vcam.Target.TrackingTarget = camWatcher;
-            vcam.Target.LookAtTarget = camWatcher;
-            WatchPosImediately(vcam, camWatcher);
-        }
 
+            // Force Cinemachine update ngay lập tức
+            vcam.PreviousStateIsValid = false;
+        }
+        public static void ClearWatch(this CinemachineCamera vcam)
+        {
+
+
+            vcam.Target.TrackingTarget = null;
+            vcam.Follow = null;
+            vcam.LookAt = null;
+            vcam.Target.TrackingTarget = null;
+            vcam.Target.LookAtTarget = null;
+            SingleScene.Instance.VCam.ForceCameraPosition(new Vector3(0, 0, -10), Quaternion.identity);
+        }
         public static void WatchPosImediately(this CinemachineCamera vcam, Transform camWatcher)
         {
-            vcam.OnTargetObjectWarped(camWatcher, camWatcher.position - vcam.transform.position);
+            vcam.OnTargetObjectWarped(camWatcher, camWatcher.position);
 
             // 3. (Tùy chọn) Force camera cập nhật ngay trong Frame này
             vcam.ForceCameraPosition(camWatcher.position, vcam.transform.rotation);
@@ -48,7 +58,11 @@ namespace unvs.ext
             if (lens.OrthographicSize == size) return;
             lens.OrthographicSize = size;
             vcam.Lens = lens;
-
+            var bodyCam = Camera.main.GetComponentInChildren<ICamBody>();
+            if (bodyCam != null)
+            {
+                bodyCam.UpdateSizeByLensSettings(vcam.Lens);
+            }
             // 2. Xử lý Confiner2D (Nguyên nhân chính gây trượt)
             var confiner = vcam.GetComponent<CinemachineConfiner2D>();
             if (confiner != null)
@@ -72,11 +86,7 @@ namespace unvs.ext
                 // Nếu không có confiner, chỉ cần ForcePosition là đủ
                 vcam.ForceCameraPosition(vcam.transform.position, vcam.transform.rotation);
             }
-            var bodyCam = Camera.main.GetComponentInChildren<ICamBody>();
-            if(bodyCam != null)
-            {
-                bodyCam.UpdateSizeByLensSettings(vcam.Lens);
-            }
+            
         }
         public static void UpdateDamping(this CinemachineCamera vcam, float DampingValue = 5f)
         {

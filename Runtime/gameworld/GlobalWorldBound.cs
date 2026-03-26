@@ -75,9 +75,10 @@ namespace unvs.gameword
                 instance.Confiner.Damping = 5;
                 
             }
+            Instance.ClearOrphanBound();
             if (autoInvalidateBoundingShapeCache)
                 instance.Confiner.InvalidateBoundingShapeCache();
-            Instance.ClearOrphanBound();
+           
            
         }
 

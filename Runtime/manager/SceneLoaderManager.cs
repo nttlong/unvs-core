@@ -93,14 +93,18 @@ namespace unvs.manager
 
         public async UniTask<IScenePrefab> LoadInteriorAsync(string pathToWord, string targetName,IScenePrefab FromScene=null)
         {
-           
-            //await GlobalApplication.FadeScreenController.FadeInAsync();
-            if(FromScene!=null)
+            var actor = actorPlaceHolder.GetComponentInChildren<IActorObject>();
+            if (actor != null)
+            {
+                (actor as MonoBehaviour).gameObject.SetActive(false);
+            }
+          
+
+            if (FromScene!=null)
             {
                 if (!FromScene.IsInteriorScene())
                 {
-                    // move to backupInteriror
-                    // FromScene.GoWorld.SetActive(false);
+                   
                     FromScene.GlobalightRestore();
                     FromScene.WorldBound.Restore();
                     FromScene.GoWorld.transform.SetParent(backupInteriror.transform);
@@ -131,13 +135,11 @@ namespace unvs.manager
             {
                 Instance.LastInteriorScene.GlobalightRestore();
                 Instance.LastInteriorScene.WorldBound.Restore();
-                //(Instance.LastInteriorScene.Globalight.GlobalLight as MonoBehaviour).transform.SetParent(Instance.LastInteriorScene.GoWorld.transform);
                 GlobalApplication.LightManagerObjectInstance.FindLightByScene(Instance.LastInteriorScene);
                 Instance.LastInteriorScene.GoWorld.transform.SetParent(backupInteriror.transform, true);
             }
             DisableWorldBound();
             GlobalApplication.LightManagerObjectInstance.SetLight(scene.Globalight.GlobalLight);
-            //scene.Globalight.GlobalLight.Light.CopyFrom( GlobalApplication.LightManagerObjectInstance.GlobalLight);
             
 
 
@@ -145,19 +147,28 @@ namespace unvs.manager
             Instance.LastInteriorScene=scene;
 
             ISpawnTarget target = Instance.LastInteriorScene.FindSpawnTargetNullReturnStartPos(targetName);
-            var actor=actorPlaceHolder.GetComponentInChildren<IActorObject>();
-            if(actor!=null)
-            {
-                target.MoveOtherToMe(actor as MonoBehaviour);
-                SingleScene.Instance.VCam.Watch(actor.CamWacher);
-            }
+           
+            
             this.EpxandWorldBoundHorizontalBeforeAddGlobalWorldBound(scene);
             scene.TrimEdge();
             GlobalWorldBound.Instance.AddBound(scene);
             SingleScene.Instance.VCam.SetOrthoSizeImmediate(scene.OrthographicSize);
+            if (actor != null)
+            {
+                target.MoveOtherToMe(actor as MonoBehaviour);
+                SingleScene.Instance.VCam.Watch(actor.CamWacher);
+            }
+            
             scene.GoWorld.SetActive(true);
             scene.WorkTracker.On();
-            //await GlobalApplication.FadeScreenController.FadeOutAsync();
+            //await UniTask.DelayFrame(5, PlayerLoopTiming.Update);
+           
+            
+            if (actor != null)
+            {
+                (actor as MonoBehaviour).gameObject.SetActive(true);
+            }
+           
             return scene;
         }
 
@@ -181,7 +192,7 @@ namespace unvs.manager
             scene.TrimEdge();
             Instance.SetupLayout(scene);
             Instance.SetUpEnvironment(scene);
-            SingleScene.Instance.VCam.SetOrthoSizeImmediate(scene.OrthographicSize);
+            
             
             EpxandWorldBoundHorizontalBeforeAddGlobalWorldBound(scene);
 
@@ -193,6 +204,7 @@ namespace unvs.manager
             LightManagerObject.Add(scene);
            
             this.InitActor(scene, targetName);
+            SingleScene.Instance.VCam.SetOrthoSizeImmediate(scene.OrthographicSize);
             await GlobalApplication.FadeScreenController.FadeOutAsync();
             
             return scene;

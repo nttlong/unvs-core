@@ -4,11 +4,17 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using unvs.shares;
 
 namespace unvs.ext
 {
     public static class SpriteRendererExtension
     {
+        internal static void ApplyTexture(this SpriteRenderer sprite, string path)
+        {
+            var t=Commons.LoadAsset<Texture2D>(path);
+            sprite.ApplyTexture(t);
+        }
         public static Sprite ApplyTexture(this SpriteRenderer sr, Texture2D texT)
         {
             Sprite newSprite = Sprite.Create(texT,
@@ -88,5 +94,7 @@ namespace unvs.ext
                 Addressables.Release(handle);
             }
         }
+
+       
     }
 }

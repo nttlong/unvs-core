@@ -56,7 +56,8 @@ namespace unvs.gameword
 
 
                 sprite = GetComponent<SpriteRenderer>();
-                sprite.sprite = Commons.LoadAsset<Sprite>("Packages/com.unvs.core/Runtime/Sprites/Circle.png");
+                sprite.ApplyTexture("Packages/com.unvs.core/Runtime/Sprites/Circle.png");
+                //sprite.sprite = Commons.LoadAsset<Texture2D>("Packages/com.unvs.core/Runtime/Sprites/Circle.png");
                 //sprite.LoadImage("Packages/com.unvs.core/Runtime/Sprites/Circle.png");
 
 

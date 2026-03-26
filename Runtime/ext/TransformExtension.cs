@@ -71,6 +71,7 @@ namespace unvs.ext
             return Math.Abs(dx);
 
         }
+
         public static async UniTask<MoveInfo2D> MoveToAsync(this Transform transform, float Speed, Vector2 target, Action<MoveInfo2D> OnMoving,Action<MoveInfo2D> OnFinish, CancellationToken ct)
         {
 
@@ -88,7 +89,7 @@ namespace unvs.ext
                 var dir = ret.Direction;
 
                 // Tính toán bước di chuyển đầu tiên
-                var ds = transform.MoveStep(target, Speed, out dir);
+                var ds = transform.MoveStep(target, Speed , out dir);
 
                 ret.Direction = dir; // Cập nhật hướng cho nhân vật
                 OnMoving?.Invoke(ret);
@@ -104,7 +105,7 @@ namespace unvs.ext
                     await UniTask.Yield(PlayerLoopTiming.Update, ct);
 
                     // Tiếp tục di chuyển và cập nhật ds
-                    ds = transform.MoveStep(target, Speed*Time.deltaTime, out dir);
+                    ds = transform.MoveStep(target, Speed, out dir);
 
                     ret.Direction = dir; // Cập nhật hướng liên tục để nhân vật quay đúng hướng
                     OnMoving?.Invoke(ret);

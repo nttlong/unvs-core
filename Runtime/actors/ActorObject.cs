@@ -279,8 +279,10 @@ namespace unvs.actors
             var rb = GetComponent<Rigidbody2D>();
             rb.freezeRotation = true;
         }
-        private void UpdateOld()
-        {
+        private void Update()
+        {   if (controller == null) return;
+            if (controller.IsInteracting) return;
+            if (!controller.IsMoving) return;
             if (rb == null)
             {
                 rb = GetComponent<Rigidbody2D>();
@@ -290,7 +292,7 @@ namespace unvs.actors
                 rb.transform.MoveContinuous(controller.Direction, controller.Speed);
             }
         }
-        void FixedUpdate()
+        void UpdateDelete()
         {
             if(controller!=null)
             Speaker.SayText($"IsInteracting={controller.IsInteracting}");
