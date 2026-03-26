@@ -46,6 +46,8 @@ namespace unvs.actors
         private ContactPoint2D[] contacts = new ContactPoint2D[10];
         public bool isActive = true;
 
+        public event Action<IActorObject> OnMoving;
+
         public CancellationTokenSource Cts { get; set; }
         public IActorMotion Motion => motion;
 
@@ -283,6 +285,7 @@ namespace unvs.actors
         {   if (controller == null) return;
             if (controller.IsInteracting) return;
             if (!controller.IsMoving) return;
+            OnMoving?.Invoke(this);
             if (rb == null)
             {
                 rb = GetComponent<Rigidbody2D>();

@@ -19,7 +19,9 @@ namespace unvs.interfaces
         SpriteRenderer SpriteRenderer { get; }
         string TargetName { get; }
         bool HideSpriteWhenPlaying { get; }
-        
+        bool HideSpriteRendererWhenRun { get; }
+
+
     }
 }
 //public interface ITeleportObject

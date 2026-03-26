@@ -34,6 +34,7 @@ namespace unvs.baseobjects
         public SpriteRenderer spriteRenderer;
         public Texture2D texT;
         public Sprite sprite;
+        public bool hideSpriteRendererWhenRun=true;
 
         public AudioClip OpenSound => openSound;
 
@@ -69,6 +70,7 @@ namespace unvs.baseobjects
 
         public SpriteRenderer Renderer => throw new System.NotImplementedException();
 
+        public bool HideSpriteRendererWhenRun => hideSpriteRendererWhenRun;
 
         public async UniTask<bool> ExecAsync(MonoBehaviour target, CancellationTokenSource token)
         {
@@ -92,6 +94,10 @@ namespace unvs.baseobjects
 
         private void Awake()
         {
+            if(Application.isPlaying)
+            {
+                spriteRenderer.enabled = hideSpriteRendererWhenRun;
+            }
             if(spriteRenderer==null) spriteRenderer=GetComponent<SpriteRenderer>();
             if (texT == null)
             {

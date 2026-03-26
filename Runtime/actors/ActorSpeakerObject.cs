@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Localization;
@@ -54,13 +55,31 @@ namespace unvs.actors
             if(GlobalApplication.SpeakerController==null) return;
             GlobalApplication.SpeakerController.Show(this.GetPosition(), v);
         }
-        
+        private void Start()
+        {
+#if UNITY_EDITOR
+            if (!msgICanNotDoThat.IsValid())
+            {
+                msgICanNotDoThat = new LocalizedString("Global", "ThisDoesNotDoAnything");
+
+                if (msgICanNotDoThat == null || msgICanNotDoThat.IsEmpty)
+                {
+                    throw new Exception($"key='ThisDoesNotDoAnything' was not found in 'Global'");
+                }
+            }
+#endif
+        }
         private void OnValidate()
         {
             if (Application.isPlaying) return;
-            if (msgICanNotDoThat == null || msgICanNotDoThat.TableReference == null)
+            if (!msgICanNotDoThat.IsValid())
             {
                 msgICanNotDoThat = new LocalizedString("Global", "ThisDoesNotDoAnything");
+               
+                if (msgICanNotDoThat==null||msgICanNotDoThat.IsEmpty)
+                {
+                    throw new Exception  ($"key='ThisDoesNotDoAnything' was not found in 'Global'");
+                }
 
 #if UNITY_EDITOR
                 // Báo cho Unity biết là Object này đã bị thay đổi để nó hiện dấu * (cần Save)

@@ -9,6 +9,7 @@ namespace unvs.interfaces
 {
     public interface IActorObject
     {
+        event Action<IActorObject> OnMoving;
         CancellationTokenSource Cts { get; set; }
         CapsuleCollider2D Coll { get; }
         Rigidbody2D Body { get; }
