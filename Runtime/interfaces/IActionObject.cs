@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Localization;
 //using XGame.Core;
 namespace unvs.interfaces
 {
@@ -25,13 +26,26 @@ namespace unvs.interfaces
     }
     public interface IPickableObject
     {
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Direction">Direction of actor when moving</param>
+        /// <param name="ReachDistance">Arm lenght of actor</param>
+        /// <returns></returns>
+        Vector2 GetPosition(float Direction, float ReachDistance);
+        Texture2D TexT { get; }
+        SpriteRenderer SpriteR { get; }
+        bool HideSpriteRendererWhenPlaying { get; }
     }
     public interface IStoragableObject
     {
         public Sprite Icon { get; }
         public string Name { get; }
-        public UnityEngine.Localization.LocalizedString Description { get; }
+        /// <summary>
+        /// Name in game which is called by actor or NPC
+        /// </summary>
+        public LocalizedString GameName { get; }
+        public LocalizedString Description { get; }
     }
     public interface IWorldTracker
     {

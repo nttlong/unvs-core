@@ -175,6 +175,7 @@ namespace unvs.actors
 
                 Motion.Flip(dir.x);
                 controller.Speed = Movable.WalkSpeed;
+                Movable.Direction = dir;
 
             };
             controller.OnStop = () =>
