@@ -11,6 +11,8 @@ using UnityEngine.U2D.Animation;
 using UnityEngine.U2D.IK;
 using UnityEngine.XR;
 using unvs.shares;
+using static UnityEditor.Experimental.GraphView.GraphView;
+
 namespace unvs.ext
 {
     public static class AnimExt
@@ -78,62 +80,92 @@ namespace unvs.ext
 
         }
 #if UNITY_EDITOR
-        public static List<BlendTreeInfo> EditorGetListOfAnimInfo(this Animator anim)
+        public static List<BlendTreeInfo> EditorExtractBaseLayer(this Animator anim)
         {
             var ret = new List<BlendTreeInfo>();
             var controller = anim.runtimeAnimatorController as AnimatorController;
-            foreach (var layer in controller.layers)
+            
+            for(var i=0;i< controller.layers.Length; i++)
             {
-                // 3. Duyệt qua các State trong StateMachine của mỗi Layer
+                var layer = controller.layers[i];
+                for (var j = 0; j < layer.stateMachine.states.Length; j++)
+                {
+                    var stateInMachine = layer.stateMachine.states[j];
+                    var state = stateInMachine.state;
+                    if (state.motion is BlendTree blendTree)
+                    {
+                        foreach (var child in blendTree.children)
+                        {
+                            ret.Add(new BlendTreeInfo
+                            {
+                                blendName = blendTree.name,
+                                blendIndex=j,
+                                motionName = child.motion.name,
+
+                                layerName = layer.name,
+                                animationController = anim,
+                                index = i,
+                                paramName = blendTree.blendParameter,
+                                value = child.threshold
+
+
+                            });
+                        }
+
+                    }
+
+                }
+            }
+            
+            return ret;
+        }
+        
+        public static List<BlendTreeInfo> EditorExtractAllMotions(this Animator anim)
+        {
+            var ret = new List<BlendTreeInfo>();
+            var controller = anim.runtimeAnimatorController as AnimatorController;
+            for (var i=0;i<controller.layers.Length;i++)
+            {
+               var layer = controller.layers[i];
                 foreach (var stateInMachine in layer.stateMachine.states)
                 {
                     var state = stateInMachine.state;
-
-                    // 4. Kiểm tra xem Motion của State này có phải là Blend Tree không
-                    if (state.motion is BlendTree blendTree)
+                    if (state.motion is BlendTree) continue;
+                        if (state is AnimatorState animSt)
                     {
-
-
-                        // 5. Lấy danh sách các Motion con
-                        ChildMotion[] children = blendTree.children;
-                        foreach (var child in children)
+                        ret.Add(new BlendTreeInfo
                         {
-                            if (child.motion != null)
-                            {
-                                ret.Add(new BlendTreeInfo
-                                {
-                                    motionName = child.motion.name,
-                                    value = child.threshold,
-                                });
+                            motionName = animSt.name,
 
+                            layerName = layer.name,
+                            animationController = anim,
+                            index=i,
 
-
-                            }
-                        }
+                        });
                     }
                 }
+               
             }
             return ret;
         }
 
-
 #endif
-        
+
         public static void CreateAllIK(this Animator anim)
         {
-            
+
             if (anim == null) return;
             var sp = anim.ExtractAllSpriteSkins();
             var bones = sp.SelectMany(p => p.boneTransforms);
-            foreach ( var bone in bones)
+            foreach (var bone in bones)
             {
                 Debug.Log($"ExtractAllSpriteSkins {bone.name}");
             }
-            Transform rootBone= TransformExt.GetRoot(bones);
-            
-            var ik=rootBone.AddComponentIfNotExist<IKManager2D>();
-            
-            
+            Transform rootBone = TransformExt.GetRoot(bones);
+
+            var ik = rootBone.AddComponentIfNotExist<IKManager2D>();
+
+
             //IKManager2D ret= ik.AddChildIfNotExist<LimbSolver2D>(nameOfSover);
             //var ls=rootBone.transform.CreateIfNoExist<LimbSolver2D>(nameOfSover);
             var leafs = bones.GetAllLeafBones();
@@ -151,7 +183,8 @@ namespace unvs.ext
                 {
                     throw new System.Exception($"ik.AddChildIfNotExist<LimbSolver2D>({nameOfSover}) fail");
                 }
-                if(ik.solvers.FirstOrDefault(p => p.name == nameOfTarget)==null){
+                if (ik.solvers.FirstOrDefault(p => p.name == nameOfTarget) == null)
+                {
                     ik.AddSolver(ret);
                 }
                 //ik.AddSolver(ret);
@@ -167,19 +200,19 @@ namespace unvs.ext
                     ch.target = ret.AddChildIfNotExist<Transform>(nameOfTarget);
 
                 }
-                ch.target.transform.position= bone.transform.position;
+                ch.target.transform.position = bone.transform.position;
                 ch.effector = bone;
                 //Debug.Log($"CreateAllIK {rootBone.name}->{nameOfSover} {nameOfTarget}");
 
             }
-            
+
         }
-        public static void CreateAllSortingGroup(this Animator anim,string sortingLayerName)
+        public static void CreateAllSortingGroup(this Animator anim, string sortingLayerName)
         {
-           
-            
+
+
             var st = anim.GetComponentInParent<SortingGroup>();
-            if(st == null) return;
+            if (st == null) return;
             st.sortingLayerName = sortingLayerName;
             var lst = anim.ExtractAllSpriteSkins();
             foreach (SpriteSkin s in lst)

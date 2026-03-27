@@ -90,6 +90,8 @@ namespace unvs.shares
         public class Settings
         {
             public const float DEFAULT_WORLD_BOUND_SCALE = 1.1f;
+
+            public const float REACH_TOLERRANCE = 0.4f;
         }
     }
 }

@@ -36,6 +36,7 @@ namespace unvs.interfaces
         Texture2D TexT { get; }
         SpriteRenderer SpriteR { get; }
         bool HideSpriteRendererWhenPlaying { get; }
+        Vector2 Size { get; }
     }
     public interface IStoragableObject
     {

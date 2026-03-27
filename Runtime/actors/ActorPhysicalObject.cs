@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.U2D.Animation;
@@ -9,6 +10,7 @@ using unvs.ext;
 using unvs.gameobjects;
 using unvs.interfaces;
 using unvs.shares;
+
 
 namespace unvs.actors
 {
@@ -28,15 +30,26 @@ namespace unvs.actors
         private ContactFilter2D floorFilter;
         //private ContactPoint2D[] contacts = new ContactPoint2D[10]; // Cache sẵn mảng 10 phần tử
         public bool lockIK;
-
+        public float reachTolerance=Constants.Settings.REACH_TOLERRANCE;
+        float _armLen = -1;
         public float ArmLen
         {
             get
             {
-                return Vector3.Distance(RootArm.transform.position, TopArm.transform.position);
+
+                if(_armLen!=-1) return _armLen;
+                _armLen= Vector2.Distance(rootArm.position, topArm.position) + topArm.GetSegment().Length;
+                return _armLen;
             }
         }
-
+        public Vector2 GetHandPosition()
+        {
+            if (topArm == null)
+            {
+                throw new NullReferenceException($"topArm of {name} is null");
+            }
+            return topArm.GetSegment().End / 2;
+        }
         public Transform RootArm => rootArm;
 
         public Transform TopArm => topArm;
@@ -57,6 +70,8 @@ namespace unvs.actors
         }
 
         public IActorIK ActorIK => actorIK;
+
+        public float ReachTolerance => reachTolerance;
 
         public void HoldItem(MonoBehaviour item)
         {
@@ -124,6 +139,24 @@ namespace unvs.actors
             
             Validate();
         }
+
         
+
+        public bool CanReachTarget(Vector2 pos)
+        {
+            
+
+            return  math.abs(math.abs(GetPosition().x-pos.x) - ArmLen)<this.ReachTolerance;
+        }
+
+        public Vector2 GetPosition()
+        {
+            return GetComponent<Collider2D>().bounds.center;
+        }
+
+        public bool IsTargetLower(Vector2 pos)
+        {
+            return this.GetHandPosition().y >= pos.y;
+        }
     }
 }

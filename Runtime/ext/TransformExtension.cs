@@ -72,7 +72,7 @@ namespace unvs.ext
 
         }
 
-        public static async UniTask<MoveInfo2D> MoveToAsync(this Transform transform, float Speed, Vector2 target, Action<MoveInfo2D> OnMoving,Action<MoveInfo2D> OnFinish, CancellationToken ct)
+        public static async UniTask<MoveInfo2D> MoveToAsync(this Transform transform, float Speed, Vector2 target, Action<MoveInfo2D> OnMoving,Action<MoveInfo2D> OnFinish, CancellationToken ct,float distance=0)
         {
 
             var ret = new MoveInfo2D();
@@ -94,7 +94,7 @@ namespace unvs.ext
                 ret.Direction = dir; // Cập nhật hướng cho nhân vật
                 OnMoving?.Invoke(ret);
 
-                while (ds > 0)
+                while (ds > distance)
                 {
                     // Kiểm tra xem Task có bị hủy (cancel) không (ví dụ khi đổi mục tiêu hoặc thoát game)
                     if (ct.IsCancellationRequested)
@@ -162,6 +162,41 @@ namespace unvs.ext
             {
                 return go.AddComponent<T>();
             }
+        }
+        public struct Segment
+        {
+            public Vector2 Start;
+            public Vector2 End;
+
+            public float Length
+            {
+                get
+                {
+                    return Vector2.Distance(Start, End);
+                }
+            }
+        }
+        /// <summary>
+        /// Lấy tọa độ thế giới của điểm gốc và điểm kết thúc dựa trên hướng Forward và Scale.
+        /// </summary>
+        public static Segment GetSegment(this Transform transform)
+        {
+            // Lấy vị trí 2D (tự động bỏ qua Z)
+            Vector2 start = transform.position;
+
+            // Lấy hướng "Right" của đối tượng trong không gian thế giới (đã bao gồm xoay)
+            // transform.right là vector đơn vị hướng theo trục X cục bộ của object
+            Vector2 direction = transform.right;
+
+            // Tính điểm cuối dựa trên Scale X (độ dài của object)
+            // Sử dụng lossyScale để tính cả scale của cha nếu có
+            Vector2 end = start + direction * transform.lossyScale.x;
+
+            return new Segment
+            {
+                Start = start,
+                End = end
+            };
         }
     }
    

@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
@@ -13,10 +14,12 @@ namespace unvs.actors
     [ExecuteInEditMode]
     public class ActorSpeakerObject : MonoBehaviour, ISpeakableObject
     {
+        public LocalizedString msgThisDoesNotDoAnything;
         public LocalizedString msgICanNotDoThat;
-        
 
+        public LocalizedString MsgThisDoesNotDoAnything => msgThisDoesNotDoAnything;
 
+       
 
         public LocalizedString MsgICanNotDoThat => msgICanNotDoThat;
 
@@ -37,19 +40,33 @@ namespace unvs.actors
         public void Say(LocalizedString message)
         {
 
-            var txt = "??????????????????????";
-            if (message != null && !message.IsEmpty)
-                txt = message.GetText();
+            //var txt = "??????????????????????";
+            //if (message != null && !message.IsEmpty)
+             var   txt = message.GetText();
             GlobalApplication.SpeakerController.Show(this.GetPosition(), txt);
         }
+        public async UniTask SayAsync(LocalizedString msg, params LocalizedString[] p)
+        {
+            await UniTask.Yield();
+          
+            Say(msg.GetFirstValid(p));
+        }
 
+        
+        #region Default saying
+        public async UniTask SayIThisDoesNotDoAnythingAsync()
+        {
+            await UniTask.Yield();
+            this.Say(this.MsgThisDoesNotDoAnything);
+
+        }
         public async UniTask SayICanNotDoThatAsync()
         {
             await UniTask.Yield();
             this.Say(this.MsgICanNotDoThat);
-            
         }
-
+        
+        #endregion
         public void SayText(string v)
         {
             if(GlobalApplication.SpeakerController==null) return;
@@ -58,25 +75,29 @@ namespace unvs.actors
         private void Start()
         {
 #if UNITY_EDITOR
+            if (!msgThisDoesNotDoAnything.IsValid())
+            {
+                msgThisDoesNotDoAnything = new LocalizedString("Global", "ThisDoesNotDoAnything");
+
+               
+            }
             if (!msgICanNotDoThat.IsValid())
             {
-                msgICanNotDoThat = new LocalizedString("Global", "ThisDoesNotDoAnything");
+                msgICanNotDoThat = new LocalizedString("Global", "ICanNotDoThat");
 
-                if (msgICanNotDoThat == null || msgICanNotDoThat.IsEmpty)
-                {
-                    throw new Exception($"key='ThisDoesNotDoAnything' was not found in 'Global'");
-                }
+
             }
 #endif
         }
         private void OnValidate()
         {
             if (Application.isPlaying) return;
-            if (!msgICanNotDoThat.IsValid())
+            msgICanNotDoThat = new LocalizedString("Global", "ICanNotDoThat");
+            if (!msgThisDoesNotDoAnything.IsValid())
             {
-                msgICanNotDoThat = new LocalizedString("Global", "ThisDoesNotDoAnything");
+                msgThisDoesNotDoAnything = new LocalizedString("Global", "ThisDoesNotDoAnything");
                
-                if (msgICanNotDoThat==null||msgICanNotDoThat.IsEmpty)
+                if (msgThisDoesNotDoAnything==null||msgThisDoesNotDoAnything.IsEmpty)
                 {
                     throw new Exception  ($"key='ThisDoesNotDoAnything' was not found in 'Global'");
                 }
@@ -88,5 +109,6 @@ namespace unvs.actors
             }
         }
 
+        
     }
 }

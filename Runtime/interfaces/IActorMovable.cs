@@ -14,8 +14,9 @@ namespace unvs.interfaces
         float WalkSpeed { get; set; }
         float RunSpeed { get; set; }
         Vector2 Direction { get; set; }
-
+         
+       Vector2 GetPostion();
         void MoveTo(Vector2 dir);
-        UniTask MoveToAsync(Vector2 dir,Action<float> OnMoving, Action Stop,CancellationToken ct);
+        UniTask MoveToAsync(Vector2 dir,Action<float> OnMoving, Action Stop,CancellationToken ct, float distance = 0);
     }
 }

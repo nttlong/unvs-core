@@ -17,9 +17,13 @@ namespace unvs.interfaces
         public IActorIK ActorIK { get; }
         DirectionEnum Direction { get; set; }
         MonoBehaviour CurrentHoldingObject { get; set; }
-
+        float ReachTolerance { get; }
+        bool CanReachTarget(Vector2 pos);
+        Vector2 GetHandPosition();
+        Vector2 GetPosition();
         void HoldItem(MonoBehaviour monoBehaviour);
        
         void Validate();
+        bool IsTargetLower(Vector2 pos);
     }
 }

@@ -50,6 +50,8 @@ namespace unvs.baseobjects
 
         public bool HideSpriteRendererWhenPlaying => hideSpriteRendererWhenPlaying;
 
+        public Vector2 Size => GetComponent<Collider2D>().bounds.size;
+
         public async UniTask<bool> ExecAsync(MonoBehaviour target, CancellationTokenSource token)
         {
           return await data.ExecAsync(this, target, token);
@@ -89,5 +91,23 @@ namespace unvs.baseobjects
             coll = GetComponent<BoxCollider2D>();
             coll.isTrigger = true;
         }
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (spriteR == null) spriteR = GetComponent<SpriteRenderer>();
+            if (texT == null)
+            {
+                texT = Commons.LoadAsset<Texture2D>("Packages/com.unvs.core/Runtime/Sprites/Circle.png");
+                
+
+            }
+            if (spriteR.sprite==null && texT!=null)
+            {
+                spriteR.ApplyTexture(texT);
+                UnityEditor.EditorUtility.SetDirty(this);
+            }
+            
+        }
+#endif
     }
 }

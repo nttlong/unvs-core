@@ -21,6 +21,17 @@ namespace unvs.actions
             IsCancel=true;
             this.Cts?.Cancel();
         }
+
+        public T GetTargetComponent<T>()
+        {
+            if(Target == null) return default(T);
+            return Target.GetComponent<T>();
+        }
+        public T GetSourceComponent<T>()
+        {
+            if(Source == null) return default(T);
+            return Source.GetComponent<T>();
+        }
     }
     [Serializable]
     public abstract class ActionBase // Chuyển thành abstract

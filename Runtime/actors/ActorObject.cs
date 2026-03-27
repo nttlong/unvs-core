@@ -167,11 +167,12 @@ namespace unvs.actors
 
             controller.OnMoving = (dir) =>
             {
+                speaker.Off();
                 this.Cts = this.Cts.Refresh();
                 controller.IsMoving = true;
                 controller.Direction = dir;
 
-                Motion.Anim.Play("Motions.Walk");
+                Motion.Walk();
 
                 Motion.Flip(dir.x);
                 controller.Speed = Movable.WalkSpeed;
@@ -190,10 +191,10 @@ namespace unvs.actors
             controller.OnSprint = (dir) =>
             {
                 this.Cts = this.Cts.Refresh();
-
+                speaker.Off();
                 controller.Speed = Movable.RunSpeed;
                 controller.Direction = dir;
-                Motion.Anim.Play("Motions.Run");
+                Motion.Sprint();
             };
             controller.OnInteract = (go) =>
             {
@@ -250,7 +251,7 @@ namespace unvs.actors
 
             try
             {
-                this.Motion.Anim.Play("Motions.Walk");
+                this.Motion.Walk();
 
 
                 this.speaker.Off();
@@ -264,7 +265,7 @@ namespace unvs.actors
 
                 }, p =>
                 {
-                    this.Motion.Anim.Play("Motions.Idle");
+                    this.motion.Idle();
                 }, ct);
                 //if (!ct.IsCancellationRequested) // if not cancel -> finished routine
                     

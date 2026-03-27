@@ -20,12 +20,14 @@ namespace unvs.actionsbasics
             var pickableItem = Sender.Source.GetComponent<IPickableObject>();
             if (pickableItem == null)
             {
-               await actor.Speaker.SayICanNotDoThatAsync();
+               await actor.Speaker.SayIThisDoesNotDoAnythingAsync();
             }
             float dir = actor.Movable.Direction.x;
             var lengOfArm = actor.Physical.ArmLen;
             actor.Motion.Walk();
-            await actor.Movable.MoveToAsync(pickableItem.GetPosition(dir, actor.Physical.ArmLen), dir =>
+            var p = pickableItem.GetPosition(dir, actor.Physical.ArmLen);
+            p = new Vector2(p.x, 0);
+            await actor.Movable.MoveToAsync(p, dir =>
             {
 
             }, () =>

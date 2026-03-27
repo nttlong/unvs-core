@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Tables;
@@ -42,6 +43,14 @@ namespace unvs.ext
                 return false;
 
             return true;
+        }
+
+        public static LocalizedString GetFirstValid(this LocalizedString msg,params LocalizedString[] p)
+        {
+            if(msg.IsValid()) return msg;
+            var ret= p.FirstOrDefault(p=>p.IsValid());
+            if(ret == null) return msg;
+            else return ret;
         }
     }
 }

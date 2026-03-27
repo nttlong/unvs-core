@@ -24,7 +24,7 @@ namespace unvs.actionsbasics
             }
             if (string.IsNullOrEmpty(teleportObject.PathToWord))
             {
-               await Sender.Target.GetComponent<ISpeakableObject>().SayICanNotDoThatAsync();
+               await Sender.Target.GetComponent<ISpeakableObject>().SayIThisDoesNotDoAnythingAsync();
                 Sender.Target.GetComponent<IActorObject>().OnMoving += TeleportAction_OnMoving1;
                 Sender.Cancel();
                 return;

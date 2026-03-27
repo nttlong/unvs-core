@@ -28,7 +28,7 @@ namespace unvs.actors
             instance = this as IActorMovable;
         }
 
-        public async UniTask MoveToAsync(Vector2 Pos, Action<float> OnMoving, Action Stop, CancellationToken ct)
+        public async UniTask MoveToAsync(Vector2 Pos, Action<float> OnMoving, Action Stop, CancellationToken ct,float distance=0)
         {
             if (ct == null)
             {
@@ -57,7 +57,7 @@ namespace unvs.actors
                 }, p =>
                 {
                     Stop?.Invoke();
-                }, ct);
+                }, ct,distance);
                 //if (!ct.IsCancellationRequested) // if not cancel -> finished routine
 
             }
@@ -67,6 +67,12 @@ namespace unvs.actors
                 return;
             }
         }
-        
+
+        public Vector2 GetPostion()
+        {
+            var coll=GetComponent<Collider2D>();
+            if( coll == null ) return Vector2.zero;
+            return coll.bounds.center;
+        }
     }
 }

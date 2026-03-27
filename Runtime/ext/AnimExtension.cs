@@ -73,11 +73,11 @@ namespace unvs.ext
                 anim.SetLayerWeight(i, 0);
             }
         }
-        public static void ResetAllAddtiveLayers(this Animator anim)
+        public static void ResetAllAddtiveLayers(this Animator anim,bool IncludingBaseLayer=false)
         {
             for (int i = 0; i < anim.layerCount; i++)
             {
-                if (i == 0) continue;
+                if (i == 1 && !IncludingBaseLayer) continue;
                 anim.SetLayerWeight(i, 0);
             }
         }
