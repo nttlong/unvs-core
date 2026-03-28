@@ -37,9 +37,8 @@ namespace unvs.actors
             get
             {
 
-                if(_armLen!=-1) return _armLen;
-                _armLen= Vector2.Distance(rootArm.position, topArm.position) + topArm.GetSegment().Length;
-                return _armLen;
+               
+                return Vector2.Distance(rootArm.position, topArm.position) + topArm.GetSegment().Length;
             }
         }
         public Vector2 GetHandPosition()
@@ -48,7 +47,7 @@ namespace unvs.actors
             {
                 throw new NullReferenceException($"topArm of {name} is null");
             }
-            return topArm.GetSegment().End / 2;
+            return topArm.transform.position;
         }
         public Transform RootArm => rootArm;
 

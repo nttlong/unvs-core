@@ -125,7 +125,7 @@ namespace unvs.actors
         }
         public virtual void PickItem()
         {
-            this.motionsAnim.PlayCrossFadeMotion("BendDownAndPickItem");
+            this.motionsAnim.PlayCrossFadeMotion("PickItem");
         }
 
         private void Start()

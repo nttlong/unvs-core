@@ -20,6 +20,7 @@ namespace unvs.interfaces
         IActorInteractable Interactable { get; }
         IActorPhysical Physical { get; }
         DirectionEnum SideView { get; set; }
+        IInventoryController Inventory { get; }
         ActorsControllers Controller { get; }
         bool IsActive { get; set; }
 

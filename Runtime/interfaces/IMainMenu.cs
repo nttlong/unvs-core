@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using unvs.shares;
 
 namespace unvs.interfaces
 {
@@ -19,7 +20,9 @@ namespace unvs.interfaces
     }
     public interface IUIHub
     {
-        float Height { get; }
+        DockDirection Dock { get; }
+
+        float Size { get; }
         Canvas HubCanvas { get; }
         Image HubPanel { get; }
         void Hide();

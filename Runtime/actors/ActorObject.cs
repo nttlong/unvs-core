@@ -26,6 +26,7 @@ namespace unvs.actors
     [RequireComponent(typeof(ActorMovableObject))]
     [RequireComponent(typeof(ActorInteractableObject))]
     [RequireComponent(typeof(ActorPhysicalObject))]
+    [RequireComponent (typeof(ActorInventoryObject))]
     [RequireComponent(typeof(AudibleStepObject))]
     [RequireComponent(typeof(CapsuleCollider2D))]
     [RequireComponent(typeof(Rigidbody2D))]
@@ -105,6 +106,8 @@ namespace unvs.actors
 
         public bool IsActive { get => isActive; set => isActive = value; }
         public Action OnDestroying { get; set; }
+
+        public IInventoryController Inventory => throw new NotImplementedException();
 
         private void Start()
         {

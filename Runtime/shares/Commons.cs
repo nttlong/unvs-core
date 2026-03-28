@@ -12,6 +12,14 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 namespace unvs.shares
 {
+    public enum DockDirection
+    {
+        Left,
+        Right,
+        Top,
+        Bottom,
+        Full
+    }
     /// <summary>
     /// Enum đại diện cho loại platform/environment đang chạy (runtime).
     /// Dùng Application.platform để detect.
@@ -28,6 +36,7 @@ namespace unvs.shares
         EditorOnly, // Chỉ trong Editor, chưa switch platform
         Unknown
     }
+
     public static class Commons
     {
         
@@ -187,9 +196,9 @@ namespace unvs.shares
 
             return _draggingClone;
         }
-        public static T LoadPrefab<T>(string path)
+        public static T LoadPrefab<T>(string path,Transform parent=null)
         {
-            var go = LoadPrefabs(path);
+            var go = LoadPrefabs(path, parent);
             return go.GetComponent<T>();
         }
         public static T LoadAsset<T>(string key) where T : UnityEngine.Object

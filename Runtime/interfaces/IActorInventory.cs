@@ -6,10 +6,11 @@ namespace unvs.interfaces
 {
     public interface IActorInventory
     {
-        public GameObject Bager { get; }
-        public IInventoryController InventoryController { get; }
-
-        void Add(MonoBehaviour source);
+       IInventoryController InventoryController { get; }
+        /// <summary>
+        /// Path to prefab of Inventory controller
+        /// </summary>
+        string PrefabPath { get; }
     }
     public interface IActorDiscovery
     {

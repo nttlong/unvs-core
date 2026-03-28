@@ -65,7 +65,7 @@ namespace unvs.ext
                 throw new NullReferenceException($"animationController is null, refer {motionName}");
             }
             item.animationController.SetLayerWeight(item.index, 1);
-            item.animationController.CrossFade(motionName, normalizedTimeOffset,item.index);
+            item.animationController.CrossFadeInFixedTime(motionName, normalizedTimeOffset,item.index);
         }
         public static void PlayAddtiveMotion(this BlendTreeInfo[] blendTreeAnim, string motionName)
         {

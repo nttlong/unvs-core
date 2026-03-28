@@ -16,13 +16,16 @@ namespace unvs.ui
     {
         private Canvas hubCanvas;
         private Image hubPanel;
-        public float height=-1;
+        public float size=-1;
+        public DockDirection dock= DockDirection.Bottom;
 
         public Canvas HubCanvas => hubCanvas;
 
         public Image HubPanel => hubPanel;
 
-        public float Height => height;
+        public float Size => size;
+
+        public DockDirection Dock => dock;
 
         public void Hide()
         {
@@ -57,18 +60,18 @@ namespace unvs.ui
 
                 if (Commons.IsAndroid())
                 {
-                    if (this.height == -1)
+                    if (this.size == -1)
                     {
-                        this.height = Commons.GetScreenSize().y / 6;
+                        this.size = Commons.GetScreenSize().y / 6;
                     }
-                    this.HubPanel.DockTop(this.height);
+                    this.HubPanel.DockTop(this.size);
                 } else
                 { 
-                    if (this.height == -1)
+                    if (this.size == -1)
                     {
-                        this.height = Commons.GetScreenSize().y / 9;
+                        this.size = Commons.GetScreenSize().y / 9;
                     }
-                    this.HubPanel.Dock(PanelExtension.DockDirection.Bottom, this.height);
+                    this.HubPanel.Dock(dock, this.size);
                 }
             }
         }

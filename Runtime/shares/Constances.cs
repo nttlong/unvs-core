@@ -86,6 +86,10 @@ namespace unvs.shares
             public const string CAM_TRACKER_BODY = "CAM-TRACKER-BODY";
             public const string HUB_CANVAS = "HUB-CANVAS";
             public const string HUB_PANEL = "HUB-PANEL";
+
+            public const string INVENTORY_CANVAS = "INVENTORY-CANVAS";
+
+            public const string INVENTORY_PANEL = "INVENTORY-PANEL";
         }
         public class Settings
         {

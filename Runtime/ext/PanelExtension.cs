@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -62,17 +63,69 @@ namespace unvs.ext
             var y = Commons.GetScreenSize().y - heightInPx;
             var w = Commons.GetScreenSize().x;
             panel.SetPosition(0f, y, w, heightInPx);
-            panel.Dock(DockDirection.Top, heightInPx);
+            var rect = panel.rectTransform;
+            rect.anchorMin = new Vector2(0, 1);
+            rect.anchorMax = new Vector2(1, 1);
+            rect.pivot = new Vector2(0.5f, 1);
+            rect.sizeDelta = new Vector2(w, heightInPx);
+            rect.anchoredPosition = Vector2.zero;
+            //panel.Dock(DockDirection.Top, heightInPx);
         }
-        public enum DockDirection
+        public static void DockBottom(this UnityEngine.UI.Image panel, float heightInPx)
         {
-            Left,
-            Right,
-            Top,
-            Bottom
+
+            var y = Commons.GetScreenSize().y-heightInPx;
+            var w = Commons.GetScreenSize().x;
+            panel.SetPosition(0f, 100, heightInPx, heightInPx);
+            var rect = panel.rectTransform;
+            rect.anchorMin = new Vector2(0, 0);
+            rect.anchorMax = new Vector2(1, 0);
+            rect.pivot = new Vector2(0.5f, 0);
+            rect.sizeDelta = new Vector2(w, heightInPx);
+            rect.anchoredPosition = Vector2.zero;
+           
+        }
+        public static void DockLeft(this UnityEngine.UI.Image panel, float widthInPx)
+        {
+            //// Anchor dính lề trái, trải dài từ trên xuống dưới
+            //rect.anchorMin = new Vector2(0, 0);
+            //rect.anchorMax = new Vector2(0, 1);
+            //rect.pivot = new Vector2(0, 0.5f);
+            //rect.sizeDelta = new Vector2(heightOrWidthInPx, 0);
+            //rect.anchoredPosition = Vector2.zero; // Đưa sát về lề
+            var y = Commons.GetScreenSize().y ;
+            var w = widthInPx;
+            panel.SetPosition(0f, y, w, y);
+            var rect = panel.rectTransform;
+            rect.anchorMin = new Vector2(0, 0);
+            rect.anchorMax = new Vector2(0, 1);
+            rect.pivot = new Vector2(0, 0.5f);
+            rect.sizeDelta = new Vector2(widthInPx, 0);
+            rect.anchoredPosition = Vector2.zero;
+            //panel.Dock(DockDirection.Top, heightInPx);
+        }
+        public static void DockRight(this UnityEngine.UI.Image panel, float widthInPx)
+        {
+            // Anchor dính lề phải, trải dài từ trên xuống dưới
+            //rect.anchorMin = new Vector2(1, 0);
+            //rect.anchorMax = new Vector2(1, 1);
+            //rect.pivot = new Vector2(1, 0.5f);
+            //rect.sizeDelta = new Vector2(heightOrWidthInPx, 0);
+            //rect.anchoredPosition = Vector2.zero;
+            var y = Commons.GetScreenSize().y;
+            var w = widthInPx;
+            panel.SetPosition(0f, y, w, y);
+            var rect = panel.rectTransform;
+            rect.anchorMin = new Vector2(1, 0);
+            rect.anchorMax = new Vector2(1, 1);
+            rect.pivot = new Vector2(1, 0.5f);
+            rect.sizeDelta = new Vector2(widthInPx, 0);
+            rect.anchoredPosition = Vector2.zero;
+            //panel.Dock(DockDirection.Top, heightInPx);
         }
         public static void DockFull(this UnityEngine.UI.Image panel)
         {
+            
             if (panel == null) return;
 
             // Lấy RectTransform của image
@@ -90,48 +143,30 @@ namespace unvs.ext
             rect.anchoredPosition = Vector2.zero;
             rect.sizeDelta = Vector2.zero;
         }
-        public static void Dock(this UnityEngine.UI.Image panel, DockDirection direction, float heightOrWidthInPx)
+        public static void Dock(this UnityEngine.UI.Image panel, DockDirection direction, float size)
         {
             var rect = panel.rectTransform; // Cách viết tắt của GetComponent<RectTransform>()
 
             switch (direction)
             {
                 case DockDirection.Left:
-                    // Anchor dính lề trái, trải dài từ trên xuống dưới
-                    rect.anchorMin = new Vector2(0, 0);
-                    rect.anchorMax = new Vector2(0, 1);
-                    rect.pivot = new Vector2(0, 0.5f);
-                    rect.sizeDelta = new Vector2(heightOrWidthInPx, 0);
-                    rect.anchoredPosition = Vector2.zero; // Đưa sát về lề
+
+                    panel.DockLeft(size);
                     break;
 
                 case DockDirection.Right:
-                    // Anchor dính lề phải, trải dài từ trên xuống dưới
-                    rect.anchorMin = new Vector2(1, 0);
-                    rect.anchorMax = new Vector2(1, 1);
-                    rect.pivot = new Vector2(1, 0.5f);
-                    rect.sizeDelta = new Vector2(heightOrWidthInPx, 0);
-                    rect.anchoredPosition = Vector2.zero;
+                    panel.DockRight(size);
                     break;
 
                 case DockDirection.Top:
-                    // Anchor dính lề trên, trải dài từ trái sang phải
-                    panel.SetPosition(0, heightOrWidthInPx, Commons.GetScreenSize().x, heightOrWidthInPx);
-                    rect.anchorMin = new Vector2(0, 1);
-                    rect.anchorMax = new Vector2(1, 1);
-                    rect.pivot = new Vector2(0.5f, 1);
-                    rect.sizeDelta = new Vector2(0, heightOrWidthInPx);
-                    rect.anchoredPosition = Vector2.zero;
+                    panel.DockTop(size);
                     break;
 
                 case DockDirection.Bottom:
-                    panel.SetPosition(0, heightOrWidthInPx, Commons.GetScreenSize().x, heightOrWidthInPx);
-                    // Anchor dính lề dưới, trải dài từ trái sang phải
-                    rect.anchorMin = new Vector2(0, 0);
-                    rect.anchorMax = new Vector2(1, 0);
-                    rect.pivot = new Vector2(0.5f, 0);
-                    rect.sizeDelta = new Vector2(0, heightOrWidthInPx);
-                    rect.anchoredPosition = Vector2.zero;
+                    panel.DockBottom(size);
+                    break;
+                case DockDirection.Full:
+                    panel.DockFull();
                     break;
             }
         }
@@ -185,6 +220,17 @@ namespace unvs.ext
             var canvasGroup = panel.AddComponentIfNotExist<CanvasGroup>();
 
             await panel.FadeOutAsync(canvasGroup, fadingTime);
+        }
+
+        public static Vector2 GetSize(this Image container)
+        {
+            if (container == null) return Vector2.zero;
+
+            // Image luôn đi kèm với RectTransform trên UI
+            RectTransform rectTransform = container.rectTransform;
+
+            // Trả về size (x là width, y là height)
+            return rectTransform.rect.size;
         }
     }
 }
