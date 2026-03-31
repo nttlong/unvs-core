@@ -8,8 +8,9 @@ using unvs.gameobjects;
 using unvs.interfaces;
 namespace unvs.actors.actions
 {
-    public class ActorsControllers : MonoBehaviour
+    public abstract class ActorsControllers : MonoBehaviour
     {
+        
         private GameObject currentTaget;
         public bool isMouseButtonIsDowning;
 
@@ -181,6 +182,24 @@ namespace unvs.actors.actions
            
             
             
+        }
+        public abstract void OnControllerEnable();
+        public abstract void OnControllerDisable();
+        public abstract void OnInitController();
+        private void Awake()
+        {
+            OnInitController();
+        }
+
+        
+
+        public  void OnEnable()
+        {
+            OnControllerEnable();
+        }
+        public void OnDisable()
+        {
+            OnControllerDisable();
         }
     }
 }

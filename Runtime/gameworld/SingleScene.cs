@@ -4,6 +4,7 @@ using System;
 using System.ComponentModel;
 using Unity.Cinemachine;
 using Unity.VisualScripting;
+using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -15,6 +16,7 @@ using unvs.interfaces;
 using unvs.interfaces.sys;
 using unvs.manager;
 using unvs.shares;
+using unvs.ui;
 namespace unvs.gameword
 {
     [RequireComponent(typeof(LightManagerObject))]
@@ -118,6 +120,7 @@ namespace unvs.gameword
         public IPauseMenu PauseMenu => pauseMenu;
 
         public ISceneLoader SceneLoader => sceneLoader;
+
         
 
         public string StartPath;
@@ -151,6 +154,7 @@ namespace unvs.gameword
         /// "Assets/Prefabs/UI/PauseMenu/PauseMenu.prefab"
         /// </summary>
         public string PauseMenuAddressalbePath;
+      
 
         private bool SetupSingeScene()
         {
@@ -251,10 +255,26 @@ namespace unvs.gameword
                 }).Forget();
             };
         }
+        private void Awake()
+        {
+            
+        }
+
+        private void UiEvents_PauseStarted()
+        {
+            pauseMenu.Toggle();
+           
+        }
 
         private void Start()
         {
-           
+            if (Application.isPlaying)
+            {
+                if (GetComponent<SettingsGlobalEvents>() == null)
+                {
+                    throw new Exception($"Pleass, setup {typeof(SettingsGlobalEvents)}");
+                }
+            }
             if (Application.isPlaying && !string.IsNullOrEmpty(cinemaSettingPrefabPath))
             {
                 var cmp = SetupSceneWorld.CreateComponents(
@@ -283,42 +303,42 @@ namespace unvs.gameword
 
 
 
-        public void SetupComponentsOld()
-        {
+        //public void SetupComponentsOld()
+        //{
 
-            if (this.Cam == null || this.VCam == null) return;
-            this.Cam.AddComponentIfNotExist<CamObject>();
-            // 1. Setup vật lý cho Main Camera (Dựa theo ảnh 2)
-            this.Cam.orthographic = true;
-            this.Cam.orthographicSize = 20;
-            this.Cam.nearClipPlane = 0.5f;
-            this.Cam.farClipPlane = 1000f;
+        //    if (this.Cam == null || this.VCam == null) return;
+        //    this.Cam.AddComponentIfNotExist<CamObject>();
+        //    // 1. Setup vật lý cho Main Camera (Dựa theo ảnh 2)
+        //    this.Cam.orthographic = true;
+        //    this.Cam.orthographicSize = 20;
+        //    this.Cam.nearClipPlane = 0.5f;
+        //    this.Cam.farClipPlane = 1000f;
 
-            // 2. Setup Cinemachine Camera (Để vcam điều khiển Main Cam đúng thông số)
-            // Trong Unity 6, LensSettings nằm trực tiếp trong vcam.Lens
-            //VCam.Lens.OrthographicSize = 20;
-            //VCam.Lens.NearClipPlane = 0.5f;
-            //VCam.Lens.FarClipPlane = 1000f;
+        //    // 2. Setup Cinemachine Camera (Để vcam điều khiển Main Cam đúng thông số)
+        //    // Trong Unity 6, LensSettings nằm trực tiếp trong vcam.Lens
+        //    //VCam.Lens.OrthographicSize = 20;
+        //    //VCam.Lens.NearClipPlane = 0.5f;
+        //    //VCam.Lens.FarClipPlane = 1000f;
 
-            // Đảm bảo vcam có Priority cao để Brain ưu tiên (Ảnh 1 cho thấy nó đang Live)
-            //VCam.Priority = 100;
+        //    // Đảm bảo vcam có Priority cao để Brain ưu tiên (Ảnh 1 cho thấy nó đang Live)
+        //    //VCam.Priority = 100;
 
-            // 3. Setup Confiner (Giới hạn vùng nhìn)
-            if (this.Confiner != null && this.GlobalWorldBound.Coll != null)
-            {
-                Confiner.BoundingShape2D = this.GlobalWorldBound.Coll;
-                // Xóa cache cũ để Confiner tính toán lại theo Collider mới của Scene
-                Confiner.InvalidateBoundingShapeCache();
-            }
+        //    // 3. Setup Confiner (Giới hạn vùng nhìn)
+        //    if (this.Confiner != null && this.GlobalWorldBound.Coll != null)
+        //    {
+        //        Confiner.BoundingShape2D = this.GlobalWorldBound.Coll;
+        //        // Xóa cache cũ để Confiner tính toán lại theo Collider mới của Scene
+        //        Confiner.InvalidateBoundingShapeCache();
+        //    }
 
-            // 4. FIX MÀN HÌNH XANH: Ép Camera về vị trí của mục tiêu ngay lập tức
-            // Nếu vcam.Follow đang null, nó sẽ đứng ở (0,0,0) và dễ gây màn hình xanh
-            //if (VCam.Follow != null)
-            //{
-            //    vcam.ForceCameraPosition(vcam.Follow.position, Quaternion.identity);
-            //}
-            // Brain.ManualUpdate();
-        }
+        //    // 4. FIX MÀN HÌNH XANH: Ép Camera về vị trí của mục tiêu ngay lập tức
+        //    // Nếu vcam.Follow đang null, nó sẽ đứng ở (0,0,0) và dễ gây màn hình xanh
+        //    //if (VCam.Follow != null)
+        //    //{
+        //    //    vcam.ForceCameraPosition(vcam.Follow.position, Quaternion.identity);
+        //    //}
+        //    // Brain.ManualUpdate();
+        //}
 
         
     }

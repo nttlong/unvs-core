@@ -3,6 +3,7 @@ using PlasticPipe.PlasticProtocol.Messages;
 using System.Collections;
 using UnityEngine;
 using unvs.actions;
+using unvs.ext;
 using unvs.interfaces;
 
 namespace unvs.actionsbasics
@@ -22,14 +23,18 @@ namespace unvs.actionsbasics
             {
                await actor.Speaker.SayIThisDoesNotDoAnythingAsync();
             }
-            float dir = actor.Movable.Direction.x;
+            actor.Movable.Direction = ((Vector2)Sender.GetSourceComponent<BoxCollider2D>().bounds.center - actor.Physical.GetPosition()).CalculateDiection();
             var lengOfArm = actor.Physical.ArmLen;
+            actor.Motion.Flip(actor.Movable.Direction.x);
             actor.Motion.Walk();
-            var p = pickableItem.GetPosition(dir, actor.Physical.ArmLen);
+            actor.Speaker.SayText($"{actor.Movable.Direction},{actor.Physical.ArmLen}");
+            var p = pickableItem.GetPosition(actor.Movable.Direction.x, actor.Physical.ArmLen);
             p = new Vector2(p.x, 0);
             await actor.Movable.MoveToAsync(p, dir =>
             {
-
+                actor.Physical.Direction = (dir > 0) ? DirectionEnum.Forward : DirectionEnum.Backward;
+                actor.Motion.Flip(dir);
+                actor.Motion.Walk();
             }, () =>
             {
                 actor.Motion.Idle();

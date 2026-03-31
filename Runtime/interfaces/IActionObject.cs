@@ -19,9 +19,7 @@ namespace unvs.interfaces
     }
     public interface IActorController
     {
-        ActorStatus Status { get; }
-        CancellationTokenSource Cts { get; set; }
-        IAnimObject AnimObject { get; }
+        IActorObject Actor { get; }
         //UniTask<bool> ExecuteAsync(MonoBehaviour source, MonoBehaviour target, CancellationTokenSource ct);
     }
     public interface IPickableObject

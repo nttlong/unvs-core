@@ -26,6 +26,7 @@ namespace unvs.actionsbasics
             }
            
             actor.Physical.Direction = dir > 0 ? DirectionEnum.Forward : DirectionEnum.Backward;
+            actor.Motion.Flip(dir);
             actor.Motion.Idle();
 
         }

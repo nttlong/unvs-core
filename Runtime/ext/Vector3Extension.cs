@@ -263,8 +263,8 @@ namespace unvs.ext
         public static Vector2 CalculateDiection(this Vector2 v)
         {
             return new Vector2(
-            v.x == 0 ? 0 : Mathf.Sign(v.x),
-            v.y == 0 ? 0 : Mathf.Sign(v.y)
+           Mathf.Sign(v.x),
+            Mathf.Sign(v.y)
             );
         }
     }

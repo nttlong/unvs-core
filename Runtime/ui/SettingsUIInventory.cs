@@ -23,10 +23,9 @@ namespace unvs.ui
         
         public Image container;
         public Canvas containerCanvas;
-        public float height;
-        public float width;
-        public DockDirection dockDirection;
-        public float size;
+      
+        public DockDirection dockDirection=DockDirection.Bottom;
+        public float size=0;
 
         public GameObject Owner { get; set ; }
 
@@ -56,9 +55,9 @@ namespace unvs.ui
             containerCanvas=this.AddChildComponentIfNotExist<Canvas>(Constants.ObjectsConst.INVENTORY_CANVAS);
            // containerCanvas.AddComponent<HorizontalLayoutGroup>();
             container =containerCanvas.transform.AddChildComponentIfNotExist<Image>(Constants.ObjectsConst.INVENTORY_PANEL);
-           
 
-            if(Application.isPlaying)
+            container.transform.AddChildComponentIfNotExist<DragDropContainer>(Constants.ObjectsConst.INVENTORY_PANEL_INTERACT);
+            if (Application.isPlaying)
             {
                 InitAtRunTime();
             }
@@ -66,6 +65,23 @@ namespace unvs.ui
 
         private void InitAtRunTime()
         {
+            if(size==0)
+            {
+                if (dockDirection == DockDirection.Bottom || dockDirection == DockDirection.Top)
+                {
+                    size = Commons.GetScreenSize().y / 8;
+                    container.AddComponentIfNotExist<VerticalLayoutGroup>();
+                }
+                if (dockDirection == DockDirection.Left || dockDirection == DockDirection.Right)
+                {
+                    size = Commons.GetScreenSize().x / 8;
+                    container.AddComponentIfNotExist<HorizontalLayoutGroup>();
+                    
+
+
+
+                }
+            }
             containerCanvas.FullSize();
             container.Dock(this.DockDirection, size);
             GetComponent<BoxCollider2D>().isTrigger=true;

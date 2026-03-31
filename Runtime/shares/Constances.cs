@@ -90,6 +90,7 @@ namespace unvs.shares
             public const string INVENTORY_CANVAS = "INVENTORY-CANVAS";
 
             public const string INVENTORY_PANEL = "INVENTORY-PANEL";
+            public const string INVENTORY_PANEL_INTERACT = "INVENTORY-PANEL-INTERACT";
         }
         public class Settings
         {

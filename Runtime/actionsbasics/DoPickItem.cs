@@ -32,10 +32,12 @@ namespace unvs.actionsbasics
 
             if (interactObj == null)
             {
-                await actor.Speaker.SayIThisDoesNotDoAnythingAsync();
+               await  actor.Speaker.SayIThisDoesNotDoAnythingAsync();
                 Sender.Cancel();
                 return;
             }
+            actor.Movable.Direction = ((Vector2)Sender.GetSourceComponent<BoxCollider2D>().bounds.center - actor.Physical.GetPosition()).CalculateDiection();
+            actor.Motion.Flip(actor.Movable.Direction.x);
             var pos= interactObj.GetPosition();
            
             var handPosition = actor.Physical.GetHandPosition();
@@ -43,8 +45,8 @@ namespace unvs.actionsbasics
             var v = math.abs(Vector2.Distance(actor.Physical.GetPosition(), pos)- actor.Physical.ArmLen);
             if (!actor.Physical.CanReachTarget(pos))
             {
-               
-                actor.Speaker.SayText($"{v<=0.05f},No {d},{actor.Physical.ArmLen}");
+
+                actor.Speaker.Say(this.MsgFail.GetFirstValid(actor.Speaker.MsgICanNotDoThat));
             } else
             {
                 if (actor.Physical.IsTargetLower(pos))

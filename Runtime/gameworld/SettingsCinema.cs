@@ -2,10 +2,12 @@
 using System.Collections;
 using Unity.Cinemachine;
 using Unity.VisualScripting;
+using UnityEditor.PackageManager;
 using UnityEngine;
 using unvs.ext;
 using unvs.gameword;
 using unvs.interfaces;
+using unvs.ui;
 using static Unity.Cinemachine.CinemachineBrain;
 
 namespace unvs.gameworld
@@ -18,6 +20,7 @@ namespace unvs.gameworld
         public CinemachineCamera vCam;
         public GlobalWorldBound worldBound;
         public CinemachineFollow cinemaFollow;
+       
 
         public Camera Main => main;
 
@@ -28,6 +31,8 @@ namespace unvs.gameworld
         public GlobalWorldBound WorldBound => worldBound;
 
         public CinemachineFollow CinemaFollow => cinemaFollow;
+
+       
 
         private void Awake()
         {
@@ -59,12 +64,17 @@ namespace unvs.gameworld
             vCam.Priority = new PrioritySettings {
                 Enabled = true,
             };
+            
         }
+
+       
+
         private void Start()
         {
             var confiner = vCam.AddComponentIfNotExist<CinemachineConfiner2D>();
             confiner.BoundingShape2D = worldBound.GetComponent<CompositeCollider2D>();
             vCam.transform.position = new Vector3(0, 0, -10);
+            
         }
     }
 }

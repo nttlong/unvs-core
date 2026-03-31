@@ -2,6 +2,7 @@
 using Unity.Cinemachine;
 using UnityEngine;
 using unvs.gameword;
+using unvs.ui;
 
 namespace interfaces.cinema
 {
@@ -12,5 +13,7 @@ namespace interfaces.cinema
         CinemachineCamera VCam { get; }
         GlobalWorldBound WorldBound { get; }
         CinemachineFollow CinemaFollow { get; }
+       
+        
     }
 }

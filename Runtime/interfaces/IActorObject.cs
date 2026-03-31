@@ -21,7 +21,7 @@ namespace unvs.interfaces
         IActorPhysical Physical { get; }
         DirectionEnum SideView { get; set; }
         IInventoryController Inventory { get; }
-        ActorsControllers Controller { get; }
+        IActorController Controller { get; }
         bool IsActive { get; set; }
 
         UniTask MoveToAsync(Vector2 Pos, CancellationToken ct);

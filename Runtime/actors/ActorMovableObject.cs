@@ -53,7 +53,7 @@ namespace unvs.actors
                 {
                     var x = p.Direction ;
                     this.Direction = new Vector2(x, Direction.y);
-
+                    OnMoving?.Invoke(x);
                 }, p =>
                 {
                     Stop?.Invoke();

@@ -9,6 +9,7 @@ using static Codice.Client.Commands.WkTree.WorkspaceTreeNode;
 
 namespace unvs.interfaces
 {
+    
     public interface IActorMovable
     {
         float WalkSpeed { get; set; }

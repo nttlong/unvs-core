@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using unvs.interfaces;
 using unvs.interfaces.sys;
 using unvs.manager;
+using unvs.ui;
 namespace unvs.shares
 {
     public class GlobalApplication
@@ -26,5 +27,6 @@ namespace unvs.shares
         public static IUIHub UIHub { get; internal set; }
         public static IPauseMenu UIPauseMenu { get; internal set; }
         public static IDiscoveryDialog UIDiscoveryDialog { get; internal set; }
+        public static SettingsGlobalEvents GlobalInput { get; internal set; }
     }
 }

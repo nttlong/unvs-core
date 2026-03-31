@@ -32,6 +32,7 @@ namespace unvs.actors
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(UniqueObject))]
     [RequireComponent(typeof(SortingGroup))]
+    [RequireComponent(typeof(ActorController))]
     public class ActorObject : MonoBehaviour, IActorObject
     {
         IActorObject instance;
@@ -41,7 +42,7 @@ namespace unvs.actors
         private IActorMovable movable;
         private IActorInteractable interactable;
         private IActorPhysical physical;
-        private ActorsControllers controller;
+        private ActorController controller;
         public Rigidbody2D rb;
         private ContactFilter2D floorFilter;
         private ContactPoint2D[] contacts = new ContactPoint2D[10];
@@ -100,7 +101,7 @@ namespace unvs.actors
             }
         }
 
-        public ActorsControllers Controller => controller;
+        public IActorController Controller => controller;
 
         public Rigidbody2D Body => rb;
 
@@ -135,7 +136,14 @@ namespace unvs.actors
         private void Awake()
         {
             _ = CamWacher;
-            if (!Application.isPlaying) return;
+            controller = GetComponent<ActorController>();
+            if (!Application.isPlaying)
+            {
+                if(controller == null)
+                {
+                    throw new Exception($"require {typeof(ActorsControllers)}");
+                }
+            }
 
             instance = this;
             motion = GetComponent<IActorMotion>();
@@ -144,7 +152,7 @@ namespace unvs.actors
             speaker = GetComponent<ISpeakableObject>();
             interactable = GetComponent<IActorInteractable>();
             physical = GetComponent<IActorPhysical>();
-            controller = GetComponent<ActorsControllers>();
+            
 
             unvs.manager.GameEvents.OnSceneLoadComplete += GameEvents_OnSceneLoadComplete; ;
             //unvs.manager.ChunkSceneLoaderUtils.OnLoadNew += ChunkSceneLoaderUtils_OnLoadNew;
@@ -264,8 +272,9 @@ namespace unvs.actors
 
                 var ret = await this.transform.MoveToAsync(Movable.WalkSpeed, Pos, p =>
                 {
+                    
                     Physical.Direction = p.Direction > 0 ? DirectionEnum.Forward : DirectionEnum.Backward;
-
+                    this.Motion.Walk();
                 }, p =>
                 {
                     this.motion.Idle();
@@ -286,20 +295,7 @@ namespace unvs.actors
             var rb = GetComponent<Rigidbody2D>();
             rb.freezeRotation = true;
         }
-        private void Update()
-        {   if (controller == null) return;
-            if (controller.IsInteracting) return;
-            if (!controller.IsMoving) return;
-            OnMoving?.Invoke(this);
-            if (rb == null)
-            {
-                rb = GetComponent<Rigidbody2D>();
-            }
-            if (controller?.Speed > 0)
-            {
-                rb.transform.MoveContinuous(controller.Direction, controller.Speed);
-            }
-        }
+       
         void UpdateDelete()
         {
             if(controller!=null)
