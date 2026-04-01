@@ -15,6 +15,7 @@ using unvs.gameword;
 using unvs.interfaces;
 using unvs.shares;
 using unvs.sys;
+using unvs.ui;
 
 
 
@@ -47,6 +48,7 @@ namespace unvs.actors
         private ContactFilter2D floorFilter;
         private ContactPoint2D[] contacts = new ContactPoint2D[10];
         public bool isActive = true;
+        private SettingsUIInventory inventory;
 
         public event Action<IActorObject> OnMoving;
 
@@ -108,10 +110,11 @@ namespace unvs.actors
         public bool IsActive { get => isActive; set => isActive = value; }
         public Action OnDestroying { get; set; }
 
-        public IInventoryController Inventory => throw new NotImplementedException();
+        public IInventoryController Inventory => inventory;
 
         private void Start()
         {
+            
             rb = GetComponent<Rigidbody2D>();
 
 
@@ -129,6 +132,10 @@ namespace unvs.actors
                 }
 
 
+            }
+            if(Application.isPlaying)
+            {
+                inventory = this.GetComponent<ActorInventoryObject>().InventoryController as SettingsUIInventory;
             }
         }
 

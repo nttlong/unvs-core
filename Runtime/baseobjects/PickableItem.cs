@@ -9,18 +9,21 @@ using unvs.actions;
 using unvs.ext;
 using unvs.interfaces;
 using unvs.shares;
+using unvs.sys;
 namespace unvs.baseobjects
 {
     [ExecuteInEditMode]
     [RequireComponent(typeof(SpriteRenderer))]
     [RequireComponent(typeof(SortingGroup))]
     [RequireComponent(typeof(BoxCollider2D))]
+    [RequireComponent(typeof(UniqueObject))]
     public class PickableItem : MonoBehaviour, IPickableObject, IInteractableObject, IStoragableObject
     {
         public ExploringType exploring;
         public InteractionDefinition data;
         public Collider2D coll;
         public Sprite icon;
+        [SerializeField]
         public LocalizedString description;
         public LocalizedString gameName;
         public Texture2D texT;

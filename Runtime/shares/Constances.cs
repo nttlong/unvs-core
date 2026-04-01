@@ -91,6 +91,9 @@ namespace unvs.shares
 
             public const string INVENTORY_PANEL = "INVENTORY-PANEL";
             public const string INVENTORY_PANEL_INTERACT = "INVENTORY-PANEL-INTERACT";
+            public const string INVENTORY_PANEL_BAGGER = "INVENTORY-PANEL-BAGGER";
+
+            public const string UI_SYSTEM_DRAG_DROP = "UI-SYSTEM-DRAG_DROP";
         }
         public class Settings
         {

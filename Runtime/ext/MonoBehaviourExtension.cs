@@ -16,6 +16,7 @@ namespace unvs.ext
         {
             var ret = obj.AddChildComponentIfNotExist<Canvas>(name);
             ret.AddComponentIfNotExist<GraphicRaycaster>();
+           
             return ret;
         }
         public static T AddChildComponentIfNotExist<T>(this MonoBehaviour obj, string name) where T : Component

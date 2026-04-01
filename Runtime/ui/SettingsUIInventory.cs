@@ -1,9 +1,11 @@
 using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Rendering;
@@ -26,12 +28,16 @@ namespace unvs.ui
       
         public DockDirection dockDirection=DockDirection.Bottom;
         public float size=0;
+        private Dictionary<string, GameObject> storage=new Dictionary<string, GameObject>();
+        private HybridDragSystem dragSystem;
+        public Image bagger;
+        private Image interactContainer;
 
         public GameObject Owner { get; set ; }
 
         public Image Container => container;
 
-        public IDragAndDropContainer InteractContainer => throw new System.NotImplementedException();
+        public Image InteractContainer => interactContainer;
 
         public Canvas ContainerCanvas => containerCanvas;
 
@@ -39,11 +45,23 @@ namespace unvs.ui
 
         public float Size => size;
 
-        
+        public Dictionary<string, GameObject> Storage => storage;
+
+        public Image Bagger => bagger;
+
+        public HybridDragSystem DragSystem => dragSystem;
 
         public bool Add(MonoBehaviour source)
         {
-            throw new System.NotImplementedException();
+            var storagableItem = source.GetComponent<IStoragableObject>();
+            if(storagableItem ==null)  return false;
+            var img= interactContainer.transform.AddChildComponentIfNotExist<Image>(source.name);
+            img.sprite = storagableItem.Icon;
+            source.transform.SetParent(bagger.transform, false);
+           
+            //dItem.enabled = true;
+            //source.transform.SetParent(this.container.transform);
+            return true;
         }
 
         public void Delete()
@@ -53,14 +71,60 @@ namespace unvs.ui
         private void Awake()
         {
             containerCanvas=this.AddChildComponentIfNotExist<Canvas>(Constants.ObjectsConst.INVENTORY_CANVAS);
-           // containerCanvas.AddComponent<HorizontalLayoutGroup>();
+            containerCanvas.AddComponentIfNotExist<GraphicRaycaster>();
+            // containerCanvas.AddComponent<HorizontalLayoutGroup>();
             container =containerCanvas.transform.AddChildComponentIfNotExist<Image>(Constants.ObjectsConst.INVENTORY_PANEL);
 
-            container.transform.AddChildComponentIfNotExist<DragDropContainer>(Constants.ObjectsConst.INVENTORY_PANEL_INTERACT);
+           interactContainer= container.transform.AddChildComponentIfNotExist<Image>(Constants.ObjectsConst.INVENTORY_PANEL_INTERACT);
+            interactContainer.raycastTarget = false;
+            container.raycastTarget = false;
+            //interactContainer la noi de cac image cho phep drag 
+            dragSystem=interactContainer.AddComponentIfNotExist<HybridDragSystem>();
+            bagger = transform.AddChildComponentIfNotExist<Image>(Constants.ObjectsConst.INVENTORY_PANEL_BAGGER);
+            bagger.gameObject.SetActive(false);
             if (Application.isPlaying)
             {
                 InitAtRunTime();
+                InitDragSystem();
             }
+        }
+
+        private void InitDragSystem()
+        {
+            dragSystem.OnDragBegin = p =>
+            {
+                //var storageableItem = bagger.GetComponentInChildrenByName<IStoragableObject>(p.Source.name);
+                //if (storageableItem == null) return;
+                //p.CloneObject(transform, storageableItem.Icon, storageableItem.Name,120);
+               
+            };
+            dragSystem.OnDragging = p =>
+            {
+                if(p.DraggingVisual==null)
+                {
+                    var storageableItem = bagger.GetComponentInChildrenByName<IStoragableObject>(p.Source.name);
+                    if (storageableItem == null) return;
+                    p.CloneObject(this.containerCanvas, storageableItem.Icon, storageableItem.Name, 120);
+                }
+                p.Move();
+                Ray ray = Camera.main.ScreenPointToRay(p.Pos);
+               
+
+                
+               
+                if (Physics.Raycast(ray, out RaycastHit hit))
+                {
+
+                    IInteractableObject target = hit.collider.GetComponent<IInteractableObject>();
+
+                    if (target != null)
+                    {
+                        Debug.Log($"InitDragSystem.OnDragging.Drop, pos={p.Pos},source={p.Source.name}");
+                        return;
+                    }
+                }
+                Debug.Log($"InitDragSystem.OnDragging.OnDragging, pos={p.Pos},source={p.Source.name}");
+            };
         }
 
         private void InitAtRunTime()

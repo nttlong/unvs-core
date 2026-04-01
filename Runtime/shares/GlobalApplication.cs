@@ -28,5 +28,6 @@ namespace unvs.shares
         public static IPauseMenu UIPauseMenu { get;  set; }
         public static IDiscoveryDialog UIDiscoveryDialog { get;  set; }
         public static SettingsGlobalEvents GlobalInput { get;  set; }
+       
     }
 }
