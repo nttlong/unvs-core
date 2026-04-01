@@ -1,6 +1,8 @@
 using Cysharp.Threading.Tasks;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
@@ -90,18 +92,17 @@ namespace unvs.actors
             this.Instance = this;
 
         }
-        public async UniTask BendDownAndPickItemAsync()
+        public async UniTask BendDownAndPickItemAsync(Action OnFinish, CancellationToken ct)
         {
             await UniTask.Yield();
-            BendDownAndPickItem();
+            await this.motionsAnim.PlayMotionAsync("BendDownAndPickItem", OnFinish, ct);
         }
-
-        public virtual void BendDownAndPickItem()
+        public async UniTask PickItemAsync(Action OnFinish, CancellationToken ct)
         {
-           // this.motionsAnim.PlayCrossFadeMotion("BendDownAndPickItem",0);
-
-            this.motionsAnim.PlayMotion("BendDownAndPickItem");
+            await UniTask.Yield();
+            await this.motionsAnim.PlayMotionAsync("PickItem", OnFinish, ct);
         }
+
 
         public virtual void Sprint()
         {
@@ -121,11 +122,12 @@ namespace unvs.actors
         public virtual void Walk()
         {//"Motions.Walk"
             this.PlayBaselayerMotion("Walk");
+            this.GetComponent<ISpeakableObject>()?.Off();
             
         }
         public virtual void PickItem()
         {
-            this.motionsAnim.PlayCrossFadeMotion("PickItem");
+            this.motionsAnim.PlayMotion("PickItem");
         }
 
         private void Start()
@@ -162,9 +164,11 @@ namespace unvs.actors
         }
 
         
+
+
 #endif
-        
-        
+
+
 
 
 

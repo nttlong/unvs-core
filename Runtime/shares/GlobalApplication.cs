@@ -19,14 +19,14 @@ namespace unvs.shares
         //public static IWorldMonitor WorldMonitorManager { get; set; }
         public static IWorldTracker WorldTrackerObject { get; set; }
         public static ICamCenterCamTracking CamTracking { get; set; }
-        public static ISingleScene SingleScene { get; internal set; }
-        public static IDiscoveryDialog DiscoveryDialogInstance { get; set; }
-        public static LightManagerObject LightManagerObjectInstance { get; internal set; }
-        public static IRealtimeStats RealtimeStatsInstance { get; internal set; }
-        public static ISceneLoader SceneLoaderManagerInstance { get; internal set; }
-        public static IUIHub UIHub { get; internal set; }
-        public static IPauseMenu UIPauseMenu { get; internal set; }
-        public static IDiscoveryDialog UIDiscoveryDialog { get; internal set; }
-        public static SettingsGlobalEvents GlobalInput { get; internal set; }
+        public static ISingleScene SingleScene { get;  set; }
+        //public static IDiscoveryDialog DiscoveryDialogInstance { get; set; }
+        public static LightManagerObject LightManagerObjectInstance { get;  set; }
+        public static IRealtimeStats RealtimeStatsInstance { get;  set; }
+        public static ISceneLoader SceneLoaderManagerInstance { get;  set; }
+        public static IUIHub UIHub { get;  set; }
+        public static IPauseMenu UIPauseMenu { get;  set; }
+        public static IDiscoveryDialog UIDiscoveryDialog { get;  set; }
+        public static SettingsGlobalEvents GlobalInput { get;  set; }
     }
 }

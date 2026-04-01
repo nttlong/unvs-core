@@ -11,6 +11,12 @@ namespace unvs.ext
 {
     public static class PanelExtension
     {
+        public static void ShowAtCenter(this Image panel, float widthInPixels,float heightInPixels)
+        {
+            var v = (Commons.GetScreenSize()-new Vector2(widthInPixels,heightInPixels))/2;
+            panel.SetPosition(v.x,v.y,widthInPixels,heightInPixels);
+        }
+
         public static void SetPosition(
         this Image panel,
         float xPixel,

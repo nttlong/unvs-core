@@ -5,11 +5,19 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.U2D.Animation;
+using UnityEngine.UI;
 
 namespace unvs.ext
 {
     public static class MonoBehaviourExtension
     {
+        public static Canvas AddChildChildCanvasWithGraphicRaycasterIfNotExist(this MonoBehaviour obj, string name) 
+        
+        {
+            var ret = obj.AddChildComponentIfNotExist<Canvas>(name);
+            ret.AddComponentIfNotExist<GraphicRaycaster>();
+            return ret;
+        }
         public static T AddChildComponentIfNotExist<T>(this MonoBehaviour obj, string name) where T : Component
         {
             var ret= obj.GetComponentInChildrenByName<T>(name);

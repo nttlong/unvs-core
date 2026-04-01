@@ -10,14 +10,14 @@ namespace unvs.actors
             get
             {
                 
-                return unvs.shares.GlobalApplication.DiscoveryDialogInstance;
+                return unvs.shares.GlobalApplication.UIDiscoveryDialog;
             }
         }
 
         public async UniTask ShowDialogAsync(MonoBehaviour source)
         {
-            if (unvs.shares.GlobalApplication.DiscoveryDialogInstance == null) return;
-            await unvs.shares.GlobalApplication.DiscoveryDialogInstance.DoShowDialogAsync(this, source);
+            if (unvs.shares.GlobalApplication.UIDiscoveryDialog == null) return;
+            await unvs.shares.GlobalApplication.UIDiscoveryDialog.DoShowDialogAsync(this, source);
         }
     }
 }

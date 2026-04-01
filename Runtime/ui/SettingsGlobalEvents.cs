@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks.Triggers;
 using System;
 using System.Collections;
 using System.Threading;
@@ -17,6 +18,31 @@ namespace unvs.ui
 {
     public class InputActions
     {
+        private bool _enable;
+        public Action OnEnable;
+        public Action OnDisable;
+        public bool enable
+        {
+            get
+            {
+                return _enable;
+            }
+            set
+            {
+                _enable = value;
+                if(value)
+                {
+                    OnEnable?.Invoke();
+                } else
+                {
+                    OnDisable?.Invoke();
+                }
+            }
+        }
+
+            
+        
+
         public InputAction Look { get; set; }
         public InputAction Move { get; set; }
         public InputAction Interact { get; set; }
@@ -30,6 +56,8 @@ namespace unvs.ui
         public InputAction Pause { get; set; }
         public InputAction Cancel { get; set; }
         public InputAction ScrollWheel { get; set; }
+        public InputAction Submit { get; set; }
+        
     }
     public abstract class SettingsGlobalEvents : MonoBehaviour
     {

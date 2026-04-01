@@ -18,7 +18,7 @@ namespace unvs.shares
         public string layerName;
         public Animator animationController;
         public string paramName;
-        public int index;
+        public int layerIndex;
         public string blendName;
         public int blendIndex;
     }

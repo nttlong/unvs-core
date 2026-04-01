@@ -51,18 +51,24 @@ namespace unvs.actionsbasics
             {
                 if (actor.Physical.IsTargetLower(pos))
                 {
-                   await  actor.Motion.BendDownAndPickItemAsync();
+                   await  actor.Motion.BendDownAndPickItemAsync(()=> {
+                       actor.Motion.Idle();
+
+                   },Sender.Cts.Token);
 
                 } else
                 {
 
-                    await actor.Motion.PickItemAsync();
+                    await actor.Motion.PickItemAsync(()=>
+                    {
+                        actor.Motion.Idle();
+                    },Sender.Cts.Token);
                     // if (MsgFail.IsValid()) await actor.Speaker.SayAsync(MsgFail);
                     //await actor.Speaker.SayICanNotDoThatAsync();
                 }
                     
             }
-            actor.Motion.Idle();
+           
 
 
         }

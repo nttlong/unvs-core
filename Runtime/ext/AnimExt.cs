@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Cysharp.Threading.Tasks;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Unity.VisualScripting;
 
 #if UNITY_EDITOR
@@ -104,7 +107,7 @@ namespace unvs.ext
 
                                 layerName = layer.name,
                                 animationController = anim,
-                                index = i,
+                                layerIndex = i,
                                 paramName = blendTree.blendParameter,
                                 value = child.threshold
 
@@ -139,7 +142,7 @@ namespace unvs.ext
 
                             layerName = layer.name,
                             animationController = anim,
-                            index=i,
+                            layerIndex = i,
 
                         });
                     }
@@ -222,6 +225,25 @@ namespace unvs.ext
                 sg.sortingOrder = s.GetComponent<SpriteRenderer>().sortingOrder;
                 Debug.Log($"{s.transform.name}");
             }
+        }
+        public static async UniTask PlayAnimationAsync(this Animator animator, string stateName, int layer,Action OnFinish, CancellationToken ct, float normalizedTime=1f)
+        {
+            // 1. Kích hoạt Animation
+            animator.PlayInFixedTime(stateName, layer);
+
+            // 2. Đợi 1 frame để Animator chuyển sang State mới 
+            // (Nếu không nó sẽ lấy thông tin của State cũ)
+            await UniTask.Yield();
+            
+            // 3. Đợi cho đến khi Animation chạy đến cuối (normalizedTime >= 1)
+            await UniTask.WaitUntil(() =>
+               // animator.GetCurrentAnimatorStateInfo(layer).IsName(stateName) &&
+               
+                animator.GetCurrentAnimatorStateInfo(layer).normalizedTime >= animator.GetCurrentAnimatorStateInfo(layer).length,
+                cancellationToken: ct
+            );
+
+            OnFinish?.Invoke();
         }
     }
 }
