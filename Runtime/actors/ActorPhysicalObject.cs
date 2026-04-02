@@ -74,14 +74,25 @@ namespace unvs.actors
 
         public void HoldItem(MonoBehaviour item)
         {
+            item.GetComponent<Collider2D>().enabled = false;
+            item.GetComponent<SortingGroup>().enabled = false;
             var obj = item.GetComponent<ICarryableObject>();
             if (obj == null) return;
-
-            obj.Handle.transform.SetParent(SocketBack.transform, false);
-            item.transform.SetParent(SocketBack.transform, false);
-            obj.Handle.AddComponentIfNotExist<SortingGroup>();
             currentHoldingObject = item;
-            item.SetMeOnLayer(unvs.shares.Constants.Layers.HOLD_ITEM);
+          
+            
+            CurrentHoldingObject.transform.AttachToParent(SocketBack.transform);
+
+            SpriteRenderer sr = (this as MonoBehaviour).FindSpriteRenderer(SocketBack.transform.parent);
+            if (sr != null)
+            {
+                CurrentHoldingObject.SetSortingOrder(sr, true);
+                //var sr2 = CurrentHoldingObject.GetComponentInChildren<SpriteRenderer>();
+                //if (sr2 != null)
+                //{
+                //    sr2.SetSortingOrder()
+                //}
+            }
 
 
 

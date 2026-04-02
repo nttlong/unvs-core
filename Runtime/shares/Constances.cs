@@ -24,7 +24,7 @@ namespace unvs.shares
 
             public const string INVENTORY = "inventory";
 
-            public const string HOLD_ITEM = "hold_item";
+            public const string HOLD_ITEM = "Hold-Item";
             public const string LIMIT_WALL = "limit_wall";
 
             public const string SURFACE = "surface";

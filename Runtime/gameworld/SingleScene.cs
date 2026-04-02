@@ -281,7 +281,7 @@ namespace unvs.gameword
                 {
                     throw new Exception($"Pleass, setup {typeof(SettingsGlobalEvents)}");
                 }
-              
+                InitGlobalEvents();
             }
             if (Application.isPlaying && !string.IsNullOrEmpty(cinemaSettingPrefabPath))
             {
@@ -309,6 +309,43 @@ namespace unvs.gameword
             InitDefaultCursor();
 
         }
+
+        private void InitGlobalEvents()
+        {
+            GlobalApplication.Events.OnHoverInteractObject += Events_OnHoverInteractObject;
+        }
+        string _unknownIconPrefabPath = "Assets/prefabs/Sprites/unknowni.png";
+        string _openableIconPrefab = "Assets/prefabs/Sprites/Openable.psd";
+        string _pickItemInconPrefab = "Assets/prefabs/Sprites/pick-item.psd";
+        private void Events_OnHoverInteractObject(Vector2 arg1, Image cursor, GameObject target)
+        {
+            var interactableObject = target.GetComponent<IInteractableObject>();
+            if (interactableObject != null)
+            {
+                var t = interactableObject.Exploring;
+                switch (t)
+                {
+                    case ExploringType.Unknown:
+                        cursor.sprite = Commons.LoadAsset<Sprite>(_unknownIconPrefabPath);
+                       
+                        break;
+                    case ExploringType.None:
+                        cursor.sprite = Commons.LoadAsset<Sprite>(_unknownIconPrefabPath);
+                      
+                        break;
+                    case ExploringType.Openable:
+                        cursor.sprite = Commons.LoadAsset<Sprite>(_openableIconPrefab);
+
+                        break;
+                    case ExploringType.Pickable:
+
+                        cursor.sprite = Commons.LoadAsset<Sprite>(_pickItemInconPrefab);
+
+                        break;
+                }
+            }
+        }
+
         public void InitDefaultCursor()
         {
             if (!Application.isPlaying) return;

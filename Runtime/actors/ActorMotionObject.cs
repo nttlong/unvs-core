@@ -65,18 +65,20 @@ namespace unvs.actors
         public virtual void Idle()
         {
             Animator anim =Instance.Anim;
-            var physical=this.GetComponent<IActorPhysical>();
-            if (physical!=null)
+           
+            this.PlayBaselayerMotion("Idle");
+
+            var physical = this.GetComponent<IActorPhysical>();
+            if (physical != null)
             {
                 if (physical.CurrentHoldingObject != null)
                 {
-                    throw new System.NotImplementedException();
-                    return;
+                    //this.PlayAddtiveMotion("Idle-Hangging-Item");
+                    physical.CurrentHoldingObject.transform.AttachToParent(this.GetComponent<IActorPhysical>().SocketBack.transform);
+                    
                 }
+                  
             }
-            this.PlayBaselayerMotion("Idle");
-
-
         }
         public virtual void PlayBlendTreeMotion(string layername, string blendName, string motionName)
         {
@@ -122,6 +124,16 @@ namespace unvs.actors
         public virtual void Walk()
         {//"Motions.Walk"
             this.PlayBaselayerMotion("Walk");
+            var physical = this.GetComponent<IActorPhysical>();
+            if (physical != null)
+            {
+                if (physical.CurrentHoldingObject != null)
+                {
+                    //this.PlayAddtiveMotion("Walk-Hangging-Item");
+                    physical.CurrentHoldingObject.transform.AttachToParent(this.GetComponent<IActorPhysical>().SocketBack.transform);
+                    //physical.CurrentHoldingObject.gameObject.SetActive(true);
+                }
+            }
             this.GetComponent<ISpeakableObject>()?.Off();
             
         }

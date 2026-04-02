@@ -14,6 +14,7 @@ namespace unvs.baseobjects
     [RequireComponent(typeof(SpriteRenderer))]
     [RequireComponent(typeof(SortingGroup))]
     [RequireComponent (typeof(BoxCollider2D))]
+    [RequireComponent(typeof(ShadowCaster2DObject))]
     public class TeleportObject : MonoBehaviour, ITeleportPrefab,IInteractableObject,ISpawnTarget, IConsumerObject
     {
         [Header("Audio")]

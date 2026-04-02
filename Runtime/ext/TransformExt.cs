@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Cinemachine;
 using UnityEngine;
+using unvs.interfaces;
 
 namespace unvs.ext
 {
@@ -99,6 +100,14 @@ namespace unvs.ext
             }
 
             return go.AddComponent<T>();
+        }
+
+        public static void AttachToParent(this Transform child, Transform parent)
+        {
+            child.SetParent(parent, false);
+            child.localPosition = Vector3.zero;
+            child.localRotation = Quaternion.identity;
+            child.localScale = Vector3.one;//physical.CurrentHoldingObject.gameObject.SetActive(true);
         }
     }
 }

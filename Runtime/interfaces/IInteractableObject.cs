@@ -11,7 +11,8 @@ namespace unvs.interfaces
     {
         None,
         Unknown,
-        Pick,
+        Pickable,
+        Openable
 
     }
     public interface IInteractableObject

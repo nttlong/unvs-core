@@ -19,7 +19,7 @@ namespace unvs.baseobjects
     [RequireComponent(typeof(UniqueObject))]
     public class PickableItem : MonoBehaviour, IPickableObject, IInteractableObject, IStoragableObject, IConsumableItem
     {
-        public ExploringType exploring;
+        public ExploringType exploring=ExploringType.Pickable;
         public InteractionDefinition data;
         public Collider2D coll;
         public Sprite icon;
@@ -83,7 +83,9 @@ namespace unvs.baseobjects
             if (Application.isPlaying)
             {
                 this.SetMeOnLayer(Constants.Layers.INTERACT_OBJECT);
-                spriteR.enabled = hideSpriteRendererWhenPlaying;
+                GetComponent<SpriteRenderer>().enabled = !hideSpriteRendererWhenPlaying;
+               
+                return;
             }
             if (spriteR == null) spriteR = GetComponent<SpriteRenderer>();
             if (texT == null)

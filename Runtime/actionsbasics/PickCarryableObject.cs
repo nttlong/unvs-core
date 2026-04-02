@@ -23,19 +23,19 @@ namespace unvs.actionsbasics
             var pos = obj.Handle.position;
             var socketPosition = actor.Physical.SocketBack.position;
             var distance = Vector2.Distance(socketPosition, pos);
-            if (socketPosition.y - pos.y > PreciseReachDistance)
-            {
-                
-              
-                actor.Motion.Anim.PlayCrossFade("Motions.Pick-Ittem-Slow");
+            //if (socketPosition.y - pos.y > PreciseReachDistance)
+            //{
+
+
+            //    await actor.Motion.BendDownAndPickItemAsync(() => { },Sender.Cts.Token);
                
-            }
-            actor.Physical.HoldItem(obj as MonoBehaviour);
+            //}
+            
             
             actor.Motion.Idle();
 
+            actor.Physical.HoldItem(obj as MonoBehaviour);
 
-            
             if (actor == null)
             {
                 Sender.Cancel();

@@ -89,7 +89,7 @@ namespace unvs.ext
         }
         public static void PlayAddtiveMotion(this BlendTreeInfo[] blendTreeAnim, string motionName)
         {
-            var item = blendTreeAnim.FirstOrDefault(p => p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase));
+            var item = blendTreeAnim.FirstOrDefault(p =>p.layerIndex>0 && p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase));
             if (item == null)
             {
                 throw new Exception($"Can not find {motionName}");

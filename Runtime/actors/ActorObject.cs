@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.U2D.Animation;
 using unvs.actors.actions;
+using unvs.baseobjects;
 using unvs.ext;
 using unvs.gameobjects;
 using unvs.gameword;
@@ -34,6 +35,7 @@ namespace unvs.actors
     [RequireComponent(typeof(UniqueObject))]
     [RequireComponent(typeof(SortingGroup))]
     [RequireComponent(typeof(ActorController))]
+    [RequireComponent(typeof(ShadowCaster2DObject))]
     public class ActorObject : MonoBehaviour, IActorObject
     {
         IActorObject instance;
