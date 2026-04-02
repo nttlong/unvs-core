@@ -61,22 +61,27 @@ namespace unvs.ui
     }
     public abstract class SettingsGlobalEvents : MonoBehaviour
     {
-        public InputActions Player;
+        public InputActions Player { get; set; }
 
-        public UIInputActions UI;
+        public UIInputActions UI { get; set; }
 
         private void Awake()
         {
             Player=new InputActions();
             UI = new UIInputActions();
+            var inputs=OnMapInputSystem();
+            Commons.DoMapPalerAndUIAction(inputs, this);
+            GlobalApplication.GlobalInput = this;
             SetupController();
             GlobalApplication.GlobalInput = this;
         }
-        
 
-        
+        public abstract object OnMapInputSystem();
+       
 
         public abstract void SetupController();
 
+        public abstract void RaiseOnExitGame();
+       
     }
 }

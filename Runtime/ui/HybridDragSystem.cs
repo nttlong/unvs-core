@@ -80,6 +80,7 @@ namespace unvs.ui
 
         private void Update()
         {
+            if(GlobalApplication.GlobalInput==null) return;
             var ui = GlobalApplication.GlobalInput.UI;
 
             // 1. CẬP NHẬT TỌA ĐỘ (HYBRID LOGIC)

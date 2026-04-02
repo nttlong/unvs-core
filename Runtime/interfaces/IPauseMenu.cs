@@ -6,7 +6,7 @@ namespace unvs.interfaces
 {
     public interface IPauseMenu
     {
-        GameObject FirstSelectItem {  get; }
+       
         Canvas PauseMenuCanvas { get; }
         Image PauseMenuPanel { get; }
         Action OnResume { get; set; }

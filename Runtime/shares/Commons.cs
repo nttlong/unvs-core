@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AddressableAssets; // Cần cái này
+using UnityEngine.InputSystem;
 using UnityEngine.Localization;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using unvs.ui;
 namespace unvs.shares
 {
     public enum DockDirection
@@ -289,6 +291,55 @@ namespace unvs.shares
             float height = cam.orthographicSize * 2f;
             float width = height * cam.aspect; // cam.aspect = Screen.width / Screen.height
             return new Vector2(width, height);
+        }
+
+        public static void DoMapAction(object source, object target)
+        {
+            var sourceMapType = source.GetType();
+
+            // 2. Get properties from your target 'Player' object (the one receiving the actions)
+            var targetProperties = target.GetType().GetProperties()
+                .Where(p => p.PropertyType == typeof(InputAction) && p.CanWrite);
+
+            foreach (var targetProp in targetProperties)
+            {
+                // 3. Find the matching property in the source Action Map
+                var sourceProp = sourceMapType.GetProperty(targetProp.Name);
+
+                if (sourceProp != null)
+                {
+                    // 4. CRITICAL: Pass 'sourcePlayerMap' as the instance, NOT 'this.inputs'
+                    var actionValue = sourceProp.GetValue(source);
+
+                    targetProp.SetValue(target, actionValue, null);
+
+                    
+                }
+            }
+        }
+        public static void DoMapPalerAndUIAction(object source, object target)
+        {
+            var sourcePlayerProperty = source.GetType().GetProperty("Player");
+            if (sourcePlayerProperty == null) return;
+            var sourcePlayerValue = sourcePlayerProperty.GetValue(source);
+            if (sourcePlayerValue == null) return;
+            var targetPlayerProperty = target.GetType().GetProperty("Player");
+            if (targetPlayerProperty == null) return;
+            var targetPlayerValue = targetPlayerProperty.GetValue(target);
+            if (targetPlayerValue == null) return;
+            Commons.DoMapAction(sourcePlayerValue, targetPlayerValue);
+            targetPlayerProperty.SetValue(target, targetPlayerValue);
+            var sourceUIProperty = source.GetType().GetProperty("UI");
+            if (sourceUIProperty == null) return;
+            var sourceUIValue = sourceUIProperty.GetValue(source);
+            if (sourceUIValue == null) return;
+            var targetUIProperty = target.GetType().GetProperty("UI");
+            if (targetUIProperty == null) return;
+            var targetUIValue = targetUIProperty.GetValue(target);
+            Commons.DoMapAction(sourceUIValue, targetUIValue);
+            targetUIProperty.SetValue(target, targetUIValue);
+            
+            
         }
     }
 }

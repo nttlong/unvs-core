@@ -15,6 +15,8 @@ namespace unvs.interfaces
         Action OnExitClick { get; set; }
         Canvas MenuCanvas { get; }
         Image Panel { get; }
+        bool IsShowing { get; }
+
         void DoStartGame();
         void DoExitGame();
     }

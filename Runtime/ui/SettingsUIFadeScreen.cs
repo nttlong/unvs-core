@@ -22,6 +22,7 @@ namespace unvs.ui
 
         public async UniTask FadeInAsync(float fadingTime = 0.5F)
         {
+            Time.timeScale = 1;
             this.uiCanvas.enabled = true;
             this.uiCanvas.gameObject.SetActive(true);
             await panel.FadeInAsync(fadingTime);
@@ -29,6 +30,7 @@ namespace unvs.ui
 
         public async UniTask FadeOutAsync(float fadingTime = 0.5F)
         {
+            Time.timeScale = 1;
             await panel.FadeOutAsync(fadingTime);
             this.uiCanvas.enabled = false;
             this.uiCanvas.gameObject.SetActive(false);

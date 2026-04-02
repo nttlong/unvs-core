@@ -31,7 +31,7 @@ namespace unvs.shares
 
             public const string ENEMIES = "enemies";
 
-           
+            public const string TOP_UI = "TOP-UI";
         }
         public class Scenes
         {
@@ -94,6 +94,9 @@ namespace unvs.shares
             public const string INVENTORY_PANEL_BAGGER = "INVENTORY-PANEL-BAGGER";
 
             public const string UI_SYSTEM_DRAG_DROP = "UI-SYSTEM-DRAG_DROP";
+
+            public const string TOP_CANVAS = "TOP-CANVAS";
+            public const string VIRTUAL_CURSOR = "VIRTUAL-CURSOR";
         }
         public class Settings
         {

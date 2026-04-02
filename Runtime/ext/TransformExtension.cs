@@ -8,6 +8,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.U2D.Animation;
+using unvs.interfaces;
 using unvs.shares;
 namespace unvs.ext
 {
@@ -17,12 +18,9 @@ namespace unvs.ext
         public static void MoveContinuous(this Transform transform, Vector2 direction, float speed)
         {
             if (transform == null || direction == Vector2.zero) return;
-
-            // Chỉ di chuyển trên trục X (theo logic của bạn)
-            // Nếu muốn di chuyển cả Y, hãy thay 0 bằng direction.y
-            Vector3 velocity = new Vector3(direction.x, 0, 0) * speed * Time.deltaTime;
-
-            transform.position += velocity;
+           
+            transform.position += new Vector3(direction.x>0?1:-1,0,0) * (speed * Time.deltaTime);
+           
         }
         public static Transform FlipX(this Transform transform)
         {

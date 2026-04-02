@@ -25,12 +25,17 @@ namespace unvs.ext
             if (ret != null) return ret;
             var go=new GameObject(name);
             go.transform.SetParent(obj.transform);
-            if(typeof(T)== typeof(Transform)){
+            if (typeof(T) == typeof(Canvas))
+            {
+                go.SetMeOnLayer(unvs.shares.Constants.Layers.UI);
+            }
+            if (typeof(T)== typeof(Transform)){
                 return go.transform as T;
             } else
             {
                 return go.AddComponent<T>();
             }
+           
         }
         public static T AddComponentIfNotExist<T>(this Component obj, Action<T> OnInit = null) where T : Component
         {
@@ -43,7 +48,10 @@ namespace unvs.ext
                 component = obj.gameObject.AddComponent<T>();
                 OnInit?.Invoke(component);
             }
-
+            if (typeof(T) == typeof(Canvas))
+            {
+                obj.gameObject.SetMeOnLayer(unvs.shares.Constants.Layers.UI);
+            }
             return component;
         }
         public static T AddComponentIfNotExist<T>(this MonoBehaviour obj, Action<T> OnInit = null) where T : Component
@@ -57,7 +65,10 @@ namespace unvs.ext
                 component = obj.AddComponent<T>();
                 OnInit?.Invoke(component);
             }
-
+            if (typeof(T) == typeof(Canvas))
+            {
+                obj.SetMeOnLayer(unvs.shares.Constants.Layers.UI);
+            }
             return component;
         }
         public static SpriteSkin GetSpriteSkin(this GameObject obj)

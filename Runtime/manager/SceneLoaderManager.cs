@@ -182,9 +182,11 @@ namespace unvs.manager
 
         public async UniTask<IScenePrefab> LoadNewAsync(string pathToWord, string targetName)
         {
+            await ClearAsync();
             await GlobalApplication.FadeScreenController.FadeInAsync();
             GlobalApplication.WorldTrackerObject?.Cts?.Stop();
-            await ClearAsync();
+           
+          
             var scene = await Commons.LoadPrefabsAsync<IScenePrefab>(pathToWord, this.tempLoader);
             OnLoadBegin?.Invoke(scene,LoadTypeEnum.New);
             

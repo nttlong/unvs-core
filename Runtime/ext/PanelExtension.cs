@@ -131,7 +131,7 @@ namespace unvs.ext
         }
         public static void DockFull(this UnityEngine.UI.Image panel)
         {
-            
+            if (!Application.isPlaying) return;
             if (panel == null) return;
 
             // Lấy RectTransform của image

@@ -303,79 +303,8 @@ namespace unvs.actors
             rb.freezeRotation = true;
         }
        
-        void UpdateDelete()
-        {
-            if(controller!=null)
-            Speaker.SayText($"IsInteracting={controller.IsInteracting}");
-            if (rb == null || controller == null) return;
-            if (controller.IsInteracting ) return;
-            int contactCount = rb.GetContacts(floorFilter, contacts);
-            bool isGrounded = false;
-            Vector2 groundNormal = Vector2.up;
-
-            if (contactCount > 0)
-            {
-                for (int i = 0; i < contactCount; i++)
-                {
-                    // Độ dốc cho phép (0.5f tương đương dốc 45 độ)
-                    if (contacts[i].normal.y > 0.5f)
-                    {
-                        isGrounded = true;
-                        groundNormal = contacts[i].normal;
-                        break;
-                    }
-                }
-            }
-
-            Vector2 finalVelocity = rb.linearVelocity;
-            float moveInput = controller.Direction.x;
-
-            if (Mathf.Abs(moveInput) > 0.01f && controller.Speed > 0)
-            {
-                if (isGrounded)
-                {
-                    // Tính hướng dốc chuẩn
-                    Vector2 slopeDir = new Vector2(groundNormal.y, -groundNormal.x);
-
-                    // Tính vận tốc dựa trên hướng dốc
-                    Vector2 moveVelocity = slopeDir * (moveInput * controller.Speed);
-
-                    // BÍ QUYẾT: Chỉ ép Y mạnh khi đang thực sự ở trên dốc đi xuống
-                    // Nếu mặt ngang (Normal.y xấp xỉ 1), chỉ ép nhẹ để giữ Grounded
-                    float stickyForce = (groundNormal.y < 0.99f) ? -2f : -0.1f;
-
-                    finalVelocity.x = moveVelocity.x;
-                    finalVelocity.y = moveVelocity.y + stickyForce;
-                }
-                else
-                {
-                    // Trên không: giữ X, Y rơi tự do theo trọng lực Unity
-                    finalVelocity.x = moveInput * controller.Speed;
-                }
-            }
-            else
-            {
-                // Khi không bấm nút: Dừng X, Y giữ nguyên để bám sàn
-                finalVelocity.x = 0;
-                if (isGrounded) finalVelocity.y = -0.5f;
-            }
-
-            rb.linearVelocity = finalVelocity;
-        }
-        void HandleSlopeMovement(Vector2 groundNormal)
-        {
-            // Triệt tiêu lực nảy bằng cách điều chỉnh vận tốc theo độ nghiêng của sàn
-            // Giúp nhân vật bám dính lấy dốc
-            float slopeAngle = Vector2.Angle(Vector2.up, groundNormal);
-
-            if (slopeAngle > 0)
-            {
-                // Ép vận tốc Y tỉ lệ thuận với vận tốc X để "dán" vào mặt dốc
-                Vector2 velocity = rb.linearVelocity;
-                float speed = velocity.x;
-                rb.linearVelocity = new Vector2(speed, -Mathf.Abs(speed) * Mathf.Tan(slopeAngle * Mathf.Deg2Rad));
-            }
-        }
+        
+       
         private void OnDestroy()
         {
             OnDestroying?.Invoke();

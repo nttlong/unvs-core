@@ -7,7 +7,8 @@ using Unity.Cinemachine;
 
 using UnityEngine;
 using UnityEngine.EventSystems;
-
+using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 //using UnityEngine.UIElements.InputSystem;
 using unvs.ext;
@@ -121,7 +122,9 @@ namespace unvs.gameword
 
         public ISceneLoader SceneLoader => sceneLoader;
 
-        
+        public Image CursorImage => cursor;
+
+        public Canvas TopCanvas => topCanvas;
 
         public string StartPath;
         private ISceneLoader sceneLoader;
@@ -154,26 +157,18 @@ namespace unvs.gameword
         /// "Assets/Prefabs/UI/PauseMenu/PauseMenu.prefab"
         /// </summary>
         public string PauseMenuAddressalbePath;
-      
+        public Texture2D cursorIcon;
+        public Canvas topCanvas;
+        public Image cursor;
 
         private bool SetupSingeScene()
         {
-            //if (Instance != null)
-            //{
-            //    Destroy(gameObject);
-            //    return false;
-            //}
-            //DontDestroyOnLoad(gameObject);
+          
             Instance = this;
 
             _ = Instance.Cam;
             _ = Instance.VCam;
-            //if (cam == null)
-            //{
-            //    cam = Camera.main;
-            //    if (cam != null)
-            //        cam.AddComponentIfNotExist<CamObject>();
-            //}
+           
             unvs.shares.GlobalApplication.SingleScene = this;
             if (goSceneLoader == null)
             {
@@ -209,7 +204,7 @@ namespace unvs.gameword
         {
            
             
-            //await GlobalApplication.FadeScreenController.FadeInAsync();
+           
             
             await GlobalApplication.SceneLoaderManagerInstance.ClearAllAsync();
            
@@ -225,55 +220,68 @@ namespace unvs.gameword
             pauseMenu = pauseMenuGo.GetComponent<IPauseMenu>();
             pauseMenu.OnExit = () =>
             {
-                
 
-                RunExitAsync().Forget();
+
+                GlobalApplication.DoExitGame();
 
             };
             pauseMenu.OnResume = () =>
             {
                 pauseMenu.Hide();
             };
+            pauseMenu.OnToMain = () =>
+            {
+                GlobalApplication.SceneLoaderManagerInstance.ClearAllAsync().ContinueWith(() =>
+                {
+                    PauseMenu.Hide();
+                    MainMenu.Show();
+                }).Forget();
+            };
         }
-
+         async UniTask StartGame()
+        {
+            await GlobalApplication.SceneLoaderManagerInstance.LoadNewAsync(this.StartPath, null);
+            maiMenu.GetComponent<IMainMenu>().Hide();
+        }
         private void LoadPrefabMainMenu()
         {
+            InitDefaultCursor();
             maiMenu = Commons.LoadPrefabs(MainMenuAddressablePath);
             maiMenu.transform.SetParent(transform);
             // maiMenu.SetActive(false);
             _mainMenu = maiMenu.GetComponent<IMainMenu>();
             _mainMenu.OnStartClick = () =>
             {
-                if (isStarting) return;
-                isStarting=true;
-                //var runner = ChunkSceneLoaderUtils.LoadNewAsync(this.StartPath, null);
-                var runner = GlobalApplication.SceneLoaderManagerInstance.LoadNewAsync(this.StartPath,null);
-                runner.ContinueWith((p) =>
-                {
-                    _mainMenu.Hide();
-                    isStarting = false;
-                }).Forget();
+                
+                StartGame().Forget();
+            };
+            _mainMenu.OnExitClick = () =>
+            {
+                GlobalApplication.DoExitGame();
             };
         }
         private void Awake()
         {
             
-        }
-
-        private void UiEvents_PauseStarted()
-        {
-            pauseMenu.Toggle();
+            // Optional: Lock it to the center so it doesn't accidentally click outside the window
            
         }
+
+        
 
         private void Start()
         {
             if (Application.isPlaying)
             {
+                if (cursorIcon == null)
+                {
+                    throw new Exception($"Pleass, setup cursorIcon for {name}");
+                }
                 if (GetComponent<SettingsGlobalEvents>() == null)
                 {
                     throw new Exception($"Pleass, setup {typeof(SettingsGlobalEvents)}");
                 }
+              
             }
             if (Application.isPlaying && !string.IsNullOrEmpty(cinemaSettingPrefabPath))
             {
@@ -298,49 +306,116 @@ namespace unvs.gameword
                 this.MainMenu.Hide();
             }
             cam = Camera.main;
-           
+            InitDefaultCursor();
+
+        }
+        public void InitDefaultCursor()
+        {
+            if (!Application.isPlaying) return;
+            if (topCanvas == null)
+            {
+                topCanvas = this.AddChildComponentIfNotExist<Canvas>(Constants.ObjectsConst.TOP_CANVAS);
+                //topCanvas.AddComponentIfNotExist<GraphicRaycaster>();
+                topCanvas.FullSize();
+                topCanvas.SetMeOnLayer(Constants.Layers.UI);
+                topCanvas.sortingOrder = 1024;
+
+                cursor = topCanvas.transform.AddChildComponentIfNotExist<Image>(Constants.ObjectsConst.VIRTUAL_CURSOR);
+                // 3. Convert Texture2D to Sprite
+                // cursorIcon is your Texture2D asset
+                if (cursorIcon != null)
+                {
+                    // Create a new Sprite from the texture
+                    // Rect defines the area (full texture), Pivot (0.5, 0.5) centers it
+                    cursor.sprite = Sprite.Create(
+                        cursorIcon,
+                        new Rect(0, 0, cursorIcon.width, cursorIcon.height),
+                        new Vector2(0.5f, 0.5f)
+                    );
+
+                    // 4. Set the UI size based on the texture dimensions
+                    cursor.rectTransform.sizeDelta = new Vector2(cursorIcon.width, cursorIcon.height);
+                }
+
+                // 5. Reset position to center of screen initially
+                cursor.rectTransform.anchoredPosition = Vector2.zero;
+                // Hide the system cursor
+                Cursor.visible = false;
+            }
+        }
+        /// <summary>
+        /// This function will update postion of cursor for input_system keyboard and mouse or even gamepad
+        /// </summary>
+        void Update()
+        {
+            UpdateCursorPosition();
+        }
+        private void LateUpdate()
+        {
+            var pos = (Vector2)_virtualMousePos;
+            var interactObject = pos.GetHitCollider<Transform>(Constants.Layers.INTERACT_OBJECT);
+            if (interactObject != null)
+            {
+                GlobalApplication.Events.RaiseOnHoverInteractObject(pos,this.cursor,interactObject.gameObject);
+            } else
+            {
+                cursor.sprite = Sprite.Create(
+                           cursorIcon,
+                           new Rect(0, 0, cursorIcon.width, cursorIcon.height),
+                           new Vector2(0.5f, 0.5f)
+                       );
+            }
+        }
+        [SerializeField] float gamepadSensitivity = 1000f;
+        private Vector3 _virtualMousePos;
+
+        void UpdateCursorPosition()
+        {
+            Vector2 deltaMouse = Vector2.zero;
+            Vector2 stickInput = Vector2.zero;
+
+            // 1. Check Mouse (New System)
+            if (Mouse.current != null)
+            {
+                deltaMouse = Mouse.current.delta.ReadValue();
             }
 
+            // 2. Check Gamepad (New System)
+            if (Gamepad.current != null)
+            {
+                // Right Stick thường là stick phía tay phải
+                stickInput = Gamepad.current.rightStick.ReadValue();
+            }
 
+            // --- Logic cập nhật vị trí ---
 
-        //public void SetupComponentsOld()
-        //{
+            // Nếu chuột di chuyển (delta khác 0)
+            if (deltaMouse.sqrMagnitude > 0.01f)
+            {
+                // Với hệ thống mới, bạn có thể lấy vị trí chuột trực tiếp
+                _virtualMousePos = Mouse.current.position.ReadValue();
+            }
+            else if (stickInput.sqrMagnitude > 0.1f) // Deadzone
+            {
+                _virtualMousePos += (Vector3)stickInput * gamepadSensitivity * Time.deltaTime;
+            }
 
-        //    if (this.Cam == null || this.VCam == null) return;
-        //    this.Cam.AddComponentIfNotExist<CamObject>();
-        //    // 1. Setup vật lý cho Main Camera (Dựa theo ảnh 2)
-        //    this.Cam.orthographic = true;
-        //    this.Cam.orthographicSize = 20;
-        //    this.Cam.nearClipPlane = 0.5f;
-        //    this.Cam.farClipPlane = 1000f;
+            // Clamp và Update UI như cũ
+            _virtualMousePos.x = Mathf.Clamp(_virtualMousePos.x, 0, Screen.width);
+            _virtualMousePos.y = Mathf.Clamp(_virtualMousePos.y, 0, Screen.height);
 
-        //    // 2. Setup Cinemachine Camera (Để vcam điều khiển Main Cam đúng thông số)
-        //    // Trong Unity 6, LensSettings nằm trực tiếp trong vcam.Lens
-        //    //VCam.Lens.OrthographicSize = 20;
-        //    //VCam.Lens.NearClipPlane = 0.5f;
-        //    //VCam.Lens.FarClipPlane = 1000f;
+            cursor.rectTransform.position = _virtualMousePos;
+        }
 
-        //    // Đảm bảo vcam có Priority cao để Brain ưu tiên (Ảnh 1 cho thấy nó đang Live)
-        //    //VCam.Priority = 100;
+        public void CursorOff()
+        {
+            topCanvas.gameObject.SetActive(false);
+        }
 
-        //    // 3. Setup Confiner (Giới hạn vùng nhìn)
-        //    if (this.Confiner != null && this.GlobalWorldBound.Coll != null)
-        //    {
-        //        Confiner.BoundingShape2D = this.GlobalWorldBound.Coll;
-        //        // Xóa cache cũ để Confiner tính toán lại theo Collider mới của Scene
-        //        Confiner.InvalidateBoundingShapeCache();
-        //    }
-
-        //    // 4. FIX MÀN HÌNH XANH: Ép Camera về vị trí của mục tiêu ngay lập tức
-        //    // Nếu vcam.Follow đang null, nó sẽ đứng ở (0,0,0) và dễ gây màn hình xanh
-        //    //if (VCam.Follow != null)
-        //    //{
-        //    //    vcam.ForceCameraPosition(vcam.Follow.position, Quaternion.identity);
-        //    //}
-        //    // Brain.ManualUpdate();
-        //}
-
-        
+        public void CursorOn()
+        {
+            topCanvas.gameObject.SetActive(true);
+        }
     }
 
 }

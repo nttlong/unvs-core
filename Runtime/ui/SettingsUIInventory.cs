@@ -60,7 +60,7 @@ namespace unvs.ui
             img.sprite = storagableItem.Icon;
             source.transform.SetParent(bagger.transform, false);
             var actor=Owner.GetComponent<IActorObject>();
-            actor.Speaker.SayText($"Add {source.name}");
+           
             var item = source.GetComponent<IConsumableItem>();
             if(item != null)
             {

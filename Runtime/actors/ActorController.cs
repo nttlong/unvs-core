@@ -61,6 +61,8 @@ namespace unvs.actors {
 
         private void SetupInput()
         {
+            // Hide the system cursor
+           
             inputPlayer.Move.started += Move_started;
             inputPlayer.Move.canceled += Move_canceled;
             inputPlayer.Interact.started += Interact_started;
@@ -85,12 +87,14 @@ namespace unvs.actors {
             Direction= inputPlayer.Move.ReadValue<Vector2>();
             this.Actor.Motion.Flip(Direction.x);
             this.Actor.Motion.Walk();
+            SingleScene.Instance.CursorOff();
         }
         private void Interact_started(UnityEngine.InputSystem.InputAction.CallbackContext obj)
         {
             var isMouse = obj.control.device is Mouse;
             if (isMouse)
             {
+                SingleScene.Instance.CursorOn();
                 var pos = inputPlayer.Look.ReadValue<Vector2>().ToWorld();
                 Direction = (pos - actor.Physical.GetPosition()).CalculateDiection();
                 this.Actor.Motion.Flip(Direction.x);
@@ -144,8 +148,9 @@ namespace unvs.actors {
            
          
             if (!IsMoving) return;
-
+            this.GetComponent<IActorObject>().Speaker.SayText($"{Speed}");
             transform.MoveContinuous(Direction, Speed);
+            
         }
         private void OnDestroy()
         {

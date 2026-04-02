@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using unvs.interfaces;
@@ -28,6 +29,33 @@ namespace unvs.shares
         public static IPauseMenu UIPauseMenu { get;  set; }
         public static IDiscoveryDialog UIDiscoveryDialog { get;  set; }
         public static SettingsGlobalEvents GlobalInput { get;  set; }
-       
+        public static IMainMenu UIMainMenu { get; internal set; }
+
+        public static GlobalEvents Events = new GlobalEvents();
+
+        public static void DoExitGame()
+        {
+            // 1. Trigger your custom events (Save data, play exit sound, etc.)
+            GlobalInput.RaiseOnExitGame();
+
+            // 2. Handle Application Exit based on the Environment
+#if UNITY_EDITOR
+            // This will stop the Play Mode in the Unity Editor
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+    // This will close the actual built application (.exe, .app, .apk)
+    Application.Quit();
+#endif
+        }
+    }
+    public class GlobalEvents
+    {
+        public event Action<Vector2, Image, GameObject> OnHoverInteractObject;
+
+        internal void RaiseOnHoverInteractObject(Vector2 pos, Image cursor, GameObject gameObject)
+        {
+            OnHoverInteractObject?.Invoke(pos, cursor, gameObject);
+           
+        }
     }
 }

@@ -64,20 +64,21 @@ namespace unvs.ui
         {
             
             isConfirm = true;
-            this.DiscoveryDialogCanvas.enabled = false;
-            this.DiscoveryDialogCanvas.gameObject.SetActive(false);
-            GlobalApplication.GlobalInput.Player.enable = true;
-            Time.timeScale = 1f;
+         
+            
+           
+            this.DiscoveryDialogCanvas.DoDeactive();
         }
 
         public void Show()
         {
+            this.DiscoveryDialogCanvas.DoActive();
             confirmPanel.gameObject.SetActive(true);
             this.DiscoveryDialogCanvas.enabled = true;
             this.DiscoveryDialogCanvas.gameObject.SetActive(true);
-            this.DiscoveryDialogCanvas.FullSize();
+            
             this.DiscoveryDialogPanel.ShowAtCenter(width,height);
-            GlobalApplication.GlobalInput.Player.enable=false;
+            
             EventSystem.current.SetSelectedGameObject(btnOk.gameObject);
             Time.timeScale = 0f;
             
@@ -93,6 +94,7 @@ namespace unvs.ui
             btnOk=this.GetComponentInChildrenByName<Button>("btnOK");
             btnCancel = this.GetComponentInChildrenByName<Button>("btnCancel");
             confirmPanel = this.GetComponentInChildrenByName<Image>("ConfirmPanel");
+            
         }
         private void Start()
         {
@@ -106,7 +108,7 @@ namespace unvs.ui
                 if (btnCancel == null) throw new Exception($"Button Cancel was not found in {name}, please create button name btnCancel");
                 if(confirmPanel==null) throw new Exception($"Panel  'ConfirmPanel' was not found in {name}, please create Panel (name is 'confirmPanel') and place 2 buttons there");
                 GlobalApplication.UIDiscoveryDialog = this as IDiscoveryDialog;
-               
+                this.DiscoveryDialogCanvas.FullSize();
                 initEvents();
                 this.Hide();
             }

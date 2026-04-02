@@ -15,7 +15,7 @@ namespace unvs.ui
     {
         public Canvas pauseMenuCanvas;
         public Image pauseMenuPanel;
-        public GameObject firstSelectItem;
+       
 
         public Action OnResume { get; set ; }
         public Action OnExit { get ; set; }
@@ -27,31 +27,35 @@ namespace unvs.ui
 
        
 
-        public GameObject FirstSelectItem => firstSelectItem;
+       
 
         public void Hide()
         {
-            Time.timeScale = 1.0f;
-            this.pauseMenuCanvas.enabled = false;
-            this.pauseMenuCanvas.gameObject.SetActive(false);
-            //GlobalApplication.UIEventControllerInstance.PauseStarted -= UIEventControllerInstance_PauseStarted;
+            
+            
+            this.pauseMenuCanvas.DoDeactive();
         }
 
         public void Show()
         {
-            Time.timeScale =0f;
-            this.pauseMenuCanvas.enabled = true;
-            this.pauseMenuCanvas.gameObject.SetActive(true);
-            //GlobalApplication.UIEventControllerInstance.PauseStarted += UIEventControllerInstance_PauseStarted;
+            if (GlobalApplication.UIMainMenu.IsShowing) return;
+            this.pauseMenuCanvas.DoActive();
+            EventSystem.current.SetSelectedGameObject(null);
+
+            var firstSelectItem= this.GetComponentInChildren<Button>();
+            if(firstSelectItem != null)
+            {
+                EventSystem.current.SetSelectedGameObject(firstSelectItem.gameObject);
+                _lastSelectedButton= firstSelectItem.gameObject;
+            }
+
+
         }
 
-        private void UIEventControllerInstance_PauseStarted()
-        {
-            this.Toggle();
-        }
-
+       
         public void Toggle()
-        {
+        { 
+
             if (this.pauseMenuCanvas.enabled)
             {
                 Hide();
@@ -63,33 +67,54 @@ namespace unvs.ui
 
         private void Awake()
         {
-            if(Application.isPlaying)
-            {
-                if (firstSelectItem == null)
-                {
-                    throw new Exception("Please set value of firstSelectItem");
-                }
-            }
+            
             pauseMenuCanvas = this.AddChildComponentIfNotExist<Canvas>("PauseMenuCanvas");
             pauseMenuCanvas.AddComponentIfNotExist<GraphicRaycaster>();
             pauseMenuPanel = pauseMenuCanvas.transform.AddChildComponentIfNotExist<Image>("PauseMenuPanel");
+            pauseMenuCanvas.FullSize();
+            pauseMenuPanel.DockFull();
         }
         private void Start()
         {
             if(Application.isPlaying)
             {
-                this.pauseMenuCanvas.FullSize();
+                
                 GlobalApplication.UIPauseMenu = this as IPauseMenu;
                 this.Hide();
             }
         }
-        void OnEnable()
+        public void DoResum()
         {
-            // Xóa lựa chọn cũ (nếu có)
-            EventSystem.current.SetSelectedGameObject(null);
+            this.OnResume?.Invoke();
+        }
+        public void DoExitToMain()
+        {
+            this.OnToMain?.Invoke();
+        }
+        public void DoExit()
+        {
+            this.OnExit?.Invoke();
+        }
+        private GameObject _lastSelectedButton;
 
-            // Đặt lựa chọn mới vào nút mặc định
-            EventSystem.current.SetSelectedGameObject(firstSelectItem);
+        void Update()
+        {
+            if (pauseMenuCanvas.enabled)
+            {
+                // 1. Nếu có một Object đang được chọn, hãy lưu nó lại
+                if (EventSystem.current.currentSelectedGameObject != null &&
+                    EventSystem.current.currentSelectedGameObject != _lastSelectedButton)
+                {
+                    _lastSelectedButton = EventSystem.current.currentSelectedGameObject;
+                }
+
+                // 2. Nếu bỗng nhiên mất Focus (do click trượt hoặc lỗi logic)
+                if (EventSystem.current.currentSelectedGameObject == null && _lastSelectedButton != null)
+                {
+                    // Trả Focus về nút cũ để người dùng Gamepad có thể tiếp tục chơi
+                    EventSystem.current.SetSelectedGameObject(_lastSelectedButton);
+                }
+            }
         }
     }
 }

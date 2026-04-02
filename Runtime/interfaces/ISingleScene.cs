@@ -8,6 +8,8 @@ namespace unvs.interfaces
 {
     public interface ISingleScene
     {
+        Image CursorImage {  get; }
+        Canvas TopCanvas { get; }
         Camera Cam { get; }
         CinemachineBrain Brain { get; }
         CinemachineCamera VCam { get; }
@@ -22,8 +24,9 @@ namespace unvs.interfaces
        // IWorldMonitor WorldMonitor { get; }
         IPauseMenu PauseMenu { get; }
         ISceneLoader SceneLoader { get; }
-      
-      
-        
+
+        void CursorOff();
+        void CursorOn();
+        void InitDefaultCursor();
     }
 }
