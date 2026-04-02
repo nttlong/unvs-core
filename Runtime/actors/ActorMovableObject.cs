@@ -5,7 +5,7 @@ using System.Threading;
 using UnityEngine;
 using unvs.ext;
 using unvs.interfaces;
-using static UnityEditor.PlayerSettings;
+
 
 namespace unvs.actors
 {

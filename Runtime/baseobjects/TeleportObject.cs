@@ -14,7 +14,7 @@ namespace unvs.baseobjects
     [RequireComponent(typeof(SpriteRenderer))]
     [RequireComponent(typeof(SortingGroup))]
     [RequireComponent (typeof(BoxCollider2D))]
-    public class TeleportObject : MonoBehaviour, ITeleportPrefab,IInteractableObject,ISpawnTarget
+    public class TeleportObject : MonoBehaviour, ITeleportPrefab,IInteractableObject,ISpawnTarget, IConsumerObject
     {
         [Header("Audio")]
         [SerializeField]
@@ -35,6 +35,7 @@ namespace unvs.baseobjects
         public Texture2D texT;
         public Sprite sprite;
         public bool hideSpriteRendererWhenRun=true;
+        public InteractionDefinition consumeDefinintion;
 
         public AudioClip OpenSound => openSound;
 
@@ -68,9 +69,11 @@ namespace unvs.baseobjects
 
         public Vector2 Pos => GetPosition();
 
-        public SpriteRenderer Renderer => throw new System.NotImplementedException();
+        public SpriteRenderer Renderer => spriteRenderer;
 
         public bool HideSpriteRendererWhenRun => hideSpriteRendererWhenRun;
+
+        public InteractionDefinition ConsumeDefinintion => consumeDefinintion;
 
         public async UniTask<bool> ExecAsync(MonoBehaviour target, CancellationTokenSource token)
         {
@@ -124,28 +127,16 @@ namespace unvs.baseobjects
         {
             
         }
-#endif
+
         private void OnValidate()
         {
-#if UNITY_EDITOR
+
            this.sprite= GetComponent<SpriteRenderer>()?.ApplyTextureIfEmptySprite(texT);
 
-            //if (Application.isPlaying)
-            //{
-            //    return;
-            //}
-            //spriteRenderer = GetComponent<SpriteRenderer>();
-            //coll = GetComponent<BoxCollider2D>();
-            //if (spriteRenderer != null && coll != null)
-            //{
-            //    spriteRenderer.FitSpriteToBoxCollider2D_WorldCorrect(coll);
-            //}
             UnityEditor.EditorUtility.SetDirty(this);
             
 
 
-            //if(!Application.isPlaying)
-            //GetComponent<BoxCollider2D>()?.Resize(transform);
 
         }
 #endif

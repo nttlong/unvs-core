@@ -17,7 +17,7 @@ namespace unvs.baseobjects
     [RequireComponent(typeof(SortingGroup))]
     [RequireComponent(typeof(BoxCollider2D))]
     [RequireComponent(typeof(UniqueObject))]
-    public class PickableItem : MonoBehaviour, IPickableObject, IInteractableObject, IStoragableObject
+    public class PickableItem : MonoBehaviour, IPickableObject, IInteractableObject, IStoragableObject, IConsumableItem
     {
         public ExploringType exploring;
         public InteractionDefinition data;
@@ -54,6 +54,8 @@ namespace unvs.baseobjects
         public bool HideSpriteRendererWhenPlaying => hideSpriteRendererWhenPlaying;
 
         public Vector2 Size => GetComponent<Collider2D>().bounds.size;
+
+        public IActorObject Owner { get ; set ; }
 
         public async UniTask<bool> ExecAsync(MonoBehaviour target, CancellationTokenSource token)
         {

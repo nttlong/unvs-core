@@ -52,7 +52,7 @@ namespace unvs.ext
             T component = obj.GetComponent<T>();
 
             // 2. Nếu chưa có thì mới Add
-            if (component == null)
+            if (component == null || component==default(T))
             {
                 component = obj.AddComponent<T>();
                 OnInit?.Invoke(component);

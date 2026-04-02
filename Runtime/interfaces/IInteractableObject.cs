@@ -16,12 +16,20 @@ namespace unvs.interfaces
     }
     public interface IInteractableObject
     {
-        public ExploringType Exploring { get; }
-        public InteractionDefinition Data { get; }
-        public Collider2D Collider { get; }
+        ExploringType Exploring { get; }
+        InteractionDefinition Data { get; }
+        Collider2D Collider { get; }
        
 
-        public UniTask<bool> ExecAsync( MonoBehaviour target, CancellationTokenSource token);
+        UniTask<bool> ExecAsync( MonoBehaviour target, CancellationTokenSource token);
         Vector2 GetPosition();
+    }
+    public interface IConsumerObject
+    {
+        InteractionDefinition ConsumeDefinintion { get; }
+    }
+    public interface IConsumableItem
+    {
+        IActorObject Owner { get; set; }
     }
 }

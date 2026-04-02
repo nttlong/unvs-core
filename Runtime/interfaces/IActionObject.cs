@@ -45,6 +45,7 @@ namespace unvs.interfaces
         /// </summary>
         public LocalizedString GameName { get; }
         public LocalizedString Description { get; }
+       
     }
     public interface IWorldTracker
     {

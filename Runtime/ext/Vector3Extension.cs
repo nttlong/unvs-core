@@ -2,10 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
+using Unity.VisualScripting.YamlDotNet.Core;
+using Unity.VisualScripting.YamlDotNet.Serialization;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.VirtualTexturing;
 using UnityEngine.XR;
 using unvs.interfaces;
+using static UnityEngine.Audio.GeneratorInstance;
 
 namespace unvs.ext
 {
@@ -207,7 +213,7 @@ namespace unvs.ext
             return nearest;
         }
 
-        public static GameObject GetObjectInLayer(this Vector2 point,int LayerMask)
+        public static GameObject GetObjectInLayer(this Vector2 point, int LayerMask)
         {
             Collider2D col = Physics2D.OverlapPoint(point, LayerMask);
             if (col != null)
@@ -266,6 +272,165 @@ namespace unvs.ext
            Mathf.Sign(v.x),
             Mathf.Sign(v.y)
             );
+        }
+
+        public static T GetHitCollider<T>(this Vector2 pos)
+        {
+            // 1. Use GetRayIntersectionAll to detect 2D Colliders from a 3D Camera ray
+            Ray ray = Camera.main.ScreenPointToRay(pos);
+            RaycastHit2D[] hits = Physics2D.GetRayIntersectionAll(ray);
+
+            if (hits.Length == 0) return default(T);
+
+            // 2. Map hits to sorting info
+            var candidates = hits
+                .Select(hit => new
+                {
+                    // hit.collider is a Collider2D
+                    Component = hit.collider.GetComponent<T>(),
+                    // distance is from the ray origin to the intersection point
+                    Distance = hit.fraction,
+                    SortingGroup = hit.collider.GetComponentInParent<SortingGroup>(),
+                    Renderer = hit.collider.GetComponent<SpriteRenderer>()
+                })
+                .Where(c => c.Component != null)
+                .ToList();
+
+            if (candidates.Count == 0) return default(T);
+
+            // 3. Sorting Logic
+            var bestCandidate = candidates
+                .OrderByDescending(c => c.SortingGroup != null ?
+                    SortingLayer.GetLayerValueFromID(c.SortingGroup.sortingLayerID) :
+                    (c.Renderer != null ? SortingLayer.GetLayerValueFromID(c.Renderer.sortingLayerID) : 0))
+                .ThenByDescending(c => c.SortingGroup != null ? c.SortingGroup.sortingOrder :
+                    (c.Renderer != null ? c.Renderer.sortingOrder : 0))
+                .ThenBy(c => c.Distance)
+                .FirstOrDefault();
+
+            return bestCandidate != null ? bestCandidate.Component : default(T);
+        }
+        /// <summary>
+        /// Detects all 2D components of type T at the given screen position.
+        /// Optimized for 2.5D games using 3D Cameras and 2D Colliders.
+        /// </summary>
+        public static List<T> GetAllHitComponents<T>(this Vector2 pos)
+        {
+            List<T> results = new List<T>();
+
+            // 1. Convert screen position (Mouse/Gamepad) to a 3D Ray
+            Ray ray = Camera.main.ScreenPointToRay(pos);
+
+            // 2. Use GetRayIntersectionAll to find where the 3D Ray hits 2D Colliders
+            // This is the bridge between 3D Camera space and 2D Physics space
+            RaycastHit2D[] hits = Physics2D.GetRayIntersectionAll(ray);
+
+            if (hits == null || hits.Length == 0) return results;
+
+            foreach (var hit in hits)
+            {
+                // 3. Search for the component on the hit GameObject
+                // Note: Use GetComponents to capture multiple instances if they exist
+                T[] components = hit.collider.GetComponents<T>();
+
+                if (components != null && components.Length > 0)
+                {
+                    results.AddRange(components);
+                }
+            }
+
+            return results;
+        }
+        /// <summary>
+        /// This function will get all hit GameObjects located at specific Layers in a 2.5D environment.
+        /// Compatible with 2D Colliders (BoxCollider2D, CircleCollider2D, etc.)
+        /// </summary>
+        /// <param name="pos">The screen position (Mouse or Hybrid Pointer).</param>
+        /// <param name="layers">Array of layer names to filter the raycast.</param>
+        /// <returns>A list of GameObjects hit by the ray, or an empty list if nothing hit.</returns>
+        public static List<GameObject> GetAllHitComponents(this Vector2 pos, params string[] layers)
+        {
+            // 1. Basic validation
+            if (layers == null || layers.Length == 0) return null;
+
+            // 2. Create the bitmask for the specified layers
+            int layerMask = LayerMask.GetMask(layers);
+
+            // 3. Generate a 3D ray from the Camera through the screen point
+            Ray ray = Camera.main.ScreenPointToRay(pos);
+
+            // 4. Use Physics2D.GetRayIntersectionAll to detect 2D Colliders along that 3D Ray
+            // This is the correct method for 2.5D interaction (3D Camera -> 2D Physics)
+            RaycastHit2D[] hits = Physics2D.GetRayIntersectionAll(ray, Mathf.Infinity, layerMask);
+
+            if (hits == null || hits.Length == 0) return new List<GameObject>();
+
+            // 5. Extract GameObjects from the 2D hits
+            List<GameObject> hitObjects = new List<GameObject>();
+            foreach (var hit in hits)
+            {
+                // Check if the hit object is valid before adding
+                if (hit.collider != null)
+                {
+                    hitObjects.Add(hit.collider.gameObject);
+                }
+            }
+
+            return hitObjects;
+        }
+        public static T GetHitCollider<T>(this Vector2 pos, params string[] layers)
+        {
+            // 1. Validate input and layers
+            if (layers == null || layers.Length == 0) return default(T);
+
+            // 2. Create the layer mask from names
+            int layerMask = LayerMask.GetMask(layers);
+
+            // 3. Generate a 3D ray from the perspective camera
+            Ray ray = Camera.main.ScreenPointToRay(pos);
+
+            // 4. CRITICAL FIX: Use Physics2D.GetRayIntersectionAll for 2.5D
+            // Standard Physics.RaycastAll ignores BoxCollider2D.
+            RaycastHit2D[] hits = Physics2D.GetRayIntersectionAll(ray, Mathf.Infinity, layerMask);
+
+            if (hits == null || hits.Length == 0) return default(T);
+
+            // 5. Map hits to sorting data for 2.5D layering logic
+            var candidates = hits
+                .Select(hit =>
+                {
+                    // Find the component T on the hit collider
+                    var component = hit.collider.GetComponent<T>();
+
+                    // Get sorting info (Essential for overlapping sprites in 2.5D)
+                    var sGroup = hit.collider.GetComponentInParent<SortingGroup>();
+                    var sRenderer = hit.collider.GetComponent<SpriteRenderer>();
+
+                    return new
+                    {
+                        Component = component,
+                        // fraction represents the distance along the ray
+                        Distance = hit.fraction,
+                        LayerID = sGroup != null ? sGroup.sortingLayerID : (sRenderer != null ? sRenderer.sortingLayerID : 0),
+                        OrderValue = sGroup != null ? sGroup.sortingOrder : (sRenderer != null ? sRenderer.sortingOrder : 0)
+                    };
+                })
+                .Where(c => c.Component != null)
+                .ToList();
+
+            if (candidates.Count == 0) return default(T);
+
+            // 6. Sorting Logic:
+            // Priority 1: Sorting Layer Value (Actual stack order in Inspector)
+            // Priority 2: Sorting Order (Z-index within the same layer)
+            // Priority 3: Distance (Depth relative to camera)
+            var bestCandidate = candidates
+                .OrderByDescending(c => SortingLayer.GetLayerValueFromID(c.LayerID))
+                .ThenByDescending(c => c.OrderValue)
+                .ThenBy(c => c.Distance)
+                .FirstOrDefault();
+
+            return bestCandidate != null ? bestCandidate.Component : default(T);
         }
     }
 }

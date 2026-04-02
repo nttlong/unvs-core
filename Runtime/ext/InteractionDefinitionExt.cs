@@ -52,5 +52,46 @@ namespace unvs.ext
 
             return true;
         }
+
+        public async static UniTask<bool> ObjectsExecAsync(this InteractionDefinition data, object source, object another, CancellationTokenSource ct)
+        {
+            // 1. Kiểm tra sớm để tránh chạy vòng lặp vô ích
+            if (ct.IsCancellationRequested) return false;
+            ct.Token.ThrowIfCancellationRequested();
+
+            // 2. Kiểm tra dữ liệu đầu vào để tránh NullReferenceException
+            if (data == null || data.actions == null) return false;
+            var sender = new ActionBaseSender
+            {
+                Cts = ct,
+                Source = source as MonoBehaviour,
+                Target = another as MonoBehaviour
+            };
+            try
+            {
+                var srcMono = source as MonoBehaviour;
+                var anotherMono = another;
+                foreach (var action in data.actions)
+                {
+                    if (action == null) continue;
+                    //Debug.Log($"InteractionDefinition.ExecAsync,{action.GetType().Name},source={srcMono.name},{srcMono.GetType().Name},another={anotherMono.name},{anotherMono.GetType().Name}");
+                    // Kiểm tra Token trước mỗi Action trong chuỗi
+                    if (ct.IsCancellationRequested) return false;
+                    var success = false;
+                    // Nếu một action thất bại (return false), dừng toàn bộ chuỗi
+                    await action.ExecuteAsync(sender);
+                    if (sender.IsCancel) return false;
+
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Trả về false thay vì ném lỗi để các hệ thống cha xử lý nhẹ nhàng hơn
+                return false;
+            }
+
+
+            return true;
+        }
     }
 }

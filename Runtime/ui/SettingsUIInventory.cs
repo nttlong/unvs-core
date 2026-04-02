@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
+
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Rendering;
@@ -14,6 +14,7 @@ using unvs.actions;
 using unvs.ext;
 using unvs.interfaces;
 using unvs.shares;
+using static Unity.VisualScripting.Member;
 namespace unvs.ui
 {
     [ExecuteInEditMode]
@@ -58,6 +59,13 @@ namespace unvs.ui
             var img= interactContainer.transform.AddChildComponentIfNotExist<Image>(source.name);
             img.sprite = storagableItem.Icon;
             source.transform.SetParent(bagger.transform, false);
+            var actor=Owner.GetComponent<IActorObject>();
+            actor.Speaker.SayText($"Add {source.name}");
+            var item = source.GetComponent<IConsumableItem>();
+            if(item != null)
+            {
+                item.Owner=actor;
+            }
            
             //dItem.enabled = true;
             //source.transform.SetParent(this.container.transform);
@@ -107,23 +115,26 @@ namespace unvs.ui
                     p.CloneObject(this.containerCanvas, storageableItem.Icon, storageableItem.Name, 120);
                 }
                 p.Move();
-                Ray ray = Camera.main.ScreenPointToRay(p.Pos);
                
 
-                
+
                
-                if (Physics.Raycast(ray, out RaycastHit hit))
+            };
+            dragSystem.OnDrop = p =>
+            {
+                var target = Vector2dExtesion.GetHitCollider<IConsumerObject>(p.Pos);
+
+                if (target != null)
                 {
 
-                    IInteractableObject target = hit.collider.GetComponent<IInteractableObject>();
-
-                    if (target != null)
-                    {
-                        Debug.Log($"InitDragSystem.OnDragging.Drop, pos={p.Pos},source={p.Source.name}");
-                        return;
-                    }
+                    
+                    
+                    var actor = Owner.GetComponent<IActorObject>();
+                    var consumeItem = bagger.GetComponentInChildrenByName<IConsumableItem>(p.Source.name);
+                    consumeItem.Owner.Cts = consumeItem.Owner.Cts.Refresh();
+                    target.ConsumeDefinintion.ObjectsExecAsync(target, consumeItem, consumeItem.Owner.Cts).Forget();
+                    return;
                 }
-                Debug.Log($"InitDragSystem.OnDragging.OnDragging, pos={p.Pos},source={p.Source.name}");
             };
         }
 
