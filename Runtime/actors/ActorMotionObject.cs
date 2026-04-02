@@ -73,7 +73,7 @@ namespace unvs.actors
             {
                 if (physical.CurrentHoldingObject != null)
                 {
-                    //this.PlayAddtiveMotion("Idle-Hangging-Item");
+                    this.PlayAddtiveMotion("Idle-Hangging-Item");
                     physical.CurrentHoldingObject.transform.AttachToParent(this.GetComponent<IActorPhysical>().SocketBack.transform);
                     
                 }
@@ -129,9 +129,9 @@ namespace unvs.actors
             {
                 if (physical.CurrentHoldingObject != null)
                 {
-                    //this.PlayAddtiveMotion("Walk-Hangging-Item");
+                    this.PlayAddtiveMotion("Walk-Hangging-Item");
                     physical.CurrentHoldingObject.transform.AttachToParent(this.GetComponent<IActorPhysical>().SocketBack.transform);
-                    //physical.CurrentHoldingObject.gameObject.SetActive(true);
+                   
                 }
             }
             this.GetComponent<ISpeakableObject>()?.Off();

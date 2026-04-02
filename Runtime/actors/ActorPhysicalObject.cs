@@ -87,11 +87,7 @@ namespace unvs.actors
             if (sr != null)
             {
                 CurrentHoldingObject.SetSortingOrder(sr, true);
-                //var sr2 = CurrentHoldingObject.GetComponentInChildren<SpriteRenderer>();
-                //if (sr2 != null)
-                //{
-                //    sr2.SetSortingOrder()
-                //}
+                
             }
 
 
