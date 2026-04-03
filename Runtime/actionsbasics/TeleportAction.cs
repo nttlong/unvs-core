@@ -11,9 +11,9 @@ namespace unvs.actionsbasics
     public class TeleportAction : unvs.actions.ActionBase
     {
         [SerializeField]
-        public AudioClip OpenSound;
+        public AudioInfo OpenSound;
         [SerializeField]
-        public AudioClip CloseSound;
+        public AudioInfo CloseSound;
         public async override UniTask ExecuteAsync(ActionBaseSender Sender)
         {
             var teleportObject = Sender.Source.GetComponent<ITeleportPrefab>();
@@ -29,7 +29,7 @@ namespace unvs.actionsbasics
                 Sender.Cancel();
                 return;
             }
-            await teleportObject.OpenSound.PlayBetterAudioClipAsync(OpenSound);
+            teleportObject.OpenSound.PlayBetterAudioClip();
             if (teleportObject.IsNew)
             {
                 await GlobalApplication.SceneLoaderManagerInstance.LoadNewAsync(teleportObject.PathToWord, teleportObject.TargetName);

@@ -30,6 +30,7 @@ namespace unvs.shares
         public static IDiscoveryDialog UIDiscoveryDialog { get;  set; }
         public static SettingsGlobalEvents GlobalInput { get;  set; }
         public static IMainMenu UIMainMenu { get; internal set; }
+        public static AudioSource CommonAudioSource { get; internal set; }
 
         public static GlobalEvents Events = new GlobalEvents();
 

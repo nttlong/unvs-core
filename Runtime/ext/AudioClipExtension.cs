@@ -14,9 +14,9 @@ public static class AudioClipExtension
     /// Phát clip1 nếu không null, ngược lại phát clip2. 
     /// Hàm sẽ đợi cho đến khi clip kết thúc mới hoàn tất task.
     /// </summary>
-    public static async UniTask PlayBetterAudioClipAsync(this AudioClip clip1, AudioClip clip2)
+    public static async UniTask PlayBetterAudioClipAsync(this AudioClip clip1, AudioClip clip2, float volumScale=1f)
     {
-        AudioSource audioSource = Commons.GetOrCreateAudioSource();
+       
         // 1. Xác định clip nào sẽ được phát
         AudioClip clipToPlay = clip1 != null ? clip1 : clip2;
 
@@ -30,7 +30,7 @@ public static class AudioClipExtension
         // 2. Tạo một GameObject tạm thời để phát âm thanh
         // Cách này đảm bảo âm thanh không bị ngắt nếu object gọi hàm bị destroy
 
-        audioSource.PlayOneShot(clipToPlay);
+        GlobalApplication.CommonAudioSource.PlayOneShot(clipToPlay);
         
 
         // 4. Chờ cho đến khi clip phát xong
@@ -38,11 +38,35 @@ public static class AudioClipExtension
         await UniTask.Delay(TimeSpan.FromSeconds(clipToPlay.length), delayTiming: PlayerLoopTiming.Update);
 
     }
-    public static void Play(this AudioClip clip1,float? scale=1f)
+        public static void PlayBetterAudioClip(this AudioClip clip1, AudioClip clip2,float volumScale)
+        {
+            
+            // 1. Xác định clip nào sẽ được phát
+            AudioClip clipToPlay = clip1 != null ? clip1 : clip2;
+
+            // Nếu cả hai đều null thì không làm gì cả
+            if (clipToPlay == null)
+            {
+                Debug.LogWarning("Cả hai AudioClip đều null!");
+                return;
+            }
+
+            // 2. Tạo một GameObject tạm thời để phát âm thanh
+            // Cách này đảm bảo âm thanh không bị ngắt nếu object gọi hàm bị destroy
+
+            GlobalApplication.CommonAudioSource.PlayOneShot(clipToPlay, volumScale);
+
+
+            // 4. Chờ cho đến khi clip phát xong
+            // Chúng ta sử dụng UniTask.Delay để đợi theo độ dài của clip
+            //await UniTask.Delay(TimeSpan.FromSeconds(clipToPlay.length), delayTiming: PlayerLoopTiming.Update);
+
+        }
+        public static void Play(this AudioClip clip1,float? scale=1f)
     {
         if (clip1 == null) return;
         
-        Commons.GetOrCreateAudioSource().PlayOneShot(clip1, scale??1);
+        GlobalApplication.CommonAudioSource.PlayOneShot(clip1, scale??1);
     }
     public static void PlayFirstNotNull(this AudioClip primarySource, params AudioClip[] otherSources)
     {

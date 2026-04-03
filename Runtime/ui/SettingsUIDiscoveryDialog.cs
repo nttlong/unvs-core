@@ -13,7 +13,7 @@ using unvs.shares;
 namespace unvs.ui
 {
     [ExecuteInEditMode]
-    [RequireComponent(typeof(AudioSource))]
+    
     public class SettingsUIDiscoveryDialog : MonoBehaviour, IDiscoveryDialog
     {
         public AudioSource audioSource;
@@ -80,6 +80,7 @@ namespace unvs.ui
             this.DiscoveryDialogPanel.ShowAtCenter(width,height);
             
             EventSystem.current.SetSelectedGameObject(btnOk.gameObject);
+            if(this.sound!=null) this.audioSource.PlayOneShot(this.sound);
             Time.timeScale = 0f;
             
         }
@@ -137,6 +138,7 @@ namespace unvs.ui
             this.DiscoveryDialogPanel.ShowAtCenter(width, height);
             GlobalApplication.GlobalInput.Player.enable = false;
             EventSystem.current.SetSelectedGameObject(btnOk.gameObject);
+            if (this.sound != null) this.audioSource.PlayOneShot(this.sound);
             Time.timeScale = 0f;
         }
 

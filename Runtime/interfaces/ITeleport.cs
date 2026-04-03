@@ -6,12 +6,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using unvs.actions;
+using unvs.shares;
 namespace unvs.interfaces
 {
     public interface ITeleportPrefab
     {
-        AudioClip OpenSound { get; }
-        AudioClip CloseSound { get; }
+        AudioInfo OpenSound { get; }
+        AudioInfo CloseSound { get; }
         string PathToWord { get; }
         bool IsNew { get; }
         Texture2D TextT { get; }

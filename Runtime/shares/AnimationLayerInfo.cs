@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using System;
 using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace unvs.shares
@@ -21,5 +23,26 @@ namespace unvs.shares
         public int layerIndex;
         public string blendName;
         public int blendIndex;
+    }
+    [Serializable]
+    public struct AudioInfo
+    {
+        [SerializeField]
+        public AudioClip Clip;
+        [Range(0,1)]
+        [SerializeField]
+        public float volume;
+
+        public bool IsEmpty()
+        {
+            return Clip == null;
+        }
+        public static AudioInfo EmptyNew()
+        {
+            return new AudioInfo()
+            {
+                volume = 1f
+            };
+        }
     }
 }

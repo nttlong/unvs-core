@@ -275,15 +275,7 @@ namespace unvs.shares
             }
         }
         static AudioSource tempAudioSource;
-        public static AudioSource GetOrCreateAudioSource()
-        {
-            if (tempAudioSource == null)
-            {
-                GameObject tempGO = new GameObject("Commos.GetOrCreateAudioSource");
-                tempAudioSource = tempGO.AddComponent<AudioSource>();
-            }
-            return tempAudioSource;
-        }
+        
         
         public static Vector2 GetCameraWorldSize()
         {

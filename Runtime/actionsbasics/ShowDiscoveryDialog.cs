@@ -16,16 +16,16 @@ namespace unvs.actionsbasics
     public class ShowDiscoveryDialog : ActionBase
     {
 
-        public AudioClip AlertSound;
+        public AudioInfo AlertSound;
         private UniTaskCompletionSource<bool> utcs;
         public bool ShowConform;
-
+        
         public override async UniTask ExecuteAsync(ActionBaseSender Sender)
         {
             await UniTask.Yield();
             var actor = Sender.GetTargetComponent<IActorObject>();
             var item = Sender.GetSourceComponent<IStoragableObject>();
-
+            var alertSound=this.AlertSound;
             if (item != null)
             {
                 // Setup UI ...
@@ -47,14 +47,19 @@ namespace unvs.actionsbasics
 
                 try
                 {
-                    if(ShowConform)
+                    
+                    if (ShowConform)
                     GlobalApplication.UIDiscoveryDialog.Show();
                     else 
                         GlobalApplication.UIDiscoveryDialog.ShowWithoutConfirm();
 
-
-                        // 4. IMPORTANT: wait until utcs return result
-                        bool result = await utcs.Task;
+                    var audibleObject = Sender.GetSourceComponent<IAudiableObject>();
+                    if (audibleObject != null && !audibleObject.DiscoverySound.IsEmpty())
+                        alertSound = audibleObject.DiscoverySound;
+                    alertSound.PlayBetterAudioClipAsync().Forget();
+                    
+                    // 4. IMPORTANT: wait until utcs return result
+                    bool result = await utcs.Task;
 
                     if (!result)
                     {

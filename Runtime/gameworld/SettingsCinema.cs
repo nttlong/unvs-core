@@ -20,7 +20,7 @@ namespace unvs.gameworld
         public CinemachineCamera vCam;
         public GlobalWorldBound worldBound;
         public CinemachineFollow cinemaFollow;
-       
+        public SettingsCommonAudioSource commonAudioSource;
 
         public Camera Main => main;
 
@@ -32,13 +32,15 @@ namespace unvs.gameworld
 
         public CinemachineFollow CinemaFollow => cinemaFollow;
 
-       
+        public SettingsCommonAudioSource AudioSource => commonAudioSource;
 
         private void Awake()
         {
             worldBound = this.AddChildComponentIfNotExist<GlobalWorldBound>(unvs.shares.Constants.ObjectsConst.GLOBAL_WORLD_BOUND);
             main = this.AddChildComponentIfNotExist<Camera>("Main Camera");
             main.tag = "MainCamera";
+            main.AddComponentIfNotExist<AudioListener>();
+            commonAudioSource = this.AddChildComponentIfNotExist<SettingsCommonAudioSource>(unvs.shares.Constants.ObjectsConst.COMMON_AUDIO_SOURCE);
             vCam = this.AddChildComponentIfNotExist<CinemachineCamera>("VCam");
             brain= main.AddComponentIfNotExist<CinemachineBrain>();
             cinemaFollow=vCam.AddComponentIfNotExist<CinemachineFollow>();

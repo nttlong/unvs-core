@@ -19,9 +19,9 @@ namespace unvs.baseobjects
     {
         [Header("Audio")]
         [SerializeField]
-        public AudioClip openSound;
+        public AudioInfo openSound;
         [SerializeField]
-        public AudioClip closeSound;
+        public AudioInfo closeSound;
         [Header("Target")]
         public bool isNew;
         public string pathToWord;
@@ -38,9 +38,9 @@ namespace unvs.baseobjects
         public bool hideSpriteRendererWhenRun=true;
         public InteractionDefinition consumeDefinintion;
 
-        public AudioClip OpenSound => openSound;
+        public AudioInfo OpenSound => openSound;
 
-        public AudioClip CloseSound => closeSound;
+        public AudioInfo CloseSound => closeSound;
 
         public string PathToWord => pathToWord;
 

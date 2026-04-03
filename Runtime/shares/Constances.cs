@@ -97,6 +97,8 @@ namespace unvs.shares
 
             public const string TOP_CANVAS = "TOP-CANVAS";
             public const string VIRTUAL_CURSOR = "VIRTUAL-CURSOR";
+
+            public const string COMMON_AUDIO_SOURCE = "COMMON-AUDIO-SOURCE";
         }
         public class Settings
         {

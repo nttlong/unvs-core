@@ -13,6 +13,7 @@ namespace interfaces.cinema
         CinemachineCamera VCam { get; }
         GlobalWorldBound WorldBound { get; }
         CinemachineFollow CinemaFollow { get; }
+        SettingsCommonAudioSource AudioSource { get; }
        
         
     }

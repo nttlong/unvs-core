@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Localization;
+using unvs.shares;
 //using XGame.Core;
 namespace unvs.interfaces
 {
@@ -46,6 +47,10 @@ namespace unvs.interfaces
         public LocalizedString GameName { get; }
         public LocalizedString Description { get; }
        
+    }
+    public interface IAudiableObject
+    {
+        AudioInfo DiscoverySound { get; }
     }
     public interface IWorldTracker
     {
