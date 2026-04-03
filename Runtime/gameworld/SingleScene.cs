@@ -126,6 +126,8 @@ namespace unvs.gameword
 
         public Canvas TopCanvas => topCanvas;
 
+        
+
         public string StartPath;
         private ISceneLoader sceneLoader;
         public GameObject goSceneLoader;
@@ -405,7 +407,7 @@ namespace unvs.gameword
         }
         [SerializeField] float gamepadSensitivity = 1000f;
         private Vector3 _virtualMousePos;
-
+        
         void UpdateCursorPosition()
         {
             Vector2 deltaMouse = Vector2.zero;

@@ -13,7 +13,7 @@ namespace unvs.gameword
     [ExecuteInEditMode]
     [RequireComponent(typeof(ElasticScene))]
     [RequireComponent(typeof(WorldGlobalLight))]
-
+    [RequireComponent(typeof(AudioSource))]
     public class WorldObject : MonoBehaviour, IScenePrefab
     {
         
@@ -51,7 +51,9 @@ namespace unvs.gameword
         [Header("Physical")]
         public PhysicsMaterial2D defaultSurfacePhysicsMaterial2D;
         [Header("Scene")]
-
+        public AudioSource audioSource;
+        [SerializeField]
+        public AudioInfo ambientSound = AudioInfo.EmptyNew();
         public BoxCollider2D leftWall;
         public BoxCollider2D rightWall;
         public ITriggerZone leftTriggerZone;
@@ -76,7 +78,9 @@ namespace unvs.gameword
         public bool gizmosDraw = true;
         private System.Action<IScenePrefab> onDestroyMe;
         
-        
+
+
+
 
         //private Transform runtimeRightPosJoin;
         //private Transform runtimeLeftPosJoin;
@@ -324,10 +328,10 @@ namespace unvs.gameword
         }
 
         public bool GizmosDraw { get => gizmosDraw; }
-        
 
-        
-       
+        public AudioInfo Ambient => ambientSound;
+
+        public AudioSource Audio => audioSource;
 
         void CalculateBound()
         {
@@ -382,7 +386,7 @@ namespace unvs.gameword
         void Awake()
         {
 
-
+            audioSource=GetComponent<AudioSource>();
             _ = this.LeftTriggerZone;
             _ = this.RightTriggerZone;
             if (Application.isPlaying)

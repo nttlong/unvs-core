@@ -2,10 +2,13 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using unvs.shares;
 namespace unvs.interfaces
 {
     public interface IScenePrefab
     {
+        AudioSource Audio {  get; }
+        AudioInfo Ambient {  get; }
         bool GizmosDraw { get; }
         IWorldGlobalLight Globalight { get; }
         public IWorldJoinInfoObject JoinInfo { get; }

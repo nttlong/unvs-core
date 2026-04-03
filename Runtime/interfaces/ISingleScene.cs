@@ -3,11 +3,13 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using unvs.interfaces.sys;
+using unvs.shares;
 using unvs.ui;
 namespace unvs.interfaces
 {
     public interface ISingleScene
     {
+       
         Image CursorImage {  get; }
         Canvas TopCanvas { get; }
         Camera Cam { get; }
