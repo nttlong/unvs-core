@@ -23,18 +23,19 @@ using unvs.ui;
 namespace unvs.actors
 {
     [ExecuteInEditMode]
-    [RequireComponent(typeof(ActorMotionObject))]
-    [RequireComponent(typeof(ActorSpeakerObject))]
-    [RequireComponent(typeof(ActorMovableObject))]
-    [RequireComponent(typeof(ActorInteractableObject))]
-    [RequireComponent(typeof(ActorPhysicalObject))]
-    [RequireComponent (typeof(ActorInventoryObject))]
-    [RequireComponent(typeof(AudibleStepObject))]
+    [RequireComponent(typeof(ActorMotionObject))] // Quan ly Motion
+    [RequireComponent(typeof(ActorSpeakerObject))] // Dung khi NV can noi chuyen
+    [RequireComponent(typeof(ActorMovableObject))] // Dung khi NV di chuyen hoac combat...
+    [RequireComponent(typeof(ActorInteractableObject))] // Dung khi NV can tuong tac voi cac doi tuong khac
+    [RequireComponent(typeof(ActorPhysicalObject))] // Dung de quan ly Bone va tinh toan nhu: do dai canh tay, do dai buoc chan,...
+    [RequireComponent (typeof(ActorInventoryObject))] // Dung de quan ly tui do cua NV
+    [RequireComponent(typeof(AudibleStepObject))] // Dung de quan ly cac am thanh ma NV tao ra do tuong tac voi cac doi tuong khac
+    [RequireComponent(typeof(ActorController))] // Dung de ket noi voi input_system, dieu khien NV
     [RequireComponent(typeof(CapsuleCollider2D))]
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(UniqueObject))]
     [RequireComponent(typeof(SortingGroup))]
-    [RequireComponent(typeof(ActorController))]
+    
     [RequireComponent(typeof(ShadowCaster2DObject))]
     public class ActorObject : MonoBehaviour, IActorObject
     {

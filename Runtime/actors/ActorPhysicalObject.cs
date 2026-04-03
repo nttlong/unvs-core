@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Linq;
 using Unity.Mathematics;
@@ -15,7 +15,7 @@ using unvs.shares;
 namespace unvs.actors
 {
     [ExecuteInEditMode]
-    public class ActorPhysicalObject : MonoBehaviour, IActorPhysical
+    public class ActorPhysicalObject : ActorPhysicsSuite, IActorPhysical
     {
         public Transform rootArm;
         public Transform topArm;
@@ -26,7 +26,6 @@ namespace unvs.actors
         private IActorIK actorIK;
         public Transform IKControls;
         public Transform rootBone;
-        private Rigidbody2D rb;
         private ContactFilter2D floorFilter;
         //private ContactPoint2D[] contacts = new ContactPoint2D[10]; // Cache sẵn mảng 10 phần tử
         public bool lockIK;
@@ -129,8 +128,9 @@ namespace unvs.actors
 
 
         }
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             //if (!Application.isPlaying)
             //{
             //    actorIK = this.AddChildComponentIfNotExist<ActorIKObject>("IK");
