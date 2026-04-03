@@ -6,7 +6,7 @@ namespace unvs.interfaces
 {
     public interface IGlobalWorldBound
     {
-
+        bool IsMultiPolygon { get; }
         CompositeCollider2D Coll { get; }
         Rigidbody2D Rigidbody { get; }
         void AddBound(IScenePrefab newScenePrefab);

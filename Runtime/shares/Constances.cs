@@ -99,10 +99,12 @@ namespace unvs.shares
             public const string VIRTUAL_CURSOR = "VIRTUAL-CURSOR";
 
             public const string COMMON_AUDIO_SOURCE = "COMMON-AUDIO-SOURCE";
+
+            public const string GLOBAL_WORLD_BOUND_SINGLE_POLYGON = "GLOBAL-WORLD-BOUND-SINGLE-POLYGON";
         }
         public class Settings
         {
-            public const float DEFAULT_WORLD_BOUND_SCALE = 1.1f;
+            public const float DEFAULT_WORLD_BOUND_SCALE = 1.0f;
 
             public const float REACH_TOLERRANCE = 0.4f;
         }

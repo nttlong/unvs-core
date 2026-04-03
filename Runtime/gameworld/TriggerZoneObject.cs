@@ -65,17 +65,17 @@ namespace unvs.gameword
 
                 if (string.IsNullOrEmpty(triggerPath))
                 {
-                    var parent = GetComponentInParent<IElasticScene>();
+                    var parent = GetComponentInParent<IScenePrefab>();
 
                     if (parent != null)
                     {
                         if (direction == TriggerZoneDirection.Left)
                         {
-                            triggerPath = parent.LeftScenePath;
+                            triggerPath = parent.GetLeftScenePath();
                         }
                         if (direction == TriggerZoneDirection.Right)
                         {
-                            triggerPath = parent.RightScenePath;
+                            triggerPath = parent.GetRightScenePath();
                         }
                     }
                 }

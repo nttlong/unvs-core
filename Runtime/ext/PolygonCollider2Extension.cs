@@ -273,7 +273,7 @@ namespace unvs.ext
 
         public static PolygonCollider2D CreateRectCollider2D(this PolygonCollider2D source, string name, float margin = 0.1f)
         {
-           
+
             // 1. Tạo GameObject con
             GameObject trackerGo = new GameObject(name);
             trackerGo.transform.SetParent(source.transform, false);
@@ -314,7 +314,7 @@ namespace unvs.ext
 
             return newColl;
         }
-        public static PolygonCollider2D Clone(this PolygonCollider2D source, string name,bool defaultActive=true )
+        public static PolygonCollider2D Clone(this PolygonCollider2D source, string name, bool defaultActive = true)
         {
             // 1. Tạo GameObject mới làm con của Source để thừa hưởng Transform (vị trí, góc quay, scale)
             GameObject trackerGo = new GameObject(name);
@@ -951,7 +951,7 @@ namespace unvs.ext
             //Vector3 offset = oldCenter - newCenter;
 
             //coll.transform.position += offset;
-            
+
         }
         public static void ScalePolygonCollider2D_KeepCentroid(this PolygonCollider2D col, float scale)
         {
@@ -1031,6 +1031,97 @@ namespace unvs.ext
             cy /= (6f * signedArea);
 
             return new Vector2(cx, cy);
+        }
+
+        public static Vector2[] CreateRect(this PolygonCollider2D targetColl, params PolygonCollider2D[] extraPolys)
+        {
+            float minX = float.MaxValue, minY = float.MaxValue;
+            float maxX = float.MinValue, maxY = float.MinValue;
+
+            // Hàm phụ để duyệt từng điểm và cập nhật cực trị
+            void EncapsulateCollider(PolygonCollider2D pc)
+            {
+                if (pc == null || pc.points.Length == 0) return;
+
+                foreach (Vector2 localPoint in pc.points)
+                {
+                    // Chuyển điểm từ Local của pc sang World Space
+                    Vector3 worldPt = pc.transform.TransformPoint(localPoint);
+
+                    if (worldPt.x < minX) minX = worldPt.x;
+                    if (worldPt.x > maxX) maxX = worldPt.x;
+                    if (worldPt.y < minY) minY = worldPt.y;
+                    if (worldPt.y > maxY) maxY = worldPt.y;
+                }
+            }
+
+            // 1. Duyệt qua collider chính và các collider phụ
+            EncapsulateCollider(targetColl);
+            if (extraPolys != null)
+            {
+                foreach (var extra in extraPolys) EncapsulateCollider(extra);
+            }
+
+            // 2. Nếu sau khi duyệt mà vẫn là MaxValue (nghĩa là không có điểm nào)
+            if (minX == float.MaxValue) return new Vector2[4];
+
+                    // 3. Tạo 4 góc World Space
+                    Vector3[] worldCorners = new Vector3[] {
+                new Vector3(minX, minY, 0),
+                new Vector3(minX, maxY, 0),
+                new Vector3(maxX, maxY, 0),
+                new Vector3(maxX, minY, 0)
+            };
+
+            // 4. Chuyển ngược về Local của targetColl để SetPath
+            Vector2[] localCorners = new Vector2[4];
+            for (int i = 0; i < 4; i++)
+            {
+                localCorners[i] = targetColl.transform.InverseTransformPoint(worldCorners[i]);
+            }
+
+            return localCorners;
+        }
+
+        public static Vector2[] CreateRectFromVectorList(this PolygonCollider2D[] polygonCollider2Ds)
+        {
+            if (polygonCollider2Ds == null || polygonCollider2Ds.Length == 0)
+                return new Vector2[0];
+
+            float minX = float.MaxValue, minY = float.MaxValue;
+            float maxX = float.MinValue, maxY = float.MinValue;
+            bool hasValidPoint = false;
+
+            foreach (var pc in polygonCollider2Ds)
+            {
+                if (pc == null || pc.points.Length == 0) continue;
+
+                foreach (Vector2 localPoint in pc.points)
+                {
+                    // Chuyển tọa độ điểm từ Local của từng mảnh Polygon sang World Space
+                    Vector3 worldPt = pc.transform.TransformPoint(localPoint);
+
+                    if (worldPt.x < minX) minX = worldPt.x;
+                    if (worldPt.x > maxX) maxX = worldPt.x;
+                    if (worldPt.y < minY) minY = worldPt.y;
+                    if (worldPt.y > maxY) maxY = worldPt.y;
+
+                    hasValidPoint = true;
+                }
+            }
+
+            if (!hasValidPoint) return new Vector2[0];
+
+            // Trả về 4 góc của hình chữ nhật bao quanh (World Space)
+            // Lưu ý: Nếu bạn muốn nạp vào SetPath của một Polygon khác, 
+            // bạn có thể cần InverseTransformPoint về Local của Polygon đó.
+            return new Vector2[]
+            {
+                new Vector2(minX, minY), // Bottom-Left
+                new Vector2(minX, maxY), // Top-Left
+                new Vector2(maxX, maxY), // Top-Right
+                new Vector2(maxX, minY)  // Bottom-Right
+            };
         }
     }
 }

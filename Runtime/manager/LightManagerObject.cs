@@ -65,32 +65,7 @@ namespace unvs.manager
                 //check[scene] = scene.Globalight.GlobalLight.Light;
             }
 
-            //List<IScenePrefab> keysToRemove = new List<IScenePrefab>();
-
-            //foreach (var p in check)
-            //{
-            //    if (p.Key.IsDestroying)
-            //    {
-            //        // Hủy Object trong Scene
-            //        if (p.Value != null)
-            //        {
-            //            Destroy(p.Value.gameObject);
-            //        }
-            //        keysToRemove.Add(p.Key);
-            //    }
-            //}
-
-            //// 2. Xóa sạch các bản ghi trong Dictionary sau khi duyệt xong
-            //foreach (var key in keysToRemove)
-            //{
-            //    check.Remove(key);
-            //}
-            //if (!isDirty)
-            //{
-            //    this.GlobalLight.color = check.First().Value.color;
-            //    this.GlobalLight.intensity = check.First().Value.intensity;
-               
-            //}
+            
             RefreshLight();
             GlobalLight.gameObject.SetActive(true);
             isDirty = true;
@@ -165,6 +140,7 @@ namespace unvs.manager
 
         public void DoClean()
         {
+            
             this.enabled = false;
             foreach (var p in check)
             {

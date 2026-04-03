@@ -101,7 +101,7 @@ namespace unvs.baseobjects
             if(Application.isPlaying)
             {
                 if(spriteRenderer!=null) 
-                spriteRenderer.enabled = hideSpriteRendererWhenRun;
+                spriteRenderer.enabled = !hideSpriteRendererWhenRun;
             }
             if(spriteRenderer==null) spriteRenderer=GetComponent<SpriteRenderer>();
             if (texT == null)

@@ -105,12 +105,101 @@ namespace unvs.ext
         {
             return vcam.Lens.OrthographicSize;
         }
+        public static void UpdateByScenePrefab(this CinemachineCamera vcam,IScenePrefab scene)
+        {
+            
+            if (!scene.CameraOffsetFolow.IsEmpty)
+            {
+                Vector3 v = CreateOffsetCameraFollowOffset(scene);
+                vcam.GetComponent<CinemachineFollow>().FollowOffset = v;
+            }
+            vcam.SetOrthoSizeImmediate(scene.OrthographicSize);
+        }
+        public static async UniTask ChangeFollowOffsetSmoothAsync(
+    this CinemachineCamera vcam,
+    IScenePrefab scene,
+    CancellationToken cancellationToken,
+    float duration = 1.0f)
+        {
+            var f = vcam.GetComponent<CinemachineFollow>();
+            if (f == null) return;
+
+            Vector3 oldOffset = f.FollowOffset;
+            Vector3 targetOffset = CreateOffsetCameraFollowOffset(scene);
+
+            float elapsed = 0;
+
+            try
+            {
+                while (elapsed < duration)
+                {
+                    // Kiểm tra ngay lập tức nếu tác vụ đã bị hủy
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    elapsed += Time.deltaTime;
+                    float t = Mathf.Clamp01(elapsed / duration);
+
+                    // Dùng SmoothStep để tăng độ mượt cho camera
+                    float step = Mathf.SmoothStep(0, 1, t);
+                    f.FollowOffset = Vector3.Lerp(oldOffset, targetOffset, step);
+
+                    // Chờ đến frame tiếp theo, gắn kèm token để UniTask tự động ngắt khi cần
+                    await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+                }
+
+                // Đảm bảo giá trị cuối cùng khớp tuyệt đối
+                f.FollowOffset = targetOffset;
+            }
+            catch (OperationCanceledException)
+            {
+                // Xử lý khi tác vụ bị hủy (ví dụ: chuyển scene, tắt object)
+                // Bạn có thể giữ nguyên offset hiện tại hoặc force về target tùy logic game
+                Debug.Log("[Camera] Offset transition was cancelled.");
+            }
+        }
+        public static async UniTask UpdateByScenePrefabAsync(this CinemachineCamera vcam, IScenePrefab scene,
+        float duration = -1f,
+        float zoomSpeed = 3f,
+        CancellationToken cancellationToken = default)
+        {
+            vcam.ChangeFollowOffsetSmoothAsync(scene, cancellationToken, duration).Forget();
+            await SetOrthoSizeSmoothlyAsync(vcam, scene.OrthographicSize, duration, zoomSpeed, cancellationToken, (size) =>
+            {
+                
+            });
+            
+        }
+        public static Vector3 CreateOffsetCameraFollowOffset(this IScenePrefab scene)
+        {
+            float x = 0;
+            float y = 0;
+            if (!scene.CameraOffsetFolow.x.IsEmpty)
+            {
+                x = scene.CameraOffsetFolow.x.OffsetValue;
+                if (scene.CameraOffsetFolow.x.ByRatio)
+                {
+                    x = scene.OrthographicSize * x;
+                }
+            }
+            if (!scene.CameraOffsetFolow.y.IsEmpty)
+            {
+                y = scene.CameraOffsetFolow.y.OffsetValue;
+                if (scene.CameraOffsetFolow.y.ByRatio)
+                {
+                    y = scene.OrthographicSize * y;
+                }
+            }
+            var v = new Vector3(x, y,-10);
+            return v;
+        }
+
         public static async UniTask SetOrthoSizeSmoothlyAsync(
         this CinemachineCamera vcam,
         float targetSize,
         float duration = -1f,
         float zoomSpeed = 3f,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        Action<float> OnUpdating=null)
         {
             try
             {
@@ -151,8 +240,9 @@ namespace unvs.ext
 
                     LensSettings lens = vcam.Lens;
                     lens.OrthographicSize = currentSize;
-                    vcam.Lens = lens;
 
+                    vcam.Lens = lens;
+                   
                     if (confiner != null)
                     {
                         // QUAN TRỌNG: Chỉ Invalidate khi thực sự cần thiết 
@@ -162,16 +252,17 @@ namespace unvs.ext
                             confiner.InvalidateBoundingShapeCache();
                         }
                     }
-
+                    
                     // Dùng PreLateUpdate để đảm bảo Camera tính toán xong TRƯỚC KHI Render
-                    await UniTask.Yield(PlayerLoopTiming.PreLateUpdate, cancellationToken);
+                    await UniTask.Yield(PlayerLoopTiming.PreUpdate, cancellationToken);
+                    OnUpdating?.Invoke(currentSize);
                 }
 
                 // KẾT THÚC: Đảm bảo trị số chuẩn và trả lại Damping
                 LensSettings finalLens = vcam.Lens;
                 finalLens.OrthographicSize = targetSize;
                 vcam.Lens = finalLens;
-
+                
                 if (confiner != null)
                 {
                     confiner.InvalidateBoundingShapeCache();
@@ -182,6 +273,7 @@ namespace unvs.ext
                 {
                     body.UpdateSizeByLensSettings(vcam.Lens);
                 }
+                OnUpdating?.Invoke(targetSize);
             }
             catch (System.OperationCanceledException) { throw; }
         }

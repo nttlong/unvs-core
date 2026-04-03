@@ -13,6 +13,7 @@ namespace unvs.gameword
     public class GlobalWorldBound : MonoBehaviour, IGlobalWorldBound
     {
         [Header("Settings")]
+        public bool isMultiPolygon=false;
         //public float scaleOut=2f;
         public bool autoGenerateGeometry = true;
         public bool autoInvalidateBoundingShapeCache=true;
@@ -20,18 +21,125 @@ namespace unvs.gameword
         public bool DefautlUseDelaunayMesh = false;
         public CompositeCollider2D coll;
         public Rigidbody2D rigiBody;
-
+        public bool IsMultiPolygon => isMultiPolygon;
         public CompositeCollider2D Coll => coll;
         public static GlobalWorldBound Instance;
-        
+        public PolygonCollider2D singleCollider;
 
         public Rigidbody2D Rigidbody => rigiBody;
+        List<IScenePrefab> prefabList=new List<IScenePrefab>();
 
-        
+        public void SetBound(IScenePrefab newScenePrefab)
+        {
+            if(isMultiPolygon) SetBoundModeMulti(newScenePrefab);
+            else SetBoundModeSingle(newScenePrefab);
+        }
+        public void SetBoundModeSingle(IScenePrefab newScenePrefab)
+        {
+            var instace = SingleScene.Instance;
+            Clear();
+            newScenePrefab.WorldBound.Owner = newScenePrefab;
+            newScenePrefab.WorldBound.refColl = newScenePrefab.WorldBound.Coll;
+            if (newScenePrefab.WorkTracker == null)
+            {
+                var track = newScenePrefab.WorldBound.Coll.Clone(Constants.ObjectsConst.SCENE_TRACKER);
+                track.transform.SetParent((newScenePrefab as MonoBehaviour).transform, true);
+                track.AddComponent<WorldTrackerObject>();
+            }
+            newScenePrefab.WorldBound.Coll.enabled = false;
+            prefabList.Add(newScenePrefab);
+            singleCollider.points = PolygonCollider2Extension.CreateRectFromVectorList(prefabList.Select(p => p.WorldBound.Coll).ToArray());
+            coll.GenerateGeometry();
+            instace.Confiner.InvalidateBoundingShapeCache();
+           
+            //var track = newScenePrefab.RefColliderWorldBound.CloneWithMarginByScale(SingleSceneController.Instance.WorldBoundMrgin);
 
-        //Dictionary<IScenePrefab,PolygonCollider2D> storage=new Dictionary<IScenePrefab, PolygonCollider2D> ();
 
+        }
         public void AddBound(IScenePrefab newScenePrefab)
+        {
+            if (isMultiPolygon) AddBoundModeMulti(newScenePrefab);
+            else AddBoundModeSingle(newScenePrefab);
+        }
+        public void AddBoundModeSingle(IScenePrefab newScenePrefab)
+        {
+            var instance = SingleScene.Instance;
+            newScenePrefab.WorldBound.refColl = newScenePrefab.WorldBound.Coll;
+            if (newScenePrefab.WorkTracker == null)
+            {
+                var track = newScenePrefab.WorldBound.Coll.Clone(Constants.ObjectsConst.SCENE_TRACKER, false);
+                track.transform.SetParent((newScenePrefab as MonoBehaviour).transform, true);
+                var tck = track.AddComponent<WorldTrackerObject>();
+                tck.enabled = false;
+            }
+            else
+            {
+                newScenePrefab.WorkTracker.Off();
+            }
+            newScenePrefab.WorldBound.Coll.enabled = false;
+            Instance.ClearOrphanBound();
+            prefabList.Add(newScenePrefab);
+            singleCollider.points = PolygonCollider2Extension.CreateRectFromVectorList(prefabList.Select(p => p.WorldBound.Coll).ToArray());
+            
+
+
+
+            // Force regenerate Composite Collider
+            if (autoGenerateGeometry)
+                coll.GenerateGeometry(); // Thay vì disable/enable, dùng hàm này chuyên dụng hơn
+
+
+
+            if (fixDampling)
+            {
+                //SingleScene.Instance.VCam.CancelDamping();
+                instance.Confiner.Damping = 5;
+
+            }
+            
+            if (autoInvalidateBoundingShapeCache)
+                instance.Confiner.InvalidateBoundingShapeCache();
+        }
+        public void SetBoundModeMulti(IScenePrefab newScenePrefab)
+        {
+            var instace = SingleScene.Instance;
+            Clear();
+            newScenePrefab.WorldBound.Owner = newScenePrefab;
+            newScenePrefab.WorldBound.refColl = newScenePrefab.WorldBound.Coll;
+            if (newScenePrefab.WorkTracker == null)
+            {
+                var track = newScenePrefab.WorldBound.Coll.Clone(Constants.ObjectsConst.SCENE_TRACKER);
+                track.transform.SetParent((newScenePrefab as MonoBehaviour).transform, true);
+                track.AddComponent<WorldTrackerObject>();
+            }
+
+            newScenePrefab.WorldBound.DoScaleOnce(Constants.Settings.DEFAULT_WORLD_BOUND_SCALE);
+            PolygonCollider2D newBounds = newScenePrefab.WorldBound.Coll;
+            newBounds.useDelaunayMesh = DefautlUseDelaunayMesh;
+            newBounds.SetMeOnLayer(Constants.Layers.WORLD_BOUND);
+
+            //var track = newScenePrefab.RefColliderWorldBound.CloneWithMarginByScale(SingleSceneController.Instance.WorldBoundMrgin);
+
+            if (newBounds != null)
+            {
+                newBounds.transform.SetParent(transform, true);
+
+                // 3. Kích hoạt tính năng "Gộp"
+                // Khi dòng này bật lên, Composite Collider ở cha sẽ tự động nới rộng ra
+                newBounds.compositeOperation = Collider2D.CompositeOperation.Merge;
+
+                // 4. BẮT BUỘC: Báo cho Cinemachine biết là cái khung đã thay đổi kích thước
+                // Nếu không có dòng này, Camera vẫn sẽ bị kẹt ở vùng cũ
+                coll.GenerateGeometry();
+                instace.Confiner.InvalidateBoundingShapeCache();
+                //this.storage.Add(newScenePrefab, newBounds);
+            }
+            Instance.ClearOrphanBound();
+            //newScenePrefab.WorldBound.Disable();
+            // newScenePrefab.WorldBound.Disable();
+
+        }
+        public void AddBoundModeMulti(IScenePrefab newScenePrefab)
         {
 
             var instance = SingleScene.Instance;
@@ -86,7 +194,14 @@ namespace unvs.gameword
         {
             foreach (var item in coll.GetComponentsInChildren<IScenePrefabWorldBound>(true).Where(p => p.TrOWner.IsDestroyed()))
             {
+
                 UnityEngine.Object.Destroy((item as MonoBehaviour).gameObject);
+            }
+            var phantom=prefabList.FirstOrDefault(p=>p.IsDestroying);
+            while (phantom != null)
+            {
+                prefabList.Remove(phantom);
+                phantom = prefabList.FirstOrDefault(p => p.IsDestroying);
             }
         }
 
@@ -97,10 +212,42 @@ namespace unvs.gameword
             coll.enabled = true;
             SingleScene.Instance.Confiner.InvalidateBoundingShapeCache();
         }
-
-
-
         public void RemoveBound(IScenePrefab newScenePrefab)
+        {
+            if(IsMultiPolygon) RemoveBoundMultiMode(newScenePrefab);
+            else RemoveBoundSingleMode(newScenePrefab);
+        }
+        private void RemoveBoundSingleMode(IScenePrefab newScenePrefab)
+        {
+            var instance = SingleScene.Instance;
+            prefabList.Remove(newScenePrefab);
+
+
+            Instance.ClearOrphanBound();
+            prefabList.Add(newScenePrefab);
+            singleCollider.points = PolygonCollider2Extension.CreateRectFromVectorList(prefabList.Select(p => p.WorldBound.Coll).ToArray());
+
+
+
+
+            // Force regenerate Composite Collider
+            if (autoGenerateGeometry)
+                coll.GenerateGeometry(); // Thay vì disable/enable, dùng hàm này chuyên dụng hơn
+
+
+
+            if (fixDampling)
+            {
+                //SingleScene.Instance.VCam.CancelDamping();
+                instance.Confiner.Damping = 5;
+
+            }
+
+            if (autoInvalidateBoundingShapeCache)
+                instance.Confiner.InvalidateBoundingShapeCache();
+        }
+
+        private void RemoveBoundMultiMode(IScenePrefab newScenePrefab)
         {
             var wb =coll.GetComponentsInChildren<IScenePrefabWorldBound>(true).FirstOrDefault(p => p.Owner == newScenePrefab);
             if (wb == null)
@@ -137,8 +284,18 @@ namespace unvs.gameword
             DontDestroyOnLoad(gameObject);
 
         }
+        private void InitRunTime()
+        {
+            if (Application.isPlaying)
+            {
+                singleCollider = this.transform.AddChildComponentIfNotExist<PolygonCollider2D>(Constants.ObjectsConst.GLOBAL_WORLD_BOUND_SINGLE_POLYGON);
+                singleCollider.compositeOperation = Collider2D.CompositeOperation.Merge;
+                singleCollider.isTrigger = true;
+            }
+        }
         private void Awake()
         {
+            InitRunTime();
             coll = GetComponent<CompositeCollider2D>();
             coll.geometryType = CompositeCollider2D.GeometryType.Polygons; // Hợp nhất diện tích
             coll.vertexDistance = 0.0005f; // Hàn kín các đỉnh
@@ -153,47 +310,22 @@ namespace unvs.gameword
             coll.isTrigger = true;
         }
 
-        public void SetBound(IScenePrefab newScenePrefab)
-        {
-            var instace = SingleScene.Instance;
-            Clear();
-            newScenePrefab.WorldBound.Owner = newScenePrefab;
-            newScenePrefab.WorldBound.refColl = newScenePrefab.WorldBound.Coll;
-            if (newScenePrefab.WorkTracker == null)
-            {
-                var track = newScenePrefab.WorldBound.Coll.Clone(Constants.ObjectsConst.SCENE_TRACKER);
-                track.transform.SetParent((newScenePrefab as MonoBehaviour).transform, true);
-                track.AddComponent<WorldTrackerObject>();
-            }
-            
-            newScenePrefab.WorldBound.DoScaleOnce(Constants.Settings.DEFAULT_WORLD_BOUND_SCALE);
-            PolygonCollider2D newBounds = newScenePrefab.WorldBound.Coll;
-            newBounds.useDelaunayMesh = DefautlUseDelaunayMesh;
-            newBounds.SetMeOnLayer(Constants.Layers.WORLD_BOUND);
-          
-            //var track = newScenePrefab.RefColliderWorldBound.CloneWithMarginByScale(SingleSceneController.Instance.WorldBoundMrgin);
-           
-            if (newBounds != null)
-            {
-                newBounds.transform.SetParent(transform, true);
-
-                // 3. Kích hoạt tính năng "Gộp"
-                // Khi dòng này bật lên, Composite Collider ở cha sẽ tự động nới rộng ra
-                newBounds.compositeOperation = Collider2D.CompositeOperation.Merge;
-
-                // 4. BẮT BUỘC: Báo cho Cinemachine biết là cái khung đã thay đổi kích thước
-                // Nếu không có dòng này, Camera vẫn sẽ bị kẹt ở vùng cũ
-                coll.GenerateGeometry();
-                instace.Confiner.InvalidateBoundingShapeCache();
-                //this.storage.Add(newScenePrefab, newBounds);
-            }
-            Instance.ClearOrphanBound();
-            //newScenePrefab.WorldBound.Disable();
-            // newScenePrefab.WorldBound.Disable();
-
-        }
+        
 
         public void Clear()
+        {
+            if(isMultiPolygon)
+            ClearModeMulty();
+            else ClearModeSingle();
+        }
+
+        private void ClearModeSingle()
+        {
+            singleCollider.points = null;
+            this.prefabList.Clear();
+        }
+
+        private void ClearModeMulty()
         {
             foreach (Transform tr in GetComponentInChildren<Transform>())
             {

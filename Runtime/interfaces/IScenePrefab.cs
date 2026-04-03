@@ -1,14 +1,66 @@
-﻿using System;
+﻿using PlasticGui.Help.Conditions;
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using unvs.shares;
 namespace unvs.interfaces
 {
+    [Serializable]
+    public struct OffsetFollowInfo
+    {
+        public bool ByRatio;
+        public float OffsetValue;
+        public bool IsEmpty;
+        public static OffsetFollowInfo Default()
+        {
+            var ret = new OffsetFollowInfo();
+            ret.IsEmpty = false;
+            ret.ByRatio = true;
+            ret.OffsetValue = 0.33f;
+            return ret;
+        }
+
+        public static OffsetFollowInfo Empty()
+        {
+            var ret = new OffsetFollowInfo();
+            ret.IsEmpty = true;
+         
+            return ret;
+        }
+    }
+    [Serializable]
+    public struct OffsetFollow
+    {
+        public bool IsEmpty;
+        [SerializeField]
+        public OffsetFollowInfo x;
+        [SerializeField]
+        public OffsetFollowInfo y;
+        public static OffsetFollow Empty()
+        {
+            var ret= new OffsetFollow();
+            ret.IsEmpty= true;
+            ret.x = OffsetFollowInfo.Empty();
+            ret.y = OffsetFollowInfo.Empty();
+            return ret;
+        }
+
+        public static OffsetFollow DefaultNew()
+        {
+            var ret = new OffsetFollow();
+            ret.IsEmpty = false;
+            ret.x = OffsetFollowInfo.Empty();
+            ret.y = OffsetFollowInfo.Default();
+            return ret;
+        }
+    }
     public interface IScenePrefab
     {
-        AudioSource Audio {  get; }
-        AudioInfo Ambient {  get; }
+        OffsetFollow CameraOffsetFolow { get; }
+
+        AudioSource Audio { get; }
+        AudioInfo Ambient { get; }
         bool GizmosDraw { get; }
         IWorldGlobalLight Globalight { get; }
         public IWorldJoinInfoObject JoinInfo { get; }
@@ -51,7 +103,7 @@ namespace unvs.interfaces
         /// Usage: change environment of hit scene and meny thing
         /// </summary>
         IWorldTracker WorkTracker { get; }
-       
-       
+
+
     }
 }

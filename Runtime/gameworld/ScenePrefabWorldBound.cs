@@ -72,6 +72,7 @@ namespace unvs.gameword
 
         public void Restore()
         {
+            if(GlobalWorldBound.Instance.isMultiPolygon)
             Coll.transform.SetParent(owner.GoWorld.transform, false);
         }
 

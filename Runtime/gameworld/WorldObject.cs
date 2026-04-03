@@ -36,7 +36,9 @@ namespace unvs.gameword
         public IActorObject CurrentActor;
         public ISpawnTarget _startPos;
         public Transform startPos;
-
+        [Header("Camera")]
+        [SerializeField]
+        public OffsetFollow cameraOffsetFolow = OffsetFollow.DefaultNew();
         public float orthographicSize = Constants.CinemachineDefaut.OrthographicSize;
 
         public EdgeCollider2D floor;
@@ -51,9 +53,11 @@ namespace unvs.gameword
         [Header("Physical")]
         public PhysicsMaterial2D defaultSurfacePhysicsMaterial2D;
         [Header("Scene")]
+        public OffsetFollow CameraOffsetFolow => cameraOffsetFolow;
         public AudioSource audioSource;
         [SerializeField]
         public AudioInfo ambientSound = AudioInfo.EmptyNew();
+        
         public BoxCollider2D leftWall;
         public BoxCollider2D rightWall;
         public ITriggerZone leftTriggerZone;
@@ -78,6 +82,7 @@ namespace unvs.gameword
         public bool gizmosDraw = true;
         private System.Action<IScenePrefab> onDestroyMe;
         
+
 
 
 
@@ -332,6 +337,8 @@ namespace unvs.gameword
         public AudioInfo Ambient => ambientSound;
 
         public AudioSource Audio => audioSource;
+
+        
 
         void CalculateBound()
         {

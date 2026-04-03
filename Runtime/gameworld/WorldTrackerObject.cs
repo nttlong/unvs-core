@@ -61,7 +61,7 @@ namespace unvs.gameword
                 this.stop = true;
                 
 
-                var ascynValue = SingleScene.Instance.VCam.SetOrthoSizeSmoothlyAsync(nearestScene.OrthographicSize, 2f);
+                var ascynValue = SingleScene.Instance.VCam.UpdateByScenePrefabAsync(nearestScene, 2f);
 
                 ascynValue.ContinueWith(() =>
                 {
@@ -105,7 +105,7 @@ namespace unvs.gameword
                 this.stop = true;
                 //lastScenesTracking = Clone(tracker.ScensHit);
 
-                SingleScene.Instance.VCam.SetOrthoSizeSmoothlyAsync(nearestScene.OrthographicSize, 2f).ContinueWith(async () =>
+                SingleScene.Instance.VCam.UpdateByScenePrefabAsync(nearestScene, 2f).ContinueWith(async () =>
                 {
                     this.stop = false;
                     tracker.Clear();
