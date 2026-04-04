@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 using unvs.interfaces;
@@ -31,6 +32,7 @@ namespace unvs.shares
         public static SettingsGlobalEvents GlobalInput { get;  set; }
         public static IMainMenu UIMainMenu { get; internal set; }
         public static AudioSource CommonAudioSource { get; internal set; }
+        public static CancellationTokenSource WorldTrackerCancellationTokenSource { get;  set; }
 
         public static GlobalEvents Events = new GlobalEvents();
 

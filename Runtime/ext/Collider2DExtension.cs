@@ -90,6 +90,7 @@ namespace unvs.ext
                 Handles.DrawBezier(bottomLeft, topLeft, bottomLeft, topLeft, color, null, thickness);
             }
         }
-    }
 #endif
+    }
+
 }

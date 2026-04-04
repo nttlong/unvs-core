@@ -68,40 +68,10 @@ namespace unvs.ext
             {
                 bodyCam.UpdateSizeByLensSettings(vcam.Lens);
             }
-            // 2. Xử lý Confiner2D (Nguyên nhân chính gây trượt)
-            //var confiner = vcam.GetComponent<CinemachineConfiner2D>();
-            //if (confiner != null)
-            //{
-            //    // Tạm thời tắt Damping để chặn đứng sự trượt
-            //    float originalDamping = confiner.Damping;
-            //    confiner.Damping = 0;
-
-            //    // Ép tính toán lại vùng bao dựa trên Size mới
-            //    confiner.InvalidateBoundingShapeCache();
-
-            //    // 3. Ép Camera nhảy tới vị trí đúng ngay lập tức
-            //    // Hàm này sẽ xóa bỏ trạng thái "mượt" của frame cũ
-            //    vcam.ForceCameraPosition(vcam.transform.position, vcam.transform.rotation);
-
-            //    // (Tùy chọn) Nếu bạn muốn mượt lại sau đó, dùng Invoke hoặc chờ 1 frame
-            //    // Nhưng thông thường khi chuyển vùng, ta để Damping thấp là tốt nhất
-            //}
-            //else
-            //{
-            //    // Nếu không có confiner, chỉ cần ForcePosition là đủ
-            //    vcam.ForceCameraPosition(vcam.transform.position, vcam.transform.rotation);
-            //}
+            
 
         }
-        //public static void UpdateDamping(this CinemachineCamera vcam, float DampingValue = 5f)
-        //{
-        //    var confiner = vcam.GetComponent<CinemachineConfiner2D>();
-        //    if (confiner != null)
-        //    {
-        //        confiner.Damping = DampingValue;
-        //        confiner.InvalidateBoundingShapeCache();
-        //    }
-        //}
+      
 
         /// <summary>
         /// Thay đổi Zoom mượt mà (Dùng kèm với Coroutine hoặc Tweening)
@@ -128,57 +98,83 @@ namespace unvs.ext
             vcam.SetOrthoSizeImmediate(scene.OrthographicSize);
         }
         public static async UniTask ChangeFollowOffsetSmoothAsync(
-    this CinemachineCamera vcam,
-    IScenePrefab scene,
-    CancellationToken cancellationToken,
-    float duration = 1.0f)
+      this CinemachineCamera vcam,
+      IScenePrefab scene,
+      CancellationToken cancellationToken,
+      float duration = 1.0f)
         {
-            var state = vcam.AddComponentIfNotExist<CamStateObject>();
             var f = vcam.GetComponent<CinemachineFollow>();
             if (f == null) return;
 
+            var state = vcam.AddComponentIfNotExist<CamStateObject>();
             Vector3 oldOffset = f.FollowOffset;
             Vector3 targetOffset = CreateOffsetCameraFollowOffset(scene);
 
+            // Sử dụng using cho cả hai để đảm bảo giải phóng tài nguyên hệ thống
+            using var userCts = new CancellationTokenSource();
+            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(userCts.Token, cancellationToken);
+
+            // Lấy token tổng hợp để sử dụng xuyên suốt
+            var linkedToken = linkedCts.Token;
+
             float elapsed = 0;
+            state.isInProgress = true;
 
             try
             {
                 while (elapsed < duration)
                 {
-                    if(state.isInteruptValue)
+                    // Kiểm tra token tổng hợp trước
+                    linkedToken.ThrowIfCancellationRequested();
+
+                    if (state.isInteruptValue)
                     {
-                        f.FollowOffset=state.offSetValue;
+                        f.FollowOffset = state.offSetValue;
                         state.isInteruptValue = false;
-                        state.isInProgress = false;
-                        return;
+                        state.isInProgress=false;
+                        return; // Thoát ra, khối 'finally' sẽ lo việc reset isInProgress
                     }
-                    state.isInProgress = true;
-                    // Kiểm tra ngay lập tức nếu tác vụ đã bị hủy
-                    cancellationToken.ThrowIfCancellationRequested();
 
                     elapsed += Time.deltaTime;
                     float t = Mathf.Clamp01(elapsed / duration);
-
-                    // Dùng SmoothStep để tăng độ mượt cho camera
                     float step = Mathf.SmoothStep(0, 1, t);
+
                     f.FollowOffset = Vector3.Lerp(oldOffset, targetOffset, step);
 
-                    // Chờ đến frame tiếp theo, gắn kèm token để UniTask tự động ngắt khi cần
-                    await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+                    // Truyền linkedToken vào đây để UniTask tự ngắt nếu 1 trong 2 nguồn bị hủy
+                    await UniTask.Yield(PlayerLoopTiming.Update, linkedToken);
                 }
 
-                // Đảm bảo giá trị cuối cùng khớp tuyệt đối
                 f.FollowOffset = targetOffset;
-                state.isInProgress = false;
             }
             catch (OperationCanceledException)
             {
-                // Xử lý khi tác vụ bị hủy (ví dụ: chuyển scene, tắt object)
-                // Bạn có thể giữ nguyên offset hiện tại hoặc force về target tùy logic game
-                Debug.Log("[Camera] Offset transition was cancelled.");
+                if (state.isInteruptValue)
+                {
+                    f.FollowOffset = state.offSetValue;
+                    state.isInteruptValue = false;
+                 
+                } else
+                {
+                    if (f != null) f.FollowOffset = oldOffset;
+                }
+               
+            }
+            finally
+            {
+                // Dùng finally để đảm bảo dù chạy xong, bị lỗi, hay bị cancel thì flag vẫn về false
+                if (state != null) state.isInProgress = false;
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="vcam"></param>
+        /// <param name="scene"></param>
+        /// <param name="duration"></param>
+        /// <param name="zoomSpeed"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public static async UniTask UpdateByScenePrefabAsync(this CinemachineCamera vcam, IScenePrefab scene,
         float duration = -1f,
         float zoomSpeed = 3f,

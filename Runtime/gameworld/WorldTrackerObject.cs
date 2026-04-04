@@ -60,9 +60,9 @@ namespace unvs.gameword
             if (camWacher.Coll.bounds.center != lastPos && !this.stop && nearestScene!=null)
             {
                 this.stop = true;
-                
 
-                var ascynValue = SettingsSingleScene.Instance.VCam.UpdateByScenePrefabAsync(nearestScene, 2f);
+                GlobalApplication.WorldTrackerCancellationTokenSource = GlobalApplication.WorldTrackerCancellationTokenSource.Refresh();
+                var ascynValue = SettingsSingleScene.Instance.VCam.UpdateByScenePrefabAsync(nearestScene, 2f,3f, GlobalApplication.WorldTrackerCancellationTokenSource.Token);
 
                 ascynValue.ContinueWith(() =>
                 {
@@ -105,8 +105,8 @@ namespace unvs.gameword
             {
                 this.stop = true;
                 //lastScenesTracking = Clone(tracker.ScensHit);
-
-                SettingsSingleScene.Instance.VCam.UpdateByScenePrefabAsync(nearestScene, 2f).ContinueWith(async () =>
+                GlobalApplication.WorldTrackerCancellationTokenSource = GlobalApplication.WorldTrackerCancellationTokenSource.Refresh();
+                SettingsSingleScene.Instance.VCam.UpdateByScenePrefabAsync(nearestScene, 2f,3f, GlobalApplication.WorldTrackerCancellationTokenSource.Token).ContinueWith(async () =>
                 {
                     this.stop = false;
                     tracker.Clear();

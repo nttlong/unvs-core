@@ -275,41 +275,17 @@ namespace unvs.shares
             }
         }
         
-#if UNITY_EDITOR
+//#if UNITY_EDITOR
         public static Vector2 GetCameraWorldSizeEditorMode(float orthographicSize)
         {
             float height = orthographicSize * 2f;
             float aspect = 1.7777f; // Mặc định 16:9 nếu không tìm thấy camera
 
-            // 1. Thử lấy Camera chính trong Scene (hoạt động cả khi không Play)
-            //Camera cam = Camera.main;
-
-            // 2. Nếu Camera.main null (thường bị trong Editor), tìm tất cả camera
-            //if (cam == null) cam = GameObject.FindObjectOfType<Camera>();
-
-            //if (cam != null)
-            //{
-            //    aspect = cam.aspect;
-            //}
-            //else
-            //{
-            //    // 3. Dự phòng: Lấy aspect ratio từ cửa sổ Game hiện tại trong Editor
-
-            //    System.Type T = System.Type.GetType("UnityEditor.GameView,UnityEditor");
-            //    UnityEditor.EditorWindow gameView = UnityEditor.EditorWindow.GetWindow(T);
-            //    var prop = gameView.GetType().GetProperty("targetSize",
-            //        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-            //    if (prop != null)
-            //    {
-            //        Vector2 size = (Vector2)prop.GetValue(gameView);
-            //        aspect = size.x / size.y;
-            //    }
-
-            //}
+            
 
             return new Vector2(height * aspect, height);
         }
-#endif
+//#endif
         public static Vector2 GetCameraWorldSize()
         {
             Camera cam = Camera.main;
