@@ -196,7 +196,7 @@ namespace unvs.manager
         private bool RefreshLight()
         {
             // Check null an toàn cho các singleton/global reference
-            if (GlobalApplication.CamTracking == null || SingleScene.Instance == null) return false;
+            if (GlobalApplication.CamTracking == null || SettingsSingleScene.Instance == null) return false;
 
             // Vì bạn đảm bảo < 3 con, dùng thẳng GetComponentsInChildren là chấp nhận được
             var wrappers = this.GlobalLight.GetComponentsInChildren<IGlobalLightWapper>(true);

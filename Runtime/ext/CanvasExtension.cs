@@ -56,7 +56,7 @@ namespace unvs.ext
             UICanvas.gameObject.SetActive(true);
             GlobalApplication.GlobalInput.Player.enable = false;
             Time.timeScale = 0f;
-            SingleScene.Instance.CursorOn();
+            SettingsSingleScene.Instance.CursorOn();
 
         }
         public static void DoDeactive(this Canvas UICanvas)

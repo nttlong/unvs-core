@@ -36,7 +36,7 @@ namespace unvs.gameword
         }
         public void SetBoundModeSingle(IScenePrefab newScenePrefab)
         {
-            var instace = SingleScene.Instance;
+            var instace = SettingsSingleScene.Instance;
             Clear();
             newScenePrefab.WorldBound.Owner = newScenePrefab;
             newScenePrefab.WorldBound.refColl = newScenePrefab.WorldBound.Coll;
@@ -63,7 +63,7 @@ namespace unvs.gameword
         }
         public void AddBoundModeSingle(IScenePrefab newScenePrefab)
         {
-            var instance = SingleScene.Instance;
+            var instance = SettingsSingleScene.Instance;
             newScenePrefab.WorldBound.refColl = newScenePrefab.WorldBound.Coll;
             if (newScenePrefab.WorkTracker == null)
             {
@@ -102,7 +102,7 @@ namespace unvs.gameword
         }
         public void SetBoundModeMulti(IScenePrefab newScenePrefab)
         {
-            var instace = SingleScene.Instance;
+            var instace = SettingsSingleScene.Instance;
             Clear();
             newScenePrefab.WorldBound.Owner = newScenePrefab;
             newScenePrefab.WorldBound.refColl = newScenePrefab.WorldBound.Coll;
@@ -142,7 +142,7 @@ namespace unvs.gameword
         public void AddBoundModeMulti(IScenePrefab newScenePrefab)
         {
 
-            var instance = SingleScene.Instance;
+            var instance = SettingsSingleScene.Instance;
             newScenePrefab.WorldBound.refColl = newScenePrefab.WorldBound.Coll;
             if (newScenePrefab.WorkTracker == null)
             {
@@ -210,7 +210,7 @@ namespace unvs.gameword
             yield return new WaitForEndOfFrame();
             coll.enabled = false;
             coll.enabled = true;
-            SingleScene.Instance.Confiner.InvalidateBoundingShapeCache();
+            SettingsSingleScene.Instance.Confiner.InvalidateBoundingShapeCache();
         }
         public void RemoveBound(IScenePrefab newScenePrefab)
         {
@@ -219,7 +219,7 @@ namespace unvs.gameword
         }
         private void RemoveBoundSingleMode(IScenePrefab newScenePrefab)
         {
-            var instance = SingleScene.Instance;
+            var instance = SettingsSingleScene.Instance;
             prefabList.Remove(newScenePrefab);
 
 
@@ -265,7 +265,7 @@ namespace unvs.gameword
                 UnityEngine.Object.Destroy(tr.gameObject);
             }
            
-            SingleScene.Instance.Confiner.InvalidateBoundingShapeCache();
+            SettingsSingleScene.Instance.Confiner.InvalidateBoundingShapeCache();
 
         }
         private void Start()
@@ -276,10 +276,10 @@ namespace unvs.gameword
                 return;
             }
             Instance = this;
-            if (SingleScene.Instance != null)
+            if (SettingsSingleScene.Instance != null)
             {
-                SingleScene.Instance.Confiner.BoundingShape2D = coll;
-                SingleScene.Instance.Confiner.InvalidateBoundingShapeCache();
+                SettingsSingleScene.Instance.Confiner.BoundingShape2D = coll;
+                SettingsSingleScene.Instance.Confiner.InvalidateBoundingShapeCache();
             }
             DontDestroyOnLoad(gameObject);
 

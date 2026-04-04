@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 namespace unvs.interfaces.sys
@@ -43,6 +44,8 @@ namespace unvs.interfaces.sys
     {
         UniTask CheckLeftAsync(Transform tempDelete, int horizontalChunkSize);
         UniTask CheckRightAsync(Transform tempDelete, int horizontalChunkSize);
+        void Hide();
+        void Show();
     }
 }
 

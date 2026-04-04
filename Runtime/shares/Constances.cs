@@ -101,6 +101,8 @@ namespace unvs.shares
             public const string COMMON_AUDIO_SOURCE = "COMMON-AUDIO-SOURCE";
 
             public const string GLOBAL_WORLD_BOUND_SINGLE_POLYGON = "GLOBAL-WORLD-BOUND-SINGLE-POLYGON";
+
+            public const string DEFAULT_CAM_WATCHER = "DEFAULT-CAM-WATCHER";
         }
         public class Settings
         {

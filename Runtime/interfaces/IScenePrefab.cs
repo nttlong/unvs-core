@@ -1,4 +1,4 @@
-﻿using PlasticGui.Help.Conditions;
+﻿
 using System;
 using System.Collections;
 using UnityEngine;
@@ -54,9 +54,51 @@ namespace unvs.interfaces
             ret.y = OffsetFollowInfo.Default();
             return ret;
         }
+
+        public Vector3 CalculateOffset(float orthographicSize)
+        {
+            float x = 0;
+            float y = 0;
+            if (!this.x.IsEmpty)
+            {
+                x = this.x.OffsetValue;
+                if (this.x.ByRatio)
+                {
+                    x = orthographicSize * x;
+                }
+            }
+            if (!this.y.IsEmpty)
+            {
+                y = this.y.OffsetValue;
+                if (this.y.ByRatio)
+                {
+                    y = orthographicSize * y;
+                }
+            }
+            var v = new Vector3(x, y, -10);
+            return v;
+
+        }
+    }
+    [Serializable]
+    public struct ViewInfo
+    {
+        [SerializeField]
+        public Vector2 Size;
+        [SerializeField] public Vector2 Center;
+        [SerializeField]
+        public Vector2 Offset;
+
+        public void Calculate(OffsetFollow cameraOffsetFolow, float orthographicSize)
+        {
+           Size=Commons.GetCameraWorldSizeEditorMode(orthographicSize);
+            Offset = cameraOffsetFolow.CalculateOffset(orthographicSize);
+        }
     }
     public interface IScenePrefab
     {
+        ViewInfo View {  get; }
+        GameObject DefaultCamWatcher { get; }
         OffsetFollow CameraOffsetFolow { get; }
 
         AudioSource Audio { get; }

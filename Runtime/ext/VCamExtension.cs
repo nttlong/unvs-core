@@ -4,21 +4,28 @@ using System.Collections;
 using System.Threading;
 using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.Localization.SmartFormat.Utilities;
 using unvs.gameword;
 using unvs.interfaces;
 
 namespace unvs.ext
 {
+    public class CamStateObject : MonoBehaviour
+    {
+        internal Vector3 offSetValue;
+        internal bool isInteruptValue;
+        internal bool isInProgress;
+    }
     public static class VCamExtension
     {
         public static void Watch(this CinemachineCamera vcam, ICamWacher camWatcher)
         {
-            vcam.Watch((camWatcher  as MonoBehaviour).transform );
+            vcam.Watch((camWatcher as MonoBehaviour).transform);
         }
         public static void Watch(this CinemachineCamera vcam, Transform camWatcher)
         {
 
-           
+
             vcam.Follow = camWatcher;
             vcam.LookAt = camWatcher;
 
@@ -27,23 +34,21 @@ namespace unvs.ext
         }
         public static void ClearWatch(this CinemachineCamera vcam)
         {
-
-
             vcam.Target.TrackingTarget = null;
             vcam.Follow = null;
             vcam.LookAt = null;
             vcam.Target.TrackingTarget = null;
             vcam.Target.LookAtTarget = null;
-            SingleScene.Instance.VCam.ForceCameraPosition(new Vector3(0, 0, -10), Quaternion.identity);
+            SettingsSingleScene.Instance.VCam.ForceCameraPosition(new Vector3(0, 0, -10), Quaternion.identity);
         }
-        public static void WatchPosImediately(this CinemachineCamera vcam, Transform camWatcher)
-        {
-            vcam.OnTargetObjectWarped(camWatcher, camWatcher.position);
+        //public static void WatchPosImediately(this CinemachineCamera vcam, Transform camWatcher)
+        //{
+        //    vcam.OnTargetObjectWarped(camWatcher, camWatcher.position);
 
-            // 3. (Tùy chọn) Force camera cập nhật ngay trong Frame này
-            vcam.ForceCameraPosition(camWatcher.position, vcam.transform.rotation);
-            vcam.transform.position = vcam.transform.position + new Vector3(0, 0, -10);
-        }
+        //    // 3. (Tùy chọn) Force camera cập nhật ngay trong Frame này
+        //    vcam.ForceCameraPosition(camWatcher.position, vcam.transform.rotation);
+        //    vcam.transform.position = vcam.transform.position + new Vector3(0, 0, -10);
+        //}
 
         /// <summary>
         /// Thiết lập độ rộng tầm nhìn (Zoom) cho Camera Orthographic.
@@ -64,39 +69,39 @@ namespace unvs.ext
                 bodyCam.UpdateSizeByLensSettings(vcam.Lens);
             }
             // 2. Xử lý Confiner2D (Nguyên nhân chính gây trượt)
-            var confiner = vcam.GetComponent<CinemachineConfiner2D>();
-            if (confiner != null)
-            {
-                // Tạm thời tắt Damping để chặn đứng sự trượt
-                float originalDamping = confiner.Damping;
-                confiner.Damping = 0;
+            //var confiner = vcam.GetComponent<CinemachineConfiner2D>();
+            //if (confiner != null)
+            //{
+            //    // Tạm thời tắt Damping để chặn đứng sự trượt
+            //    float originalDamping = confiner.Damping;
+            //    confiner.Damping = 0;
 
-                // Ép tính toán lại vùng bao dựa trên Size mới
-                confiner.InvalidateBoundingShapeCache();
+            //    // Ép tính toán lại vùng bao dựa trên Size mới
+            //    confiner.InvalidateBoundingShapeCache();
 
-                // 3. Ép Camera nhảy tới vị trí đúng ngay lập tức
-                // Hàm này sẽ xóa bỏ trạng thái "mượt" của frame cũ
-                vcam.ForceCameraPosition(vcam.transform.position, vcam.transform.rotation);
+            //    // 3. Ép Camera nhảy tới vị trí đúng ngay lập tức
+            //    // Hàm này sẽ xóa bỏ trạng thái "mượt" của frame cũ
+            //    vcam.ForceCameraPosition(vcam.transform.position, vcam.transform.rotation);
 
-                // (Tùy chọn) Nếu bạn muốn mượt lại sau đó, dùng Invoke hoặc chờ 1 frame
-                // Nhưng thông thường khi chuyển vùng, ta để Damping thấp là tốt nhất
-            }
-            else
-            {
-                // Nếu không có confiner, chỉ cần ForcePosition là đủ
-                vcam.ForceCameraPosition(vcam.transform.position, vcam.transform.rotation);
-            }
-            
+            //    // (Tùy chọn) Nếu bạn muốn mượt lại sau đó, dùng Invoke hoặc chờ 1 frame
+            //    // Nhưng thông thường khi chuyển vùng, ta để Damping thấp là tốt nhất
+            //}
+            //else
+            //{
+            //    // Nếu không có confiner, chỉ cần ForcePosition là đủ
+            //    vcam.ForceCameraPosition(vcam.transform.position, vcam.transform.rotation);
+            //}
+
         }
-        public static void UpdateDamping(this CinemachineCamera vcam, float DampingValue = 5f)
-        {
-            var confiner = vcam.GetComponent<CinemachineConfiner2D>();
-            if (confiner != null)
-            {
-                confiner.Damping = DampingValue;
-                confiner.InvalidateBoundingShapeCache();
-            }
-        }
+        //public static void UpdateDamping(this CinemachineCamera vcam, float DampingValue = 5f)
+        //{
+        //    var confiner = vcam.GetComponent<CinemachineConfiner2D>();
+        //    if (confiner != null)
+        //    {
+        //        confiner.Damping = DampingValue;
+        //        confiner.InvalidateBoundingShapeCache();
+        //    }
+        //}
 
         /// <summary>
         /// Thay đổi Zoom mượt mà (Dùng kèm với Coroutine hoặc Tweening)
@@ -105,13 +110,20 @@ namespace unvs.ext
         {
             return vcam.Lens.OrthographicSize;
         }
-        public static void UpdateByScenePrefab(this CinemachineCamera vcam,IScenePrefab scene)
+        public static void UpdateByScenePrefab(this CinemachineCamera vcam, IScenePrefab scene)
         {
-            
+            var state = vcam.AddComponentIfNotExist<CamStateObject>();
+
+
             if (!scene.CameraOffsetFolow.IsEmpty)
             {
                 Vector3 v = CreateOffsetCameraFollowOffset(scene);
                 vcam.GetComponent<CinemachineFollow>().FollowOffset = v;
+                if (state.isInProgress)
+                {
+                    state.isInteruptValue = true;
+                    state.offSetValue = v;
+                }
             }
             vcam.SetOrthoSizeImmediate(scene.OrthographicSize);
         }
@@ -121,6 +133,7 @@ namespace unvs.ext
     CancellationToken cancellationToken,
     float duration = 1.0f)
         {
+            var state = vcam.AddComponentIfNotExist<CamStateObject>();
             var f = vcam.GetComponent<CinemachineFollow>();
             if (f == null) return;
 
@@ -133,6 +146,14 @@ namespace unvs.ext
             {
                 while (elapsed < duration)
                 {
+                    if(state.isInteruptValue)
+                    {
+                        f.FollowOffset=state.offSetValue;
+                        state.isInteruptValue = false;
+                        state.isInProgress = false;
+                        return;
+                    }
+                    state.isInProgress = true;
                     // Kiểm tra ngay lập tức nếu tác vụ đã bị hủy
                     cancellationToken.ThrowIfCancellationRequested();
 
@@ -149,6 +170,7 @@ namespace unvs.ext
 
                 // Đảm bảo giá trị cuối cùng khớp tuyệt đối
                 f.FollowOffset = targetOffset;
+                state.isInProgress = false;
             }
             catch (OperationCanceledException)
             {
@@ -163,11 +185,12 @@ namespace unvs.ext
         CancellationToken cancellationToken = default)
         {
             vcam.ChangeFollowOffsetSmoothAsync(scene, cancellationToken, duration).Forget();
+
             await SetOrthoSizeSmoothlyAsync(vcam, scene.OrthographicSize, duration, zoomSpeed, cancellationToken, (size) =>
             {
-                
+
             });
-            
+            //vcam.GetComponent<CinemachineFollow>().FollowOffset = scene.CameraOffsetFolow.CalculateOffset(scene.OrthographicSize);
         }
         public static Vector3 CreateOffsetCameraFollowOffset(this IScenePrefab scene)
         {
@@ -189,7 +212,7 @@ namespace unvs.ext
                     y = scene.OrthographicSize * y;
                 }
             }
-            var v = new Vector3(x, y,-10);
+            var v = new Vector3(x, y, -10);
             return v;
         }
 
@@ -199,7 +222,7 @@ namespace unvs.ext
         float duration = -1f,
         float zoomSpeed = 3f,
         CancellationToken cancellationToken = default,
-        Action<float> OnUpdating=null)
+        Action<float> OnUpdating = null)
         {
             try
             {
@@ -242,7 +265,7 @@ namespace unvs.ext
                     lens.OrthographicSize = currentSize;
 
                     vcam.Lens = lens;
-                   
+
                     if (confiner != null)
                     {
                         // QUAN TRỌNG: Chỉ Invalidate khi thực sự cần thiết 
@@ -252,7 +275,7 @@ namespace unvs.ext
                             confiner.InvalidateBoundingShapeCache();
                         }
                     }
-                    
+
                     // Dùng PreLateUpdate để đảm bảo Camera tính toán xong TRƯỚC KHI Render
                     await UniTask.Yield(PlayerLoopTiming.PreUpdate, cancellationToken);
                     OnUpdating?.Invoke(currentSize);
@@ -262,7 +285,7 @@ namespace unvs.ext
                 LensSettings finalLens = vcam.Lens;
                 finalLens.OrthographicSize = targetSize;
                 vcam.Lens = finalLens;
-                
+
                 if (confiner != null)
                 {
                     confiner.InvalidateBoundingShapeCache();

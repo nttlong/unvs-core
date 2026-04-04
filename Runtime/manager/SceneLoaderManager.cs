@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks.Triggers;
 using Script.unvs.ext;
 using System;
 using System.Collections;
+using System.Threading;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -191,13 +192,13 @@ namespace unvs.manager
                 GlobalWorldBound.Instance.AddBound(scene);
             else GlobalWorldBound.Instance.SetBound(scene);
             if (GlobalWorldBound.Instance.isMultiPolygon)
-                SingleScene.Instance.VCam.SetOrthoSizeImmediate(scene.OrthographicSize);
+                SettingsSingleScene.Instance.VCam.SetOrthoSizeImmediate(scene.OrthographicSize);
             else
-                SingleScene.Instance.VCam.UpdateByScenePrefab(scene);
+                SettingsSingleScene.Instance.VCam.UpdateByScenePrefab(scene);
             if (actor != null)
             {
                 target.MoveOtherToMe(actor as MonoBehaviour);
-                SingleScene.Instance.VCam.Watch(actor.CamWacher);
+                SettingsSingleScene.Instance.VCam.Watch(actor.CamWacher);
             }
 
             scene.GoWorld.SetActive(true);
@@ -211,6 +212,140 @@ namespace unvs.manager
             }
 
             return scene;
+        }
+        public async UniTask<IScenePrefab> LoadInteriorAsyncOld(string pathToWord, string targetName, CancellationToken ct, IScenePrefab SourceScene = null)
+        {
+            // 1. Immediate cancellation check
+            ct.ThrowIfCancellationRequested();
+
+            try
+            {
+                // 2. Ensuring execution starts after current frame logic to avoid physics/lifecycle conflicts
+                await UniTask.WaitForEndOfFrame(ct);
+
+                // 3. Handle Current Actor (Player/NPC)
+                var actor = actorPlaceHolder.GetComponentInChildren<IActorObject>();
+                if (actor != null)
+                {
+                    // Disable actor to prevent interactions during scene transition
+                    (actor as MonoBehaviour).gameObject.SetActive(false);
+                }
+
+                // 4. Cleanup Previous Interior Scene
+                if (Instance.LastInteriorScene != null && !Instance.LastInteriorScene.IsDestroying)
+                {
+                    
+                    Instance.LastInteriorScene.GlobalightRestore();
+                    Instance.LastInteriorScene.WorldBound.Restore();
+
+                    // Unregister light mapping before moving to backup
+                    GlobalApplication.LightManagerObjectInstance.FindLightByScene(Instance.LastInteriorScene);
+
+                    // Pivot scene to backup container to keep it in memory for reuse
+                    Instance.LastInteriorScene.GoWorld.transform.SetParent(backupInteriror.transform, true);
+                    Instance.LastInteriorScene.WorkTracker.Off();
+                }
+
+                // 5. Handle Source Scene Transitions (if moving from a specific world scene)
+                if (SourceScene != null && !SourceScene.IsInteriorScene())
+                {
+                    //SourceScene.WorkTracker.Cts = SourceScene.WorkTracker.Cts.Refresh();
+                    SourceScene.GlobalightRestore();
+                    SourceScene.WorldBound.Restore();
+                    SourceScene.GoWorld.transform.SetParent(backupInteriror.transform);
+
+                    // Reactivate boundaries for future world-exploration returns
+                    SourceScene.LeftTriggerZone.On();
+                    SourceScene.RightTriggerZone.On();
+                    SourceScene.LeftWall.isTrigger = !string.IsNullOrEmpty(SourceScene.GetLeftScenePath());
+                    SourceScene.RightWall.isTrigger = !string.IsNullOrEmpty(SourceScene.GetRightScenePath());
+
+                    SourceScene.WorkTracker.Off();
+                }
+
+                // 6. Resource Management & World State Reset
+                await ClearChunksAsync(); // Cleanup world chunks to free up VRAM
+                GlobalApplication.WorldTrackerObject?.Cts?.Stop(); // Kill background world tracking
+                (this.chunks as MonoBehaviour).gameObject.SetActive(false); // Switch to Interior mode
+
+                // 7. Scene Retrieval (Pooling vs Loading)
+                IScenePrefab scene = backupInteriror.gameObject.GetComponentInChildrenByName<IScenePrefab>(pathToWord);
+
+                if (scene == null)
+                {
+                    // Scenario A: Fresh Load from Resources/Addressables
+                    scene = await Commons.LoadPrefabsAsync<IScenePrefab>(pathToWord, interiorScene);
+                }
+                else
+                {
+                    // Scenario B: Reuse existing prefab from Backup Pool
+                    scene.GoWorld.SetActive(false); // Keep invisible during reparenting to avoid frame flickers
+                    scene.WorkTracker.Off();
+                    scene.GoWorld.transform.SetParent(interiorScene, true);
+                }
+
+               
+
+                // 9. Light & Boundary Configuration
+                DisableWorldBound();
+                GlobalApplication.LightManagerObjectInstance.SetLight(scene.Globalight.GlobalLight);
+                DisableConflictController(scene);
+                Instance.LastInteriorScene = scene;
+
+                // 10. Positioning & Boundary Baking
+                ISpawnTarget target = scene.FindSpawnTargetNullReturnStartPos(targetName);
+                this.EpxandWorldBoundHorizontalBeforeAddGlobalWorldBound(scene);
+                scene.TrimEdge();
+
+                if (GlobalWorldBound.Instance.isMultiPolygon)
+                    GlobalWorldBound.Instance.AddBound(scene);
+                else
+                    GlobalWorldBound.Instance.SetBound(scene);
+
+                // 11. Finalizing Actor Placement & Camera Tracking
+                if (actor != null)
+                {
+                    target.MoveOtherToMe(actor as MonoBehaviour);
+                    SettingsSingleScene.Instance.VCam.Watch(actor.CamWacher);
+                }
+                // 8. Update Camera Lens Properties
+                if (GlobalWorldBound.Instance.isMultiPolygon)
+                    SettingsSingleScene.Instance.VCam.SetOrthoSizeImmediate(scene.OrthographicSize);
+                else
+                {
+                    SettingsSingleScene.Instance.VCam.UpdateByScenePrefab(scene);
+                    await UniTask.WaitForSeconds(0.005f);
+                }
+                    
+                // 12. Awakening the Scene
+                scene.GoWorld.SetActive(true);
+                
+
+                // Optional delay for stabilization if needed
+                // await UniTask.DelayFrame(5, PlayerLoopTiming.Update, ct);
+
+                if (actor != null)
+                {
+                    (actor as MonoBehaviour).gameObject.SetActive(true);
+                }
+                //UniTask.WaitForSeconds(0.5f).ContinueWith(() =>
+                //{
+                //    if(scene==null||scene.IsDestroying) return;
+
+                //}).Forget();
+                scene.WorkTracker.On();
+                return scene;
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.LogWarning($"LoadInteriorAsync for {pathToWord} was cancelled.");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error loading interior {pathToWord}: {ex.Message}");
+                throw;
+            }
         }
 
         public void BackupGlobalLight()
@@ -250,9 +385,9 @@ namespace unvs.manager
 
             this.InitActor(scene, targetName);
             if (GlobalWorldBound.Instance.isMultiPolygon)
-                SingleScene.Instance.VCam.SetOrthoSizeImmediate(scene.OrthographicSize);
+                SettingsSingleScene.Instance.VCam.SetOrthoSizeImmediate(scene.OrthographicSize);
             else
-                SingleScene.Instance.VCam.UpdateByScenePrefab(scene);
+                SettingsSingleScene.Instance.VCam.UpdateByScenePrefab(scene);
             await GlobalApplication.FadeScreenController.FadeOutAsync();
 
             return scene;
@@ -315,7 +450,7 @@ namespace unvs.manager
                 var camWatcher = actor.CamWacher as MonoBehaviour;
                 if (camWatcher != null)
                 {
-                    SingleScene.Instance.VCam.Watch(camWatcher.transform);
+                    SettingsSingleScene.Instance.VCam.Watch(camWatcher.transform);
                 }
                 actor.OnDestroying = () =>
                 {
@@ -323,6 +458,10 @@ namespace unvs.manager
                 };
                 (actor as MonoBehaviour).GetComponent<SortingGroup>().sortAtRoot = true;
 
+            }
+            else if (scene.DefaultCamWatcher != null)
+            {
+                SettingsSingleScene.Instance.VCam.Watch(scene.DefaultCamWatcher.transform);
             }
         }
 
@@ -350,7 +489,7 @@ namespace unvs.manager
 
         public void SetUpCam(IScenePrefab scene)
         {
-            SingleScene.Instance.Cam.GetComponent<ICam>().Body.UpdateSizeByLensSettings(SingleScene.Instance.VCam.Lens);
+            SettingsSingleScene.Instance.Cam.GetComponent<ICam>().Body.UpdateSizeByLensSettings(SettingsSingleScene.Instance.VCam.Lens);
         }
 
         public async UniTask<IScenePrefab> LoadChunksAsync(ITriggerZone triggerZone)

@@ -87,14 +87,14 @@ namespace unvs.actors {
             Direction= inputPlayer.Move.ReadValue<Vector2>();
             this.Actor.Motion.Flip(Direction.x);
             this.Actor.Motion.Walk();
-            SingleScene.Instance.CursorOff();
+            SettingsSingleScene.Instance.CursorOff();
         }
         private void Interact_started(UnityEngine.InputSystem.InputAction.CallbackContext obj)
         {
             var isMouse = obj.control.device is Mouse;
             if (isMouse)
             {
-                SingleScene.Instance.CursorOn();
+                SettingsSingleScene.Instance.CursorOn();
                 var pos = inputPlayer.Look.ReadValue<Vector2>().ToWorld();
                 Direction = (pos - actor.Physical.GetPosition()).CalculateDiection();
                 this.Actor.Motion.Flip(Direction.x);

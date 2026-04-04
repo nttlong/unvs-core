@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using System.Collections;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using unvs.ext;
@@ -53,6 +54,24 @@ namespace unvs.manager
                 }
                 scenes[scenes.Length - 1].GoWorld.transform.SetParent(tempDelete.transform, false);
                 tempDelete.SafeDestroyChildrenAsync().Forget();
+            }
+        }
+
+        public void Hide()
+        {
+            var scenes = this.GetComponentsInChildren<IScenePrefab>().Where(p=>p!=null && !p.IsDestroying);
+            foreach (var scen in scenes)
+            {
+                scen.GoWorld.SetActive(false);
+            }
+        }
+
+        public void Show()
+        {
+            var scenes = this.GetComponentsInChildren<IScenePrefab>().Where(p => p != null && !p.IsDestroying);
+            foreach (var scen in scenes)
+            {
+                scen.GoWorld.SetActive(true);
             }
         }
     }

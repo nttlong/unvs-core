@@ -21,28 +21,30 @@ using unvs.ui;
 namespace unvs.gameword
 {
     [RequireComponent(typeof(LightManagerObject))]
-    public class SingleScene : MonoBehaviour, ISingleScene
+    public class SettingsSingleScene : MonoBehaviour, ISingleScene
     {
         
         public static ISingleScene Instance;
+        [Header("Cinema settings")]
         public Camera cam;
         public CinemachineCamera vcam;
         public CinemachineConfiner2D confiner;
-        
+        public CinemachineBrain brain;
         private GameObject currentActorTr;
         private IGlobalWorldBound _globalWorldBound;
         private GameObject globalWorldBound;
         private IScenePrefab _currentWorld;
-        public GameObject currentWorld;
-        public Image fadePanel;
+         GameObject currentWorld;
+       // public Image fadePanel;
 
-        public CinemachineBrain brain;
+      
         private GameObject maiMenu;
         private IFadeScreen fadeScreen;
         private IMainMenu _mainMenu;
-        private EventSystem eventsSys;
+        IPauseMenu _pauseMenu;
+        //private EventSystem eventsSys;
        
-        private IPauseMenu pauseMenu;
+        
 
         public Camera Cam
         {
@@ -118,9 +120,9 @@ namespace unvs.gameword
 
         
 
-        public IPauseMenu PauseMenu => pauseMenu;
-
-        public ISceneLoader SceneLoader => sceneLoader;
+        public IPauseMenu PauseMenu => _pauseMenu;
+        ISceneLoader _sceneLoader;
+        public ISceneLoader SceneLoader => _sceneLoader;
 
         public Image CursorImage => cursor;
 
@@ -129,10 +131,12 @@ namespace unvs.gameword
         
 
         public string StartPath;
-        private ISceneLoader sceneLoader;
-        public GameObject goSceneLoader;
-        private bool isStarting;
-        [Header("Prefab settings")]
+        
+        GameObject _goSceneLoader;
+     
+        [Header("UI")]
+        #region UI settings
+        public Texture2D defaultCursorIcon;
         [Description("Example: Assets/Prefabs/Cinema/Cinema.prefab")]
         public string cinemaSettingPrefabPath;
         /// <summary>
@@ -158,8 +162,9 @@ namespace unvs.gameword
         /// <summary>
         /// "Assets/Prefabs/UI/PauseMenu/PauseMenu.prefab"
         /// </summary>
-        public string PauseMenuAddressalbePath;
-        public Texture2D cursorIcon;
+        public string PauseMenuAddressalbePath; 
+        #endregion
+
         public Canvas topCanvas;
         public Image cursor;
 
@@ -172,10 +177,10 @@ namespace unvs.gameword
             _ = Instance.VCam;
            
             unvs.shares.GlobalApplication.SingleScene = this;
-            if (goSceneLoader == null)
+            if (_goSceneLoader == null)
             {
-                goSceneLoader = new GameObject(Constants.ObjectsConst.SCENE_LOADER);
-                sceneLoader = goSceneLoader.AddComponent<SceneLoaderManager>();
+                _goSceneLoader = new GameObject(Constants.ObjectsConst.SCENE_LOADER);
+                _sceneLoader = _goSceneLoader.AddComponent<SceneLoaderManager>();
             }
 
             return true;
@@ -210,7 +215,7 @@ namespace unvs.gameword
             
             await GlobalApplication.SceneLoaderManagerInstance.ClearAllAsync();
            
-            pauseMenu.Hide();
+            _pauseMenu.Hide();
            
             _mainMenu.Show();
            
@@ -219,19 +224,19 @@ namespace unvs.gameword
         {
             var pauseMenuGo = Commons.LoadPrefabs(PauseMenuAddressalbePath);
             pauseMenuGo.transform.SetParent(transform);
-            pauseMenu = pauseMenuGo.GetComponent<IPauseMenu>();
-            pauseMenu.OnExit = () =>
+            _pauseMenu = pauseMenuGo.GetComponent<IPauseMenu>();
+            _pauseMenu.OnExit = () =>
             {
 
 
                 GlobalApplication.DoExitGame();
 
             };
-            pauseMenu.OnResume = () =>
+            _pauseMenu.OnResume = () =>
             {
-                pauseMenu.Hide();
+                _pauseMenu.Hide();
             };
-            pauseMenu.OnToMain = () =>
+            _pauseMenu.OnToMain = () =>
             {
                 GlobalApplication.SceneLoaderManagerInstance.ClearAllAsync().ContinueWith(() =>
                 {
@@ -275,13 +280,19 @@ namespace unvs.gameword
         {
             if (Application.isPlaying)
             {
-                if (cursorIcon == null)
+                if(string.IsNullOrEmpty(this.StartPath))
                 {
-                    throw new Exception($"Pleass, setup cursorIcon for {name}");
+                    Debug.LogError($"Please, setup StartPath for {name}");
+                }
+                if (defaultCursorIcon == null)
+                {
+                    Debug.LogError($"Please, setup defaultCursorIcon for {name}");
+                    
                 }
                 if (GetComponent<SettingsGlobalEvents>() == null)
                 {
-                    throw new Exception($"Pleass, setup {typeof(SettingsGlobalEvents)}");
+                    Debug.LogError($"Please, setup {typeof(SettingsGlobalEvents)}, ref={name}");
+                   
                 }
                 InitGlobalEvents();
             }
@@ -362,18 +373,18 @@ namespace unvs.gameword
                 cursor = topCanvas.transform.AddChildComponentIfNotExist<Image>(Constants.ObjectsConst.VIRTUAL_CURSOR);
                 // 3. Convert Texture2D to Sprite
                 // cursorIcon is your Texture2D asset
-                if (cursorIcon != null)
+                if (defaultCursorIcon != null)
                 {
                     // Create a new Sprite from the texture
                     // Rect defines the area (full texture), Pivot (0.5, 0.5) centers it
                     cursor.sprite = Sprite.Create(
-                        cursorIcon,
-                        new Rect(0, 0, cursorIcon.width, cursorIcon.height),
+                        defaultCursorIcon,
+                        new Rect(0, 0, defaultCursorIcon.width, defaultCursorIcon.height),
                         new Vector2(0.5f, 0.5f)
                     );
 
                     // 4. Set the UI size based on the texture dimensions
-                    cursor.rectTransform.sizeDelta = new Vector2(cursorIcon.width, cursorIcon.height);
+                    cursor.rectTransform.sizeDelta = new Vector2(defaultCursorIcon.width, defaultCursorIcon.height);
                 }
 
                 // 5. Reset position to center of screen initially
@@ -399,8 +410,8 @@ namespace unvs.gameword
             } else
             {
                 cursor.sprite = Sprite.Create(
-                           cursorIcon,
-                           new Rect(0, 0, cursorIcon.width, cursorIcon.height),
+                           defaultCursorIcon,
+                           new Rect(0, 0, defaultCursorIcon.width, defaultCursorIcon.height),
                            new Vector2(0.5f, 0.5f)
                        );
             }

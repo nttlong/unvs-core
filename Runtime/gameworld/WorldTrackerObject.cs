@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using Unity.Mathematics.Geometry;
+using Unity.VisualScripting;
 using UnityEngine;
 using unvs.ext;
 //using unvs.gameword.manager;
@@ -42,7 +43,7 @@ namespace unvs.gameword
             var camWacher = other.GetComponent<ICamWacher>();
             if (camWacher == null) return;
             if (!(camWacher as MonoBehaviour).GetComponentInParent<IActorObject>().IsActive) return;
-            var Instance = SingleScene.Instance;
+            var Instance = SettingsSingleScene.Instance;
 
 
             var tracker = GlobalApplication.CamTracking;
@@ -61,7 +62,7 @@ namespace unvs.gameword
                 this.stop = true;
                 
 
-                var ascynValue = SingleScene.Instance.VCam.UpdateByScenePrefabAsync(nearestScene, 2f);
+                var ascynValue = SettingsSingleScene.Instance.VCam.UpdateByScenePrefabAsync(nearestScene, 2f);
 
                 ascynValue.ContinueWith(() =>
                 {
@@ -88,7 +89,7 @@ namespace unvs.gameword
             var camWacher = other.GetComponent<ICamWacher>();
             if (camWacher == null) return;
             //this.stop = false;
-            var Instance = SingleScene.Instance;
+            var Instance = SettingsSingleScene.Instance;
             var tracker = GlobalApplication.CamTracking;
 
             //var watcher = other.GetComponent<ICamTracking>();
@@ -105,7 +106,7 @@ namespace unvs.gameword
                 this.stop = true;
                 //lastScenesTracking = Clone(tracker.ScensHit);
 
-                SingleScene.Instance.VCam.UpdateByScenePrefabAsync(nearestScene, 2f).ContinueWith(async () =>
+                SettingsSingleScene.Instance.VCam.UpdateByScenePrefabAsync(nearestScene, 2f).ContinueWith(async () =>
                 {
                     this.stop = false;
                     tracker.Clear();
@@ -127,6 +128,7 @@ namespace unvs.gameword
 
         public void On()
         {
+            if(gameObject.IsDestroyed()) return;
             gameObject.SetActive(true);
             if (Coll != null) Coll.gameObject.SetActive(true);
            

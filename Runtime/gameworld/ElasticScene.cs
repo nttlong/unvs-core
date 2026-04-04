@@ -35,7 +35,7 @@ namespace unvs.gameword
             get
             {
 
-                return SingleScene.Instance.CurrentWorld; ;
+                return SettingsSingleScene.Instance.CurrentWorld; ;
             }
         }
 

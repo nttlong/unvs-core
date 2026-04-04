@@ -16,9 +16,9 @@ namespace unvs.gameword
     [RequireComponent(typeof(AudioSource))]
     public class WorldObject : MonoBehaviour, IScenePrefab
     {
-        
+
         WorldJoinInfoObject joinInfo;
-        
+
         public IWorldGlobalLight Globalight => GetComponent<IWorldGlobalLight>();
 
         public IWorldJoinInfoObject JoinInfo
@@ -27,7 +27,7 @@ namespace unvs.gameword
             {
                 if (joinInfo != null) return joinInfo;
                 joinInfo = this.GetComponentInChildrenByName<WorldJoinInfoObject>(Constants.ObjectsConst.WORLD_INFO);
-               
+
                 return joinInfo;
             }
         }
@@ -45,26 +45,29 @@ namespace unvs.gameword
 
         public bool isReszieWorldBound;
 
-        
+
         [SerializeField]
         public ScenePrefabWorldBound worldBound;
         public EdgeCollider2D groundPhysics;
         public PolygonCollider2D coll;
         [Header("Physical")]
         public PhysicsMaterial2D defaultSurfacePhysicsMaterial2D;
-        [Header("Scene")]
+        [Header("Scene settings")]
+        [SerializeField]
+        public ViewInfo view;
+        public GameObject defaultCamWatcher;
         public OffsetFollow CameraOffsetFolow => cameraOffsetFolow;
         public AudioSource audioSource;
         [SerializeField]
         public AudioInfo ambientSound = AudioInfo.EmptyNew();
-        
+
         public BoxCollider2D leftWall;
         public BoxCollider2D rightWall;
         public ITriggerZone leftTriggerZone;
         public BoxCollider2D collTriggerLeft;
         public ITriggerZone rightTriggerZone;
         public BoxCollider2D collTriggerRight;
-
+        public GameObject DefaultCamWatcher => defaultCamWatcher;
 
         [Header("Scene-link")]
         public IScenePrefab left;
@@ -81,9 +84,9 @@ namespace unvs.gameword
         private IWorldTracker workTracker;
         public bool gizmosDraw = true;
         private System.Action<IScenePrefab> onDestroyMe;
-        
-
-
+        [SerializeField]
+        public bool isDefaultCamWatcherSettings;
+        private bool _defaultCamWatcherReady;
 
 
 
@@ -147,7 +150,7 @@ namespace unvs.gameword
                 if (Application.isPlaying) return leftWall;
                 if (leftWall != null) return leftWall;
                 leftWall = this.GetComponentInChildrenByName<BoxCollider2D>(Constants.ObjectsConst.LEFT_WALL_NAME);
-                
+
                 if (leftWall == null)
                 {
                     leftWall = transform.Create<BoxCollider2D>(Constants.ObjectsConst.LEFT_WALL_NAME);
@@ -175,7 +178,7 @@ namespace unvs.gameword
 
 
 
-       
+
 
 
 
@@ -223,7 +226,8 @@ namespace unvs.gameword
                 joinInfo = go.AddComponent<WorldJoinInfoObject>();
                 go.transform.SetParent(transform);
                 trWorldJoinInfoObject = go.transform;
-            } else
+            }
+            else
             {
                 trWorldJoinInfoObject = (joinInfo as MonoBehaviour).transform;
             }
@@ -253,7 +257,7 @@ namespace unvs.gameword
                     return leftTriggerZone;
                 }
                 leftTriggerZone = transform.CreateIfNoExist<TriggerZoneObject>(Constants.ObjectsConst.TRGIGER_LEFT_NAME);
-                leftTriggerZone.Direction= TriggerZoneDirection.Left;
+                leftTriggerZone.Direction = TriggerZoneDirection.Left;
                 collTriggerLeft = leftTriggerZone.Coll;
                 return leftTriggerZone;
             }
@@ -270,7 +274,8 @@ namespace unvs.gameword
                         rightTriggerZone = this.GetComponentInChildrenByName<TriggerZoneObject>(Constants.ObjectsConst.TRGIGER_RIGHT_NAME);
                         rightTriggerZone.Direction = TriggerZoneDirection.Right;
                         return rightTriggerZone;
-                    } else
+                    }
+                    else
                     {
                         return rightTriggerZone;
                     }
@@ -327,7 +332,7 @@ namespace unvs.gameword
             get
             {
                 if (workTracker != null) return workTracker;
-                workTracker=this.GetComponentInChildren<IWorldTracker>(true);
+                workTracker = this.GetComponentInChildren<IWorldTracker>(true);
                 return workTracker;
             }
         }
@@ -338,7 +343,11 @@ namespace unvs.gameword
 
         public AudioSource Audio => audioSource;
 
-        
+        public ViewInfo View => view;
+
+        /// <summary>
+        /// Calculate all positions of all objects of scene before runtime
+        /// </summary>
 
         void CalculateBound()
         {
@@ -361,13 +370,13 @@ namespace unvs.gameword
                 joinInfo.worldJoinInfo.WorldFacets = new WorldBoundFacets();
                 var start = -1;
                 var end = -1;
-                this.worldBound.coll.LeftVerticalFacet(out  start,  out end);
+                this.worldBound.coll.LeftVerticalFacet(out start, out end);
                 joinInfo.worldJoinInfo.WorldFacets.Left = new FacetInfo
                 {
                     End = end,
                     Start = start,
                 };
-                this.worldBound.coll.RightVerticalFacet(out  start, out  end);
+                this.worldBound.coll.RightVerticalFacet(out start, out end);
                 joinInfo.worldJoinInfo.WorldFacets.Right = new FacetInfo
                 {
                     End = end,
@@ -393,12 +402,13 @@ namespace unvs.gameword
         void Awake()
         {
 
-            audioSource=GetComponent<AudioSource>();
+            audioSource = GetComponent<AudioSource>();
             _ = this.LeftTriggerZone;
             _ = this.RightTriggerZone;
             if (Application.isPlaying)
             {
-                
+                if (defaultCamWatcher != null && defaultCamWatcher.GetComponent<SpriteRenderer>() != null)
+                    defaultCamWatcher.GetComponent<SpriteRenderer>().enabled = false;
                 worldBound = this.GetComponentInChildrenByName<ScenePrefabWorldBound>(Constants.ObjectsConst.WORLD_BOUND);
                 groundPhysics = this.GetComponentInChildrenByName<EdgeCollider2D>(Constants.ObjectsConst.GROUND_PHYSICAL);
                 groundPhysics.SetMeOnLayer(Constants.Layers.SURFACE);
@@ -413,11 +423,21 @@ namespace unvs.gameword
 
             else
             {
-               
                 CreateWorldBound();
                 CreateInfo();
                 if (joinInfo == null) throw new Exception($"WorldJoinInfoObject is empty in {name}");
                 trWorldJoinInfoObject = (joinInfo as MonoBehaviour).transform;
+                if (defaultCamWatcher == null)
+                {
+                    defaultCamWatcher = this.AddChildComponentIfNotExist<MonoBehaviour>(Constants.ObjectsConst.DEFAULT_CAM_WATCHER).gameObject;
+
+                    _defaultCamWatcherReady = true;
+
+                }
+                else
+                {
+                    _defaultCamWatcherReady = true;
+                }
                 //CreateLeftRightTrigger();
             }
         }
@@ -433,9 +453,9 @@ namespace unvs.gameword
 
 
             leftWall = this.GetComponentInChildrenByName<BoxCollider2D>(Constants.ObjectsConst.LEFT_WALL_NAME);
-           
+
             rightWall = this.GetComponentInChildrenByName<BoxCollider2D>(Constants.ObjectsConst.RIGHT_WALL_NAME);
-          
+
             if (leftWall == null && rightWall == null)
             {
                 IWall lw = null;
@@ -453,14 +473,14 @@ namespace unvs.gameword
             }
         }
 
-        
+
 
         void CreateChildGround()
         {
-            
+
             // 1. Tạo một GameObject mới
             GameObject groundChild = new GameObject(unvs.shares.Constants.ObjectsConst.GROUND_PHYSICAL);
-            
+
 
             // 2. Đặt nó làm con của đối tượng hiện tại (WorldObject)
             groundChild.transform.SetParent(this.transform);
@@ -481,9 +501,12 @@ namespace unvs.gameword
 
         private void OnValidate()
         {
+
+           // this.View.Calculate(this.cameraOffsetFolow, this.orthographicSize);
             coll = this.WorldBound?.Coll;
 
             if (Application.isPlaying) return;
+
             if (startPos == null)
             {
 
@@ -524,7 +547,13 @@ namespace unvs.gameword
             }
 
             CalculateBound();
-
+            if (defaultCamWatcher != null && !isDefaultCamWatcherSettings)
+            {
+                var sr = defaultCamWatcher.GetOrAddComponent<SpriteRenderer>();
+                sr.sprite = Commons.LoadAsset<Sprite>("Packages/com.unvs.core/Runtime/Sprites/Circle.png");
+                defaultCamWatcher.transform.position = this.worldBound.coll.bounds.center;
+                isDefaultCamWatcherSettings = true;
+            }
             //// Nếu đây là một Prefab đang mở trong Prefab Mode, hãy lưu Scene của nó
             //var stage = PrefabStageUtility.GetCurrentPrefabStage();
             //if (stage != null)
@@ -535,21 +564,22 @@ namespace unvs.gameword
         }
         private void OnDrawGizmos()
         {
-            if(!gizmosDraw && Application.isPlaying) return;
+            if (!gizmosDraw && Application.isPlaying) return;
+
             OnValidate();
             this.floor.GizmosDraw(Color.cyan, 5);
             this.leftWall?.GizmosDraw(Color.red, 5);
             //  this.leftWall?.GismosDrawHatchBox(Color.red, 25);
             this.rightWall?.GizmosDraw(Color.red, 5);
             // this.rightWall?.GismosDrawHatchBox(Color.red, 25,-45);
-            if(this.LeftTriggerZone!=null
+            if (this.LeftTriggerZone != null
                 && !(this.LeftTriggerZone as MonoBehaviour).IsDestroyed()
-                && this.LeftTriggerZone.Coll!= null
-                && (!this.LeftTriggerZone.Coll.gameObject.IsDestroyed())) 
-            this.LeftTriggerZone?.Coll?.GizmosDraw(Color.whiteSmoke, 5);
+                && this.LeftTriggerZone.Coll != null
+                && (!this.LeftTriggerZone.Coll.gameObject.IsDestroyed()))
+                this.LeftTriggerZone?.Coll?.GizmosDraw(Color.whiteSmoke, 5);
             if (this.RightTriggerZone != null
                 && !(this.RightTriggerZone as MonoBehaviour).IsDestroyed())
-            this.RightTriggerZone?.Coll?.GizmosDraw(Color.whiteSmoke, 5);
+                this.RightTriggerZone?.Coll?.GizmosDraw(Color.whiteSmoke, 5);
             this.WorldBound?.Coll?.GizmosDraw(Color.yellow, 5);
             var wt = this.GetComponentInChildren<IWorldTracker>();
             if (wt != null)
@@ -565,9 +595,43 @@ namespace unvs.gameword
                 // Vẽ điểm chốt bên phải màu xanh
                 joinInfo.worldJoinInfo.RightPos.DrawCircle(10, 0.1f, Color.red);
             }
+            //if (defaultCamWatcher == null)
+            //{
+            //    defaultCamWatcher = this.AddChildComponentIfNotExist<MonoBehaviour>(Constants.ObjectsConst.DEFAULT_CAM_WATCHER).gameObject;
+            //    var coll = defaultCamWatcher.transform.AddComponentIfNotExist<BoxCollider2D>();
+            //    coll.isTrigger = false;
+            //    coll.gameObject.SetActive(false);
+            //    _defaultCamWatcherReady = true;
 
+            //}
+            if (defaultCamWatcher == null)
+            {
+                var tr = this.GetComponentsInChildren<Transform>(true).FirstOrDefault(p => p.name == Constants.ObjectsConst.DEFAULT_CAM_WATCHER);
+                if (tr != null) defaultCamWatcher = tr.gameObject;
+            }
+            if (defaultCamWatcher != null)
+            {
+                Collider2DExtension.GizmosDrawCamView(defaultCamWatcher.transform.position, this.OrthographicSize,this.CameraOffsetFolow, Color.yellow, 2f);
+            }
 
         }
+
+        private void DrawScreenView()
+        {
+            if (defaultCamWatcher == null)
+            {
+                var tr = GetComponentsInChildren<Transform>(true).FirstOrDefault(p => p.name == Constants.ObjectsConst.DEFAULT_CAM_WATCHER);
+                if (tr != null) defaultCamWatcher = tr.gameObject;
+            }
+
+            if (defaultCamWatcher != null)
+            {
+
+                //var coll = defaultCamWatcher.transform.AddComponentIfNotExist<BoxCollider2D>();
+                Collider2DExtension.GizmosDrawCamView(defaultCamWatcher.transform.position, this.orthographicSize, this.CameraOffsetFolow, Color.yellow, 2f);
+            }
+        }
+
         //private void OnDrawGizmosSelected()
         //{
         //    if (!Application.isPlaying)
@@ -594,27 +658,27 @@ namespace unvs.gameword
                 this._startPos.MoveOtherToMe(actor as MonoBehaviour);
 
             }
-            SingleScene.Instance.VCam.Watch((this.CurrentActor.CamWacher as MonoBehaviour).transform);
+            SettingsSingleScene.Instance.VCam.Watch((this.CurrentActor.CamWacher as MonoBehaviour).transform);
         }
 
 
 
         public void SetupActor(IActorObject actor, string spawnName)
         {
-            
+
             var target = this.FindSpawnTargetByName(spawnName);
             if (target != null)
             {
                 var go = (actor as MonoBehaviour).gameObject;
                 go.transform.position = target.Pos;
 
-                SingleScene.Instance.VCam.Watch(( actor.CamWacher as MonoBehaviour).transform);
+                SettingsSingleScene.Instance.VCam.Watch((actor.CamWacher as MonoBehaviour).transform);
             }
             else
             {
                 var go = (actor as MonoBehaviour).gameObject;
                 go.transform.position = this.startPos.position;
-                SingleScene.Instance.VCam.Watch((actor.CamWacher as MonoBehaviour).transform);
+                SettingsSingleScene.Instance.VCam.Watch((actor.CamWacher as MonoBehaviour).transform);
             }
         }
 
@@ -664,7 +728,7 @@ namespace unvs.gameword
 
         private void OnDestroy()
         {
-            
+
             this.IsDestroying = true;
             this.OnSceneDestroy?.Invoke();
             this.OnDestroyMe?.Invoke(this);
@@ -684,7 +748,7 @@ namespace unvs.gameword
 
         public string GetLeftScenePath()
         {
-            if(!string.IsNullOrEmpty(leftTriggerZone.TriggerPath)) return leftTriggerZone.TriggerPath;
+            if (!string.IsNullOrEmpty(leftTriggerZone.TriggerPath)) return leftTriggerZone.TriggerPath;
             return GetComponent<IElasticScene>().LeftScenePath;
         }
 
@@ -696,12 +760,12 @@ namespace unvs.gameword
 
         public void GlobalightRestore()
         {
-            
-           var light= GlobalApplication.LightManagerObjectInstance.GlobalLight.transform.GetComponentsInChildren<IGlobalLightWapper>(true)
-                .Where(p=>p.Owner!=null && !p.Owner.IsDestroying)
-                .FirstOrDefault(p => p.Owner == this as IScenePrefab);
-            
-            this.GetComponent<IWorldGlobalLight>().GlobalLight= light;
+
+            var light = GlobalApplication.LightManagerObjectInstance.GlobalLight.transform.GetComponentsInChildren<IGlobalLightWapper>(true)
+                 .Where(p => p.Owner != null && !p.Owner.IsDestroying)
+                 .FirstOrDefault(p => p.Owner == this as IScenePrefab);
+
+            this.GetComponent<IWorldGlobalLight>().GlobalLight = light;
         }
 
 
