@@ -68,21 +68,35 @@ namespace unvs.manager
             backupGlobalLight.gameObject.SetActive(false);
         }
         #region Implement of ISceneLoader
+        /// <summary>
+        /// Clear all scenes in chunks
+        /// </summary>
+        /// <returns></returns>
         public async UniTask ClearChunksAsync()
         {
-            if (GlobalWorldBound.Instance.isMultiPolygon)
+            try
             {
+                // move all scenes to delete region
                 foreach (var chunk in (chunks as MonoBehaviour).GetComponentsInChildren<IScenePrefab>(true))
                 {
                     chunk.IsDestroying = true;
-                    IScenePrefabWorldBound worldBound = GlobalWorldBound.Instance.FindByOwner(chunk);
-                    (worldBound as MonoBehaviour).transform.SetParent(chunk.GoWorld.transform.transform);
-                    //chunk.WorldBound.Coll.transform.SetParent(chunk.GoWorld.transform.transform);
+                    if (GlobalWorldBound.Instance.isMultiPolygon)
+                    {
+                        ///World-Bound will only be restored if you are in Multi-Pollygon mode.
+                        IScenePrefabWorldBound worldBound = GlobalWorldBound.Instance.FindByOwner(chunk);
+                        (worldBound as MonoBehaviour).transform.SetParent(chunk.GoWorld.transform.transform);
+                    }
+                   
+
                     chunk.GoWorld.transform.SetParent(tempDelete.transform, false);
                 }
+                // finally delete all
+                
             }
-
-            await tempDelete.SafeDestroyChildrenAsync();
+            finally
+            {
+                await tempDelete.SafeDestroyChildrenAsync();
+            }
         }
         public async UniTask ClearAsync()
         {
@@ -94,47 +108,64 @@ namespace unvs.manager
 
 
         }
-
-        public async UniTask<IScenePrefab> LoadInteriorAsync(string pathToWord, string targetName, IScenePrefab FromScene = null)
+        /// <summary>
+        /// Load interior scene
+        /// </summary>
+        /// <param name="pathToWord"></param>
+        /// <param name="targetName"></param>
+        /// <param name="SourceScene">Current scene before load interior</param>
+        /// <returns></returns>
+        public async UniTask<IScenePrefab> LoadInteriorAsync(string pathToWord, string targetName, IScenePrefab SourceScene = null)
         {
+            //check if has current actor
             var actor = actorPlaceHolder.GetComponentInChildren<IActorObject>();
             if (actor != null)
             {
+                // disable actor
                 (actor as MonoBehaviour).gameObject.SetActive(false);
             }
 
-
-            if (FromScene != null)
+            //if load scene from a certain scene
+            if (SourceScene != null)
             {
-                if (!FromScene.IsInteriorScene())
+                // if certain scene was loaded by LoadInteriorAsync 
+                if (!SourceScene.IsInteriorScene())
                 {
-
-                    FromScene.GlobalightRestore();
-                    FromScene.WorldBound.Restore();
-                    FromScene.GoWorld.transform.SetParent(backupInteriror.transform);
-
-                    FromScene.LeftTriggerZone.On();
-                    FromScene.RightTriggerZone.On();
-                    FromScene.LeftWall.isTrigger = !string.IsNullOrEmpty(FromScene.GetLeftScenePath());
-                    FromScene.RightWall.isTrigger = !string.IsNullOrEmpty(FromScene.GetRightScenePath());
+                    // restore Globla light avoid conflict global ligght
+                    SourceScene.GlobalightRestore();
+                    SourceScene.WorldBound.Restore();
+                    //put SourceScene to backup InteriorScene
+                    SourceScene.GoWorld.transform.SetParent(backupInteriror.transform);
+                    //turn onn walls
+                    SourceScene.LeftTriggerZone.On();
+                    SourceScene.RightTriggerZone.On();
+                    SourceScene.LeftWall.isTrigger = !string.IsNullOrEmpty(SourceScene.GetLeftScenePath());
+                    SourceScene.RightWall.isTrigger = !string.IsNullOrEmpty(SourceScene.GetRightScenePath());
 
 
 
                 }
             }
+            // cleanup all scenes in chunks
             await ClearChunksAsync();
+            // stop all world tracker routines
             GlobalApplication.WorldTrackerObject?.Cts?.Stop();
             IScenePrefab scene = null;
+            // Load interior scene. Chunk scenes are no longer used, so disable this object.
             (this.chunks as MonoBehaviour).gameObject.SetActive(false);
+            // Check for an existing interior scene prefab in the backup object.
             scene = backupInteriror.gameObject.GetComponentInChildrenByName<IScenePrefab>(pathToWord);
             if (scene == null)
             {
+                // Not found -> load a new prefab.
                 scene = await Commons.LoadPrefabsAsync<IScenePrefab>(pathToWord, interiorScene);
             }
             else
             {
-                scene.GoWorld.SetActive(false);
-                scene.GoWorld.transform.SetParent(interiorScene, true);
+                // Found -> reuse the existing prefab instead of loading a new one.
+                scene.GoWorld.SetActive(false); // deative scens , avoid conflict before show up
+                scene.GoWorld.transform.SetParent(interiorScene, true); // move scene to Interior-Scene-Region.
+                                                                        //Note: till now the Scene is invisible
             }
             if (Instance.LastInteriorScene != null && !Instance.LastInteriorScene.IsDestroying)
             {
@@ -489,12 +520,17 @@ namespace unvs.manager
         }
         private static void MoveRightToLeft(IScenePrefab right, IScenePrefab left)
         {
+            
             if(right==null) throw new Exception($"right={right}");
             if (left == null) throw new Exception($"right={left}");
-            if (right.JoinInfo == null) throw new Exception($"right.JoinInfo={right.JoinInfo}");
+            if (right.JoinInfo == null)
+            {
+                Debug.LogError($"right.JoinInfo={right.JoinInfo},path={right.Name}");
+                return;
+            }
             if (left.JoinInfo == null)
             {
-                Debug.LogError($"right.JoinInfo={left.JoinInfo}");
+                Debug.LogError($"left.JoinInfo={left.JoinInfo},path={left.Name}");
                 return;
                 
             }

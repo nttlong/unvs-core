@@ -21,6 +21,9 @@ namespace unvs.interfaces
     {
         Left, Right
     }
+    /// <summary>
+    /// Trigger zone: an object for new scene loading trigger
+    /// </summary>
     public interface ITriggerZone
     {
         TriggerZoneDirection Direction { get; set; }

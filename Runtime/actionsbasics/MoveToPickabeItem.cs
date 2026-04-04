@@ -27,7 +27,7 @@ namespace unvs.actionsbasics
             var lengOfArm = actor.Physical.ArmLen;
             actor.Motion.Flip(actor.Movable.Direction.x);
             actor.Motion.Walk();
-            actor.Speaker.SayText($"{actor.Movable.Direction},{actor.Physical.ArmLen}");
+          
             var p = pickableItem.GetPosition(actor.Movable.Direction.x, actor.Physical.ArmLen);
             p = new Vector2(p.x, 0);
             await actor.Movable.MoveToAsync(p, dir =>

@@ -148,7 +148,7 @@ namespace unvs.actors {
            
          
             if (!IsMoving) return;
-            this.GetComponent<IActorObject>().Speaker.SayText($"{Speed}");
+           
             transform.MoveContinuous(Direction, Speed);
             
         }
