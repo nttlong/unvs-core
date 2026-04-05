@@ -7,9 +7,14 @@ using unvs.shares;
 using unvs.ui;
 namespace unvs.interfaces
 {
+    public interface IRealTimeStats
+    {
+
+    }
     public interface ISingleScene
     {
        
+        UISettingsInfo UISettings { get; }
         Image CursorImage {  get; }
         Canvas TopCanvas { get; }
         Camera Cam { get; }
@@ -26,7 +31,7 @@ namespace unvs.interfaces
        // IWorldMonitor WorldMonitor { get; }
         IPauseMenu PauseMenu { get; }
         ISceneLoader SceneLoader { get; }
-
+        IRealTimeStats RealTimeStats { get; }
         void CursorOff();
         void CursorOn();
         void InitDefaultCursor();

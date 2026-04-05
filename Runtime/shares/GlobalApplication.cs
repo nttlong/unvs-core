@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using System;
 using System.Collections;
 using System.Threading;
 using UnityEngine;
@@ -6,6 +7,7 @@ using UnityEngine.UI;
 using unvs.interfaces;
 using unvs.interfaces.sys;
 using unvs.manager;
+using unvs.sys;
 using unvs.ui;
 namespace unvs.shares
 {
@@ -24,7 +26,7 @@ namespace unvs.shares
         public static ISingleScene SingleScene { get;  set; }
         //public static IDiscoveryDialog DiscoveryDialogInstance { get; set; }
         public static LightManagerObject LightManagerObjectInstance { get;  set; }
-        public static IRealtimeStats RealtimeStatsInstance { get;  set; }
+       
         public static ISceneLoader SceneLoaderManagerInstance { get;  set; }
         public static IUIHub UIHub { get;  set; }
         public static IPauseMenu UIPauseMenu { get;  set; }
@@ -33,21 +35,24 @@ namespace unvs.shares
         public static IMainMenu UIMainMenu { get; internal set; }
         public static AudioSource CommonAudioSource { get; internal set; }
         public static CancellationTokenSource WorldTrackerCancellationTokenSource { get;  set; }
+        public static SettingsRealTimeStats RealtimeStatsInstance { get; internal set; }
 
         public static GlobalEvents Events = new GlobalEvents();
 
         public static void DoExitGame()
         {
             // 1. Trigger your custom events (Save data, play exit sound, etc.)
-            GlobalInput.RaiseOnExitGame();
 
+           
             // 2. Handle Application Exit based on the Environment
 #if UNITY_EDITOR
+            GlobalInput.RaiseOnExitGame();
             // This will stop the Play Mode in the Unity Editor
             UnityEditor.EditorApplication.isPlaying = false;
-#else
-    // This will close the actual built application (.exe, .app, .apk)
-    Application.Quit();
+
+#endif
+#if !UNITY_EDITOR && (UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX)
+                System.Diagnostics.Process.GetCurrentProcess().Kill();
 #endif
         }
     }

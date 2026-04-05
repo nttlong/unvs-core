@@ -2,20 +2,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using unvs.interfaces;
 using unvs.interfaces.sys;
 using unvs.shares;
 
 namespace unvs.sys
 {
-    public class RealtimeStats : MonoBehaviour, IRealtimeStats
+    public class SettingsRealTimeStats : MonoBehaviour, IRealTimeStats
     {
         Dictionary<string,object> trackInfo=new Dictionary<string, object>();
         float deltaTime = 0.0f;
+        public int FrameRate = 120;
+        public bool vSync = true;
         private void Awake()
         {
-            GlobalApplication.RealtimeStatsInstance = this as IRealtimeStats;
-            QualitySettings.vSyncCount = 0; // Tắt VSync
-            Application.targetFrameRate =120; // Khoá ở 60 FPS (hoặc thả rông bằng -1)
+            GlobalApplication.RealtimeStatsInstance = this;
+            if(!vSync)
+            QualitySettings.vSyncCount =  0; // Tắt VSync
+            Application.targetFrameRate = FrameRate; // Khoá ở 60 FPS (hoặc thả rông bằng -1)
         }
         void Update()
         {

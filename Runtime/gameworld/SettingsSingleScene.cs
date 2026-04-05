@@ -1,4 +1,4 @@
-﻿
+
 using Cysharp.Threading.Tasks;
 using System;
 using System.ComponentModel;
@@ -128,7 +128,9 @@ namespace unvs.gameword
 
         public Canvas TopCanvas => topCanvas;
 
-        
+        public UISettingsInfo UISettings => uiSettings;
+
+        public IRealTimeStats RealTimeStats => realTimeStats;
 
         public string StartPath;
         
@@ -138,31 +140,9 @@ namespace unvs.gameword
         #region UI settings
         public Texture2D defaultCursorIcon;
         [Description("Example: Assets/Prefabs/Cinema/Cinema.prefab")]
-        public string cinemaSettingPrefabPath;
-        /// <summary>
-        /// Exmaple "Assets/Prefabs/UI/Hub/Hub.prefab"
-        /// </summary>
-        public string HubPrefabAddressablePath;
-        /// <summary>
-        /// example : "Assets/Prefabs/UI/DiscoveryDiialog/DiscoveryDialog.prefab"
-        /// </summary>
-        public string DiscoveryDialogAddressablePath;
-        /// <summary>
-        /// Exmaple "Assets/Prefabs/UI/Speaker/Speaker.prefab"
-        /// </summary>
-        public string SpeakerDialogAddressablePath;
-        /// <summary>
-        /// Exmaple "Assets/Prefabs/UI/FadeScreenPanel/FadeScreen.prefab"
-        /// </summary>
-        public string FadeSceenAddressablePath;
-        /// <summary>
-        /// "Assets/Prefabs/UI/MainMenu/MainMenu.prefab"
-        /// </summary>
-        public string MainMenuAddressablePath;
-        /// <summary>
-        /// "Assets/Prefabs/UI/PauseMenu/PauseMenu.prefab"
-        /// </summary>
-        public string PauseMenuAddressalbePath; 
+        [SerializeField]
+        private UISettingsInfo uiSettings;
+        
         #endregion
 
         public Canvas topCanvas;
@@ -189,40 +169,28 @@ namespace unvs.gameword
         private void LoadAllUI()
         {
             LoadPrefabMainMenu();
-            var hub = Commons.LoadPrefabs(HubPrefabAddressablePath);
+            var hub = Commons.LoadPrefabs(this.uiSettings. HubPrefabAddressablePath);
 
-            var discoveryDialog = Commons.LoadPrefabs(DiscoveryDialogAddressablePath);
+            var discoveryDialog = Commons.LoadPrefabs(this.uiSettings.DiscoveryDialogAddressablePath);
             discoveryDialog.transform.SetParent(transform);
 
 
-            Speaker = Commons.LoadPrefabs(SpeakerDialogAddressablePath);
+            Speaker = Commons.LoadPrefabs(this.uiSettings.SpeakerDialogAddressablePath);
 
             Speaker.transform.SetParent(transform);
             Speaker.GetComponent<IUISpeakerController>().Hide();
 
 
-            var fadeScreenGo = Commons.LoadPrefabs(FadeSceenAddressablePath);
+            var fadeScreenGo = Commons.LoadPrefabs(this.uiSettings.FadeSceenAddressablePath);
             fadeScreen = fadeScreenGo.GetComponent<IFadeScreen>();
-
+            realTimeStats =Commons.LoadPrefab< IRealTimeStats >(this.UISettings.RealtimeStatsAddressablePath);
             LoadPrefabPauseMenu();
 
         }
-        private async UniTask RunExitAsync()
-        {
-           
-            
-           
-            
-            await GlobalApplication.SceneLoaderManagerInstance.ClearAllAsync();
-           
-            _pauseMenu.Hide();
-           
-            _mainMenu.Show();
-           
-        }
+        
         private void LoadPrefabPauseMenu()
         {
-            var pauseMenuGo = Commons.LoadPrefabs(PauseMenuAddressalbePath);
+            var pauseMenuGo = Commons.LoadPrefabs(this.uiSettings.PauseMenuAddressalbePath);
             pauseMenuGo.transform.SetParent(transform);
             _pauseMenu = pauseMenuGo.GetComponent<IPauseMenu>();
             _pauseMenu.OnExit = () =>
@@ -253,7 +221,7 @@ namespace unvs.gameword
         private void LoadPrefabMainMenu()
         {
             InitDefaultCursor();
-            maiMenu = Commons.LoadPrefabs(MainMenuAddressablePath);
+            maiMenu = Commons.LoadPrefabs(this.uiSettings.MainMenuAddressablePath);
             maiMenu.transform.SetParent(transform);
             // maiMenu.SetActive(false);
             _mainMenu = maiMenu.GetComponent<IMainMenu>();
@@ -280,6 +248,7 @@ namespace unvs.gameword
         {
             if (Application.isPlaying)
             {
+                this.uiSettings.ValidateOnRequires(this);
                 if(string.IsNullOrEmpty(this.StartPath))
                 {
                     Debug.LogError($"Please, setup StartPath for {name}");
@@ -296,10 +265,10 @@ namespace unvs.gameword
                 }
                 InitGlobalEvents();
             }
-            if (Application.isPlaying && !string.IsNullOrEmpty(cinemaSettingPrefabPath))
+            if (Application.isPlaying && !string.IsNullOrEmpty(this.uiSettings.cinemaSettingPrefabPath))
             {
                 var cmp = SetupSceneWorld.CreateComponents(
-                    transform, cinemaSettingPrefabPath);
+                    transform, this.uiSettings.cinemaSettingPrefabPath);
                 cam = cmp.Main;
                 vcam = cmp.VCam;
                 brain = cmp.Brain;
@@ -418,7 +387,8 @@ namespace unvs.gameword
         }
         [SerializeField] float gamepadSensitivity = 1000f;
         private Vector3 _virtualMousePos;
-        
+        private IRealTimeStats realTimeStats;
+
         void UpdateCursorPosition()
         {
             Vector2 deltaMouse = Vector2.zero;
