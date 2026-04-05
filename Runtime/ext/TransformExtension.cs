@@ -1,13 +1,17 @@
 using Cysharp.Threading.Tasks;
+using PlasticGui.WorkspaceWindow.QueryViews.Branches;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Events;
 using UnityEngine.U2D.Animation;
+using UnityEngine.UI;
 using unvs.interfaces;
 using unvs.shares;
 namespace unvs.ext
@@ -196,6 +200,58 @@ namespace unvs.ext
                 End = end
             };
         }
+        public static Button AddButtonIfNotExist(this Transform parent, string name, string label)
+        {
+            // 1. Kiểm tra xem nút có tên này đã tồn tại chưa
+            Transform existing = parent.Find(name);
+            if (existing != null)
+            {
+                // Nếu tìm thấy, lấy Component Button và cập nhật lại Label
+                Button existingBtn = existing.GetComponent<Button>();
+                if (existingBtn != null)
+                {
+                    // Cập nhật lại text nếu cần
+                    var tmp = existingBtn.GetComponentInChildren<TextMeshProUGUI>();
+                    if (tmp != null) tmp.text = label;
+
+                    return existingBtn;
+                }
+            }
+
+            // 2. Nếu chưa có, tiến hành tạo mới hoàn toàn
+            GameObject btnObj = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
+            btnObj.transform.SetParent(parent, false); // parent đã là Transform nên không cần .transform
+
+            // Thiết lập Button Component
+            Button btn = btnObj.GetComponent<Button>();
+            btn.transition = Selectable.Transition.ColorTint;
+
+            ColorBlock cb = ColorBlock.defaultColorBlock;
+            cb.selectedColor = new Color(0.7f, 0.9f, 1f);
+            btn.colors = cb;
+
+            // 3. Tạo Text con (TextMeshPro)
+            GameObject textObj = new GameObject("Text", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
+            textObj.transform.SetParent(btnObj.transform, false);
+
+            TextMeshProUGUI tmpNew = textObj.GetComponent<TextMeshProUGUI>();
+            tmpNew.text = label;
+            tmpNew.fontSize = 24;
+            tmpNew.color = Color.black;
+            tmpNew.alignment = TextAlignmentOptions.Center;
+
+            // 4. Căn chỉnh UI
+            RectTransform btnRect = btnObj.GetComponent<RectTransform>();
+            btnRect.sizeDelta = new Vector2(160, 45);
+
+            RectTransform textRect = textObj.GetComponent<RectTransform>();
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.sizeDelta = Vector2.zero;
+
+            return btn;
+        }
+
     }
    
 }

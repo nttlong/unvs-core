@@ -35,7 +35,19 @@ namespace unvs.ui
             
             this.pauseMenuCanvas.DoDeactive();
         }
-
+        private void Reset()
+        {
+            pauseMenuCanvas = this.AddChildComponentIfNotExist<Canvas>("PauseMenuCanvas");
+            pauseMenuCanvas.AddComponentIfNotExist<GraphicRaycaster>();
+            pauseMenuPanel = pauseMenuCanvas.transform.AddChildComponentIfNotExist<Image>("PauseMenuPanel");
+            
+            var hr= pauseMenuPanel.AddComponentIfNotExist<VerticalLayoutGroup>();
+            LayoutGroupExt.FixLayoutChildren(hr);
+           
+            btnResume = pauseMenuPanel.transform.AddButtonIfNotExist("btnResume", "Resume");
+            btnToTitleMenu = pauseMenuPanel.transform.AddButtonIfNotExist("btnToTitleMenu", "To title menu");
+            btnExit = pauseMenuPanel.transform.AddButtonIfNotExist("btnExit", "Exit");
+        }
         public void Show()
         {
             if (GlobalApplication.UIMainMenu.IsShowing) return;
@@ -67,12 +79,27 @@ namespace unvs.ui
 
         private void Awake()
         {
-            
+            if (!Application.isPlaying) return;
             pauseMenuCanvas = this.AddChildComponentIfNotExist<Canvas>("PauseMenuCanvas");
             pauseMenuCanvas.AddComponentIfNotExist<GraphicRaycaster>();
             pauseMenuPanel = pauseMenuCanvas.transform.AddChildComponentIfNotExist<Image>("PauseMenuPanel");
             pauseMenuCanvas.FullSize();
             pauseMenuPanel.DockFull();
+            btnExit = this.GetComponentInChildrenByName<Button>("btnExit");
+            btnExit.onClick.AddListener(() =>
+            {
+                this.OnExit?.Invoke();
+            });
+            btnResume = this.GetComponentInChildrenByName<Button>("btnResume");
+            btnResume.onClick.AddListener(() =>
+            {
+                this.OnResume?.Invoke();
+            });
+            btnToTitleMenu = this.GetComponentInChildrenByName<Button>("btnToTitleMenu");
+            btnToTitleMenu.onClick.AddListener(() =>
+            {
+                this.OnToMain?.Invoke();
+            });
         }
         private void Start()
         {
@@ -96,6 +123,9 @@ namespace unvs.ui
             this.OnExit?.Invoke();
         }
         private GameObject _lastSelectedButton;
+        private Button btnResume;
+        private Button btnToTitleMenu;
+        private Button btnExit;
 
         void Update()
         {

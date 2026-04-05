@@ -244,7 +244,7 @@ namespace unvs.gameword
                 }
                 if (GetComponent<SettingsGlobalEvents>() == null)
                 {
-                    Debug.LogError($"Please, setup {typeof(SettingsGlobalEvents)}, ref={name}");
+                    Debug.LogError($"Please, setup {typeof(SettingsGlobalEvents)}, ref={name}, create new MonoBehavior inherit of {typeof(SettingsGlobalEvents)} then add to {name}");
                    
                 }
                 InitGlobalEvents();

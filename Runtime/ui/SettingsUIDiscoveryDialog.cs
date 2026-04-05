@@ -84,7 +84,27 @@ namespace unvs.ui
             Time.timeScale = 0f;
             
         }
+        private void Reset()
+        {
+            buildDefaultUITempalte();
+        }
+        void buildDefaultUITempalte()
+        {
+            discoveryDialogCanvas = this.AddChildChildCanvasWithGraphicRaycasterIfNotExist("DiscoveryDialogCanvas");
+            discoveryDialogPanel = discoveryDialogCanvas.transform.AddChildComponentIfNotExist<Image>("DiscoveryDialogPanel");
+            var topPanel = discoveryDialogPanel.AddChildComponentIfNotExist<Image>("top-panel");
+            topPanel.DockTop(300);
+            topPanel.AddComponentIfNotExist<VerticalLayoutGroup>();
+            topPanel.AddChildIfNotExist<Image>("Icon");
+            topPanel.AddChildIfNotExist<TextMeshProUGUI>("content");
+            confirmPanel = discoveryDialogPanel.AddChildComponentIfNotExist<Image>("ConfirmPanel");
+            confirmPanel.AddComponentIfNotExist<HorizontalLayoutGroup>();
 
+            btnOk = confirmPanel.transform.AddButtonIfNotExist("btnOK","OK");
+            
+            btnCancel = confirmPanel.transform.AddButtonIfNotExist("btnCancel", "Cancel"); 
+            
+        }
         private void Awake()
         {
             audioSource=GetComponent<AudioSource>();

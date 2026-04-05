@@ -48,8 +48,7 @@ namespace unvs.ui
             menuCanvas = this.AddChildComponentIfNotExist<Canvas>("CanvasMain");
             menuCanvas.AddComponentIfNotExist<GraphicRaycaster>();
             panel = menuCanvas.transform.AddChildComponentIfNotExist<Image>("PanelMain");
-            
-            panel.AddComponentIfNotExist<VerticalLayoutGroup>().FixLayoutChildren();
+            panel.AddComponentIfNotExist<VerticalLayoutGroup>();
             panel.DockFull();
             btnStart = panel.transform.AddButtonIfNotExist("btnStart", "Start");
             btnExit = panel.transform.AddButtonIfNotExist("btnExit", "Exit");
@@ -69,22 +68,14 @@ namespace unvs.ui
         private void Awake()
         {
             if (!Application.isPlaying) return;
-
            menuCanvas= this.AddChildComponentIfNotExist<Canvas>("CanvasMain");
-            menuCanvas.FullSize();
             menuCanvas.AddComponentIfNotExist<GraphicRaycaster>();
             panel = menuCanvas.transform.AddChildComponentIfNotExist<Image>("PanelMain");
             panel.DockFull();
             GlobalApplication.UIMainMenu = this;
-            btnStart = this.GetComponentInChildrenByName<Button>("btnStart");
-            btnExit = this.GetComponentInChildrenByName<Button>("btnExit");
-            btnStart.onClick.AddListener(() =>
+            btnStart.onClick.AddListener(ctx =>
             {
-                this.OnStartClick?.Invoke();
-            });
-            btnExit.onClick.AddListener(() =>
-            {
-                OnStartClick?.Invoke();
+
             });
         }
         private GameObject _lastSelectedButton;
