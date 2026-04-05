@@ -1,5 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
-using System;
+﻿using System;
 using System.Collections;
 using System.Threading;
 using UnityEngine;
@@ -43,16 +42,16 @@ namespace unvs.shares
         {
             // 1. Trigger your custom events (Save data, play exit sound, etc.)
 
-           
+
             // 2. Handle Application Exit based on the Environment
 #if UNITY_EDITOR
             GlobalInput.RaiseOnExitGame();
             // This will stop the Play Mode in the Unity Editor
             UnityEditor.EditorApplication.isPlaying = false;
-
-#endif
-#if !UNITY_EDITOR && (UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX)
-                System.Diagnostics.Process.GetCurrentProcess().Kill();
+#else
+    // This will close the actual built application (.exe, .app, .apk)
+    Application.Quit();
+    System.Diagnostics.Process.GetCurrentProcess().Kill()
 #endif
         }
     }
