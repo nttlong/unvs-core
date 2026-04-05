@@ -658,7 +658,7 @@ namespace unvs.gameword
                 this._startPos.MoveOtherToMe(actor as MonoBehaviour);
 
             }
-            SettingsSingleScene.Instance.VCam.Watch((this.CurrentActor.CamWacher as MonoBehaviour).transform);
+            GlobalApplication.Cinema.VCam.Watch((this.CurrentActor.CamWacher as MonoBehaviour).transform);
         }
 
 
@@ -672,13 +672,13 @@ namespace unvs.gameword
                 var go = (actor as MonoBehaviour).gameObject;
                 go.transform.position = target.Pos;
 
-                SettingsSingleScene.Instance.VCam.Watch((actor.CamWacher as MonoBehaviour).transform);
+                GlobalApplication.Cinema.VCam.Watch((actor.CamWacher as MonoBehaviour).transform);
             }
             else
             {
                 var go = (actor as MonoBehaviour).gameObject;
                 go.transform.position = this.startPos.position;
-                SettingsSingleScene.Instance.VCam.Watch((actor.CamWacher as MonoBehaviour).transform);
+                GlobalApplication.Cinema.VCam.Watch((actor.CamWacher as MonoBehaviour).transform);
             }
         }
 

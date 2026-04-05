@@ -27,9 +27,9 @@ namespace unvs.gameword
         public static ISingleScene Instance;
         [Header("Cinema settings")]
         public Camera cam;
-        public CinemachineCamera vcam;
-        public CinemachineConfiner2D confiner;
-        public CinemachineBrain brain;
+       
+        
+        
         private GameObject currentActorTr;
         private IGlobalWorldBound _globalWorldBound;
         private GameObject globalWorldBound;
@@ -46,36 +46,15 @@ namespace unvs.gameword
        
         
 
-        public Camera Cam
-        {
-            get
-            {
-                if (cam == null)
-                {
-                    cam = Camera.main;
-                    
-                }
-                return cam;
-                
-            }
-        }
+       
 
 
 
-        public CinemachineCamera VCam
-        {
-            get
-            {
-
-                if (vcam != null) return vcam;
-
-                return vcam;
-            }
-        }
+        
 
         public Rigidbody2D CamRigidBody => cam?.GetComponent<Rigidbody2D>();
 
-        public CinemachineConfiner2D Confiner => confiner;
+        
 
         
         public IGlobalWorldBound GlobalWorldBound
@@ -109,7 +88,7 @@ namespace unvs.gameword
 
 
 
-        public CinemachineBrain Brain => brain;
+       
 
         public GameObject Speaker { get; private set; }
 
@@ -153,8 +132,7 @@ namespace unvs.gameword
           
             Instance = this;
 
-            _ = Instance.Cam;
-            _ = Instance.VCam;
+           
            
             unvs.shares.GlobalApplication.SingleScene = this;
             if (_goSceneLoader == null)
@@ -169,29 +147,29 @@ namespace unvs.gameword
         private void LoadAllUI()
         {
             LoadPrefabMainMenu();
-            var hub = Commons.LoadPrefabs(this.uiSettings. HubPrefabAddressablePath);
+            var hub = this.UISettings.Hub;
 
-            var discoveryDialog = Commons.LoadPrefabs(this.uiSettings.DiscoveryDialogAddressablePath);
-            discoveryDialog.transform.SetParent(transform);
+            var discoveryDialog = this.UISettings.UIDiscoveryDialog;
+           // discoveryDialog.transform.SetParent(transform);
 
 
-            Speaker = Commons.LoadPrefabs(this.uiSettings.SpeakerDialogAddressablePath);
+            Speaker = (this.UISettings.SettingsUISpeaker as MonoBehaviour).gameObject;
 
-            Speaker.transform.SetParent(transform);
+           // Speaker.transform.SetParent(transform);
             Speaker.GetComponent<IUISpeakerController>().Hide();
 
 
-            var fadeScreenGo = Commons.LoadPrefabs(this.uiSettings.FadeSceenAddressablePath);
+            var fadeScreenGo = this.UISettings.UIFadeScreen; 
             fadeScreen = fadeScreenGo.GetComponent<IFadeScreen>();
-            realTimeStats =Commons.LoadPrefab< IRealTimeStats >(this.UISettings.RealtimeStatsAddressablePath);
+            realTimeStats =this.uiSettings.RealTimeStats;
             LoadPrefabPauseMenu();
 
         }
         
         private void LoadPrefabPauseMenu()
         {
-            var pauseMenuGo = Commons.LoadPrefabs(this.uiSettings.PauseMenuAddressalbePath);
-            pauseMenuGo.transform.SetParent(transform);
+            var pauseMenuGo = this.UISettings.SettingsUIPauseMenu;
+         //   pauseMenuGo.transform.SetParent(transform);
             _pauseMenu = pauseMenuGo.GetComponent<IPauseMenu>();
             _pauseMenu.OnExit = () =>
             {
@@ -213,7 +191,7 @@ namespace unvs.gameword
                 }).Forget();
             };
         }
-         async UniTask StartGame()
+        async UniTask StartGame()
         {
             await GlobalApplication.SceneLoaderManagerInstance.LoadNewAsync(this.StartPath, null);
             maiMenu.GetComponent<IMainMenu>().Hide();
@@ -221,10 +199,10 @@ namespace unvs.gameword
         private void LoadPrefabMainMenu()
         {
             InitDefaultCursor();
-            maiMenu = Commons.LoadPrefabs(this.uiSettings.MainMenuAddressablePath);
-            maiMenu.transform.SetParent(transform);
-            // maiMenu.SetActive(false);
-            _mainMenu = maiMenu.GetComponent<IMainMenu>();
+            maiMenu = (this.UISettings.SettingsUIMainMenu as MonoBehaviour).gameObject;
+            //maiMenu.transform.SetParent(transform);
+            //maiMenu.SetActive(false);
+            _mainMenu = this.UISettings.SettingsUIMainMenu;
             _mainMenu.OnStartClick = () =>
             {
                 
@@ -235,20 +213,26 @@ namespace unvs.gameword
                 GlobalApplication.DoExitGame();
             };
         }
-        private void Awake()
+        private  void Awake()
         {
-            
-            // Optional: Lock it to the center so it doesn't accidentally click outside the window
+
            
+
         }
 
-        
-
-        private void Start()
+        private async void Start()
         {
             if (Application.isPlaying)
             {
                 this.uiSettings.ValidateOnRequires(this);
+                var obj = this.AddChildComponentIfNotExist<Transform>(Constants.ObjectsConst.SCENE_SETTINGS);
+                obj.gameObject.SetActive(false);
+                await this.uiSettings.InitGameSettingsAsync(obj);
+                obj.gameObject.SetActive(true);
+            }
+            if (Application.isPlaying)
+            {
+               
                 if(string.IsNullOrEmpty(this.StartPath))
                 {
                     Debug.LogError($"Please, setup StartPath for {name}");
@@ -265,16 +249,7 @@ namespace unvs.gameword
                 }
                 InitGlobalEvents();
             }
-            if (Application.isPlaying && !string.IsNullOrEmpty(this.uiSettings.cinemaSettingPrefabPath))
-            {
-                var cmp = SetupSceneWorld.CreateComponents(
-                    transform, this.uiSettings.cinemaSettingPrefabPath);
-                cam = cmp.Main;
-                vcam = cmp.VCam;
-                brain = cmp.Brain;
-                confiner = cmp.Confiner;
-                //SetupComponents();
-            }
+           
             LoadAllUI();
             SetupSingeScene();
             //var isEditPlay = ChunkSceneLoaderUtilsOld.PlayActiveSceneFromEditor();
@@ -371,6 +346,7 @@ namespace unvs.gameword
         }
         private void LateUpdate()
         {
+            if(cursor==null) return;
             var pos = (Vector2)_virtualMousePos;
             var interactObject = pos.GetHitCollider<Transform>(Constants.Layers.INTERACT_OBJECT);
             if (interactObject != null)
@@ -391,6 +367,7 @@ namespace unvs.gameword
 
         void UpdateCursorPosition()
         {
+            if(cursor==null) return;
             Vector2 deltaMouse = Vector2.zero;
             Vector2 stickInput = Vector2.zero;
 

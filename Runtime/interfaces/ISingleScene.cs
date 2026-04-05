@@ -17,11 +17,10 @@ namespace unvs.interfaces
         UISettingsInfo UISettings { get; }
         Image CursorImage {  get; }
         Canvas TopCanvas { get; }
-        Camera Cam { get; }
-        CinemachineBrain Brain { get; }
-        CinemachineCamera VCam { get; }
+       
+      
         Rigidbody2D CamRigidBody { get; }
-        CinemachineConfiner2D Confiner { get; }
+        
         //IActor CurrentActor { get; set; }
         IGlobalWorldBound GlobalWorldBound { get; }
         IScenePrefab CurrentWorld { get; set; }

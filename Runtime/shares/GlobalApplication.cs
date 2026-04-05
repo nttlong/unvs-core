@@ -1,4 +1,5 @@
-﻿using System;
+﻿using interfaces.cinema;
+using System;
 using System.Collections;
 using System.Threading;
 using UnityEngine;
@@ -35,6 +36,7 @@ namespace unvs.shares
         public static AudioSource CommonAudioSource { get; internal set; }
         public static CancellationTokenSource WorldTrackerCancellationTokenSource { get;  set; }
         public static SettingsRealTimeStats RealtimeStatsInstance { get; internal set; }
+        public static ICinemaScene Cinema { get; internal set; }
 
         public static GlobalEvents Events = new GlobalEvents();
 
@@ -51,7 +53,7 @@ namespace unvs.shares
 #else
     // This will close the actual built application (.exe, .app, .apk)
     Application.Quit();
-    System.Diagnostics.Process.GetCurrentProcess().Kill()
+    System.Diagnostics.Process.GetCurrentProcess().Kill();
 #endif
         }
     }

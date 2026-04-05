@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.Localization.SmartFormat.Utilities;
 using unvs.gameword;
 using unvs.interfaces;
+using unvs.shares;
 
 namespace unvs.ext
 {
@@ -24,7 +25,10 @@ namespace unvs.ext
         }
         public static void Watch(this CinemachineCamera vcam, Transform camWatcher)
         {
-
+            if (vcam == null)
+            {
+                return;
+            }
 
             vcam.Follow = camWatcher;
             vcam.LookAt = camWatcher;
@@ -39,7 +43,7 @@ namespace unvs.ext
             vcam.LookAt = null;
             vcam.Target.TrackingTarget = null;
             vcam.Target.LookAtTarget = null;
-            SettingsSingleScene.Instance.VCam.ForceCameraPosition(new Vector3(0, 0, -10), Quaternion.identity);
+            GlobalApplication.Cinema.VCam.ForceCameraPosition(new Vector3(0, 0, -10), Quaternion.identity);
         }
         //public static void WatchPosImediately(this CinemachineCamera vcam, Transform camWatcher)
         //{

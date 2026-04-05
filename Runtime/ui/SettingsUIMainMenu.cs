@@ -36,7 +36,7 @@ namespace unvs.ui
         {
             OnStartClick?.Invoke();
         }
-
+       
         public void Hide()
         {
             this.IsShowing = false;

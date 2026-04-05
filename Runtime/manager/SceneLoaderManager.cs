@@ -192,13 +192,13 @@ namespace unvs.manager
                 GlobalWorldBound.Instance.AddBound(scene);
             else GlobalWorldBound.Instance.SetBound(scene);
             if (GlobalWorldBound.Instance.isMultiPolygon)
-                SettingsSingleScene.Instance.VCam.SetOrthoSizeImmediate(scene.OrthographicSize);
+                GlobalApplication.Cinema.VCam.SetOrthoSizeImmediate(scene.OrthographicSize);
             else
-                SettingsSingleScene.Instance.VCam.UpdateByScenePrefab(scene);
+                GlobalApplication.Cinema.VCam.UpdateByScenePrefab(scene);
             if (actor != null)
             {
                 target.MoveOtherToMe(actor as MonoBehaviour);
-                SettingsSingleScene.Instance.VCam.Watch(actor.CamWacher);
+                GlobalApplication.Cinema.VCam.Watch(actor.CamWacher);
             }
 
             scene.GoWorld.SetActive(true);
@@ -306,14 +306,14 @@ namespace unvs.manager
                 if (actor != null)
                 {
                     target.MoveOtherToMe(actor as MonoBehaviour);
-                    SettingsSingleScene.Instance.VCam.Watch(actor.CamWacher);
+                    GlobalApplication.Cinema.VCam.Watch(actor.CamWacher);
                 }
                 // 8. Update Camera Lens Properties
                 if (GlobalWorldBound.Instance.isMultiPolygon)
-                    SettingsSingleScene.Instance.VCam.SetOrthoSizeImmediate(scene.OrthographicSize);
+                    GlobalApplication.Cinema.VCam.SetOrthoSizeImmediate(scene.OrthographicSize);
                 else
                 {
-                    SettingsSingleScene.Instance.VCam.UpdateByScenePrefab(scene);
+                    GlobalApplication.Cinema.VCam.UpdateByScenePrefab(scene);
                     await UniTask.WaitForSeconds(0.005f);
                 }
                     
@@ -385,9 +385,9 @@ namespace unvs.manager
 
             this.InitActor(scene, targetName);
             if (GlobalWorldBound.Instance.isMultiPolygon)
-                SettingsSingleScene.Instance.VCam.SetOrthoSizeImmediate(scene.OrthographicSize);
+                GlobalApplication.Cinema.VCam.SetOrthoSizeImmediate(scene.OrthographicSize);
             else
-                SettingsSingleScene.Instance.VCam.UpdateByScenePrefab(scene);
+                GlobalApplication.Cinema.VCam.UpdateByScenePrefab(scene);
             await GlobalApplication.FadeScreenController.FadeOutAsync();
 
             return scene;
@@ -450,7 +450,7 @@ namespace unvs.manager
                 var camWatcher = actor.CamWacher as MonoBehaviour;
                 if (camWatcher != null)
                 {
-                    SettingsSingleScene.Instance.VCam.Watch(camWatcher.transform);
+                    GlobalApplication.Cinema.VCam.Watch(camWatcher.transform);
                 }
                 actor.OnDestroying = () =>
                 {
@@ -461,7 +461,7 @@ namespace unvs.manager
             }
             else if (scene.DefaultCamWatcher != null)
             {
-                SettingsSingleScene.Instance.VCam.Watch(scene.DefaultCamWatcher.transform);
+                GlobalApplication.Cinema.VCam.Watch(scene.DefaultCamWatcher.transform);
             }
         }
 
@@ -489,7 +489,7 @@ namespace unvs.manager
 
         public void SetUpCam(IScenePrefab scene)
         {
-            SettingsSingleScene.Instance.Cam.GetComponent<ICam>().Body.UpdateSizeByLensSettings(SettingsSingleScene.Instance.VCam.Lens);
+            GlobalApplication.Cinema.Main.GetComponent<ICam>().Body.UpdateSizeByLensSettings(GlobalApplication.Cinema.VCam.Lens);
         }
 
         public async UniTask<IScenePrefab> LoadChunksAsync(ITriggerZone triggerZone)

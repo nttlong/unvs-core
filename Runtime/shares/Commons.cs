@@ -243,10 +243,11 @@ namespace unvs.shares
 
             return ret;
         }
-        public static async UniTask<T> LoadPrefabsAsync<T>(string v, Transform parent = null)
+        public static async UniTask<T> LoadPrefabsAsync<T>(string v, Transform parent = null, bool active=false)
         {
+           
             GameObject go=await LoadPrefabsAsync(v, parent);
-            go.SetActive(false);
+            go.SetActive(active);
             return go.GetComponent<T>();    
         }
         public static async UniTask<GameObject> LoadPrefabsAsync(string v, Transform parent = null)

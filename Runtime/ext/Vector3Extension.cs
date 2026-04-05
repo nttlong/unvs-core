@@ -379,6 +379,7 @@ namespace unvs.ext
         }
         public static T GetHitCollider<T>(this Vector2 pos, params string[] layers)
         {
+            if(Camera.main==null) return default(T);
             // 1. Validate input and layers
             if (layers == null || layers.Length == 0) return default(T);
 

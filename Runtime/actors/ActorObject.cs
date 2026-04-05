@@ -251,7 +251,7 @@ namespace unvs.actors
 
             this.transform.SetParent(null, false);
             if (startSpawn != null) startSpawn.MoveOtherToMe(this);
-            unvs.shares.GlobalApplication.SingleScene.VCam.Watch(this.CamWacher.Coll.transform);
+            unvs.shares.GlobalApplication.Cinema.VCam.Watch(this.CamWacher.Coll.transform);
             unvs.manager.GameEvents.CurrentActor = this;
             unvs.manager.GameEvents.OnSceneLoad -= GameEvents_OnSceneLoadComplete;
         }

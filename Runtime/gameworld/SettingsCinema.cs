@@ -7,6 +7,7 @@ using UnityEngine;
 using unvs.ext;
 using unvs.gameword;
 using unvs.interfaces;
+using unvs.shares;
 using unvs.ui;
 using static Unity.Cinemachine.CinemachineBrain;
 
@@ -20,8 +21,9 @@ namespace unvs.gameworld
         public CinemachineCamera vCam;
         public GlobalWorldBound worldBound;
         public CinemachineFollow cinemaFollow;
+        private CinemachineConfiner2D confiner;
         public SettingsCommonAudioSource commonAudioSource;
-
+        public CinemachineConfiner2D Confiner2D=> confiner;
         public Camera Main => main;
 
         public CinemachineBrain Brain=> brain;
@@ -45,7 +47,7 @@ namespace unvs.gameworld
             brain= main.AddComponentIfNotExist<CinemachineBrain>();
             cinemaFollow=vCam.AddComponentIfNotExist<CinemachineFollow>();
             
-            var confiner = vCam.AddComponentIfNotExist<CinemachineConfiner2D>();
+            confiner = vCam.AddComponentIfNotExist<CinemachineConfiner2D>();
             confiner.BoundingShape2D = worldBound.GetComponent<CompositeCollider2D>();
             main.AddComponentIfNotExist<CamObject>();
             main.orthographic = true;
@@ -66,7 +68,7 @@ namespace unvs.gameworld
             vCam.Priority = new PrioritySettings {
                 Enabled = true,
             };
-            
+            GlobalApplication.Cinema = this as ICinemaScene;
         }
 
        

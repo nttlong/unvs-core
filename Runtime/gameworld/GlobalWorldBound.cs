@@ -36,7 +36,7 @@ namespace unvs.gameword
         }
         public void SetBoundModeSingle(IScenePrefab newScenePrefab)
         {
-            var instace = SettingsSingleScene.Instance;
+            
             Clear();
             newScenePrefab.WorldBound.Owner = newScenePrefab;
             newScenePrefab.WorldBound.refColl = newScenePrefab.WorldBound.Coll;
@@ -50,7 +50,7 @@ namespace unvs.gameword
             prefabList.Add(newScenePrefab);
             singleCollider.points = PolygonCollider2Extension.CreateRectFromVectorList(prefabList.Select(p => p.WorldBound.Coll).ToArray());
             coll.GenerateGeometry();
-            instace.Confiner.InvalidateBoundingShapeCache();
+            GlobalApplication.Cinema.Confiner2D.InvalidateBoundingShapeCache();
            
             //var track = newScenePrefab.RefColliderWorldBound.CloneWithMarginByScale(SingleSceneController.Instance.WorldBoundMrgin);
 
@@ -93,16 +93,16 @@ namespace unvs.gameword
             if (fixDampling)
             {
                 //SingleScene.Instance.VCam.CancelDamping();
-                instance.Confiner.Damping = 5;
+                GlobalApplication.Cinema.Confiner2D.Damping = 5;
 
             }
             
             if (autoInvalidateBoundingShapeCache)
-                instance.Confiner.InvalidateBoundingShapeCache();
+                GlobalApplication.Cinema.Confiner2D.InvalidateBoundingShapeCache();
         }
         public void SetBoundModeMulti(IScenePrefab newScenePrefab)
         {
-            var instace = SettingsSingleScene.Instance;
+            
             Clear();
             newScenePrefab.WorldBound.Owner = newScenePrefab;
             newScenePrefab.WorldBound.refColl = newScenePrefab.WorldBound.Coll;
@@ -131,7 +131,7 @@ namespace unvs.gameword
                 // 4. BẮT BUỘC: Báo cho Cinemachine biết là cái khung đã thay đổi kích thước
                 // Nếu không có dòng này, Camera vẫn sẽ bị kẹt ở vùng cũ
                 coll.GenerateGeometry();
-                instace.Confiner.InvalidateBoundingShapeCache();
+                GlobalApplication.Cinema.Confiner2D.InvalidateBoundingShapeCache();
                 //this.storage.Add(newScenePrefab, newBounds);
             }
             Instance.ClearOrphanBound();
@@ -142,7 +142,7 @@ namespace unvs.gameword
         public void AddBoundModeMulti(IScenePrefab newScenePrefab)
         {
 
-            var instance = SettingsSingleScene.Instance;
+            
             newScenePrefab.WorldBound.refColl = newScenePrefab.WorldBound.Coll;
             if (newScenePrefab.WorkTracker == null)
             {
@@ -180,12 +180,12 @@ namespace unvs.gameword
             if (fixDampling)
             {
                 //SingleScene.Instance.VCam.CancelDamping();
-                instance.Confiner.Damping = 5;
-                
+                GlobalApplication.Cinema.Confiner2D.Damping = 5;
+               
             }
             Instance.ClearOrphanBound();
             if (autoInvalidateBoundingShapeCache)
-                instance.Confiner.InvalidateBoundingShapeCache();
+                GlobalApplication.Cinema.Confiner2D.InvalidateBoundingShapeCache();
            
            
         }
@@ -210,7 +210,7 @@ namespace unvs.gameword
             yield return new WaitForEndOfFrame();
             coll.enabled = false;
             coll.enabled = true;
-            SettingsSingleScene.Instance.Confiner.InvalidateBoundingShapeCache();
+            GlobalApplication.Cinema.Confiner2D.InvalidateBoundingShapeCache();
         }
         public void RemoveBound(IScenePrefab newScenePrefab)
         {
@@ -239,12 +239,12 @@ namespace unvs.gameword
             if (fixDampling)
             {
                 //SingleScene.Instance.VCam.CancelDamping();
-                instance.Confiner.Damping = 5;
+                GlobalApplication.Cinema.Confiner2D.Damping = 5;
 
             }
 
             if (autoInvalidateBoundingShapeCache)
-                instance.Confiner.InvalidateBoundingShapeCache();
+                GlobalApplication.Cinema.Confiner2D.InvalidateBoundingShapeCache();
         }
 
         private void RemoveBoundMultiMode(IScenePrefab newScenePrefab)
@@ -264,8 +264,8 @@ namespace unvs.gameword
             {
                 UnityEngine.Object.Destroy(tr.gameObject);
             }
-           
-            SettingsSingleScene.Instance.Confiner.InvalidateBoundingShapeCache();
+
+            GlobalApplication.Cinema.Confiner2D.InvalidateBoundingShapeCache();
 
         }
         private void Start()
@@ -276,10 +276,10 @@ namespace unvs.gameword
                 return;
             }
             Instance = this;
-            if (SettingsSingleScene.Instance != null)
+            if (GlobalApplication.Cinema != null )
             {
-                SettingsSingleScene.Instance.Confiner.BoundingShape2D = coll;
-                SettingsSingleScene.Instance.Confiner.InvalidateBoundingShapeCache();
+                GlobalApplication.Cinema.Confiner2D.BoundingShape2D = coll;
+                GlobalApplication.Cinema.Confiner2D.InvalidateBoundingShapeCache();
             }
             DontDestroyOnLoad(gameObject);
 

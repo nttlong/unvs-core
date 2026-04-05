@@ -21,10 +21,10 @@ namespace unvs.gameword
         public void Start()
         {
             this.SetMeOnLayer(Constants.Layers.WORLD_BOUND);
-            if (SettingsSingleScene.Instance == null) return;
-            if (SettingsSingleScene.Instance.Confiner.BoundingShape2D == null)
+            if (GlobalApplication.Cinema == null) return;
+            if (GlobalApplication.Cinema.Confiner2D.BoundingShape2D == null)
             {
-                SettingsSingleScene.Instance.Confiner.BoundingShape2D = GetComponent<PolygonCollider2D>();
+                GlobalApplication.Cinema.Confiner2D.BoundingShape2D = GetComponent<PolygonCollider2D>();
             }
         }
         //private void OnEnable()

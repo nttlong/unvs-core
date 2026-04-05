@@ -42,8 +42,8 @@ namespace unvs.gameword
                 b.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
                 b.gravityScale = 0;
                 b.mass = 0;
-                if(SettingsSingleScene.Instance!=null)
-                UpdateSizeByLensSettings(SettingsSingleScene.Instance.VCam.Lens);
+                if(GlobalApplication.Cinema != null)
+                UpdateSizeByLensSettings(GlobalApplication.Cinema.VCam.Lens);
             }
         }
 #if UNITY_EDITOR

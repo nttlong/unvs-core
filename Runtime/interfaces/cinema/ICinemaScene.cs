@@ -14,6 +14,7 @@ namespace interfaces.cinema
         GlobalWorldBound WorldBound { get; }
         CinemachineFollow CinemaFollow { get; }
         SettingsCommonAudioSource AudioSource { get; }
+        CinemachineConfiner2D Confiner2D { get; }
        
         
     }
