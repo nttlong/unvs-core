@@ -1,8 +1,12 @@
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.U2D.Animation;
+using UnityEngine.U2D.IK;
 using unvs.interfaces;
 
 namespace unvs.ext
@@ -108,6 +112,31 @@ namespace unvs.ext
             child.localPosition = Vector3.zero;
             child.localRotation = Quaternion.identity;
             child.localScale = Vector3.one;//physical.CurrentHoldingObject.gameObject.SetActive(true);
+        }
+        public static Transform GetRoot(this Transform tr)
+        {
+            if (tr.parent == null) return tr;
+            return tr.parent.GetRoot();
+        }
+        public static Transform GetRootBone(this Transform tr)
+        {
+            var allBones = tr.GetRoot().GetComponentsInChildren<SpriteSkin>(true).SelectMany(p => p.boneTransforms);
+            
+            var travel = tr;
+            var ret = tr;
+            while (allBones.Contains(travel))
+            {
+                
+                ret = travel;
+                travel = travel.parent;
+            }
+            return ret;
+        }
+        public static IKManager2D CreateRootIKManager2DIfNotExist(this Transform tr)
+        {
+            var r = tr.GetRootBone();
+            if (r == null) return null;
+            return r.AddComponentIfNotExist<IKManager2D>();
         }
     }
 }

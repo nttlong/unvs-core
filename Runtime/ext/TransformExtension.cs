@@ -150,6 +150,25 @@ namespace unvs.ext
             return ret;
         }
 
+#if UNITY_EDITOR
+        public static void EditRemoveChildComponentIfExists<T>(this Transform obj, string name) where T : Component
+        {
+            // Tìm kiếm con trực tiếp theo tên để tránh xóa nhầm "cháu chắt"
+            Transform child = obj.Find(name);
+
+            if (child != null)
+            {
+                // Kiểm tra xem Object đó có chứa Component loại T không
+                if (child.GetComponent<T>() != null)
+                {
+                    // Trong Editor, dùng DestroyImmediate là chuẩn
+                    // Dùng child.gameObject trực tiếp vì child != null đã đảm bảo nó tồn tại
+                    UnityEngine.Object.DestroyImmediate(child.gameObject);
+                }
+            }
+        }
+#endif
+
         public static T AddChildComponentIfNotExist<T>(this Transform obj, string name) where T : Component
         {
             var ret = obj.GetComponentInChildrenByName<T>(name);

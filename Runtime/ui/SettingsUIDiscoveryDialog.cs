@@ -98,7 +98,7 @@ namespace unvs.ui
             topPanel.AddChildIfNotExist<Image>("Icon");
             topPanel.AddChildIfNotExist<TextMeshProUGUI>("content");
             confirmPanel = discoveryDialogPanel.AddChildComponentIfNotExist<Image>("ConfirmPanel");
-            confirmPanel.AddComponentIfNotExist<HorizontalLayoutGroup>();
+            confirmPanel.AddComponentIfNotExist<HorizontalLayoutGroup>().FixLayoutChildren();
 
             btnOk = confirmPanel.transform.AddButtonIfNotExist("btnOK","OK");
             
