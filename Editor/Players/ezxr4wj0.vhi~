@@ -1,0 +1,30 @@
+﻿using UnityEngine;
+using UnityEditor;
+using unvs.players; // Phải có namespace này
+
+[CustomEditor(typeof(PlayerBase), true)] // 'true' để áp dụng cho cả các class con
+public class PlayerBaseBaseEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        DrawDefaultInspector();
+
+        // Ép kiểu về class CHA (Base)
+        PlayerBase script = (PlayerBase)target;
+
+        GUILayout.Space(10);
+
+        if (GUILayout.Button("ExtractAllAnim", GUILayout.Height(30)))
+        {
+            script.EditorExtractAllAnim();
+            // THÊM DÒNG NÀY ĐỂ LƯU DỮ LIỆU
+            UnityEditor.EditorUtility.SetDirty(script);
+
+            // Nếu bạn đang ở trong Prefab Mode, cần thêm dòng này để chắc chắn hơn
+            UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(script.gameObject.scene);
+
+            Debug.Log("Data Generated and Marked Dirty!");
+        }
+        
+    }
+}

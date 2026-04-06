@@ -7,8 +7,6 @@ using Unity.VisualScripting;
 
 #if UNITY_EDITOR
 using UnityEditor.Animations;
-//using UnityEditorInternal;
-
 #endif
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -99,7 +97,7 @@ namespace unvs.ext
                     var state = stateInMachine.state;
                     if (state.motion is BlendTree blendTree)
                     {
-                        extractBlendTree(anim, ret, i,j, layer, blendTree);
+                        extractBlendTree(anim, ret, i, layer, j, blendTree);
 
                     }
 
@@ -116,7 +114,7 @@ namespace unvs.ext
                 ret.Add(new BlendTreeInfo
                 {
                     blendName = blendTree.name,
-                    blendIndex = blendIndex,
+                    blendIndex = j,
                     motionName = child.motion.name,
 
                     layerName = layer.name,
@@ -143,8 +141,7 @@ namespace unvs.ext
                     var state = stateInMachine.state;
                     if (state.motion is BlendTree tree)
                     {
-                        extractBlendTree(anim, ret, i, j, layer, tree);
-                        continue;
+                        extractBlendTree(anim, ret, i, layer, j, tree);
 
                     }
                     

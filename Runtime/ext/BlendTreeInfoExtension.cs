@@ -14,7 +14,7 @@ namespace unvs.ext
     {
         public static void PlayBaseLayer(this BlendTreeInfo[] blendTreeAnim, string motionName)
         {
-            var item = blendTreeAnim.FirstOrDefault(p => 
+            var item = blendTreeAnim.FirstOrDefault(p => p.layerIndex==0 &&
              p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase) );
 
             item.animationController.ResetAllAddtiveLayers();
