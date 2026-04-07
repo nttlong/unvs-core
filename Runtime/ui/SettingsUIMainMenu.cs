@@ -26,6 +26,10 @@ namespace unvs.ui
 
         public bool IsShowing { get; internal set; }
 
+        public Button BtnStart => btnStart;
+
+        public Button BtnExit => btnExit;
+
         public void DoExitGame()
         {
             OnExitClick?.Invoke();
@@ -88,8 +92,8 @@ namespace unvs.ui
             });
         }
         private GameObject _lastSelectedButton;
-        private Button btnStart;
-        private Button btnExit;
+        public Button btnStart;
+        public Button btnExit;
 
         void Update()
         {

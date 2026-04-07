@@ -25,6 +25,8 @@ namespace unvs.gameword
     {
         
         public static ISingleScene Instance;
+        [Header("Game settings")]
+        public string startPath;
         [Header("Cinema settings")]
         public Camera cam;
        
@@ -111,7 +113,9 @@ namespace unvs.gameword
 
         public IRealTimeStats RealTimeStats => realTimeStats;
 
-        public string StartPath;
+        public string StartPath { get => startPath; set => startPath=value; }
+
+       
         
         GameObject _goSceneLoader;
      
@@ -191,7 +195,7 @@ namespace unvs.gameword
                 }).Forget();
             };
         }
-        async UniTask StartGame()
+        public async UniTask StartGame()
         {
             await GlobalApplication.SceneLoaderManagerInstance.LoadNewAsync(this.StartPath, null);
             maiMenu.GetComponent<IMainMenu>().Hide();
@@ -203,15 +207,15 @@ namespace unvs.gameword
             //maiMenu.transform.SetParent(transform);
             //maiMenu.SetActive(false);
             _mainMenu = this.UISettings.SettingsUIMainMenu;
-            _mainMenu.OnStartClick = () =>
+            _mainMenu.BtnStart.onClick.AddListener(() =>
             {
-                
                 StartGame().Forget();
-            };
-            _mainMenu.OnExitClick = () =>
+            });
+            _mainMenu.BtnExit.onClick.AddListener(() =>
             {
                 GlobalApplication.DoExitGame();
-            };
+            });
+            
         }
         private  void Awake()
         {
@@ -364,6 +368,7 @@ namespace unvs.gameword
         [SerializeField] float gamepadSensitivity = 1000f;
         private Vector3 _virtualMousePos;
         private IRealTimeStats realTimeStats;
+        
 
         void UpdateCursorPosition()
         {
@@ -412,6 +417,13 @@ namespace unvs.gameword
         public void CursorOn()
         {
             topCanvas.gameObject.SetActive(true);
+        }
+
+        public void PlayTest()
+        {
+            this.StartGame().Forget();
+
+
         }
     }
 

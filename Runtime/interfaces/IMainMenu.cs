@@ -20,6 +20,8 @@ namespace unvs.interfaces
 
         void DoStartGame();
         void DoExitGame();
+        Button BtnStart { get; }
+        Button BtnExit { get; }
     }
     public interface IUIHub
     {

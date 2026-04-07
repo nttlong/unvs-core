@@ -23,20 +23,21 @@ namespace unvs.shares
         //public static IWorldMonitor WorldMonitorManager { get; set; }
         public static IWorldTracker WorldTrackerObject { get; set; }
         public static ICamCenterCamTracking CamTracking { get; set; }
-        public static ISingleScene SingleScene { get;  set; }
+        public static ISingleScene SingleScene { get; set; }
         //public static IDiscoveryDialog DiscoveryDialogInstance { get; set; }
-        public static LightManagerObject LightManagerObjectInstance { get;  set; }
-       
-        public static ISceneLoader SceneLoaderManagerInstance { get;  set; }
-        public static IUIHub UIHub { get;  set; }
-        public static IPauseMenu UIPauseMenu { get;  set; }
-        public static IDiscoveryDialog UIDiscoveryDialog { get;  set; }
-        public static SettingsGlobalEvents GlobalInput { get;  set; }
+        public static LightManagerObject LightManagerObjectInstance { get; set; }
+
+        public static ISceneLoader SceneLoaderManagerInstance { get; set; }
+        public static IUIHub UIHub { get; set; }
+        public static IPauseMenu UIPauseMenu { get; set; }
+        public static IDiscoveryDialog UIDiscoveryDialog { get; set; }
+        public static SettingsGlobalEvents GlobalInput { get; set; }
         public static IMainMenu UIMainMenu { get; internal set; }
         public static AudioSource CommonAudioSource { get; internal set; }
-        public static CancellationTokenSource WorldTrackerCancellationTokenSource { get;  set; }
+        public static CancellationTokenSource WorldTrackerCancellationTokenSource { get; set; }
         public static SettingsRealTimeStats RealtimeStatsInstance { get; internal set; }
         public static ICinemaScene Cinema { get; internal set; }
+
 
         public static GlobalEvents Events = new GlobalEvents();
 
@@ -56,6 +57,28 @@ namespace unvs.shares
     System.Diagnostics.Process.GetCurrentProcess().Kill();
 #endif
         }
+        public static string PendingWorldPath
+        {
+            get
+            {
+
+#if UNITY_EDITOR
+                return UnityEditor.EditorPrefs.GetString("PendingWorldPath");
+#else
+                return "";
+#endif
+            }
+            set
+            {
+
+#if UNITY_EDITOR
+                UnityEditor.EditorPrefs.SetString("PendingWorldPath", value); 
+#endif
+
+
+            }
+        }
+       
     }
     public class GlobalEvents
     {
@@ -64,7 +87,7 @@ namespace unvs.shares
         internal void RaiseOnHoverInteractObject(Vector2 pos, Image cursor, GameObject gameObject)
         {
             OnHoverInteractObject?.Invoke(pos, cursor, gameObject);
-           
+
         }
     }
 }

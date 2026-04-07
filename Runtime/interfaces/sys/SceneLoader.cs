@@ -16,6 +16,7 @@ namespace unvs.interfaces.sys
     }
     public interface ISceneLoader
     {
+
         event Action<IScenePrefab, LoadTypeEnum>  OnLoadBegin;
         event Action<IScenePrefab, LoadTypeEnum> OnLoadComplete;
         IChunkScenes Chunks {  get; }

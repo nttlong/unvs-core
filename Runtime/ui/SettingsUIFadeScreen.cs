@@ -50,6 +50,7 @@ namespace unvs.ui
             uiCanvas= this.AddChildComponentIfNotExist<Canvas>("FadeScreenCanvas");
             uiCanvas.AddComponentIfNotExist<GraphicRaycaster>();
             panel = uiCanvas.transform.AddChildComponentIfNotExist<Image>("FadeScreenPanel");
+            GlobalApplication.FadeScreenController = this;
         }
         private void Start()
         {

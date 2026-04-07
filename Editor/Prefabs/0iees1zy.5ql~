@@ -1,14 +1,16 @@
 ﻿#if UNITY_EDITOR
-using System;
-using System.Linq;
 using UnityEditor;
-using UnityEditor.AddressableAssets;
-using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using unvs.gameword;
+
+
+using UnityEditor.AddressableAssets.Settings;
+
+using UnityEditor.AddressableAssets;
+using System;
 using unvs.interfaces;
 using unvs.shares;
+using unvs.gameword;
 
 public class WorldObjectEditor
 {
@@ -55,61 +57,16 @@ public class WorldObjectEditor
         {
            var s= (Selection.activeObject as GameObject).GetComponent<WorldObject>();
             var sceneName = s.TestSceneName;
-            if (string.IsNullOrEmpty(sceneName))
-            {
-                throw new Exception($"Please, set field TestSceneName for {s.name}");
-            }
             string[] guids = AssetDatabase.FindAssets($"{sceneName} t:Scene");
             if (guids.Length > 0)
             {
                 string scenePath = AssetDatabase.GUIDToAssetPath(guids[0]);
-                s.TestScensGuid = guids[0];
-                
-                var scene = EditorSceneManager.OpenScene(scenePath);
-                var singeSinge = scene.GetRootGameObjects().FirstOrDefault(p => p.GetComponent<ISingleScene>() != null);
-                if (singeSinge != null)
-                {
-                   GlobalApplication.PendingWorldPath = GetAddressableOf(Selection.activeObject);
-                   
-                    EditorApplication.isPlaying = true;
-
-                }
-                else
-                {
-                    throw new Exception($"Please add {typeof(ISingleScene)} to {scenePath} ");
-                }
+                EditorSceneManager.OpenScene(scenePath);
                 EditorApplication.isPlaying = true;
             }
         }
     }
-
-    public static string GetAddressableOf(UnityEngine.Object activeObject)
-    {
-        if (activeObject == null) return string.Empty;
-
-        // 1. Lấy Asset Path từ Object (ví dụ: Assets/Models/Hero.fbx)
-        string assetPath = AssetDatabase.GetAssetPath(activeObject);
-
-        // 2. Chuyển đổi Path sang GUID (Addressables quản lý nội bộ qua GUID)
-        string guid = AssetDatabase.AssetPathToGUID(assetPath);
-
-        // 3. Truy cập Settings mặc định của Addressables trong Project
-        AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
-
-        if (settings != null)
-        {
-            // 4. Tìm Entry (bản ghi) của Asset này trong các Group
-            AddressableAssetEntry entry = settings.FindAssetEntry(guid);
-
-            // 5. Nếu tìm thấy, trả về địa chỉ (Address), nếu không trả về chuỗi rỗng
-            if (entry != null)
-            {
-                return entry.address;
-            }
-        }
-
-        return string.Empty; // Trả về rỗng nếu object không thuộc Addressables
-    }
+    
 }
 
 

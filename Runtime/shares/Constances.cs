@@ -41,6 +41,7 @@ namespace unvs.shares
 
             //public const string SINGLE = "Single";
             public const string MAIN_SCENE = "WorldScene";
+            public const string TEST_SCENE = "TestScene";
         }
         public class ObjectsConst
         {

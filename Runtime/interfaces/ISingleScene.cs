@@ -1,7 +1,9 @@
+using Cysharp.Threading.Tasks;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using unvs.gameword;
 using unvs.interfaces.sys;
 using unvs.shares;
 using unvs.ui;
@@ -31,8 +33,13 @@ namespace unvs.interfaces
         IPauseMenu PauseMenu { get; }
         ISceneLoader SceneLoader { get; }
         IRealTimeStats RealTimeStats { get; }
+        string StartPath { get; set; }
+        
+
         void CursorOff();
         void CursorOn();
         void InitDefaultCursor();
+       
+        UniTask StartGame();
     }
 }

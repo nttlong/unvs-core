@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks.Triggers;
 using Script.unvs.ext;
 using System;
 using System.Collections;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
@@ -403,21 +404,22 @@ namespace unvs.manager
         public bool PlayActiveSceneFromEditor()
         {
 #if UNITY_EDITOR
-            if (UnityEditor.EditorPrefs.HasKey("PendingWorldPath"))
+            if (!string.IsNullOrEmpty(this.ScenePathFromEditor))
             {
+                LoadNewAsync(this.ScenePathFromEditor, null).Forget();
+                return true;
                 // Lấy đường dẫn ra
-                string path = UnityEditor.EditorPrefs.GetString("PendingWorldPath");
+                //string path = UnityEditor.EditorPrefs.GetString("PendingWorldPath");
 
                 // Xóa ngay lập tức để lần sau nhấn Play bình thường 
                 // nó không tự động load lại cái world cũ này
-                UnityEditor.EditorPrefs.DeleteKey("PendingWorldPath");
+                //UnityEditor.EditorPrefs.DeleteKey("PendingWorldPath");
 
-                if (!string.IsNullOrEmpty(path))
-                {
+                //if (!string.IsNullOrEmpty(path))
+                //{
 
-                    LoadNewAsync(path, null).Forget();
-                    return true;
-                }
+
+                //}
 
             }
 
