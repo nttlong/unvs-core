@@ -17,9 +17,9 @@ namespace unvs.players{
         FromSelected
     }
     public  class PlayerBoneSolverChain:PlayerBoneBase{
-       
 
 
+#if UNITY_EDITOR
         public SolverChainFecting applyType =SolverChainFecting.FromSelected;
         //private void Reset()
         //{
@@ -131,20 +131,20 @@ namespace unvs.players{
            
         }
 
-        
+
 
         public override void GenerateSolve()
         {
-#if UNITY_EDITOR
+
             if (applyType == SolverChainFecting.FromLeaf)
                 createMulti();
             else if (applyType == SolverChainFecting.Single)
                 createSingle();
             else
                 createFromSelected(transform);
-#endif
-        }
 
-       
+        }
+#endif
+
     }
 }

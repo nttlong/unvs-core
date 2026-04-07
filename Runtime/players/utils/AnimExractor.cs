@@ -1,20 +1,20 @@
-﻿using Cysharp.Threading.Tasks;
-using Cysharp.Threading.Tasks.Triggers;
+﻿
 using System;
-using System.ComponentModel;
+
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using unvs.ext;
 using unvs.interfaces;
 using unvs.shares;
+using unvs.ui;
 
 
 namespace unvs.players{
     public abstract class BaseSubPlayer
     {
         public PlayerBase owner;
-        public abstract void OnPlayerStart();
+        public abstract void OnPlayerStart(PlayerBase player);
     }
     [Serializable]
     public class AnimExractor: BaseSubPlayer
@@ -35,7 +35,7 @@ namespace unvs.players{
         {
             this.motions.PlayAddtiveMotion(name);
         }
-        public override void OnPlayerStart()
+        public override void OnPlayerStart(PlayerBase player)
         {
             
         }
@@ -109,7 +109,7 @@ namespace unvs.players{
             owner.transform.MoveStep(v, this.footStepLen, out var dir);
            
         }
-        public override void OnPlayerStart()
+        public override void OnPlayerStart(PlayerBase player)
         {
             
         }
@@ -191,6 +191,42 @@ namespace unvs.players{
         public Image panel;
         public TextMeshProUGUI txt;
 
+       
+
+        public override void OnPlayerStart(PlayerBase player)
+        {
+            this.owner=player;
+            if (canvas != null) canvas.FullSize();
+            container.gameObject.SetActive(false);
+        }
+
+        public void SayText(string v)
+        {
+            if(this.owner==null) return;
+            if(this.owner.GetComponent<Collider2D>()==null) return;
+            var bound = this.owner.GetComponent<Collider2D>().bounds;
+            var panelSize = panel.GetSize();
+            var center = bound.center.ToScreen();
+            var max = bound.max.ToScreen();
+            this.txt.text = $"{panelSize.x},{v}";
+            container.gameObject.SetActive(true);
+            canvas.enabled = true;
+            canvas.gameObject.SetActive(true);
+            canvas.sortingOrder = -1;
+            panel.SetPosition(new Vector2(center.x-panelSize.x/2,max.y+10));
+
+        }
+        public void Off(string v)
+        {
+           
+            container.gameObject.SetActive(false);
+        }
+        private void Owner_OnRuntimeStart(PlayerBase obj)
+        {
+            this.canvas.FullSize();
+            this.canvas.sortingOrder = -1;
+        }
+#if UNITY_EDITOR
         public void EditorGenerateDialogueUI(PlayerBase owner)
         {
             this.owner = owner;
@@ -203,16 +239,38 @@ namespace unvs.players{
             layout.FixFullLayoutChildren();
             txt = panel.AddChildComponentIfNotExist<TextMeshProUGUI>("Text");
             this.owner.OnRuntimeStart += Owner_OnRuntimeStart;
-        }
+        } 
+#endif
+    }
+    [Serializable]
+    public class Bagger : BaseSubPlayer
+    {
+        private SettingsUIInventory bagger;
 
-        public override void OnPlayerStart()
+        public override void OnPlayerStart(PlayerBase player)
         {
-            if (canvas != null) canvas.FullSize();
+            owner = player;
+            bagger = owner.GetComponentInChildrenByName<SettingsUIInventory>(Constants.ObjectsConst.INVENTORY_PANEL_BAGGER);
         }
-
-        private void Owner_OnRuntimeStart(PlayerBase obj)
+        public virtual void Show()
         {
-            this.canvas.FullSize();
+            bagger.enabled = true;
+            bagger.gameObject.SetActive(true);
+            bagger.containerCanvas.enabled = true;
+            bagger.containerCanvas.gameObject.SetActive(true);
+            bagger.bagger.Show();
+        }
+        public virtual void Hide()
+        {
+            bagger.enabled = false;
+            bagger.gameObject.SetActive(false);
+            bagger.bagger.Hide();
+        }
+        internal void EditorGenerateBagger(PlayerBase playerBase)
+        {
+            owner = playerBase;
+           bagger = owner.AddChildComponentIfNotExist<SettingsUIInventory>(Constants.ObjectsConst.INVENTORY_PANEL_BAGGER);
+            bagger.containerCanvas.gameObject.SetActive(false);
         }
     }
 

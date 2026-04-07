@@ -134,6 +134,16 @@ namespace unvs.ext
         /// <param name="worldPos">Vị trí trong Game World</param>
         /// <param name="camera">Camera thực hiện tính toán (mặc định là Camera.main)</param>
         /// <returns>Tọa độ Vector2 trên màn hình</returns>
+        public static Vector2 ToScreen(this Vector3 worldPos, Camera camera = null)
+        {
+            return ((Vector2)worldPos).ToScreen();
+        }
+        /// <summary>
+        /// Chuyển đổi tọa độ World sang tọa độ Screen (Pixel)
+        /// </summary>
+        /// <param name="worldPos">Vị trí trong Game World</param>
+        /// <param name="camera">Camera thực hiện tính toán (mặc định là Camera.main)</param>
+        /// <returns>Tọa độ Vector2 trên màn hình</returns>
         public static Vector2 ToScreen(this Vector2 worldPos, Camera camera = null)
         {
             // Sử dụng camera truyền vào, nếu không có thì lấy Camera.main

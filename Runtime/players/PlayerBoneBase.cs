@@ -10,6 +10,8 @@ using unvs.ext;
 
 namespace unvs.players{
     public abstract class PlayerBoneBase:MonoBehaviour{
+
+#if UNITY_EDITOR
         public List<Transform> clear(out Transform target, out IKManager2D ikManager, out Transform sovler)
         {
             ikManager = transform.CreateRootIKManager2DIfNotExist();
@@ -47,9 +49,10 @@ namespace unvs.players{
         public void ClearSolve()
         {
             clear(out var target, out var ikManager, out var sovler);
-            
+
         }
 
-        public abstract void GenerateSolve();
+        public abstract void GenerateSolve(); 
+#endif
     }
 }

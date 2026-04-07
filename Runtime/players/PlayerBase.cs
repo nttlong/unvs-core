@@ -1,11 +1,15 @@
-using System;
+﻿using System;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using unvs.actors;
 using unvs.ext;
 using unvs.interfaces;
+using unvs.shares;
+using unvs.ui;
 
 namespace unvs.players{
     [RequireComponent(typeof(Rigidbody2D))]
@@ -21,6 +25,13 @@ namespace unvs.players{
         public Physical physical;
         [SerializeField]
         public Dialogue dialogue;
+        [SerializeField]
+        public Bagger bagger;
+
+        public Transform CamWatcher;
+
+       
+
         public virtual void CancellationTokenSourceRefresh()
         {
             Cts = Cts.Refresh();
@@ -36,24 +47,39 @@ namespace unvs.players{
         {
             
             this.RuntimeInit();
-            if (Application.isPlaying)
-                InitAllBaseSubPlayers();
+            
         }
+        public virtual void Start()
+        {
+            if (Application.isPlaying)
+            {
+                InitAllBaseSubPlayers();
+                this.bagger.Show();
+            }
+             
+            GlobalApplication.Cinema.VCam.Watch(this.CamWatcher);
 
+        }
         public virtual void InitAllBaseSubPlayers()
         {
-            var fields=typeof(PlayerBase).GetFields().Where(p=>p.FieldType.IsAssignableFrom(typeof(BaseSubPlayer)));
-            
+            var fields = typeof(PlayerBase)
+                .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .Where(f => typeof(BaseSubPlayer).IsAssignableFrom(f.FieldType))
+                .ToList();
+
             foreach (var field in fields)
             {
-                var val=field.GetValue(this);
-                if(val != null)
+                var subPlayerInstance = field.GetValue(this);
+                if (subPlayerInstance != null)
                 {
-
+                    // Lấy method từ Type của SubPlayer
                     var mt = field.FieldType.GetMethod("OnPlayerStart");
+
                     if (mt != null)
                     {
-                        mt.Invoke(this, new object[] { val });
+                        // TARGET: subPlayerInstance (Đối tượng thực thi hàm)
+                        // PARAMETERS: this (Truyền PlayerBase vào cho SubPlayer dùng)
+                        mt.Invoke(subPlayerInstance, new object[] { this });
                     }
                 }
             }
@@ -67,9 +93,12 @@ namespace unvs.players{
             this.physical.Direction(v);
             if (Mouse.current.leftButton.IsPressed())
             {
+                this.dialogue.SayText("I'm moveing");
                 this.physical.MoveTo(v);
+                this.bagger.Show();
             } else
             {
+                this.dialogue.SayText("I stop");
                 this.anims.BaseMotion("idle");
             }
            
@@ -117,7 +146,23 @@ namespace unvs.players{
             GismoxDraw?.Invoke();
         }
 
-        
+        public void EditorGenerateCamWatcher()
+        {
+           this.CamWatcher= this.AddChildComponentIfNotExist<Transform>(Constants.ObjectsConst.CAM_WATCHER);
+            var coll= this.GetComponentInParent<Collider2D>();
+            if( coll != null)
+            {
+                this.CamWatcher.position = new Vector3(coll.bounds.center.x, coll.bounds.max.y, 0);
+            }
+            
+        }
+
+        public void EditorGenerateBagger()
+        {
+            bagger.EditorGenerateBagger(this);
+        }
+
+
 
 
 #endif

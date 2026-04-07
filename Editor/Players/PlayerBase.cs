@@ -32,5 +32,15 @@ public class PlayerBaseBaseEditor : Editor
             script.EditorGenerateDialogueUI();
             UnityEditor.EditorUtility.SetDirty(script);
         }
+        if (GUILayout.Button("Generate cam watcher", GUILayout.Height(30)))
+        {
+            script.EditorGenerateCamWatcher();
+            UnityEditor.EditorUtility.SetDirty(script);
+        }
+        if (GUILayout.Button("Generate bagger", GUILayout.Height(30)))
+        {
+            script.EditorGenerateBagger();
+            UnityEditor.EditorUtility.SetDirty(script);
+        }
     }
 }
