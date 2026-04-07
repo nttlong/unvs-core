@@ -18,6 +18,6 @@ namespace unvs.interfaces
          
        Vector2 GetPostion();
         void MoveTo(Vector2 dir);
-        UniTask MoveToAsync(Vector2 dir,Action<float> OnMoving, Action Stop,CancellationToken ct, float distance = 0);
+        UniTask MoveToAsync(Vector2 dir,Action<float> OnMoving, Action Stop,CancellationTokenSource ct, float distance = 0);
     }
 }

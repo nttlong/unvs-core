@@ -78,8 +78,6 @@ namespace unvs.players{
         [SerializeField]
         public Vector3 originalScale;
 
-        public bool IsMoving { get; private set; }
-
         public void Direction(float v)
         {
             if (owner != null)
@@ -112,25 +110,21 @@ namespace unvs.players{
         public void MoveTo(Vector2 v)
         {
             if(owner==null) return;
-            //owner.CancellationTokenSourceRefresh();
+            owner.CancellationTokenSourceRefresh();
             owner.anims.BaseMotion("walk");
             owner.transform.MoveStep(v, this.footStepLen, out var dir);
            
         }
         public virtual async UniTask MoveToAsync(Vector2 target, CancellationTokenSource cts)
         {
-            
-            this.IsMoving=false;
-            this.owner.anims.BaseMotion("walk");
-            await  this.owner.transform.MoveToAsync(this.footStepLen, target, p =>
+          await  this.owner.transform.MoveToAsync(this.footStepLen, target, p =>
             {
-                this.IsMoving = true;
+
                 this.owner.anims.BaseMotion("walk");
             }, p =>
             {
-                this.IsMoving = false;
                 this.owner.anims.BaseMotion("idle");
-            }, cts);
+            }, cts.Token);
         }
         public override void OnPlayerStart(PlayerBase player)
         {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -8,6 +9,7 @@ using UnityEngine.InputSystem;
 using unvs.actors;
 using unvs.ext;
 using unvs.interfaces;
+using unvs.playerobjects;
 using unvs.shares;
 using unvs.ui;
 
@@ -32,9 +34,11 @@ namespace unvs.players{
 
        
 
-        public virtual void CancellationTokenSourceRefresh()
+        public virtual CancellationTokenSource CancellationTokenSourceRefresh()
         {
+
             Cts = Cts.Refresh();
+            return Cts;
         }
 
         private void Reset()
@@ -87,19 +91,38 @@ namespace unvs.players{
 
         public virtual void Update()
         {
+            
             Vector2 mousePos = Mouse.current.position.ReadValue();
 
             var v = mousePos.ToWorld(); 
             this.physical.Direction(v);
             if (Mouse.current.leftButton.IsPressed())
             {
+                this.CancellationTokenSourceRefresh();
                 this.dialogue.SayText("I'm moveing");
                 this.physical.MoveTo(v);
                 this.bagger.Show();
-            } else
+            } else if(Mouse.current.leftButton.wasReleasedThisFrame)
             {
+                if(v.IsHitObject<PlayerInteractObject>(out var obj, Constants.Layers.INTERACT_OBJECT))
+                {
+                    obj.ExecAsync(this, this.CancellationTokenSourceRefresh()).Forget();
+                } else
+                {
+                    //this.CancellationTokenSourceRefresh();
+                    this.dialogue.SayText("I stop");
+                    this.anims.BaseMotion("idle");
+                }
+                    
+            } else if(!this.physical.IsMoving)
+            {
+                this.CancellationTokenSourceRefresh();
+               
                 this.dialogue.SayText("I stop");
                 this.anims.BaseMotion("idle");
+            } else
+            {
+                //this.CancellationTokenSourceRefresh();
             }
            
         }

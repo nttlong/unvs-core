@@ -337,39 +337,48 @@ namespace unvs.ext
             // Đưa collider nằm đúng vùng nhìn của camera (center theo camera)
             box.offset = new Vector3(0f, 0f, lens.NearClipPlane + depth * 0.5f);
         }
-      
+
         public static void ResizeByTransform(this BoxCollider2D coll)
         {
-            if (coll == null) return;
+            if (coll == null || coll.transform == null) return;
 
-            // Lấy Segment từ Transform (giả sử bạn đã có extension GetSegment())
             Segment segment = coll.transform.GetSegment();
 
-            // Tạo 4 điểm của rectangle (width bạn có thể truyền vào sau)
-            Vector2[] points = segment.CreateRect(width: 1f); // thay 1f bằng độ dày mong muốn
+            if (segment.Length < 0.001f)
+            {
+                coll.size = new Vector2(0.1f, 0.1f);
+                coll.offset = Vector2.zero;
+                return;
+            }
 
-            // Tính toán để BoxCollider2D khớp chính xác
-            Vector2 center = (segment.Start + segment.End) * 0.5f;
-            Vector2 direction = (segment.End - segment.Start).normalized;
-            float length = segment.Length;
+            // Tính từ Segment
+            Vector2 worldCenter = (segment.Start + segment.End) * 0.5f;
 
-            // Tính size của BoxCollider2D
-            Vector2 size = new Vector2(length, 1f); // width sẽ được set sau
+            // Chuyển sang Local Space
+            Vector2 localCenter = coll.transform.InverseTransformPoint(worldCenter);
 
-            // Chuyển points về local space để tính chính xác
-            //Vector2 localCenter = coll.transform.InverseTransformPoint(center);
+            Vector2 localStart = coll.transform.InverseTransformPoint(segment.Start);
+            Vector2 localEnd = coll.transform.InverseTransformPoint(segment.End);
 
-            // Tính size theo local space
-            float localLength = Vector2.Distance(
-                coll.transform.InverseTransformPoint(segment.Start),
-                coll.transform.InverseTransformPoint(segment.End));
+            float localLength = Vector2.Distance(localStart, localEnd);
 
-            // Resize collider
-            coll.offset =Vector2.zero;
-            coll.size = new Vector2(localLength, 1f); // tạm thời
+            // === TỰ ĐỘNG LẤY WIDTH TỪ SPRITE HOẶC SCALE ===
+            float width = GetAutoWidth(coll.transform);
 
-            // Nếu bạn muốn set width động:
-            // coll.size = new Vector2(localLength, desiredWidth);
+            coll.offset = localCenter;
+            coll.size = new Vector2(localLength, width);
+        }
+
+        // Hàm hỗ trợ tự tính chiều cao sprite
+        public static float GetSpriteHeight(this Transform t)
+        {
+            SpriteRenderer sr = t.GetComponent<SpriteRenderer>();
+            if (sr == null || sr.sprite == null)
+                return 1f;                    // fallback
+
+            // Lấy kích thước thật của sprite (local space)
+            Bounds bounds = sr.sprite.bounds;
+            return bounds.size.y * sr.transform.lossyScale.y;
         }
     }
 }

@@ -68,7 +68,7 @@ namespace unvs.actions
 
 
         public string name;
-
+        public AnimatorOverrideController animator;
         public abstract UniTask ExecuteAsync(ActionBaseSender Sender);
     }
 }

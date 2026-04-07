@@ -8,9 +8,9 @@ namespace unvs.ext
     {
         public static CancellationTokenSource Refresh(this CancellationTokenSource _cts)
         {
-
+           
             _cts?.Cancel();
-            // _cts?.Dispose();
+            
             _cts = new CancellationTokenSource();
             return _cts;
         }

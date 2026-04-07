@@ -132,8 +132,15 @@ namespace unvs.ext
 
         public static List<BlendTreeInfo> EditorExtractAllMotions(this Animator anim)
         {
+            AnimatorController controller = null;
             var ret = new List<BlendTreeInfo>();
-            var controller = anim.runtimeAnimatorController as AnimatorController;
+            if (anim.runtimeAnimatorController is AnimatorOverrideController oController)
+            {
+                controller = oController.runtimeAnimatorController as AnimatorController;
+                
+            } else {
+                controller = anim.runtimeAnimatorController as AnimatorController;
+            }
             for (var i=0;i<controller.layers.Length;i++)
             {
                var layer = controller.layers[i];

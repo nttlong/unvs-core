@@ -275,23 +275,7 @@ namespace unvs.ext
         {
             return ((Vector3)pos).IsOverObject(out hitObject,LayerName, LayerNames);
         }
-        /// <summary>
-        /// Kiểm tra có va chạm với object chứa component T không
-        /// </summary>
-        public static bool IsHitObject<T>(this Vector2 pos, out T hitObject, string LayerName, params string[] LayerNames)
-            where T : Component
-        {
-            hitObject = null;
-
-            if (((Vector3)pos).IsOverObject(out GameObject obj, LayerName, LayerNames))
-            {
-                hitObject = obj.GetComponent<T>();
-                return hitObject != null;
-            }
-
-            return false;
-        }
-        public static T IsHitObject<T>(this Vector2 pos, string LayerName, params string[] LayerNames)
+        public static T IsHitObject<T>(this Vector2 pos,, string LayerName, params string[] LayerNames)
         {
             if (((Vector3)pos).IsOverObject(out var hitObject, LayerName, LayerNames))
             {

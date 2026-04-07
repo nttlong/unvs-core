@@ -24,7 +24,7 @@ namespace unvs.actionsbasics
             if (actor != null)
             {
                 actor.Motion.Walk();
-                await actor.MoveToAsync(iteractSource.GetPosition(), sender.Cts.Token);
+                await actor.MoveToAsync(iteractSource.GetPosition(), sender.Cts);
             }
             else
             {

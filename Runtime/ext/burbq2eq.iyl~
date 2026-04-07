@@ -93,51 +93,47 @@ namespace unvs.ext
 
             return true;
         }
-        public async static UniTask<bool> MonoBehaviourExecAsync(this InteractionDefinition data, MonoBehaviour source, MonoBehaviour another, CancellationToken ct)
+        public async static UniTask<bool> MonoBehaviourExecAsync(this InteractionDefinition data, MonoBehaviour source, MonoBehaviour another, CancellationTokenSource ct)
         {
+         
+            // 1. Kiểm tra sớm để tránh chạy vòng lặp vô ích
             if (ct.IsCancellationRequested) return false;
+            ct.Token.ThrowIfCancellationRequested();
 
-            // 1. Tạo một "Cầu nối" (Linked Source)
-            // Nguồn này sẽ bị Cancel NẾU 'ct' bị Cancel HOẶC NẾU ta gọi 'internalCts.Cancel()'
-            using var internalCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
-
+            // 2. Kiểm tra dữ liệu đầu vào để tránh NullReferenceException
+            if (data == null || data.actions == null) return false;
             var sender = new ActionBaseSender
             {
-                Source = source,
-                Target = another,
-                IsCancel = false,
-                Cts = internalCts // Gán Linked Source vào đây
+                Cts = ct,
+                Source = source as MonoBehaviour,
+                Target = another
             };
-
             try
             {
+                var srcMono = source as MonoBehaviour;
+                var anotherMono = another;
                 foreach (var action in data.actions)
                 {
                     if (action == null) continue;
-
-                    // 2. Kiểm tra xem có lệnh hủy nào (từ bên ngoài hoặc từ action trước đó) không
-                    if (internalCts.IsCancellationRequested || sender.IsCancel)
+                    //Debug.Log($"InteractionDefinition.ExecAsync,{action.GetType().Name},source={srcMono.name},{srcMono.GetType().Name},another={anotherMono.name},{anotherMono.GetType().Name}");
+                    // Kiểm tra Token trước mỗi Action trong chuỗi
+                    if (ct.IsCancellationRequested)
                     {
                         return false;
                     }
-
-                    // 3. Thực thi Action
-                    // Lưu ý: Bên trong Action, bạn phải dùng sender.Cts.Token cho các hàm Async (như MoveTo)
+                    var success = false;
+                    // Nếu một action thất bại (return false), dừng toàn bộ chuỗi
                     await action.ExecuteAsync(sender);
-
-                    // 4. Nếu Action vừa rồi gọi sender.Cancel(), ngắt chuỗi ngay
                     if (sender.IsCancel) return false;
+
                 }
             }
             catch (OperationCanceledException)
             {
+                // Trả về false thay vì ném lỗi để các hệ thống cha xử lý nhẹ nhàng hơn
                 return false;
             }
-            finally
-            {
-                // Luôn dispose để tránh rò rỉ bộ nhớ
-                // internalCts.Dispose(); // Đã có 'using' ở trên lo việc này
-            }
+
 
             return true;
         }

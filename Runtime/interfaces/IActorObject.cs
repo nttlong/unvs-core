@@ -24,7 +24,7 @@ namespace unvs.interfaces
         IActorController Controller { get; }
         bool IsActive { get; set; }
 
-        UniTask MoveToAsync(Vector2 Pos, CancellationToken ct);
+        UniTask MoveToAsync(Vector2 Pos, CancellationTokenSource ct);
        
 
         Action OnDestroying { get; set; }

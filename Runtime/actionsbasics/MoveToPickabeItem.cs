@@ -38,7 +38,7 @@ namespace unvs.actionsbasics
             }, () =>
             {
                 actor.Motion.Idle();
-            }, Sender.Cts.Token);
+            }, Sender.Cts);
         }
     }
 }

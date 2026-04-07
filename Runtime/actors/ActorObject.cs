@@ -259,7 +259,7 @@ namespace unvs.actors
 
 
 
-        public async UniTask MoveToAsync(Vector2 Pos, CancellationToken ct)
+        public async UniTask MoveToAsync(Vector2 Pos, CancellationTokenSource ct)
         {
             if (ct == null)
             {
@@ -267,7 +267,7 @@ namespace unvs.actors
             }
            
             if (ct.IsCancellationRequested) return;
-            ct.ThrowIfCancellationRequested();
+            ct.Token.ThrowIfCancellationRequested();
             var speaker = GetComponent<ISpeakableObject>();
 
             try

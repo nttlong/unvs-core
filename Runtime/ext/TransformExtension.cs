@@ -73,17 +73,52 @@ namespace unvs.ext
             return Math.Abs(dx);
 
         }
-
-        public static async UniTask<MoveInfo2D> MoveToAsync(this Transform transform, float Speed, Vector2 target, Action<MoveInfo2D> OnMoving,Action<MoveInfo2D> OnFinish, CancellationToken ct,float distance=0)
+        public static async UniTask<MoveInfo2D> MoveToAsync(this Transform transform, float Speed, Vector2 target, Action<MoveInfo2D> OnMoving, Action<MoveInfo2D> OnFinish, CancellationToken token, float distance = 0)
         {
-
             var ret = new MoveInfo2D();
-            if (ct == null)
+
+            // Luôn lấy hướng hiện tại từ transform trước khi bắt đầu
+            float currentDir = 0; ;
+
+            try
+            {
+                // Tính toán bước đầu tiên
+                float ds = transform.MoveStep(target, Speed, out currentDir);
+                ret.Direction = currentDir;
+                OnMoving?.Invoke(ret);
+
+                while (ds > distance)
+                {
+                    // Quan trọng: UniTask.Yield với token sẽ tự ném OperationCanceledException
+                    await UniTask.Yield(PlayerLoopTiming.Update, token);
+
+                    // Cập nhật vị trí và hướng
+                    ds = transform.MoveStep(target, Speed, out currentDir);
+
+                    ret.Direction = currentDir;
+                    OnMoving?.Invoke(ret);
+                }
+
+                OnFinish?.Invoke(ret);
+            }
+            catch (OperationCanceledException)
+            {
+                // Khi bị Cancel, không trả về ret rỗng, mà có thể giữ nguyên hướng cuối
+                Debug.Log("MoveToAsync was cancelled - Switching target");
+            }
+
+            return ret;
+        }
+        public static async UniTask<MoveInfo2D> MoveToAsync(this Transform transform, float Speed, Vector2 target, Action<MoveInfo2D> OnMoving,Action<MoveInfo2D> OnFinish, CancellationTokenSource cts,float distance=0)
+        {
+           
+            var ret = new MoveInfo2D();
+            if (cts == null)
             {
                 return ret;
             }
-            if (ct.IsCancellationRequested) return ret;
-            ct.ThrowIfCancellationRequested();
+            if (cts.IsCancellationRequested) return ret;
+            cts.Token.ThrowIfCancellationRequested();
             try
             {
 
@@ -99,12 +134,12 @@ namespace unvs.ext
                 while (ds > distance)
                 {
                     // Kiểm tra xem Task có bị hủy (cancel) không (ví dụ khi đổi mục tiêu hoặc thoát game)
-                    if (ct.IsCancellationRequested)
+                    if (cts.Token.IsCancellationRequested)
                     {
                         return ret;
                     }
                     // Chờ đến frame tiếp theo
-                    await UniTask.Yield(PlayerLoopTiming.Update, ct);
+                    await UniTask.Yield(PlayerLoopTiming.Update, cts.Token);
 
                     // Tiếp tục di chuyển và cập nhật ds
                     ds = transform.MoveStep(target, Speed, out dir);
@@ -195,6 +230,25 @@ namespace unvs.ext
                 {
                     return Vector2.Distance(Start, End);
                 }
+            }
+            public Vector2[] CreateRect(float width = 1f, bool centered = true)
+            {
+                Vector2 dir = (End - Start).normalized;
+                Vector2 perp = new Vector2(-dir.y, dir.x);
+
+                float halfW = width * 0.5f;
+                Vector2 offset = perp * halfW;
+
+                Vector2 start = centered ? Start : Start - dir * (width * 0.5f); // nếu không centered thì dịch
+
+                return new Vector2[4]
+                {
+                    start - offset,
+                    End   - offset,
+                    End   + offset,
+                    start + offset
+                };
+               
             }
         }
         public static Segment GetSegment(this Transform transform)

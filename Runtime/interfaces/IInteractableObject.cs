@@ -21,7 +21,7 @@ namespace unvs.interfaces
         InteractionDefinition Data { get; }
         Collider2D Collider { get; }
        
-
+        
         UniTask<bool> ExecAsync( MonoBehaviour target, CancellationTokenSource token);
         Vector2 GetPosition();
     }

@@ -37,6 +37,7 @@ namespace unvs.baseobjects
         public Sprite sprite;
         public bool hideSpriteRendererWhenRun=true;
         public InteractionDefinition consumeDefinintion;
+       
 
         public AudioInfo OpenSound => openSound;
 
@@ -75,6 +76,8 @@ namespace unvs.baseobjects
         public bool HideSpriteRendererWhenRun => hideSpriteRendererWhenRun;
 
         public InteractionDefinition ConsumeDefinintion => consumeDefinintion;
+
+        
 
         public async UniTask<bool> ExecAsync(MonoBehaviour target, CancellationTokenSource token)
         {

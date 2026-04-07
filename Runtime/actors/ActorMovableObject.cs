@@ -28,7 +28,7 @@ namespace unvs.actors
             instance = this as IActorMovable;
         }
 
-        public async UniTask MoveToAsync(Vector2 Pos, Action<float> OnMoving, Action Stop, CancellationToken ct,float distance=0)
+        public async UniTask MoveToAsync(Vector2 Pos, Action<float> OnMoving, Action Stop, CancellationTokenSource ct,float distance=0)
         {
             if (ct == null)
             {
@@ -36,7 +36,7 @@ namespace unvs.actors
             }
 
             if (ct.IsCancellationRequested) return;
-            ct.ThrowIfCancellationRequested();
+            ct.Token.ThrowIfCancellationRequested();
             var speaker = GetComponent<ISpeakableObject>();
 
             try
