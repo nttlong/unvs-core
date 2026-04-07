@@ -197,27 +197,29 @@ namespace unvs.ext
                 }
             }
         }
-        /// <summary>
-        /// Lấy tọa độ thế giới của điểm gốc và điểm kết thúc dựa trên hướng Forward và Scale.
-        /// </summary>
         public static Segment GetSegment(this Transform transform)
         {
-            // Lấy vị trí 2D (tự động bỏ qua Z)
+            // Điểm Start luôn là vị trí của Transform (Khớp nối/Joint)
             Vector2 start = transform.position;
 
-            // Lấy hướng "Right" của đối tượng trong không gian thế giới (đã bao gồm xoay)
-            // transform.right là vector đơn vị hướng theo trục X cục bộ của object
-            Vector2 direction = transform.right;
+            // Trong Unity 2D Animation, xương thường dài theo trục Up (Y) hoặc Right (X)
+            // Để chính xác nhất với hình ảnh bạn gửi, ta sẽ dùng Vector hướng từ vị trí hiện tại
+            // đến vị trí của con đầu tiên (nếu có), đó chính là chiều dài thực của xương.
+            Vector2 end;
 
-            // Tính điểm cuối dựa trên Scale X (độ dài của object)
-            // Sử dụng lossyScale để tính cả scale của cha nếu có
-            Vector2 end = start + direction * transform.lossyScale.x;
-
-            return new Segment
+            if (transform.childCount > 0)
             {
-                Start = start,
-                End = end
-            };
+                // Nếu có con, điểm kết thúc chính là vị trí của xương con
+                end = transform.GetChild(0).position;
+            }
+            else
+            {
+                // Nếu không có con (xương cuối cùng), ta mặc định theo hướng 'Right' 
+                // nhưng nhân với Scale để bù đắp
+                end = start + (Vector2)transform.right * transform.lossyScale.x;
+            }
+
+            return new Segment { Start = start, End = end };
         }
         public static Button AddButtonIfNotExist(this Transform parent, string name, string label)
         {

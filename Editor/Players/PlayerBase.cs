@@ -20,11 +20,17 @@ public class PlayerBaseBaseEditor : Editor
             // THÊM DÒNG NÀY ĐỂ LƯU DỮ LIỆU
             UnityEditor.EditorUtility.SetDirty(script);
 
-            // Nếu bạn đang ở trong Prefab Mode, cần thêm dòng này để chắc chắn hơn
-           // UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(script.gameObject.scene);
-
-            Debug.Log("Data Generated and Marked Dirty!");
+           
         }
-        
+        if (GUILayout.Button("Physical calculate", GUILayout.Height(30)))
+        {
+            script.EditorPhysicalCalculate();
+            UnityEditor.EditorUtility.SetDirty(script);
+        }
+        if (GUILayout.Button("Generate dialogue UI", GUILayout.Height(30)))
+        {
+            script.EditorGenerateDialogueUI();
+            UnityEditor.EditorUtility.SetDirty(script);
+        }
     }
 }

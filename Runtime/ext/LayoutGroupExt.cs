@@ -14,5 +14,15 @@ namespace unvs.ext{
             layout.childScaleWidth = true;
             layout.childAlignment = UnityEngine.TextAnchor.MiddleCenter;
         }
+        public static void FixFullLayoutChildren(this HorizontalOrVerticalLayoutGroup layout)
+        {
+            layout.childControlHeight = true;
+            layout.childControlWidth = false;
+            layout.childForceExpandHeight = true;
+            layout.childForceExpandWidth = true;
+            layout.childScaleHeight = true;
+            layout.childScaleWidth = true;
+            layout.childAlignment = UnityEngine.TextAnchor.MiddleCenter;
+        }
     }
 }

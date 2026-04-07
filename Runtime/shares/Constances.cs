@@ -105,6 +105,8 @@ namespace unvs.shares
             public const string DEFAULT_CAM_WATCHER = "DEFAULT-CAM-WATCHER";
 
             public const string SCENE_SETTINGS = "SCENE-SETTINGS";
+
+            public const string PLAYER_DIALOGUE_CONATAINER = "PLAYER-DIALOGUE-CONATAINER";
         }
         public class Settings
         {
