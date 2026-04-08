@@ -5,7 +5,7 @@ using unvs.game2d.ext;
 using unvs.game2d.scenes;
 namespace editor.game2d
 {
-    [CustomEditor(typeof(AppCinema), true)]
+    [CustomEditor(typeof(AppCinema),true)]
     public class AppCinemaEditor : Editor
     {
         public override void OnInspectorGUI()
@@ -13,11 +13,9 @@ namespace editor.game2d
             base.OnInspectorGUI();
             if (GUILayout.Button("Generate"))
             {
-                var cinem = (AppCinema)target;
-                AppCinemaExt.GenerateCinema2D(cinem);
-                
-                cinem.EditorSetDirty();
-
+                var cinema = (AppCinema)target;
+               
+                cinema.Generate();
             }
         }
     }
