@@ -14,8 +14,8 @@ namespace editor.game2d
             if (GUILayout.Button("Generate"))
             {
                 var cinema = (AppCinema)target;
-               
-                cinema.Generate();
+               AppCinemaExt.GenerateCinema2D(cinema);
+             
             }
         }
     }

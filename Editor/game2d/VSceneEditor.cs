@@ -5,6 +5,10 @@
    
 */
 
+using UnityEditor;
+using UnityEngine;
+using unvs.game2d.scenes;
+
 namespace editor.game2d {
     [CustomEditor(typeof(VScene))]
     public class VSceneEditor : Editor
@@ -15,7 +19,7 @@ namespace editor.game2d {
             if (GUILayout.Button("Create Scene"))
             {
                 var vscene = (VScene)target;
-                vscene.EditorCreateScene();
+               // vscene.EditorCreateScene();
             }
         }
     }
