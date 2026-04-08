@@ -193,10 +193,10 @@ namespace unvs.players{
 
         private void PlayerBase_GismoxDraw()
         {
-           if(startPointArm!=Vector2.zero) startPointArm.DrawCircle(0.01f, 1, Color.red);
-            if (endPointArm != Vector2.zero) endPointArm.DrawCircle(0.01f, 1,Color.green);
-            if (startPointLeg != Vector2.zero) startPointLeg.DrawCircle(0.01f, 1, Color.red);
-            if (endPointLeg != Vector2.zero) endPointLeg.DrawCircle(0.01f, 1, Color.green);
+           if(startPointArm!=Vector2.zero) startPointArm.DrawCircle(0.01f,  Color.red);
+            if (endPointArm != Vector2.zero) endPointArm.DrawCircle(0.01f, Color.green);
+            if (startPointLeg != Vector2.zero) startPointLeg.DrawCircle(0.01f,  Color.red);
+            if (endPointLeg != Vector2.zero) endPointLeg.DrawCircle(0.01f, Color.green);
         }
 
         

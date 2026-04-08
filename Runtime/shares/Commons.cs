@@ -294,7 +294,13 @@ namespace unvs.shares
             float width = height * cam.aspect; // cam.aspect = Screen.width / Screen.height
             return new Vector2(width, height);
         }
-
+        public static Vector2 GetCameraWorldSize(this Camera cam)
+        {
+           
+            float height = cam.orthographicSize * 2f;
+            float width = height * cam.aspect; // cam.aspect = Screen.width / Screen.height
+            return new Vector2(width, height);
+        }
         public static void DoMapAction(object source, object target)
         {
             var sourceMapType = source.GetType();

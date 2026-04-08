@@ -8,6 +8,7 @@ using UnityEditor;
 using UnityEngine;
 using System.Reflection;
 using System.Linq;
+using game2d.ext;
 namespace editor.game2d
 {
    
@@ -49,7 +50,7 @@ namespace editor.game2d
                     {
                         // Thực thi method
                         method.Invoke(target, null);
-                        EditorUtility.SetDirty(target);
+                        target.EditorSetDirty();
                     }
 
                     GUILayout.FlexibleSpace();

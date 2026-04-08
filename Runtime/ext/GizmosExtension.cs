@@ -78,6 +78,7 @@ namespace unvs.ext
                 if (pathPoints.Length < 2) continue;
 
                 // Chuyển Vector2[] sang Vector3[] và thêm điểm cuối trùng điểm đầu để khép kín
+                // Chuyển Vector2[] sang Vector3[] và thêm điểm cuối trùng điểm đầu để khép kín
                 Vector3[] pointsToDraw = new Vector3[pathPoints.Length + 1];
                 for (int j = 0; j < pathPoints.Length; j++)
                 {
@@ -217,9 +218,31 @@ namespace unvs.ext
             }
         }
 
-        public static void DrawCircle(this Vector2 pos, float radius, float thickness, Color color)
+        public static void DrawCircle(this Vector2 pos, float radius, Color color, float thickness=0f)
         {
             if (pos == Vector2.zero || pos == Vector2.negativeInfinity || pos == Vector2.positiveInfinity) return;
+            Gizmos.color = color;
+
+            // Nếu thickness <= 0, chỉ vẽ 1 vòng đơn cho nhẹ
+            if (thickness <= 0.01f)
+            {
+                Gizmos.DrawWireSphere((Vector3)pos, radius);
+                return;
+            }
+
+            // Vẽ nhiều vòng đồng tâm để tạo cảm giác "dày"
+            // Điều này giúp team họa sĩ của bạn dễ nhìn thấy điểm chốt hơn
+            float halfThick = thickness / 2f;
+            int stepCount = 3; // Số lớp vẽ thêm
+            for (int i = 0; i <= stepCount; i++)
+            {
+                float currentRadius = radius - halfThick + (thickness * i / stepCount);
+                Gizmos.DrawWireSphere((Vector3)pos, currentRadius);
+            }
+        }
+        public static void DrawCircle(this Vector3 pos, float radius, Color color,float thickness=0 )
+        {
+            if (pos == Vector3.zero || pos == Vector3.negativeInfinity || pos == Vector3.positiveInfinity) return;
             Gizmos.color = color;
 
             // Nếu thickness <= 0, chỉ vẽ 1 vòng đơn cho nhẹ

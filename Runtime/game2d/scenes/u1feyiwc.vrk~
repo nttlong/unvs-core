@@ -1,0 +1,48 @@
+/*
+    this file define Virtuale scene, acctually, that is prefab of scene
+    it contain Main cam
+   
+   
+*/
+using game2d.ext;
+using game2d.scenes;
+using Unity.Cinemachine;
+using Unity.VisualScripting;
+using UnityEngine;
+using unvs.ext;
+
+namespace unvs.game2d.scenes
+{
+    [EditButtons("Generate")]
+    public class VScene : UnvsComponent
+    {
+        public Camera cam;
+        public CinemachineCamera vcam;
+        public Transform defaulCamWatcher;
+        public CinemachineConfiner2D confiner;
+        public CinemachineFollow cinemachineFollow;
+
+        public override void InitRuntime()
+        {
+            Destroy(cam.gameObject);
+        }
+
+
+#if UNITY_EDITOR
+        [InspectorButton("Generate elements")]
+        public void Generate()
+        {
+            this.cam = this.AddChildComponentIfNotExist<Camera>("Main Camera");
+            this.cam.tag = "MainCamera";
+            this.cam.orthographic = true;
+            this.cam.AddComponentIfNotExist<CinemachineBrain>();
+            this.vcam = this.AddChildComponentIfNotExist<CinemachineCamera>("cam");
+            this.defaulCamWatcher = this.AddChildComponentIfNotExist<Transform>("default-cam-watcher");
+            this.confiner = this.vcam.GetOrAddComponent<CinemachineConfiner2D>();
+            this.cinemachineFollow = this.vcam.GetOrAddComponent<CinemachineFollow>();
+            this.vcam.Follow = this.defaulCamWatcher;
+            this.defaultSize
+        }
+#endif
+    }
+}

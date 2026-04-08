@@ -595,11 +595,11 @@ namespace unvs.gameword
             }
             if (joinInfo != null)
             {
-                joinInfo.worldJoinInfo.LeftPos.DrawCircle(10, 0.1f, Color.red);
+                joinInfo.worldJoinInfo.LeftPos.DrawCircle(10,  Color.red,0);
 
 
                 // Vẽ điểm chốt bên phải màu xanh
-                joinInfo.worldJoinInfo.RightPos.DrawCircle(10, 0.1f, Color.red);
+                joinInfo.worldJoinInfo.RightPos.DrawCircle(10, Color.red,0);
             }
             //if (defaultCamWatcher == null)
             //{

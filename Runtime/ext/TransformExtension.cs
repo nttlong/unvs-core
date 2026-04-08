@@ -250,6 +250,11 @@ namespace unvs.ext
                 };
                
             }
+
+            public Vector2 Center()
+            {
+                return (this.End - this.Start)/2;
+            }
         }
         public static Segment GetSegment(this Transform transform)
         {

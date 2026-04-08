@@ -466,5 +466,30 @@ namespace unvs.ext
 
             return bestCandidate != null ? bestCandidate.Component : default(T);
         }
+        /// <summary>
+        /// Tạo 4 điểm của hình chữ nhật quanh tâm dựa trên kích thước size.
+        /// Thứ tự các điểm: Top-Left, Top-Right, Bottom-Right, Bottom-Left (Theo chiều kim đồng hồ hoặc ngược lại)
+        /// </summary>
+        public static Vector2[] CreateRectFromCenter(this Vector3 center, Vector2 size)
+        {
+            float halfWidth = size.x / 2f;
+            float halfHeight = size.y / 2f;
+
+            Vector2[] points = new Vector2[4];
+
+            // Top Left
+            points[0] = new Vector2(center.x - halfWidth, center.y + halfHeight);
+
+            // Top Right
+            points[1] = new Vector2(center.x + halfWidth, center.y + halfHeight);
+
+            // Bottom Right
+            points[2] = new Vector2(center.x + halfWidth, center.y - halfHeight);
+
+            // Bottom Left
+            points[3] = new Vector2(center.x - halfWidth, center.y - halfHeight);
+
+            return points;
+        }
     }
 }
