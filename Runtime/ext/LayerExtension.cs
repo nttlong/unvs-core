@@ -2,13 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using unvs.shares;
 namespace unvs.ext
 {
     public static class LayerExtension
     {
-       // [System.Diagnostics.DebuggerStepThrough]
+        // [System.Diagnostics.DebuggerStepThrough]
+        public static void SetMeOnTag(this Behaviour behaviour, string tagName)
+        {
+#if UNITY_EDITOR
+            TagHelper.AddTag(tagName);
+#endif
+            behaviour.gameObject.tag = tagName;
+        }
         public static void SetMeOnLayer(this Behaviour behaviour, string layerName, bool applyAllChildren = false)
         {
+#if UNITY_EDITOR
+            LayerHelper.AddLayer(layerName);
+#endif
             var index = LayerMask.NameToLayer(layerName);
             if (index == -1)
             {

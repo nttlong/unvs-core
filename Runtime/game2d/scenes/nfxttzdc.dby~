@@ -1,4 +1,4 @@
-﻿/*
+/*
     this file define Virtuale scene, acctually, that is prefab of scene
     it contain Main cam
    
@@ -7,7 +7,6 @@
 using Cysharp.Threading.Tasks.Triggers;
 using game2d.ext;
 using game2d.scenes;
-using PlasticPipe.PlasticProtocol.Messages;
 using Unity.Burst.Intrinsics;
 using Unity.Cinemachine;
 using Unity.VisualScripting;
@@ -20,23 +19,15 @@ namespace unvs.game2d.scenes
     
     public class VScene : UnvsComponent
     {
-        [SerializeField]
         [Header("Sene game world info")]
-        public WorldJoinInfo JoinInfo = new WorldJoinInfo();
-        //[Header("Sene game world info")]
-        //[SerializeField]
-        //public Vector2 defaultSize;
+        [SerializeField]
+        public Vector2 defaultSize;
         [SerializeField]
         public Vector2 followOffset;
-        //[SerializeField]
-        //public Vector2 joinPointLeft;
-        //[SerializeField]
-        //public Vector2 joinPointRight;
-        //[SerializeField]
-        //public Vector2 min;
-        //[SerializeField]
-        //public Vector2 max;
-
+        [SerializeField]
+        public Vector2 joinPointLeft;
+        [SerializeField]
+        public Vector2 joinPointRight;
         public Camera cam;
         public CinemachineCamera vcam;
         public Transform defaulCamWatcher;
@@ -52,7 +43,6 @@ namespace unvs.game2d.scenes
         public BoxCollider2D wallLeft;
         public BoxCollider2D wallRight;
         public EdgeCollider2D ground;
-        
 
         public override void InitRuntime()
         {
@@ -73,91 +63,29 @@ namespace unvs.game2d.scenes
             this.confiner = this.vcam.GetOrAddComponent<CinemachineConfiner2D>();
             this.cinemachineFollow = this.vcam.GetOrAddComponent<CinemachineFollow>();
             this.vcam.Follow = this.defaulCamWatcher;
-            this.JoinInfo.Size = this.cam.GetCameraWorldSize();
+            this.defaultSize = this.cam.GetCameraWorldSize();
             this.edgesWorldBound = this.AddChildComponentIfNotExist<EdgeCollider2D>("edgesWorldBound");
             this.startPoint = this.AddChildComponentIfNotExist<Transform>("start-point");
-            this.startPoint.transform.position = new Vector3(this.JoinInfo.Size.x / 2, 0, 0);
-            this.defaulCamWatcher.transform.position = this.JoinInfo.Size / 2;
+            this.startPoint.transform.position = new Vector3(this.defaultSize.x / 2, 0, 0);
+            this.defaulCamWatcher.transform.position = this.defaultSize / 2;
             this.worldBound = this.AddChildComponentIfNotExist<PolygonCollider2D>("world-bound");
             this.worldBound.SetMeOnLayer(Constants.Layers.WORLD_BOUND);
             this.worldBound.isTrigger = true;
-            this.worldBound.points = this.defaulCamWatcher.GetSegment().Center().CreateRectFromCenter(this.JoinInfo.Size);
+            this.worldBound.points = this.defaulCamWatcher.GetSegment().Center().CreateRectFromCenter(this.defaultSize);
             this.triggerLeft = this.AddChildComponentIfNotExist<BoxCollider2D>("trigger-left");
             this.triggerLeft.SetMeOnLayer(Constants.Layers.TRIGGER_LOAD_SCENE);
             this.triggerLeft.SetMeOnTag(Constants.Tags.TRIGGER_LOAD_SCENE_LEFT);
-
+            
             this.triggerRight = this.AddChildComponentIfNotExist<BoxCollider2D>("trigger-right");
             this.triggerRight.SetMeOnLayer(Constants.Layers.TRIGGER_LOAD_SCENE);
             this.triggerRight.SetMeOnTag(Constants.Tags.TRIGGER_LOAD_SCENE_LEFT);
             this.wallLeft = this.AddChildComponentIfNotExist<BoxCollider2D>("wall-left");
             this.wallRight = this.AddChildComponentIfNotExist<BoxCollider2D>("wall-right");
             this.ground = this.AddChildComponentIfNotExist<EdgeCollider2D>("ground");
-            var dx = this.defaulCamWatcher.transform.GetSegment().Center().x;
-            this.ground.points = new Vector2[] { new Vector2(dx - this.JoinInfo.Size.x / 2 - 5, 0), new Vector2(dx + this.JoinInfo.Size.x / 2 + 5, 0) };
-
-
-            calculateJoinPoint();
+            this.ground.points[0] = new Vector2(-this.defaultSize.x / 2, 0);
+            this.ground.points[1] = new Vector2(this.defaultSize.x, 0);
+            //this.edgesWorldBound.points=Vector2dExtesion.
         }
-        WorldJoinInfo  CalculateBound( 
-            EdgeCollider2D ground,
-            
-            PolygonCollider2D worldBound)
-        {
-            
-            var edges = ground.ToEdge2dArray();
-            var bound = worldBound.bounds;
-            var minx = bound.min.x;
-            var maxx = bound.max.x;
-            var ret =
-                edges.Calculate(
-                   minx,
-                    maxx,
-                    ground.transform// Truyền transform để chuyển sang World Space
-                );
-            ret.Poly = edges;
-            ret.LeftGroundIndex = worldBound.GetMostVerticalEdgeAtMinX();
-            ret.RightGroundIndex = worldBound.GetMostVerticalEdgeAtMaxX();
-            ret.Center = bound.center;
-            ret.Max = bound.max;
-            ret.Min = bound.min;
-            ret.WorldFacets = new WorldBoundFacets();
-            var start = -1;
-            var end = -1;
-            worldBound.LeftVerticalFacet(out start, out end);
-            ret.WorldFacets.Left = new FacetInfo
-            {
-                End = end,
-                Start = start,
-            };
-            worldBound.RightVerticalFacet(out start, out end);
-            ret.WorldFacets.Right = new FacetInfo
-            {
-                End = end,
-                Start = start,
-            };
-            worldBound.TopHorizontalFacet(out start, out end);
-            ret.WorldFacets.Top = new FacetInfo
-            {
-                End = end,
-                Start = start,
-            };
-            worldBound.BootomHorizontalFacet(out start, out end);
-            ret.WorldFacets.Bottom = new FacetInfo
-            {
-                End = end,
-                Start = start,
-            };
-            return ret;
-            //var (v1, v2) = this.floor.CalculateIntersection(this.leftWall.bounds.max.x, this.rightWall.bounds.min.x);
-
-        }
-        private bool calculateJoinPoint()
-        {
-            if (this.ground == null || this.worldBound) return false;
-            this.JoinInfo= CalculateBound(this.ground, this.worldBound);
-            return true;
-        }
-
         private void OnValidate()
         {
             if (this.cinemachineFollow != null)
@@ -169,13 +97,7 @@ namespace unvs.game2d.scenes
         {
             if (this.worldBound != null) this.worldBound.GizmosDraw(Color.green, 1);
             if (this.defaulCamWatcher != null) this.defaulCamWatcher.transform.GetSegment().Center().DrawCircle(1f,Color.red);
-            if(this.startPoint!=null) this.startPoint.GetSegment().Center().DrawCircle(1f, Color.green);
-            if(calculateJoinPoint())
-            {
-                this.JoinInfo.LeftPos.DrawCircle(1,Color.red);
-                this.JoinInfo.RightPos.DrawCircle(1,Color.red);
-            }
-
+            if(this.startPoint!=null) this.startPoint.GetSegment().Center().DrawCircle(1f, Color.green);    
         }
 
 #endif

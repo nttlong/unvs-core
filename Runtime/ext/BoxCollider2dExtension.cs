@@ -117,6 +117,24 @@ namespace unvs.ext
             // Gán trực tiếp Vector2 vào size
             coll.size = new Vector2(width, height);
         }
+        public static void SetPositionAndSize(this BoxCollider2D coll, Vector2 pos, float width, float height)
+        {
+            if (coll == null)
+            {
+                Debug.LogError("SetPositionAndSize: BoxCollider2D is null!");
+                return;
+            }
+
+            // 1. Thiết lập kích thước
+            coll.size = new Vector2(width, height);
+
+            // 2. Thiết lập vị trí (Offset)
+            // Nếu 'pos' là vị trí tương đối so với Transform:
+            coll.offset = pos;
+
+            // Nếu 'pos' bạn truyền vào là World Position, bạn phải chuyển nó về Local:
+            // coll.offset = coll.transform.InverseTransformPoint(pos);
+        }
         public static void SetSizeWorld(this SpriteRenderer renderer, float targetWidth, float targetHeight)
         {
             if (renderer == null || renderer.sprite == null) return;

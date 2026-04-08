@@ -271,6 +271,23 @@ namespace unvs.ext
     }
     public static class Vector2dExtesion
     {
+        public static Bounds CalculateLocalBoundsths(this Vector2[] points)
+        {
+            if (points == null || points.Length == 0) return new Bounds(Vector3.zero, Vector3.zero);
+
+            Vector2 min = points[0];
+            Vector2 max = points[0];
+
+            for (int i = 1; i < points.Length; i++)
+            {
+                min = Vector2.Min(min, points[i]);
+                max = Vector2.Max(max, points[i]);
+            }
+
+            Bounds b = new Bounds();
+            b.SetMinMax(min, max);
+            return b;
+        }
         public static bool IsOverObject(this Vector2 pos, out GameObject hitObject, string LayerName, params string[] LayerNames)
         {
             return ((Vector3)pos).IsOverObject(out hitObject,LayerName, LayerNames);
@@ -465,6 +482,14 @@ namespace unvs.ext
                 .FirstOrDefault();
 
             return bestCandidate != null ? bestCandidate.Component : default(T);
+        }
+        /// <summary>
+        /// Tạo 4 điểm của hình chữ nhật quanh tâm dựa trên kích thước size.
+        /// Thứ tự các điểm: Top-Left, Top-Right, Bottom-Right, Bottom-Left (Theo chiều kim đồng hồ hoặc ngược lại)
+        /// </summary>
+        public static Vector2[] CreateRectFromCenter(this Vector2 center, Vector2 size)
+        {
+            return ((Vector3)center).CreateRectFromCenter(size);
         }
         /// <summary>
         /// Tạo 4 điểm của hình chữ nhật quanh tâm dựa trên kích thước size.

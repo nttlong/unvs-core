@@ -73,6 +73,10 @@ namespace unvs.shares
         public Vector2 Max;
         [SerializeField]
         public WorldBoundFacets WorldFacets;
+        [SerializeField]
+        public Vector2 Size;
+       
+
         public void Move(Vector2 OffsetPos)
         {
             RightPos += OffsetPos;

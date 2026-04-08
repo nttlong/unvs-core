@@ -6,6 +6,12 @@ namespace unvs.shares
 {
     public class Constants
     {
+        public class  Tags
+        {
+            public const string TRIGGER_LOAD_SCENE_LEFT = "TRIGGER-LOAD-SCENE-LEFT";
+            public const string TRIGGER_LOAD_SCENE_RIGHT = "TRIGGER-LOAD-SCENE-RIGHT";
+        }
+
         public class CinemachineDefaut
         {
             public const float OrthographicSize = 20;
@@ -32,6 +38,8 @@ namespace unvs.shares
             public const string ENEMIES = "enemies";
 
             public const string TOP_UI = "TOP-UI";
+
+            public const string TRIGGER_LOAD_SCENE = "TRIGGER-LOAD-SCENE";
         }
         public class Scenes
         {
