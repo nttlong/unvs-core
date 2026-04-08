@@ -198,7 +198,7 @@ namespace unvs.shares
 
             return _draggingClone;
         }
-        public static T LoadPrefab<T>(string path,Transform parent=null)
+        public static T LoadPrefab<T>(string path,Transform parent=null) 
         {
             var go = LoadPrefabs(path, parent);
             return go.GetComponent<T>();
@@ -258,7 +258,7 @@ namespace unvs.shares
             {
                 address = v;
             }
-            var handle = Addressables.InstantiateAsync(address, parent);
+            var handle = Addressables.InstantiateAsync(address.Replace('\\','/'), parent);
 
             // Chờ nhưng không làm treo Main Thread
             await handle.Task;

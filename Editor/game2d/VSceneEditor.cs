@@ -1,0 +1,28 @@
+/*
+    this file define Virtuale scene editor
+    create Button with caption "Create Scene"
+    
+   
+*/
+
+using UnityEditor;
+using UnityEngine;
+using unvs.game2d.ext;
+using unvs.game2d.scenes;
+
+namespace editr.game2d {
+    [CustomEditor(typeof(VScene))]
+    public class VSceneEditor : Editor
+    {
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+            if (GUILayout.Button("Create Scene"))
+            {
+                var vscene = (VScene)target;
+            
+                vscene.EditorCreateScene();
+            }
+        }
+    }
+}

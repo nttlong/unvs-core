@@ -5,6 +5,7 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.EventSystems;
 using unvs.shares;
 
 namespace unvs.ext
@@ -146,6 +147,17 @@ namespace unvs.ext
             Commons.CreateClone(canvas, go, pos);
         }
 
-        
+        public static void ApplyNavigate<T>(this GameObject gameObject) where T : Component
+        {
+            EventSystem.current.SetSelectedGameObject(null);
+            var firstElement= gameObject.GetComponentInChildren<T>();
+            EventSystem.current.SetSelectedGameObject(firstElement.gameObject);
+        }
+        public static void ApplyNavigate<T>(this MonoBehaviour gameObject) where T : Component
+        {
+            EventSystem.current.SetSelectedGameObject(null);
+            var firstElement = gameObject.GetComponentInChildren<T>();
+            EventSystem.current.SetSelectedGameObject(firstElement.gameObject);
+        }
     }
 }
