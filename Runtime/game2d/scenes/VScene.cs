@@ -4,19 +4,30 @@
    
    
 */
+using game2d.ext;
+using game2d.scenes;
 using UnityEngine;
+using unvs.ext;
 
 namespace unvs.game2d.scenes
 {
-    public class VScene : MonoBehaviour
+    [EditButtons("Generate")]
+    public class VScene : UnvsComponent
     {
-        /// <summary>
-        /// Main Camera, it will be hide when scene is loaded
-        /// The main cam just run in editor mode
-        /// At production mode we use AppScene for full gameplay
-        /// </summary>
-        public Camera MainCam;
-        
-        
+        public Camera cam;
+
+        public override void InitRuntime()
+        {
+            throw new System.NotImplementedException();
+        }
+
+
+#if UNITY_EDITOR
+        [InspectorButton("Generate elements")]
+        public void Generate()
+        {
+
+        }
+#endif
     }
 }
