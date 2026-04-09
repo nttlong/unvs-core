@@ -1,9 +1,10 @@
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using game2d.ext;
 using game2d.scenes;
 using System;
 using System.ComponentModel;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using unvs.ext;
 using unvs.interfaces.sys;
@@ -11,8 +12,10 @@ using unvs.shares;
 
 namespace unvs.game2d.scenes
 {
+    
     public class UnvsApp : UnvsUIComponentInstance<UnvsApp>
     {
+        public UnvsPlayerInput playerInput;
         public UnvsMainMenu MainMenu;
         public UnvsPauseMenu PauseMenu;
         public Transform container;
@@ -24,10 +27,12 @@ namespace unvs.game2d.scenes
         public UnvsFadeScreen fadeScreen;
         public string dialogPath;
         public UnvsDialog dialog;
-
+        public string playerInputPath;
         public string SceneLoaderPath;
         public UnvsSceneLoader SceneLoader;
         public string startScene;
+
+        
 
         public  void ExitGame()
         {
@@ -45,14 +50,15 @@ namespace unvs.game2d.scenes
 
         public virtual async UniTask InitRuntimeAsync()
         {
-
+            
             container = transform.CreateIfNoExist<Transform>("container");
             container.gameObject.SetActive(false);
-            SceneLoader = await Commons.LoadPrefabsAsync<UnvsSceneLoader>(SceneLoaderPath);
+            SceneLoader = await Commons.LoadPrefabsAsync<UnvsSceneLoader>(SceneLoaderPath, container,true);
             cinema = await Commons.LoadPrefabsAsync<UnvsCinema>(cinemaPath, container, true);
             MainMenu = await Commons.LoadPrefabsAsync<UnvsMainMenu>(mainMenuPath, container, false);
             PauseMenu = await Commons.LoadPrefabsAsync<UnvsPauseMenu>(pauseMenuPath, container, false);
             dialog = await Commons.LoadPrefabsAsync<UnvsDialog>(dialogPath, container, false);
+            playerInput = await Commons.LoadPrefabsAsync<UnvsPlayerInput>(playerInputPath, container, true);
             MainMenu.Show();
             //this.ApplyNavigate<Button>();
             //container.gameObject.SetActive(true);
@@ -75,7 +81,13 @@ namespace unvs.game2d.scenes
                 }).Forget();
             });
             container.gameObject.SetActive(true);
+           
+
+            
         }
+
+       
+
         public override void InitRunTime()
         {
             InitRuntimeAsync().ContinueWith(() =>
@@ -132,6 +144,13 @@ namespace unvs.game2d.scenes
             var r = this.EditorCreatePrefab<UnvsSceneLoader>("SceneLoader");
             this.SceneLoader = r.value;
             this.SceneLoaderPath = r.PrefabPath;
+        }
+        [UnvsButton()]
+        public void GeneratePlayerInput()
+        {
+            var r = this.EditorCreatePrefab<UnvsPlayerInput>("playerInput");
+            this.playerInput = r.value;
+            this.playerInputPath = r.PrefabPath;
         }
 
 #endif

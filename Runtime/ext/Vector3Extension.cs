@@ -166,6 +166,12 @@ namespace unvs.ext
 
             return new Vector2(screenPoint.x, screenPoint.y);
         }
+        public static float CalculateDirection(this Vector3 v,Vector2 other)
+        {
+            if (v.x > other.x) return 1;
+            if (v.x < other.y) return -1;
+            return 0;
+        }
         public static Vector3 CloneToNew(this Vector3 v)
         {
             return new Vector3(v.x, v.y, v.z);

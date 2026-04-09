@@ -1,0 +1,27 @@
+
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+namespace unvs.game2d.scenes
+{
+
+    [RequireComponent(typeof(PlayerInput))]
+    public class UnvsPlayerInput : UnvsComponent
+    {
+        public PlayerInput Input;
+        public override void InitRuntime() {
+            Input = GetComponent<PlayerInput>();
+
+            Input.onActionTriggered += Input_onActionTriggered;
+
+
+        }
+
+        private void Input_onActionTriggered(InputAction.CallbackContext obj)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void InitDesignTime() { }
+    }
+}

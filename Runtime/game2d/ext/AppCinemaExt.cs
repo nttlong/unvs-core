@@ -9,6 +9,7 @@ using unvs.game2d.scenes;
 
 namespace game2d.ext
 {
+    
     public static class AppCinemaExt
     {
         public static void EditorSave(this UnityEngine.Object obj)

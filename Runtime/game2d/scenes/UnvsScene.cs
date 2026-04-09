@@ -53,6 +53,8 @@ namespace unvs.game2d.scenes
             DestroyImmediate(vcam.gameObject);
             light2d.enabled = false;
             light2d.gameObject.SetActive(false);
+            this.triggerLeft.isTrigger = true;
+            this.triggerRight.isTrigger = true;
         }
         public override void InitDesignTime()
         {

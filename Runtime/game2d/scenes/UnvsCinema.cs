@@ -7,7 +7,7 @@ using unvs.ext;
 using unvs.interfaces;
 
 namespace unvs.game2d.scenes{
-    public class UnvsCinema : UnvsBaseComponent
+    public class UnvsCinema : UnvsUIComponentInstance<UnvsCinema>
     {
         public Camera cam;
         public CinemachineCamera vcam;
@@ -38,7 +38,12 @@ namespace unvs.game2d.scenes{
             b.bodyType = RigidbodyType2D.Static;
             var c = cinema.cam.AddComponentIfNotExist<BoxCollider2D>();
             c.isTrigger = true;
-        } 
+        }
+
+        public override void InitEvents()
+        {
+            //throw new System.NotImplementedException();
+        }
 #endif
     }
 }

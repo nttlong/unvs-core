@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using unvs.ext;
-namespace game2d.scenes
+namespace unvs.game2d.scenes
 {
     [AttributeUsage(AttributeTargets.Method)]
     public class UnvsButtonAttribute : Attribute

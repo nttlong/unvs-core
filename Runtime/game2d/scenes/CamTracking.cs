@@ -2,7 +2,8 @@
 using System;
 using UnityEngine;
 
-namespace game2d.scenes
+
+namespace  unvs.game2d.scenes
 {
 
     

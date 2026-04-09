@@ -1,13 +1,11 @@
 ﻿using game2d.scenes;
 using System;
 using System.Reflection;
-using UnityEditor;
+
 using UnityEngine;
 using unvs.game2d.scenes;
 using UnityEditor;
-using UnityEngine;
-using System.Reflection;
-using System.Linq;
+
 using game2d.ext;
 namespace editor.game2d
 {
