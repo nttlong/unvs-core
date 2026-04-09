@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using unvs.ext;
+using unvs.game2d.scenes.actors;
 using unvs.interfaces.sys;
 using unvs.shares;
 
@@ -15,22 +16,36 @@ namespace unvs.game2d.scenes
     
     public class UnvsApp : UnvsUIComponentInstance<UnvsApp>
     {
+
+        [Header("Components")]
         public UnvsPlayerInput playerInput;
         public UnvsMainMenu MainMenu;
         public UnvsPauseMenu PauseMenu;
         public Transform container;
         public UnvsCinema cinema;
+      
+        public UnvsFadeScreen fadeScreen;
+        public UnvsSceneLoader SceneLoader;
+        public UnvsDialog dialog;
+        public UnvsInteractUI InteractUI;
+        public UnvsActirDialogue ActorDialogue;
+        [Header("Components Path")]
+        public string startScene;
+
+        
+        public string ActorDialoguePath { get; private set; }
+
+        public string InteractUIPath;
+
+        public string playerInputPath;
+        public string SceneLoaderPath;
         public string cinemaPath;
         public string mainMenuPath;
         public string pauseMenuPath;
         public string fadeScreenPath;
-        public UnvsFadeScreen fadeScreen;
         public string dialogPath;
-        public UnvsDialog dialog;
-        public string playerInputPath;
-        public string SceneLoaderPath;
-        public UnvsSceneLoader SceneLoader;
-        public string startScene;
+       
+       
 
         
 
@@ -59,12 +74,10 @@ namespace unvs.game2d.scenes
             PauseMenu = await Commons.LoadPrefabsAsync<UnvsPauseMenu>(pauseMenuPath, container, false);
             dialog = await Commons.LoadPrefabsAsync<UnvsDialog>(dialogPath, container, false);
             playerInput = await Commons.LoadPrefabsAsync<UnvsPlayerInput>(playerInputPath, container, true);
+            InteractUI =await Commons.LoadPrefabsAsync<UnvsInteractUI>(InteractUIPath, container, true);
+            ActorDialogue =await Commons.LoadPrefabsAsync<UnvsActirDialogue>(ActorDialoguePath, container, false);
             MainMenu.Show();
-            //this.ApplyNavigate<Button>();
-            //container.gameObject.SetActive(true);
-            //// MainMenu.Show();
-            //SceneLoader.enabled = true;
-            //SceneLoader.gameObject.SetActive(true);
+           
             MainMenu.btnStart.onClick.AddListener(() =>
             {
                 SceneLoader.LoadNewAsync(this.startScene).ContinueWith(s =>
@@ -85,8 +98,11 @@ namespace unvs.game2d.scenes
 
             
         }
-
-       
+        public event Action<UnvsScene> OnScenseDestroying;
+        public void RaiseEventScenseDestroying(UnvsScene unvsScene)
+        {
+            OnScenseDestroying?.Invoke(unvsScene);
+        }
 
         public override void InitRunTime()
         {
@@ -101,7 +117,7 @@ namespace unvs.game2d.scenes
             //throw new NotImplementedException();
         }
 
-
+      
 #if UNITY_EDITOR
         [UnvsButton()]
         public void CreateCinema()
@@ -151,6 +167,20 @@ namespace unvs.game2d.scenes
             var r = this.EditorCreatePrefab<UnvsPlayerInput>("playerInput");
             this.playerInput = r.value;
             this.playerInputPath = r.PrefabPath;
+        }
+        [UnvsButton]
+        public void GenerateInteracUI()
+        {
+            var r = this.EditorCreatePrefab<UnvsInteractUI>("InteractUI");
+            this.InteractUI = r.value;
+            this.InteractUIPath = r.PrefabPath;
+        }
+        [UnvsButton]
+        public void GenerateActorDialogue()
+        {
+            var r = this.EditorCreatePrefab<UnvsActirDialogue>("ActorDialogue");
+            this.ActorDialogue = r.value;
+            this.ActorDialoguePath = r.PrefabPath;
         }
 
 #endif

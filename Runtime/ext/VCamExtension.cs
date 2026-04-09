@@ -1,10 +1,12 @@
 ﻿using Cysharp.Threading.Tasks;
+using game2d.ext;
 using System;
 using System.Collections;
 using System.Threading;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Localization.SmartFormat.Utilities;
+using unvs.game2d.scenes;
 using unvs.gameword;
 using unvs.interfaces;
 using unvs.shares;
@@ -29,7 +31,11 @@ namespace unvs.ext
             {
                 return;
             }
-
+            vcam.Target.TrackingTarget = null;
+            vcam.Follow = null;
+            vcam.LookAt = null;
+            //vcam.Target.TrackingTarget = null;
+            //vcam.Target.LookAtTarget = null;
             vcam.Follow = camWatcher;
             vcam.LookAt = camWatcher;
 
@@ -83,6 +89,23 @@ namespace unvs.ext
         public static float GetOrthoSize(this CinemachineCamera vcam)
         {
             return vcam.Lens.OrthographicSize;
+        }
+        public static void UpdateByUnvsScene(this CinemachineCamera vcam, UnvsScene scene)
+        {
+            var state = vcam.AddComponentIfNotExist<UnvsCamStaus>();
+
+
+            if (scene.followOffset!=Vector2.zero)
+            {
+                
+                vcam.GetComponent<CinemachineFollow>().FollowOffset = scene.followOffset;
+                if (state.isInProgress)
+                {
+                    state.isInteruptValue = true;
+                    state.offSetValue = scene.followOffset;
+                }
+            }
+            vcam.SetOrthoSizeImmediate(scene.OrthographicSize);
         }
         public static void UpdateByScenePrefab(this CinemachineCamera vcam, IScenePrefab scene)
         {

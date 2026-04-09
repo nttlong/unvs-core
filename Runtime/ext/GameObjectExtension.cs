@@ -56,6 +56,7 @@ namespace unvs.ext
         }
         public static async UniTask SafeDestroyChildrenAsync(this Transform target, Action<GameObject> Before = null)
         {
+            if(target == null) return;
             await target.gameObject.SafeDestroyChildrenAsync(Before);
         }
         public static async UniTask SafeDestroyChildrenAsync(this GameObject target, Action<GameObject> Before = null)

@@ -104,6 +104,7 @@ namespace unvs.game2d.scenes
     }
     public abstract class UnvsUIComponentInstance<T>: UnvsUIComponent where T : Component
     {
+        public Canvas canvas;
         public static T Instance;
         public override void InitRunTime()
         {

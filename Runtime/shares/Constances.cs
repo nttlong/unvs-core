@@ -10,6 +10,7 @@ namespace unvs.shares
         {
             public const string TRIGGER_LOAD_SCENE_LEFT = "TRIGGER-LOAD-SCENE-LEFT";
             public const string TRIGGER_LOAD_SCENE_RIGHT = "TRIGGER-LOAD-SCENE-RIGHT";
+            public const string TRIGGER_SCENE_CHANGE = "TRIGGER-SCENE-CHANGE";
         }
 
         public class CinemachineDefaut
@@ -40,6 +41,8 @@ namespace unvs.shares
             public const string TOP_UI = "TOP-UI";
 
             public const string TRIGGER_LOAD_SCENE = "TRIGGER-LOAD-SCENE";
+
+            public const string TRIGGER_SCENE_CHANGE = "TRIGGER-SCENE-CHANGE";
         }
         public class Scenes
         {

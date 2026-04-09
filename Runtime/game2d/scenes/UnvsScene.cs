@@ -8,12 +8,15 @@ using Cysharp.Threading.Tasks.Triggers;
 using game2d.ext;
 using game2d.scenes;
 using PlasticPipe.PlasticProtocol.Messages;
+using System;
+using System.Linq;
 using Unity.Burst.Intrinsics;
 using Unity.Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using unvs.ext;
+using unvs.game2d.scenes.actors;
 using unvs.shares;
 
 namespace unvs.game2d.scenes
@@ -24,9 +27,7 @@ namespace unvs.game2d.scenes
         [SerializeField]
         [Header("Sene game world info")]
         public WorldJoinInfo JoinInfo = new WorldJoinInfo();
-        //[Header("Sene game world info")]
-        //[SerializeField]
-        //public Vector2 defaultSize;
+        public float OrthographicSize = 20;
         [SerializeField]
         public Vector2 followOffset;
        
@@ -46,7 +47,10 @@ namespace unvs.game2d.scenes
         public BoxCollider2D wallRight;
         public EdgeCollider2D ground;
         public Light2D light2d;
+        public UnvsActor actor;
 
+        public bool IsDestroying { get; private set; }
+        public event Action<UnvsScene> OnDestroying;
         public override void InitRuntime()
         {
             DestroyImmediate(cam.gameObject);
@@ -56,12 +60,43 @@ namespace unvs.game2d.scenes
             this.triggerLeft.isTrigger = true;
             this.triggerRight.isTrigger = true;
         }
+        public Vector2 GetStartPosition()
+        {
+            return this.ground.GetIntersetPoint(this.startPoint.transform.GetSegment().Center().x);
+        }
         public override void InitDesignTime()
         {
-            throw new System.NotImplementedException();
+            //throw new System.NotImplementedException();
         }
-
+        public UnvsActor GetActiveActor()
+        {
+            return this.GetComponentsInChildren<UnvsActor>().FirstOrDefault(p=>p.IsActive);
+        }
+        private void OnDestroy()
+        {
+            this.IsDestroying=true;
+            this.OnDestroying?.Invoke(this);
+            UnvsApp.Instance.RaiseEventScenseDestroying(this);
+        }
 #if UNITY_EDITOR
+        [UnvsButton("Review")]
+        public void Review()
+        {
+            
+            this.actor = this.GetComponentInChildren<UnvsActor>();
+            if(this.actor != null )
+            {
+                this.actor.StandBy(this.GetStartPosition());
+                this.vcam.Watch(this.actor.camWatcher);
+                
+            } else
+            {
+               
+                this.vcam.Watch(defaulCamWatcher);
+               
+            }
+            //this.vcam.GetComponent<CinemachineConfiner2D>().BoundingShape2D = this.worldBound;
+        }
         [UnvsButton("Generate elements")]
         public void Generate()
         {
@@ -77,7 +112,7 @@ namespace unvs.game2d.scenes
             this.JoinInfo.Size = this.cam.GetCameraWorldSize();
             this.edgesWorldBound = this.AddChildComponentIfNotExist<EdgeCollider2D>("edgesWorldBound");
             this.startPoint = this.AddChildComponentIfNotExist<Transform>("start-point");
-            this.startPoint.transform.position = new Vector3(this.JoinInfo.Size.x / 2, 0, 0);
+            this.startPoint.transform.position = new Vector3(this.JoinInfo.Size.x / 2, 0, -10);
             this.defaulCamWatcher.transform.position = this.JoinInfo.Size / 2;
             this.worldBound = this.AddChildComponentIfNotExist<PolygonCollider2D>("world-bound");
             this.worldBound.SetMeOnLayer(Constants.Layers.WORLD_BOUND);
@@ -142,11 +177,17 @@ namespace unvs.game2d.scenes
                 this.triggerLeft.GizmosDraw(Color.rosyBrown, 2);
                 this.triggerRight.GizmosDraw(Color.rosyBrown, 2);
             }
-
+            this.OrthographicSize = this.vcam.GetOrthoSize();
            
         }
 
        
+
+
+
+
+
+
 
 
 

@@ -9,7 +9,12 @@ using unvs.game2d.scenes;
 
 namespace game2d.ext
 {
-    
+    public class UnvsCamStaus : MonoBehaviour
+    {
+        internal Vector2 offSetValue;
+        internal bool isInteruptValue;
+        internal bool isInProgress;
+    }
     public static class AppCinemaExt
     {
         public static void EditorSave(this UnityEngine.Object obj)

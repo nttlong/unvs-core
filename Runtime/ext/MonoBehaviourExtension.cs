@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PlasticPipe;
+using System;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEditor;
@@ -53,6 +54,23 @@ namespace unvs.ext
                 obj.gameObject.SetMeOnLayer(unvs.shares.Constants.Layers.UI);
             }
             return component;
+        }
+        public static bool CheckComponentIfNotExistCreate<T>(this MonoBehaviour obj, out T component) where T : Component
+        {
+            // 1. Kiểm tra xem Component đã tồn tại trên GameObject chưa
+            component = obj.GetComponent<T>();
+            var ret=false;
+            // 2. Nếu chưa có thì mới Add
+            if (component == null || component == default(T))
+            {
+                component = obj.AddComponent<T>();
+                ret = true;
+            }
+            if (typeof(T) == typeof(Canvas))
+            {
+                obj.SetMeOnLayer(unvs.shares.Constants.Layers.UI);
+            }
+            return ret;
         }
         public static T AddComponentIfNotExist<T>(this MonoBehaviour obj, Action<T> OnInit = null) where T : Component
         {

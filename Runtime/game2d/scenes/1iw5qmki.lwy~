@@ -8,7 +8,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using unvs.ext;
 using unvs.interfaces;
-using unvs.shares;
 
 namespace unvs.game2d.scenes{
     public class UnvsCinema : UnvsUIComponentInstance<UnvsCinema>
@@ -21,29 +20,7 @@ namespace unvs.game2d.scenes{
         private MonoBehaviour camTracking;
         Dictionary<UnvsScene,PolygonCollider2D> worldBoundDict=new Dictionary<UnvsScene, PolygonCollider2D>();
         public PolygonCollider2D worldBoundCollider2d;
-        public BoxCollider2D centerWatch;
 
-        public void UpdateMainCameraBoxCollider2dSize()
-        {
-            var c = this.cam.AddComponentIfNotExist<BoxCollider2D>();
-
-           
-            float orthoSize = vcam.Lens.OrthographicSize;
-            float aspect = vcam.Lens.Aspect;
-
-           
-            float height = orthoSize * 2f;
-            float width = height * aspect;
-
-
-            c.size = new Vector2(width, height);
-
-
-            c.isTrigger = true;
-
-
-            c.offset = Vector2.zero;
-        }
         public void UpdateWorldBound(UnvsScene ret)
         {
             
@@ -58,8 +35,7 @@ namespace unvs.game2d.scenes{
             OnSceneDestroyTmp= OnSceneDestroy;
             ret.OnDestroying += OnSceneDestroy;
             var bounds= this.worldBoundDict.Where(p=>p.Key!=null && !p.Key.IsDestroying && !p.Key.IsDestroyed()).Select(p=>p.Value).ToArray();
-            this.worldBoundCollider2d.points=   bounds.CreateRectFromVectorList();
-            this.confiner.InvalidateBoundingShapeCache();
+               bounds.CreateRectFromVectorList();
         }
 
         
@@ -81,24 +57,14 @@ namespace unvs.game2d.scenes{
             cinema.compositeCollider2D.geometryType = CompositeCollider2D.GeometryType.Polygons;
             cinema.confiner = cinema.vcam.AddComponentIfNotExist<CinemachineConfiner2D>();
             cinema.confiner.BoundingShape2D = cinema.compositeCollider2D;
-          
-            
+            var b = cinema.cam.AddComponentIfNotExist<Rigidbody2D>();
+            b.bodyType = RigidbodyType2D.Static;
+            var c = cinema.cam.AddComponentIfNotExist<BoxCollider2D>();
+            c.isTrigger = true;
             cinema.worldBoundCollider2d = this.AddChildComponentIfNotExist<PolygonCollider2D>("worldBoundCollider2d");
             cinema.worldBoundCollider2d.compositeOperation = Collider2D.CompositeOperation.Merge;
             confiner.BoundingShape2D = cinema.worldBoundCollider2d;
-            cinema.worldBoundCollider2d.transform.SetParent(cinema.compositeCollider2D.transform);
-            cinema.compositeCollider2D.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
-            cinema.compositeCollider2D.isTrigger = true;
-            var b = cinema.cam.AddComponentIfNotExist<Rigidbody2D>();
-            b.bodyType = RigidbodyType2D.Dynamic;
-            var c = cinema.cam.AddComponentIfNotExist<BoxCollider2D>();
-            c.isTrigger = true;
-            c.size = cam.GetCameraWorldSize();
-            this.centerWatch = this.cam.transform.AddChildComponentIfNotExist<BoxCollider2D>("center-watch");
-            this.centerWatch.isTrigger = true;
-            this.centerWatch.size = new Vector2(0.1f, 0.1f);
-            this.centerWatch.SetMeOnTag(Constants.Tags.TRIGGER_SCENE_CHANGE);
-            this.centerWatch.SetMeOnTag(Constants.Layers.TRIGGER_SCENE_CHANGE);
+            cinema.worldBoundCollider2d.transform.SetParent(this.transform);
         }
 
         public override void InitEvents()
@@ -107,8 +73,6 @@ namespace unvs.game2d.scenes{
         }
 
         
-
-
 #endif
     }
 }
