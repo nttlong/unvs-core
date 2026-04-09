@@ -32,8 +32,8 @@ namespace unvs.game2d.scenes
         [Header("Components Path")]
         public string startScene;
 
-        
-        public string ActorDialoguePath { get; private set; }
+
+        public string ActorDialoguePath;
 
         public string InteractUIPath;
 
@@ -70,12 +70,12 @@ namespace unvs.game2d.scenes
             container.gameObject.SetActive(false);
             SceneLoader = await Commons.LoadPrefabsAsync<UnvsSceneLoader>(SceneLoaderPath, container,true);
             cinema = await Commons.LoadPrefabsAsync<UnvsCinema>(cinemaPath, container, true);
-            MainMenu = await Commons.LoadPrefabsAsync<UnvsMainMenu>(mainMenuPath, container, false);
-            PauseMenu = await Commons.LoadPrefabsAsync<UnvsPauseMenu>(pauseMenuPath, container, false);
+            MainMenu = await Commons.LoadPrefabsAsync<UnvsMainMenu>(mainMenuPath, container, true);
+            PauseMenu = await Commons.LoadPrefabsAsync<UnvsPauseMenu>(pauseMenuPath, container, true);
             dialog = await Commons.LoadPrefabsAsync<UnvsDialog>(dialogPath, container, false);
             playerInput = await Commons.LoadPrefabsAsync<UnvsPlayerInput>(playerInputPath, container, true);
             InteractUI =await Commons.LoadPrefabsAsync<UnvsInteractUI>(InteractUIPath, container, true);
-            ActorDialogue =await Commons.LoadPrefabsAsync<UnvsActirDialogue>(ActorDialoguePath, container, false);
+            ActorDialogue =await Commons.LoadPrefabsAsync<UnvsActirDialogue>(ActorDialoguePath, container, true);
             MainMenu.Show();
            
             MainMenu.btnStart.onClick.AddListener(() =>

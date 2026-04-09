@@ -88,17 +88,19 @@ namespace unvs.game2d.scenes
         }
         public virtual void Awake()
         {
-            Debug.Log($"Awake={this}");
+            
             if (Application.isPlaying)
             {
                 InitRunTime();
-                Debug.Log($"Awake.isPlaying={this}");
+               
                 if (_canvas == null)
                     _canvas = this.GetComponentInChildren<Canvas>(true);
                 if (_canvas != null)
                 {
                     _canvas.FullSize();
                 }
+                this.enabled = false;
+
             }
         }
     }
@@ -109,7 +111,7 @@ namespace unvs.game2d.scenes
         public override void InitRunTime()
         {
             Instance = this as T;
-           
+            
         }
 
     }

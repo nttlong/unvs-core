@@ -17,6 +17,7 @@ namespace unvs.game2d.scenes.actors
         {
             base.InitRunTime();
             this.canvas.FullSize();
+            this.canvas.enabled = false;
         }
         public UnvsActirDialogue Show(Vector2 pos,string content)
         {
