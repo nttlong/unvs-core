@@ -668,5 +668,58 @@ namespace unvs.ext
             // Nếu không tìm thấy (x nằm ngoài phạm vi của sàn), trả về vị trí gốc của sàn
             return floor.transform.position;
         }
+       public static WorldJoinInfo CalculateBound(
+            this EdgeCollider2D ground,
+
+            PolygonCollider2D worldBound)
+        {
+            if (ground == null || worldBound == null) return null;
+            var edges = ground.ToEdge2dArray();
+            var bound = worldBound.bounds;
+            var minx = bound.min.x;
+            var maxx = bound.max.x;
+            var ret =
+                edges.Calculate(
+                   minx,
+                    maxx,
+                    ground.transform// Truyền transform để chuyển sang World Space
+                );
+            ret.Poly = edges;
+            ret.LeftGroundIndex = worldBound.GetMostVerticalEdgeAtMinX();
+            ret.RightGroundIndex = worldBound.GetMostVerticalEdgeAtMaxX();
+            ret.Center = bound.center;
+            ret.Max = bound.max;
+            ret.Min = bound.min;
+            ret.WorldFacets = new WorldBoundFacets();
+            var start = -1;
+            var end = -1;
+            worldBound.LeftVerticalFacet(out start, out end);
+            ret.WorldFacets.Left = new FacetInfo
+            {
+                End = end,
+                Start = start,
+            };
+            worldBound.RightVerticalFacet(out start, out end);
+            ret.WorldFacets.Right = new FacetInfo
+            {
+                End = end,
+                Start = start,
+            };
+            worldBound.TopHorizontalFacet(out start, out end);
+            ret.WorldFacets.Top = new FacetInfo
+            {
+                End = end,
+                Start = start,
+            };
+            worldBound.BootomHorizontalFacet(out start, out end);
+            ret.WorldFacets.Bottom = new FacetInfo
+            {
+                End = end,
+                Start = start,
+            };
+            return ret;
+            //var (v1, v2) = this.floor.CalculateIntersection(this.leftWall.bounds.max.x, this.rightWall.bounds.min.x);
+
+        }
     }
 }

@@ -1,0 +1,122 @@
+using Cysharp.Threading.Tasks;
+using game2d.ext;
+using game2d.scenes;
+using System;
+using System.ComponentModel;
+using UnityEngine;
+using UnityEngine.UI;
+using unvs.ext;
+using unvs.interfaces.sys;
+using unvs.shares;
+
+namespace unvs.game2d.scenes
+{
+    public class UnvsAppScene : UnvsUIComponentInstance<UnvsAppScene>
+    {
+        public UnvsMainMenu MainMenu;
+        public UnvsPauseMenu PauseMenu;
+        public Transform container;
+        public UnvsCinema cinema;
+        public string cinemaPath;
+        public string mainMenuPath;
+        public string pauseMenuPath;
+        public string fadeScreenPath;
+        public UnvsFadeScreen fadeScreen;
+        public string dialogPath;
+        public UnvsDialog dialog;
+
+        public string SceneLoaderPath;
+        public AppSceneLoader SceneLoader;
+        public string startScene;
+
+        //public override void InitEvents()
+        //{
+
+        //}
+
+        //public override void InitRunTime()
+        //{
+        //    InitRuntimeAsync().Forget();
+        //}
+
+        public virtual async UniTask InitRuntimeAsync()
+        {
+            
+            container = transform.CreateIfNoExist<Transform>("container");
+            container.gameObject.SetActive(false);
+            SceneLoader = await Commons.LoadPrefabsAsync<AppSceneLoader>(SceneLoaderPath);
+            cinema = await Commons.LoadPrefabsAsync<UnvsCinema>(cinemaPath, container, true);
+            ////MainMenu = await Commons.LoadPrefabsAsync<AppMainMenu>(mainMenuPath, container, false);
+            //PauseMenu = await Commons.LoadPrefabsAsync<AppPauseMenu>(pauseMenuPath, container, false);
+            dialog = await Commons.LoadPrefabsAsync<UnvsDialog>(dialogPath, container, false);
+            dialog.Show();
+            //this.ApplyNavigate<Button>();
+            //container.gameObject.SetActive(true);
+            //// MainMenu.Show();
+            //SceneLoader.enabled = true;
+            //SceneLoader.gameObject.SetActive(true);
+            //MainMenu.OnStart = () =>
+            //{
+            //    SceneLoader.LoadNewAsync(this.startScene).ContinueWith(s =>
+            //    {
+            //        MainMenu.Hide();
+            //    }).Forget();
+            //};
+            container.gameObject.SetActive(true);
+        }
+        public override void InitRunTime()
+        {
+            InitRuntimeAsync().ContinueWith(() =>
+            {
+                base.InitRunTime();
+            }).Forget();
+           
+        }
+        public override void InitEvents()
+        {
+            //throw new NotImplementedException();
+        }
+        
+
+#if UNITY_EDITOR
+        [UnvsButton()]
+        public void CreateCinema()
+        {
+           var r = this.EditorCreatePrefab<UnvsCinema>("cinema");
+            this.cinema = r.value;
+            this.cinemaPath = r.PrefabPath;
+        }
+        [UnvsButton()]
+        public void GenerateMainMenu()
+        {
+            var r = this.EditorCreatePrefab<UnvsMainMenu>("MainMenu");
+            this.MainMenu = r.value;
+            this.mainMenuPath = r.PrefabPath;
+        }
+        [UnvsButton()]
+        public void GeneratePauseMenu()
+        {
+            var r = this.EditorCreatePrefab<UnvsPauseMenu>("PauseMenu");
+            this.PauseMenu = r.value;
+            this.pauseMenuPath = r.PrefabPath;
+        }
+        [UnvsButton()]
+        public void GenerateFadeScreen()
+        {
+            var r = this.EditorCreatePrefab<UnvsFadeScreen>("fadeScreen");
+            this.fadeScreen = r.value;
+            this.fadeScreenPath = r.PrefabPath;
+        }
+        [UnvsButton()]
+        public void GenerateDialog()
+        {
+            var r = this.EditorCreatePrefab<UnvsDialog>("dialog");
+            this.dialog = r.value;
+            this.dialogPath = r.PrefabPath;
+        }
+
+       
+#endif
+
+    }
+}

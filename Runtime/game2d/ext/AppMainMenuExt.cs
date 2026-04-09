@@ -1,7 +1,7 @@
-namespace game2d.ext
-{
-    public static class AppMainMenuExt
-    {
+//namespace game2d.ext
+//{
+//    public static class AppMainMenuExt
+//    {
         
-    }   
-}
+//    }   
+//}

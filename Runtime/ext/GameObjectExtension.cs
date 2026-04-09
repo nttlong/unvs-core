@@ -157,6 +157,7 @@ namespace unvs.ext
         {
             EventSystem.current.SetSelectedGameObject(null);
             var firstElement = gameObject.GetComponentInChildren<T>();
+            if(firstElement!=null) 
             EventSystem.current.SetSelectedGameObject(firstElement.gameObject);
         }
     }

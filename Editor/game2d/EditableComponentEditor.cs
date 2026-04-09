@@ -13,7 +13,7 @@ namespace editor.game2d
 {
    
 
-    [CustomEditor(typeof(UnvsComponent), true)]
+    [CustomEditor(typeof(UnvsBaseComponent), true)]
     public class UnvsComponentEditor : Editor
     {
         public override void OnInspectorGUI()
@@ -37,7 +37,7 @@ namespace editor.game2d
             foreach (var method in methods)
             {
                 // Kiểm tra xem method có gắn attribute không
-                var attr = method.GetCustomAttribute<InspectorButtonAttribute>();
+                var attr = method.GetCustomAttribute<UnvsButtonAttribute>();
                 if (attr != null)
                 {
                     // Lấy tên hiển thị: Nếu attr.ButtonName trống thì dùng tên Method

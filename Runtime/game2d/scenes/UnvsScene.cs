@@ -12,13 +12,14 @@ using Unity.Burst.Intrinsics;
 using Unity.Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using unvs.ext;
 using unvs.shares;
 
 namespace unvs.game2d.scenes
 {
     
-    public class VScene : UnvsComponent
+    public class UnvsScene : UnvsComponent
     {
         [SerializeField]
         [Header("Sene game world info")]
@@ -28,15 +29,7 @@ namespace unvs.game2d.scenes
         //public Vector2 defaultSize;
         [SerializeField]
         public Vector2 followOffset;
-        //[SerializeField]
-        //public Vector2 joinPointLeft;
-        //[SerializeField]
-        //public Vector2 joinPointRight;
-        //[SerializeField]
-        //public Vector2 min;
-        //[SerializeField]
-        //public Vector2 max;
-
+       
         public Camera cam;
         public CinemachineCamera vcam;
         public Transform defaulCamWatcher;
@@ -52,16 +45,22 @@ namespace unvs.game2d.scenes
         public BoxCollider2D wallLeft;
         public BoxCollider2D wallRight;
         public EdgeCollider2D ground;
-        
+        public Light2D light2d;
 
         public override void InitRuntime()
         {
             DestroyImmediate(cam.gameObject);
+            DestroyImmediate(vcam.gameObject);
+            light2d.enabled = false;
+            light2d.gameObject.SetActive(false);
+        }
+        public override void InitDesignTime()
+        {
+            throw new System.NotImplementedException();
         }
 
-
 #if UNITY_EDITOR
-        [InspectorButton("Generate elements")]
+        [UnvsButton("Generate elements")]
         public void Generate()
         {
             this.cam = this.AddChildComponentIfNotExist<Camera>("Main Camera");
@@ -95,67 +94,21 @@ namespace unvs.game2d.scenes
             var dx = this.defaulCamWatcher.transform.GetSegment().Center().x;
             this.ground.points = new Vector2[] { new Vector2(dx - this.JoinInfo.Size.x / 2 - 5, 0), new Vector2(dx + this.JoinInfo.Size.x / 2 + 5, 0) };
 
-
+            this.worldBound.AlignWall(this.wallLeft,this.wallRight); 
+            this.worldBound.AlignWall(this.triggerLeft, this.triggerRight,true);
+            this.light2d = this.AddChildComponentIfNotExist<Light2D>("light2d");
+            this.light2d.lightType = Light2D.LightType.Global;
+            this.triggerRight.AddComponentIfNotExist<LoadeSceneTracking>();
+            this.triggerRight.AddComponentIfNotExist<LoadeSceneTracking>();
             calculateJoinPoint();
         }
-        WorldJoinInfo  CalculateBound( 
-            EdgeCollider2D ground,
-            
-            PolygonCollider2D worldBound)
-        {
-            
-            var edges = ground.ToEdge2dArray();
-            var bound = worldBound.bounds;
-            var minx = bound.min.x;
-            var maxx = bound.max.x;
-            var ret =
-                edges.Calculate(
-                   minx,
-                    maxx,
-                    ground.transform// Truyền transform để chuyển sang World Space
-                );
-            ret.Poly = edges;
-            ret.LeftGroundIndex = worldBound.GetMostVerticalEdgeAtMinX();
-            ret.RightGroundIndex = worldBound.GetMostVerticalEdgeAtMaxX();
-            ret.Center = bound.center;
-            ret.Max = bound.max;
-            ret.Min = bound.min;
-            ret.WorldFacets = new WorldBoundFacets();
-            var start = -1;
-            var end = -1;
-            worldBound.LeftVerticalFacet(out start, out end);
-            ret.WorldFacets.Left = new FacetInfo
-            {
-                End = end,
-                Start = start,
-            };
-            worldBound.RightVerticalFacet(out start, out end);
-            ret.WorldFacets.Right = new FacetInfo
-            {
-                End = end,
-                Start = start,
-            };
-            worldBound.TopHorizontalFacet(out start, out end);
-            ret.WorldFacets.Top = new FacetInfo
-            {
-                End = end,
-                Start = start,
-            };
-            worldBound.BootomHorizontalFacet(out start, out end);
-            ret.WorldFacets.Bottom = new FacetInfo
-            {
-                End = end,
-                Start = start,
-            };
-            return ret;
-            //var (v1, v2) = this.floor.CalculateIntersection(this.leftWall.bounds.max.x, this.rightWall.bounds.min.x);
-
-        }
+        
         private bool calculateJoinPoint()
         {
-            if (this.ground == null || this.worldBound) return false;
-            this.JoinInfo= CalculateBound(this.ground, this.worldBound);
-            return true;
+           
+            this.JoinInfo= ground.CalculateBound(this.worldBound);
+           
+            return this.JoinInfo!=null;
         }
 
         private void OnValidate()
@@ -175,8 +128,25 @@ namespace unvs.game2d.scenes
                 this.JoinInfo.LeftPos.DrawCircle(1,Color.red);
                 this.JoinInfo.RightPos.DrawCircle(1,Color.red);
             }
+            if(this.worldBound!=null && this.wallLeft!=null && this.wallRight != null)
+            {
+                this.worldBound.AlignWall(this.wallLeft, this.wallRight);
+                this.wallLeft.GizmosDraw(Color.red, 1);
+                this.wallRight.GizmosDraw(Color.red, 1);
+            }
+            if (this.worldBound != null && this.triggerLeft != null && this.triggerRight != null)
+            {
+                this.worldBound.AlignWall(this.triggerLeft, this.triggerRight, true);
+                this.triggerLeft.GizmosDraw(Color.rosyBrown, 2);
+                this.triggerRight.GizmosDraw(Color.rosyBrown, 2);
+            }
 
+           
         }
+
+       
+
+
 
 #endif
     }

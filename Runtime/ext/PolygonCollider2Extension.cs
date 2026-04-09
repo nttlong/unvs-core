@@ -18,7 +18,7 @@ namespace unvs.ext
         public static void AlignWall(this PolygonCollider2D polygonCollider2D, BoxCollider2D left, BoxCollider2D right, bool inner = false)
         {
 
-            if (polygonCollider2D == null)
+            if (polygonCollider2D == null || left==null|| right==null)
             {
                 // SLog.Info($"AlignWall(polygonCollider2D={polygonCollider2D}");
                 return;
