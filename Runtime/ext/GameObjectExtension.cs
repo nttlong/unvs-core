@@ -156,6 +156,11 @@ namespace unvs.ext
         }
         public static void ApplyNavigate<T>(this MonoBehaviour gameObject) where T : Component
         {
+            if (EventSystem.current == null)
+            {
+                Debug.LogError("Open scene then add SystemEvent");
+
+            }
             EventSystem.current.SetSelectedGameObject(null);
             var firstElement = gameObject.GetComponentInChildren<T>();
             if(firstElement!=null) 

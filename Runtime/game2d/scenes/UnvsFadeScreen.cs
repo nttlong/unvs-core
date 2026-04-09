@@ -7,7 +7,7 @@ using unvs.game2d.scenes;
 namespace game2d.scenes {
     public class UnvsFadeScreen : UnvsUIComponent
     {
-        public Canvas canvas;
+        
         public Image panel;
 
         public override void InitEvents()
@@ -19,5 +19,13 @@ namespace game2d.scenes {
         {
             this.canvas.FullSize();
         }
+#if UNITY_EDITOR
+        [UnvsButton]
+        public void Generate()
+        {
+            this.canvas = this.AddChildChildCanvasWithGraphicRaycasterIfNotExist("canvas");
+            this.panel = this.canvas.transform.AddChildComponentIfNotExist<Image>("Panel");
+        }
+#endif
     }
 }

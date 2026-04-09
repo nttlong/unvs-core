@@ -6,9 +6,9 @@ using unvs.ext;
 
 namespace unvs.game2d.scenes.actors
 {
-    [RequireComponent(typeof(Rigidbody))]
-    [RequireComponent(typeof(CapsuleCollider2D))]
-    [RequireComponent(typeof(UnvsActirDialogue))]
+    //[RequireComponent(typeof(Rigidbody))]
+    //[RequireComponent(typeof(CapsuleCollider2D))]
+    
     public class UnvsActor : UnvsBaseComponent
     {
 

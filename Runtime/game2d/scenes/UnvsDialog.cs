@@ -10,7 +10,7 @@ using unvs.game2d.scenes;
 namespace game2d.scenes {
     public class UnvsDialog : UnvsUIComponentInstance<UnvsDialog>
     {
-        public Canvas canvas;
+      
         public Image panel;
         public Image contentPanel;
         public Image foolterPanel;

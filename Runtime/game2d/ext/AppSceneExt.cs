@@ -1,4 +1,4 @@
-//using Cysharp.Threading.Tasks.Triggers;
+﻿//using Cysharp.Threading.Tasks.Triggers;
 //using System.IO;
 //using Unity.VisualScripting;
 //using UnityEditor;
@@ -24,17 +24,29 @@ namespace game2d.ext
         }
         public static EditorCreateResult<T> EditorCreatePrefab<T>(this Object obj, string name, string folderPath = null) where T : Component
         {
-            // 1. Determine the path of the AppScene script/asset to place the prefab in the same folder
             if (string.IsNullOrEmpty(folderPath))
                 folderPath = EditorGetAssetFolder(obj);
             string prefabPath = Path.Combine(folderPath, $"{name}.prefab");
 
-            // 2. Create a new GameObject with the required component
-            GameObject go = new GameObject("Cinema", typeof(RectTransform), typeof(T));
+            // TẠI ĐÂY: Tạo GameObject thường, đừng ép RectTransform ở Root
+            GameObject go = new GameObject(name, typeof(T));
 
-            // 3. Save as a prefab and cleanup the temporary object
+            // Nếu T là một script xử lý UI, Unity sẽ tự động chuyển Transform thành RectTransform 
+            // khi bạn add các component UI con sau này một cách chuẩn xác hơn.
+
             GameObject prefabAsset = PrefabUtility.SaveAsPrefabAsset(go, prefabPath);
             Object.DestroyImmediate(go);
+            // 1. Determine the path of the AppScene script/asset to place the prefab in the same folder
+            //if (string.IsNullOrEmpty(folderPath))
+            //    folderPath = EditorGetAssetFolder(obj);
+            //string prefabPath = Path.Combine(folderPath, $"{name}.prefab");
+
+            //// 2. Create a new GameObject with the required component
+            //GameObject go = new GameObject(name, typeof(RectTransform), typeof(T));
+
+            //// 3. Save as a prefab and cleanup the temporary object
+            //GameObject prefabAsset = PrefabUtility.SaveAsPrefabAsset(go, prefabPath);
+            //Object.DestroyImmediate(go);
 
             // 4. Assign the reference to the AppScene instance
             var ret = prefabAsset.GetComponent<T>();

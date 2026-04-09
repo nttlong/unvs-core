@@ -91,16 +91,6 @@ namespace unvs.game2d.scenes
                 }
             }
         }
-//#if UNITY_EDITOR
-//        [UnvsButton]
-//        public void DoMapping()
-//        {
-//            if (InputMap == null)
-//            {
-//                Debug.LogError($"Create new Monobehavior inherit {typeof(UnvsPlayerInputMap)} then add");
-//            }
-            
-//        }
-//#endif
+
     }
 }

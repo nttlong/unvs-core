@@ -10,7 +10,7 @@ namespace unvs.game2d.scenes
 {
     public class UnvsMainMenu : UnvsUIComponent
     {
-        public Canvas canvas;
+       
         public Image panel;
         public Button btnStart;
         public Button btnExit;
@@ -39,17 +39,19 @@ namespace unvs.game2d.scenes
         [UnvsButton]
         public void Generate()
         {
+
             this.canvas = this.AddChildChildCanvasWithGraphicRaycasterIfNotExist("canvas");
             this.panel = this.canvas.transform.AddChildComponentIfNotExist<Image>("panel");
-            var v=this.panel.AddComponentIfNotExist<VerticalLayoutGroup>();
+            var v = this.panel.AddComponentIfNotExist<VerticalLayoutGroup>();
             v.FixLayoutChildren();
             this.btnStart = this.panel.transform.AddButtonIfNotExist("btnStart", "Start");
             this.btnExit = this.panel.transform.AddButtonIfNotExist("btnExit", "Exit");
-            this.btnExit.onClick.AddListener(() => {
+            this.btnExit.onClick.AddListener(() =>
+            {
                 UnvsApp.Instance.ExitGame();
             });
-            
-            
+
+
         }
 #endif
     }

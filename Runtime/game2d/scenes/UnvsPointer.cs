@@ -29,12 +29,13 @@ namespace unvs.game2d.scenes
         {
            
         }
+        
         public override void InitRunTime()
         {
             base.InitRunTime();
             InitUI();
         }
-
+        
         private void InitUI()
         {
             canvas.SetMeOnLayer(Constants.Layers.TOP_UI);
@@ -125,6 +126,8 @@ namespace unvs.game2d.scenes
 
             
         }
+
+       
 #endif
     }
 }

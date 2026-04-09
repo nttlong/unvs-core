@@ -53,7 +53,7 @@ namespace unvs.game2d.scenes
     }
     public abstract class UnvsUIComponent: UnvsBaseComponent
     {
-        private Canvas _canvas;
+        public Canvas canvas;
 
         public abstract void InitEvents();
         public abstract void InitRunTime();
@@ -61,30 +61,40 @@ namespace unvs.game2d.scenes
         public virtual void Hide()
         {
             this.enabled = false;
-            if(_canvas==null)
-            _canvas=this.GetComponentInChildren<Canvas>(true);
-            if( _canvas!=null )
+            if(canvas == null)
+                canvas = this.GetComponentInChildren<Canvas>(true);
+            if(canvas != null )
             {
-                _canvas.enabled = true;
-                _canvas.gameObject.SetActive(false);
+                canvas.enabled = false;
+                canvas.gameObject.SetActive(false);
             }
         }
         public virtual void Show()
         {
             this.enabled = true;
             this.gameObject.SetActive(true);
-            if (_canvas == null)
+            if (canvas == null)
             {
-                _canvas = this.GetComponentInChildren<Canvas>(true);
-                if (_canvas != null) _canvas.FullSize();
+                canvas = this.GetComponentInChildren<Canvas>(true);
+                if (canvas != null) canvas.FullSize();
             }
                 
-            if (_canvas != null)
+            if (canvas != null)
             {
-                _canvas.enabled = true;
-                _canvas.gameObject.SetActive(true);
+                canvas.enabled = true;
+                canvas.gameObject.SetActive(true);
             }
             this.ApplyNavigate<Button>();
+        }
+        public virtual void Activate()
+        {
+            this.enabled = true;
+            this.gameObject.SetActive(true);
+        }
+        public virtual void Deactive()
+        {
+            this.enabled = false;
+            this.gameObject.SetActive(false);
         }
         public virtual void Awake()
         {
@@ -93,24 +103,26 @@ namespace unvs.game2d.scenes
             {
                 InitRunTime();
                
-                if (_canvas == null)
-                    _canvas = this.GetComponentInChildren<Canvas>(true);
-                if (_canvas != null)
+               
+                //if (canvas == null)
+                //    canvas = this.GetComponentInChildren<Canvas>(true);
+                if (canvas != null)
                 {
-                    _canvas.FullSize();
+                    canvas.FullSize();
+                    
                 }
-                this.enabled = false;
 
             }
         }
     }
     public abstract class UnvsUIComponentInstance<T>: UnvsUIComponent where T : Component
     {
-        public Canvas canvas;
+        
         public static T Instance;
         public override void InitRunTime()
         {
             Instance = this as T;
+
             
         }
 

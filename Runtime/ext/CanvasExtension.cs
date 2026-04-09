@@ -29,13 +29,13 @@ namespace unvs.ext
             canvasScaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
             canvasScaler.matchWidthOrHeight = 0.5f;  // 0 = match width (landscape tốt),
             UICanvas.SetMeOnLayer(Constants.Layers.UI);
-            var check = UICanvasList.FirstOrDefault(p => p == UICanvas);
-            if (check==null)
-            {
-                var lst = new List<Canvas>(UICanvasList);
-                lst.Add(UICanvas);
-                UICanvasList = lst.ToArray();
-            }
+            //var check = UICanvasList.FirstOrDefault(p => p == UICanvas);
+            //if (check==null)
+            //{
+            //    var lst = new List<Canvas>(UICanvasList);
+            //    lst.Add(UICanvas);
+            //    UICanvasList = lst.ToArray();
+            //}
         }
         public static void DoActive(this Canvas UICanvas)
         {

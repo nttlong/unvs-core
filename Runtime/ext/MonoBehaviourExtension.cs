@@ -12,12 +12,37 @@ namespace unvs.ext
 {
     public static class MonoBehaviourExtension
     {
-        public static Canvas AddChildChildCanvasWithGraphicRaycasterIfNotExist(this MonoBehaviour obj, string name) 
-        
+        public static Canvas AddChildChildCanvasWithGraphicRaycasterIfNotExist(this MonoBehaviour obj, string name)
         {
-            var ret = obj.AddChildComponentIfNotExist<Canvas>(name);
-            ret.AddComponentIfNotExist<GraphicRaycaster>();
-           
+            var go = obj.gameObject.transform.Find(name)?.gameObject;
+            if (go == null)
+            {
+                go = new GameObject(name, typeof(RectTransform));
+                go.transform.SetParent(obj.transform, false);
+            }
+
+            var ret = go.GetOrAddComponent<Canvas>();
+
+            // MẸO QUAN TRỌNG: Thiết lập Render Mode ngay lập tức
+            // Nếu để mặc định (Screen Space Overlay), Unity dễ bị nhầm lẫn trong Prefab Mode.
+            // Chuyển sang World Space hoặc giữ nguyên nhưng phải gọi lệnh cập nhật.
+            ret.renderMode = RenderMode.ScreenSpaceOverlay;
+
+            go.GetOrAddComponent<CanvasScaler>();
+            go.GetOrAddComponent<GraphicRaycaster>();
+
+            // BÁO CHO UNITY: Đây là một sự thay đổi cấu trúc UI chính thức
+            if (!Application.isPlaying)
+            {
+                UnityEditor.EditorUtility.SetDirty(obj.gameObject);
+                // Nếu đang trong Prefab Mode, dùng lệnh này để lưu "vết"
+                var stage = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
+                if (stage != null)
+                {
+                    UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(stage.scene);
+                }
+            }
+
             return ret;
         }
         public static T AddChildComponentIfNotExist<T>(this MonoBehaviour obj, string name) where T : Component

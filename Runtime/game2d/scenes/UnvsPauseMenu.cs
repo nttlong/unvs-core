@@ -10,7 +10,7 @@ namespace unvs.game2d.scenes
 {
     public class UnvsPauseMenu : UnvsUIComponentInstance<UnvsPauseMenu>
     {
-        public Canvas canvas;
+        
         public Image panel;
         public Button btnResume;
         public Button btnMainMenu;
@@ -30,10 +30,7 @@ namespace unvs.game2d.scenes
             });
         }
 
-        public override void InitRunTime()
-        {
-            this.canvas.FullSize();
-        }
+        
 #if UNITY_EDITOR
         [UnvsButton]
         public void GenerateUI()
