@@ -5,11 +5,13 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.U2D.Animation;
 using unvs.ext;
+using unvs.shares;
+
 #if UNITY_EDITOR
 using unvs.shares.editor;
-using unvs.sys;
-#endif
 
+#endif
+using unvs.sys;
 namespace unvs.game2d.scenes.actors
 {
     [RequireComponent(typeof(IKBoneMap))]
@@ -52,7 +54,11 @@ namespace unvs.game2d.scenes.actors
         [UnvsButton]
         public void FixLayout()
         {
-
+            
+            this.camWatcher.position = new Vector3(this.coll.bounds.center.x, this.coll.bounds.max.y, -10);
+            var coll = this.camWatcher.AddComponentIfNotExist<BoxCollider2D>();
+            coll.isTrigger = true;
+            coll.SetMeOnTag(Constants.Tags.PLAYER_CAM_WATCHER);
         }
         [UnvsButton("Anim controller")]
         public void GenerateAnimatorController()

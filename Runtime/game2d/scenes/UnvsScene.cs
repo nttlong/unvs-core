@@ -5,6 +5,7 @@
    
 */
 
+using Cysharp.Threading.Tasks;
 using System;
 using System.Linq;
 
@@ -58,15 +59,23 @@ namespace unvs.game2d.scenes
 
         public bool IsDestroying { get; private set; }
         public event Action<UnvsScene> OnDestroying;
+        async UniTask initAsync()
+        {
+            await UniTask.Yield();
+        }
         public override void InitRuntime()
         {
+            cam.enabled = false;
+            cam.gameObject.SetActive(false);
+            vcam.enabled = false;
+            vcam.gameObject.SetActive(false);
             DestroyImmediate(cam.gameObject);
             DestroyImmediate(vcam.gameObject);
            
             light2d.enabled = false;
             light2d.gameObject.SetActive(false);
-            this.triggerLeft.isTrigger = true;
-            this.triggerRight.isTrigger = true;
+            //this.triggerLeft.isTrigger = true;
+            //this.triggerRight.isTrigger = true;
             this.TrimGround();
            
            
@@ -212,7 +221,7 @@ namespace unvs.game2d.scenes
             this.cinemachineFollow = this.vcam.GetOrAddComponent<CinemachineFollow>();
             this.vcam.Follow = this.defaulCamWatcher;
             this.JoinInfo.Size = this.cam.GetCameraWorldSize();
-            this.edgesWorldBound = this.AddChildComponentIfNotExist<EdgeCollider2D>("edgesWorldBound");
+            //this.edgesWorldBound = this.AddChildComponentIfNotExist<EdgeCollider2D>("edgesWorldBound");
             this.startPoint = this.AddChildComponentIfNotExist<Transform>("start-point");
             this.startPoint.transform.position = new Vector3(this.JoinInfo.Size.x / 2, 0, -10);
             this.defaulCamWatcher.transform.position = this.JoinInfo.Size / 2;

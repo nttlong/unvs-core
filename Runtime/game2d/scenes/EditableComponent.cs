@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -32,9 +33,11 @@ namespace unvs.game2d.scenes
     }
     public abstract class UnvsComponent : UnvsBaseComponent
     {
+
         public virtual void Awake()
         {
             if (Application.isPlaying)
+                
                 InitRuntime();
             else
                 InitDesignTime();

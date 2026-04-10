@@ -1,7 +1,7 @@
 ﻿using Cysharp.Threading.Tasks.Triggers;
 using game2d.ext;
 using game2d.scenes;
-using PlasticPipe.PlasticProtocol.Messages;
+
 using System;
 using Unity.Burst.Intrinsics;
 using Unity.Cinemachine;

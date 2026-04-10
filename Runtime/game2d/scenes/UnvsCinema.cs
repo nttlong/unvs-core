@@ -20,35 +20,69 @@ namespace unvs.game2d.scenes{
         public CinemachineCamera vcam;
         public CompositeCollider2D compositeCollider2D;
         public CinemachineConfiner2D confiner;
-        private Rigidbody2D rb;
+       
+        public BoxCollider2D camColl;
         private MonoBehaviour camTracking;
         Dictionary<UnvsScene,PolygonCollider2D> worldBoundDict=new Dictionary<UnvsScene, PolygonCollider2D>();
         public PolygonCollider2D worldBoundCollider2d;
-        public BoxCollider2D centerWatch;
+        public Transform centerWatch;
         CancellationTokenSource ctsChangeOffset;
         CancellationTokenSource ctsChangeOrthoSize;
+        public Transform sceneLoaderTracing;
+        public BoxCollider2D centerCamTracing;
+        public float DurationTimeSmoothChangeSate = 1.5f;
         public void ChangeCameraState(List<UnvsScene> s)
         {
-            UnvsScene nearset= CalculateNearestScene(s);
+            UnvsScene nearset = CalculateNearestScene(s);
             ctsChangeOffset = ctsChangeOffset.Refresh();
-            ctsChangeOrthoSize= ctsChangeOrthoSize.Refresh();
-            vcam.ChangeFollowOffsetSmoothAsync(nearset.followOffset, ctsChangeOffset.Token).Forget();
-            vcam.SetOrthoSizeSmoothlyAsync(nearset.OrthographicSize,-1,3, ctsChangeOrthoSize.Token).ContinueWith(() =>
+            ctsChangeOrthoSize = ctsChangeOrthoSize.Refresh();
+            if (vcam.Lens.OrthographicSize > nearset.OrthographicSize)
             {
-                cam.GetComponent<BoxCollider2D>().size = cam.GetCameraWorldSize();
-            }).Forget();
-        }
+                vcam.ChangeFollowOffsetSmoothAsync(nearset.followOffset, ctsChangeOffset.Token, DurationTimeSmoothChangeSate).Forget();
+                vcam.SetOrthoSizeSmoothlyAsync(nearset.OrthographicSize, DurationTimeSmoothChangeSate, 3, ctsChangeOrthoSize.Token).ContinueWith(() =>
+                {
+                    camColl.size = cam.GetCameraWorldSize();
+                }).Forget();
 
+            }
+            else
+            {
+                vcam.SetOrthoSizeSmoothlyAsync(nearset.OrthographicSize, DurationTimeSmoothChangeSate, 3, ctsChangeOrthoSize.Token)
+                    .ContinueWith(() => { camColl.size = cam.GetCameraWorldSize(); }).Forget();
+                vcam.ChangeFollowOffsetSmoothAsync(nearset.followOffset, ctsChangeOffset.Token, DurationTimeSmoothChangeSate).Forget();
+            }
+            //ChangeCameraStateAsync(s).Forget();
+        }
+        public async UniTask ChangeCameraStateAsync(List<UnvsScene> s)
+        {
+            UnvsScene nearset = CalculateNearestScene(s);
+            ctsChangeOffset = ctsChangeOffset.Refresh();
+            ctsChangeOrthoSize = ctsChangeOrthoSize.Refresh();
+            if(vcam.Lens.OrthographicSize> nearset.OrthographicSize)
+            {
+                await vcam.ChangeFollowOffsetSmoothAsync(nearset.followOffset, ctsChangeOffset.Token);
+                await vcam.SetOrthoSizeSmoothlyAsync(nearset.OrthographicSize, -1, 3, ctsChangeOrthoSize.Token);
+               
+            }
+            else
+            {
+                await vcam.SetOrthoSizeSmoothlyAsync(nearset.OrthographicSize, -1, 3, ctsChangeOrthoSize.Token);
+                await vcam.ChangeFollowOffsetSmoothAsync(nearset.followOffset, ctsChangeOffset.Token);
+            }
+                
+            camColl.size = cam.GetCameraWorldSize();
+        }
         private UnvsScene CalculateNearestScene(List<UnvsScene> scenes)
         {
             if (scenes == null || scenes.Count == 0) return null;
 
             UnvsScene closestScene = null;
             float minDistance = float.MaxValue;
-            float centerX = this.centerWatch.bounds.center.x;
+            float centerX = centerCamTracing.bounds.center.x;
 
             foreach (var s in scenes)
             {
+                if(s==null||s.IsDestroying||s.IsDestroyed()) continue;
                
                 float distLeft = math.abs(s.wallLeft.bounds.max.x - centerX);
                 float distRight = math.abs(s.wallRight.bounds.min.x - centerX);
@@ -67,24 +101,24 @@ namespace unvs.game2d.scenes{
 
         public void UpdateMainCameraBoxCollider2dSize()
         {
-            var c = this.cam.AddComponentIfNotExist<BoxCollider2D>();
+            
 
-           
+
             float orthoSize = vcam.Lens.OrthographicSize;
             float aspect = vcam.Lens.Aspect;
 
-           
+
             float height = orthoSize * 2f;
             float width = height * aspect;
 
 
-            c.size = new Vector2(width, height);
+            camColl.size = new Vector2(width, height);
 
 
-            c.isTrigger = true;
+            camColl.isTrigger = true;
 
 
-            c.offset = Vector2.zero;
+            camColl.offset = Vector2.zero;
         }
         public void UpdateWorldBound(UnvsScene ret)
         {
@@ -107,7 +141,11 @@ namespace unvs.game2d.scenes{
         {
             //throw new System.NotImplementedException();
         }
-        
+        private void LateUpdate()
+        {
+            this.sceneLoaderTracing.transform.position=this.cam.transform.position;
+            this.centerWatch.transform.position = this.camColl.bounds.center;
+        }
 
 
 
@@ -136,21 +174,28 @@ namespace unvs.game2d.scenes{
             cinema.worldBoundCollider2d.transform.SetParent(cinema.compositeCollider2D.transform);
             cinema.compositeCollider2D.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
             cinema.compositeCollider2D.isTrigger = true;
-            var b = cinema.cam.AddComponentIfNotExist<Rigidbody2D>();
-            b.bodyType = RigidbodyType2D.Dynamic;
-            var c = cinema.cam.AddComponentIfNotExist<BoxCollider2D>();
+            this.sceneLoaderTracing = this.AddChildComponentIfNotExist<Transform>("sceneLoaderTracing");
+            var b = this.sceneLoaderTracing.AddComponentIfNotExist<Rigidbody2D>();
+            b.bodyType = RigidbodyType2D.Kinematic;
+            b.gravityScale = 0;
+            b.angularDamping = 0;
+            var c = b.AddComponentIfNotExist<BoxCollider2D>();
+            c.SetMeOnTag(Constants.Tags.TRIGGER_LOAD_SCENE);
             c.isTrigger = true;
+            camColl = c;
             c.size = cam.GetCameraWorldSize();
-            this.centerWatch = this.cam.transform.AddChildComponentIfNotExist<BoxCollider2D>("center-watch");
-            this.centerWatch.isTrigger = true;
-            this.centerWatch.size = new Vector2(0.1f, 0.1f);
-            this.centerWatch.SetMeOnTag(Constants.Tags.TRIGGER_SCENE_CHANGE);
-            this.centerWatch.SetMeOnTag(Constants.Layers.TRIGGER_SCENE_CHANGE);
-            this.centerWatch.AddComponentIfNotExist<BoxCollider2D>().isTrigger=true;
+            this.centerWatch = this.AddChildComponentIfNotExist<Transform>("center-watch");
             var rb = this.centerWatch.AddComponentIfNotExist<Rigidbody2D>();
             rb.bodyType = RigidbodyType2D.Kinematic;
             rb.gravityScale = 0;
             rb.angularDamping = 0;
+            var cwc = this.centerWatch.AddComponentIfNotExist<BoxCollider2D>();
+            cwc.isTrigger = true;
+            cwc.size = new Vector2(0.1f, 0.1f);
+            cwc.SetMeOnTag(Constants.Tags.TRIGGER_SCENE_CHANGE);
+            cwc.SetMeOnTag(Constants.Layers.TRIGGER_SCENE_CHANGE);
+            cwc.isTrigger = true;
+            this.centerCamTracing= cwc;
 
         }
 

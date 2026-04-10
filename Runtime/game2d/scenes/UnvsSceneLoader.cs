@@ -30,7 +30,7 @@ namespace unvs.game2d.scenes
         {
             await this.clearAsync();
             var ret= await Commons.LoadPrefabsAsync<UnvsScene>(path,this.buffer);
-            ret.transform.SetParent(this.chunks.transform,false);
+            ret.transform.SetParent(this.chunks.transform,true);
 
             UnvsCinema.Instance.UpdateWorldBound(ret);
             UnvsCinema.Instance.vcam.UpdateByUnvsScene(ret);
@@ -58,7 +58,7 @@ namespace unvs.game2d.scenes
             fromScene.TurnOffLeft();
             
 
-            var ret = await Commons.LoadPrefabsAsync<UnvsScene>(path, this.buffer);
+            var ret = await Commons.LoadPrefabsComponentAsync<UnvsScene>(path, this.buffer);
             ret.TurnOffRight();
 
             this.validateCurrentActor(ret);
@@ -66,9 +66,9 @@ namespace unvs.game2d.scenes
           
             var offset = ret.JoinInfo.RightPos - fromScene.JoinInfo.LeftPos;
             
-            ret.transform.position -= (Vector3)offset;
-            ret.transform.SetParent(this.chunks.transform,true);
            
+            ret.transform.SetParent(this.chunks.transform,false);
+            ret.transform.position -= (Vector3)offset;
             ret.transform.SetAsFirstSibling();
             UnvsCinema.Instance.UpdateWorldBound(ret);
             ret.gameObject.SetActive(true );
@@ -83,20 +83,23 @@ namespace unvs.game2d.scenes
 
         public async UniTask<UnvsScene> LoadChunkRightAsync(UnvsScene fromScene, string path)
         {
+            //this.clearChunkLeftIfExeedeAsync().ContinueWith(() =>
+            //{
+
+            //}).Forget();
             this.clearChunkLeftIfExeedeAsync().Forget();
             fromScene.TurnOffRight();
-           
-            fromScene.wallRight.enabled = false;
-            var ret = await Commons.LoadPrefabsAsync<UnvsScene>(path, this.buffer);
+
+            var ret = await Commons.LoadPrefabsComponentAsync<UnvsScene>(path, this.buffer);
 
             ret.TurnOffLeft();
             this.validateCurrentActor(ret);
             
             
             var offset = ret.JoinInfo.LeftPos - fromScene.JoinInfo.RightPos;
+            
+            ret.transform.SetParent(this.chunks.transform, false);
             ret.transform.position -= (Vector3)offset;
-            ret.transform.SetParent(this.chunks.transform, true);
-           
             ret.transform.SetAsLastSibling();
             UnvsCinema.Instance.UpdateWorldBound(ret);
             ret.gameObject.SetActive(true);

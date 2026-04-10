@@ -144,14 +144,14 @@ namespace unvs.game2d.scenes
                     var s = Scenes.Select(p => p.Key).ToList();
                     UnvsCinema.Instance.ChangeCameraState(s);
                 }
-                
+
             }
             if (_LastExitScene != unvsScene)
             {
                 _LastScene = unvsScene;
                 OnEnterScene?.Invoke(_LastScene);
             }
-            
+
         }
 
         public void RaiseExitScene(UnvsScene unvsScene)

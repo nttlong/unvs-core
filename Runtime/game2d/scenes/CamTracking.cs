@@ -1,7 +1,9 @@
 
+
 using Cysharp.Threading.Tasks;
 using System;
 using UnityEngine;
+using unvs.shares;
 
 
 namespace  unvs.game2d.scenes
@@ -23,9 +25,10 @@ namespace  unvs.game2d.scenes
         }
         private void OnTriggerEnter2D(Collider2D collision)
         {
-          
-          
-            if (collision.gameObject != Camera.main.gameObject) return;
+
+
+            //if (collision.gameObject != Camera.main.gameObject) return;
+            if (collision.gameObject.tag != Constants.Tags.TRIGGER_LOAD_SCENE) return;
             var scene = this.GetComponentInParent<UnvsScene>();
             if(scene == null) return;
             if(this.direction==LoadeSceneEnum.Left && !string.IsNullOrEmpty(scene.SceneLeft))

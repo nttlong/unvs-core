@@ -1,4 +1,4 @@
-﻿using PlasticPipe;
+﻿
 using System;
 using System.Linq;
 using Unity.VisualScripting;
@@ -32,6 +32,7 @@ namespace unvs.ext
             go.GetOrAddComponent<GraphicRaycaster>();
 
             // BÁO CHO UNITY: Đây là một sự thay đổi cấu trúc UI chính thức
+#if UNITY_EDITOR
             if (!Application.isPlaying)
             {
                 UnityEditor.EditorUtility.SetDirty(obj.gameObject);
@@ -41,7 +42,8 @@ namespace unvs.ext
                 {
                     UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(stage.scene);
                 }
-            }
+            } 
+#endif
 
             return ret;
         }
