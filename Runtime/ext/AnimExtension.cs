@@ -75,6 +75,7 @@ namespace unvs.ext
         }
         public static void ResetAllAddtiveLayers(this Animator anim,bool IncludingBaseLayer=false)
         {
+            if(anim==null || anim.IsDestroyed()) return;
             for (int i = 0; i < anim.layerCount; i++)
             {
                 if (i == 1 && !IncludingBaseLayer) continue;

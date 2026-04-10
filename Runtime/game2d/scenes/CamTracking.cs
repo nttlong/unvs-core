@@ -1,4 +1,5 @@
 
+using Cysharp.Threading.Tasks;
 using System;
 using UnityEngine;
 
@@ -6,24 +7,55 @@ using UnityEngine;
 namespace  unvs.game2d.scenes
 {
 
-    
-    public class LoadeSceneTracking:UnvsBaseComponent
+    public enum LoadeSceneEnum
+    {
+        Left, Right, Top, Bottom
+    }
+    public class LoadSceneTracking:UnvsBaseComponent
     {
         public BoxCollider2D coll;
+        public LoadeSceneEnum direction;
 
         private void Awake()
         {
             coll = GetComponent<BoxCollider2D>();
             coll.isTrigger = true;
         }
-
-        private void OnCollisionEnter2D(Collision2D collision)
+        private void OnTriggerEnter2D(Collider2D collision)
         {
-            var other = collision.otherCollider;
-            if (other == Camera.main)
+           if (UnvsSceneLoader.Instance==null) return;
+           if(UnvsSceneLoader.Instance.currentActor == null) return;
+            UnvsSceneLoader.Instance.currentActor.SayText($"OnCollisionEnter2D={collision.name}");
+            if (collision.gameObject != Camera.main.gameObject) return;
+            var scene = this.GetComponentInParent<UnvsScene>();
+            if(scene == null) return;
+            if(this.direction==LoadeSceneEnum.Left && !string.IsNullOrEmpty(scene.SceneLeft))
             {
-                Debug.LogError($"{name}");
+                this.Off();
+                UnvsSceneLoader.Instance.LoadChunkLeftAsync(scene,scene.SceneLeft).Forget();
+               
             }
+            if (this.direction == LoadeSceneEnum.Right && !string.IsNullOrEmpty(scene.SceneRight))
+            {
+                this.Off();
+                UnvsSceneLoader.Instance.LoadChunkRightAsync(scene, scene.SceneRight).Forget();
+            }
+        }
+
+        public void Off()
+        {
+            this.enabled = false;
+            this.gameObject.SetActive(false);
+            this.GetComponent<Collider2D>().enabled = false;
+
+        }
+        public void On()
+        {
+            this.GetComponent<Collider2D>().enabled = true;
+            this.gameObject.SetActive(true);
+            this.enabled = true;
+            
+           
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using Unity.Burst;
 using Unity.Cinemachine;
+using Unity.VisualScripting;
 using UnityEngine;
 using unvs.shares;
 
@@ -16,7 +17,7 @@ namespace unvs.ext
         {
             var item = blendTreeAnim.FirstOrDefault(p => p.layerIndex==0 &&
              p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase) );
-
+            if (item.animationController == null || item.animationController.gameObject.IsDestroyed()) return;
             item.animationController.ResetAllAddtiveLayers();
             item.animationController.SetLayerWeight(item.layerIndex, 1f);
             item.animationController.SetFloat( item.paramName, item.value);

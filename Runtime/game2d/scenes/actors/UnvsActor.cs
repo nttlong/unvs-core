@@ -1,17 +1,20 @@
 using Cysharp.Threading.Tasks.Triggers;
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.U2D.Animation;
 using unvs.ext;
 #if UNITY_EDITOR
-using unvs.shares.editor; 
+using unvs.shares.editor;
+using unvs.sys;
 #endif
 
 namespace unvs.game2d.scenes.actors
 {
     [RequireComponent(typeof(IKBoneMap))]
     [RequireComponent(typeof(AnimMap))]
+    [RequireComponent(typeof(UniqueObject))]
     public class UnvsActor : UnvsBaseComponent
     {
 
@@ -22,35 +25,11 @@ namespace unvs.game2d.scenes.actors
         public Collider2D coll;
         public Rigidbody2D body;
         public Transform camWatcher;
-        public bool IsActive;
+       
         public GameObject animEle;
         public Animator animator;
         public AnimMap motions;
-        private void Awake()
-        {
-            if (Application.isPlaying)
-            {
-                this.camWatcher = this.AddChildComponentIfNotExist<Transform>("cam-wacther");
-                UnvsGlobalInput.Player["Move"].started += c =>
-                {
-                    this.motions.Motion("walk");
-                    isMoving = true;
-                    this.isMoving = true;
-                    this.direction = c.ReadValue<Vector2>();
-                    this.motions.DirectionBy(direction);
-                    this.target = new Vector2(this.transform.position.x + direction.x * 100000, 0);
-                };
-                UnvsGlobalInput.Player["Move"].canceled += c =>
-                {
-                    this.direction = c.ReadValue<Vector2>();
-                    this.motions.DirectionBy(direction);
-                    this.isMoving = false;
-                    this.motions.Motion("idle");
-
-                };
-                UnvsCinema.Instance.vcam.Watch(transform);
-            }
-        }
+       
         public void StandBy(Vector2 vector2)
         {
             this.transform.position = vector2;// + new Vector2((coll.bounds.max.x-coll.bounds.min.x)/2,0);
@@ -64,13 +43,7 @@ namespace unvs.game2d.scenes.actors
         }
 
 
-        private void Update()
-        {
-            if (isMoving)
-            {
-                this.transform.MoveStep(this.target, this.WalkSpeed, out var dir, this.direction.x);
-            }
-        }
+       
 
 #if UNITY_EDITOR
         [UnvsButton]
