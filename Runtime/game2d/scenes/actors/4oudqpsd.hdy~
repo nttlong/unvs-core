@@ -1,0 +1,29 @@
+using System;
+using System.Linq;
+using TMPro;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.U2D.Animation;
+using UnityEngine.UI;
+using unvs.ext;
+
+namespace unvs.game2d.scenes.actors
+{
+    public class IKBoneMap : UnvsBaseComponent
+    {
+        public Transform rootBone;
+#if UNITY_EDITOR
+        [UnvsButton ("Create IK Manager")]
+        public void CreateIKManager()
+        {
+            this.rootBone = findRootBone();
+        }
+
+        private Transform findRootBone()
+        {
+            var spriteSkins = this.GetComponentsInChildren<SpriteSkin>(true);
+            spriteSkins.SelectMany(p => p.boneTransforms).GetRoot();
+        }
+#endif
+    }
+}

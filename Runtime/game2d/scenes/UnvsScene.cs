@@ -177,6 +177,10 @@ namespace unvs.game2d.scenes
                 this.triggerLeft.GizmosDraw(Color.rosyBrown, 2);
                 this.triggerRight.GizmosDraw(Color.rosyBrown, 2);
             }
+            if(this.ground!=null)
+            {
+                this.ground.GizmosDraw(Color.red,3f);
+            }
             this.OrthographicSize = this.vcam.GetOrthoSize();
            
         }

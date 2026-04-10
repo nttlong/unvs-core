@@ -2,13 +2,16 @@ using Cysharp.Threading.Tasks.Triggers;
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.U2D.Animation;
 using unvs.ext;
+#if UNITY_EDITOR
+using unvs.shares.editor; 
+#endif
 
 namespace unvs.game2d.scenes.actors
 {
-    //[RequireComponent(typeof(Rigidbody))]
-    //[RequireComponent(typeof(CapsuleCollider2D))]
-    
+    [RequireComponent(typeof(IKBoneMap))]
+    [RequireComponent(typeof(AnimMap))]
     public class UnvsActor : UnvsBaseComponent
     {
 
@@ -20,7 +23,9 @@ namespace unvs.game2d.scenes.actors
         public Rigidbody2D body;
         public Transform camWatcher;
         public bool IsActive;
-
+        public GameObject animEle;
+        public Animator animator;
+        public AnimMap motions;
         private void Awake()
         {
             if (Application.isPlaying)
@@ -28,18 +33,19 @@ namespace unvs.game2d.scenes.actors
                 this.camWatcher = this.AddChildComponentIfNotExist<Transform>("cam-wacther");
                 UnvsGlobalInput.Player["Move"].started += c =>
                 {
-                    this.SayText("Moving");
+                    this.motions.Motion("walk");
                     isMoving = true;
                     this.isMoving = true;
                     this.direction = c.ReadValue<Vector2>();
+                    this.motions.DirectionBy(direction);
                     this.target = new Vector2(this.transform.position.x + direction.x * 100000, 0);
                 };
                 UnvsGlobalInput.Player["Move"].canceled += c =>
                 {
                     this.direction = c.ReadValue<Vector2>();
-
+                    this.motions.DirectionBy(direction);
                     this.isMoving = false;
-                    this.SayText("Stop");
+                    this.motions.Motion("idle");
 
                 };
                 UnvsCinema.Instance.vcam.Watch(transform);
@@ -71,6 +77,15 @@ namespace unvs.game2d.scenes.actors
         public void FixLayout()
         {
 
+        }
+        [UnvsButton("Anim controller")]
+        public void GenerateAnimatorController()
+        {
+            this.animEle = this.GetComponentInChildren<SpriteSkin>(true).transform.parent.gameObject;
+            string folderPath=EditorUtils.EditorGetFolder(this.animEle);
+            var controller =EditorUtils.EditorCreateAnimatorController(folderPath, this.animEle.name);
+            this.animator= this.animEle.transform.AddComponentIfNotExist<Animator>();
+            this.animator.runtimeAnimatorController = controller;
         }
         [UnvsButton]
         public void Generate()

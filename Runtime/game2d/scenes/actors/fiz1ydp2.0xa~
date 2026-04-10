@@ -1,0 +1,74 @@
+using System;
+using System.Linq;
+using TMPro;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.U2D.Animation;
+using UnityEngine.U2D.IK;
+using UnityEngine.UI;
+using unvs.ext;
+
+namespace unvs.game2d.scenes.actors
+{
+    public class IKBoneMap : UnvsBaseComponent
+    {
+        [Header("IK Setup")]
+        [SerializeField]
+        public Transform[] Chain;
+        [SerializeField]
+        public Transform[] Limbs;
+        [Header("Bone setup")]
+        public Transform rootBone;
+        public Transform ikControl;
+        public Transform targets;
+        public Transform solvers;
+        private IKManager2D ikManager;
+#if UNITY_EDITOR
+        [UnvsButton ("Create IK Manager")]
+        public void CreateIKManager()
+        {
+            this.rootBone = findRootBone();
+            var anim = this.GetComponentInChildren<Animator>().transform;
+            if (anim == null)
+            {
+                throw new Exception($"{typeof(Animator)} was not found in {name}");
+            }
+            if(Chain == null || Chain.Length==0 || Limbs==null || Limbs.Length == 0)
+            {
+                throw new Exception($"Chain or  Limbs in  {name} must have value");
+            }
+            this.ikControl = anim.AddChildComponentIfNotExist<Transform>("IK-Control");
+            this.targets = this.ikControl.AddChildComponentIfNotExist<Transform>("targets");
+            this.solvers = this.ikControl.AddChildComponentIfNotExist<Transform>("solvers");
+            this.solversLims = this.solvers.AddChildIfNotExist<Transform>("solversLims");
+            fetchTarget(this.targets, this.rootBone);
+            this.ikManager = this.rootBone.AddComponentIfNotExist<IKManager2D>();
+            createSolver();
+        }
+
+        private void createSolver()
+        {
+            foreach(var tr in Limbs)
+            {
+
+                this.ikManager.AddSolver(new LimbSolver2D());
+            }
+        }
+
+        private void fetchTarget(Transform targets, Transform rootBone)
+        {
+            var rr=targets.AddChildComponentIfNotExist<Transform>(rootBone.name);
+            foreach (Transform tr in rootBone.GetComponentInChildren<Transform>(true))
+            {
+                fetchTarget(rr, tr);
+            }
+        }
+
+        private Transform findRootBone()
+        {
+            var spriteSkins = this.GetComponentsInChildren<SpriteSkin>(true);
+            return spriteSkins.SelectMany(p => p.boneTransforms).GetRoot();
+        }
+#endif
+    }
+}
