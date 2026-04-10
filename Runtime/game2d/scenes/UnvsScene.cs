@@ -4,19 +4,17 @@
    
    
 */
-using Cysharp.Threading.Tasks.Triggers;
-using game2d.ext;
-using game2d.scenes;
-using PlasticPipe.PlasticProtocol.Messages;
+
 using System;
 using System.Linq;
-using Unity.Burst.Intrinsics;
+
 using Unity.Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using unvs.ext;
 using unvs.game2d.scenes.actors;
+using unvs.interfaces;
 using unvs.shares;
 
 namespace unvs.game2d.scenes
@@ -55,6 +53,8 @@ namespace unvs.game2d.scenes
         public LoadSceneTracking triggerLoadSceneRight;
         internal UnvsScene leftScene;
         internal UnvsScene rightScene;
+        private bool _hastrimEdge;
+        public Transform sceneTracker;
 
         public bool IsDestroying { get; private set; }
         public event Action<UnvsScene> OnDestroying;
@@ -62,10 +62,14 @@ namespace unvs.game2d.scenes
         {
             DestroyImmediate(cam.gameObject);
             DestroyImmediate(vcam.gameObject);
+           
             light2d.enabled = false;
             light2d.gameObject.SetActive(false);
             this.triggerLeft.isTrigger = true;
             this.triggerRight.isTrigger = true;
+            this.TrimGround();
+           
+           
         }
         public Vector2 GetStartPosition()
         {
@@ -82,15 +86,49 @@ namespace unvs.game2d.scenes
         public void TurnOnLeft()
         {
             this.wallLeft.enabled=true;
+            this.wallLeft.gameObject.SetActive(true);
             this.triggerLeft.enabled=true;
+            this.triggerLeft.gameObject.SetActive(true);
             this.triggerLoadSceneLeft.enabled=true;
+            this.triggerLoadSceneLeft.gameObject.SetActive(true );
         }
-
+        public void TurnOffLeft()
+        {
+            this.wallLeft.enabled = false;
+            this.wallLeft.gameObject.SetActive(false);
+            this.triggerLeft.enabled = false;
+            this.triggerLeft.gameObject.SetActive(false);
+            this.triggerLoadSceneLeft.enabled = false;
+            this.triggerLoadSceneLeft.gameObject.SetActive(false);
+        }
         public void TurnOnRight()
         {
             this.wallRight.enabled = true;
+            this.wallRight.gameObject.Serialize(true);
             this.triggerRight.enabled = true;
+            this.triggerRight.gameObject.SetActive(true);
             this.triggerLoadSceneRight.enabled = true;
+            this.triggerLoadSceneRight.gameObject.SetActive(true);
+        }
+        public void TurnOffRight()
+        {
+            this.wallRight.enabled = false;
+            this.wallRight.gameObject.Serialize(false);
+            this.triggerRight.enabled = false;
+            this.triggerRight.gameObject.SetActive(false);
+            this.triggerLoadSceneRight.enabled = false;
+            this.triggerLoadSceneRight.gameObject.SetActive(false);
+        }
+        
+        public void TrimGround()
+        {
+            if (ground == null || JoinInfo == null ) return;
+            if (_hastrimEdge) return;
+           
+            ground.ClipByFirstEdgeByX(this.wallLeft.bounds.max.x);
+            ground.ClipLastEdgeByX(this.wallRight.bounds.min.x);
+
+            //_hastrimEdge = true;
         }
         private void OnDestroy()
         {
@@ -98,11 +136,12 @@ namespace unvs.game2d.scenes
             this.OnDestroying?.Invoke(this);
             UnvsApp.Instance.RaiseEventScenseDestroying(this);
         }
+        
 #if UNITY_EDITOR
         [UnvsButton("Review")]
         public void Review()
         {
-            
+            ApplyRequireComponents();
             this.actor = this.GetComponentInChildren<UnvsActor>();
             if(this.actor != null )
             {
@@ -120,7 +159,12 @@ namespace unvs.game2d.scenes
         [UnvsButton("Apply require components")]
         public void ApplyRequireComponents()
         {
-            if(this.triggerRight != null)
+            if(this.vcam!=null)
+            {
+                this.vcam.Lens.OrthographicSize = this.OrthographicSize;
+                this.vcam.GetComponent<CinemachineFollow>().FollowOffset = this.followOffset;
+            }
+            if (this.triggerRight != null)
             {
                 this.triggerLoadSceneRight = this.triggerRight.AddComponentIfNotExist<LoadSceneTracking>();
                 this.triggerLoadSceneRight.direction = LoadeSceneEnum.Right;
@@ -129,6 +173,29 @@ namespace unvs.game2d.scenes
             {
                 this.triggerLoadSceneLeft = this.triggerLeft.AddComponentIfNotExist<LoadSceneTracking>();
                 this.triggerLoadSceneLeft.direction = LoadeSceneEnum.Left;
+            }
+            if (this.sceneTracker == null)
+            {
+                this.sceneTracker = this.AddChildComponentIfNotExist<Transform>("scene-tracker");
+                var poly = this.sceneTracker.AddComponentIfNotExist<PolygonCollider2D>();
+                poly.isTrigger=true;
+                poly.SetMeOnLayer(Constants.Layers.TRIGGER_SCENE_CHANGE);
+            }
+            if (this.triggerLeft != null) this.triggerLeft.isTrigger = true;
+            if (this.triggerRight != null) this.triggerRight.isTrigger = true;
+
+            this.sceneTracker.AddComponentIfNotExist<UnvsSceneTracker>();
+            syncWorldBoundAndScencTracker();
+        }
+
+        private void syncWorldBoundAndScencTracker()
+        {
+            var rate = (this.worldBound.bounds.size.x +5f) / this.worldBound.bounds.size.x;
+            var paths = this.worldBound.ClonePaths(rate, 1);
+            this.sceneTracker.GetComponent<PolygonCollider2D>().points = new Vector2[] { };
+            for (int i = 0; i < paths.Length; i++)
+            {
+                this.sceneTracker.GetComponent<PolygonCollider2D>().SetPath(i, paths[i]);
             }
         }
 
@@ -170,6 +237,8 @@ namespace unvs.game2d.scenes
             this.worldBound.AlignWall(this.triggerLeft, this.triggerRight,true);
             this.light2d = this.AddChildComponentIfNotExist<Light2D>("light2d");
             this.light2d.lightType = Light2D.LightType.Global;
+           
+           
             this.ApplyRequireComponents();
             calculateJoinPoint();
         }
@@ -221,10 +290,18 @@ namespace unvs.game2d.scenes
                 this.JoinInfo.LeftPos.DrawCircle(1,Color.blue,3f);
                 this.JoinInfo.RightPos.DrawCircle(1, Color.darkGreen, 3f);
             }
+            if (this.sceneTracker != null && this.worldBound!=null)
+            {
+                syncWorldBoundAndScencTracker();
+                if(this.sceneTracker.GetComponent<PolygonCollider2D>()!=null)
+                this.sceneTracker.GetComponent<PolygonCollider2D>().GizmosDraw(Color.azure, 2f);
+            }
            
         }
 
-      
+       
+
+
 
 
 

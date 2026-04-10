@@ -126,6 +126,75 @@ namespace unvs.ext
         }
         public static async UniTask ChangeFollowOffsetSmoothAsync(
       this CinemachineCamera vcam,
+      Vector3 targetOffset,
+      CancellationToken cancellationToken,
+      float duration = 1.0f)
+        {
+            var f = vcam.GetComponent<CinemachineFollow>();
+            if (f == null) return;
+
+            var state = vcam.AddComponentIfNotExist<CamStateObject>();
+            Vector3 oldOffset = f.FollowOffset;
+           
+            // Sử dụng using cho cả hai để đảm bảo giải phóng tài nguyên hệ thống
+            using var userCts = new CancellationTokenSource();
+            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(userCts.Token, cancellationToken);
+
+            // Lấy token tổng hợp để sử dụng xuyên suốt
+            var linkedToken = linkedCts.Token;
+
+            float elapsed = 0;
+            state.isInProgress = true;
+
+            try
+            {
+                while (elapsed < duration)
+                {
+                    // Kiểm tra token tổng hợp trước
+                    linkedToken.ThrowIfCancellationRequested();
+
+                    if (state.isInteruptValue)
+                    {
+                        f.FollowOffset = state.offSetValue;
+                        state.isInteruptValue = false;
+                        state.isInProgress = false;
+                        return; // Thoát ra, khối 'finally' sẽ lo việc reset isInProgress
+                    }
+
+                    elapsed += Time.deltaTime;
+                    float t = Mathf.Clamp01(elapsed / duration);
+                    float step = Mathf.SmoothStep(0, 1, t);
+
+                    f.FollowOffset = Vector3.Lerp(oldOffset, targetOffset, step);
+
+                    // Truyền linkedToken vào đây để UniTask tự ngắt nếu 1 trong 2 nguồn bị hủy
+                    await UniTask.Yield(PlayerLoopTiming.Update, linkedToken);
+                }
+
+                f.FollowOffset = targetOffset;
+            }
+            catch (OperationCanceledException)
+            {
+                if (state.isInteruptValue)
+                {
+                    f.FollowOffset = state.offSetValue;
+                    state.isInteruptValue = false;
+
+                }
+                else
+                {
+                    if (f != null) f.FollowOffset = oldOffset;
+                }
+
+            }
+            finally
+            {
+                // Dùng finally để đảm bảo dù chạy xong, bị lỗi, hay bị cancel thì flag vẫn về false
+                if (state != null) state.isInProgress = false;
+            }
+        }
+        public static async UniTask ChangeFollowOffsetSmoothAsync(
+      this CinemachineCamera vcam,
       IScenePrefab scene,
       CancellationToken cancellationToken,
       float duration = 1.0f)

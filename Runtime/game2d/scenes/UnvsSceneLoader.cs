@@ -20,7 +20,7 @@ namespace unvs.game2d.scenes
         public Transform bufferDelete;
         private Transform interior;
         public Transform actorContainer;
-        public UnvsActor currentActor;
+        
 
         public override void InitEvents()
         {
@@ -45,36 +45,36 @@ namespace unvs.game2d.scenes
             {
                 actor.StandBy(ret.GetStartPosition());
                 UnvsCinema.Instance.vcam.Watch(actor.camWatcher);
-                this.currentActor = actor;
+                UnvsApp.Instance.currentActor = actor;
             }
+          
             UnvsCinema.Instance.UpdateMainCameraBoxCollider2dSize();
+            UnvsApp.Instance.RaiseEnterScene(ret);
             return ret;
         }
         public async UniTask<UnvsScene> LoadChunkLeftAsync(UnvsScene fromScene,string path)
         {
             this.clearChunkRightIfExeedeAsync().Forget();
-            fromScene.triggerLoadSceneLeft.Off();
-            fromScene.wallLeft.enabled = false;
+            fromScene.TurnOffLeft();
+            
 
             var ret = await Commons.LoadPrefabsAsync<UnvsScene>(path, this.buffer);
-            
-            ret.triggerLoadSceneRight.Off();
-            ret.wallRight.enabled = false;
+            ret.TurnOffRight();
+
             this.validateCurrentActor(ret);
             
-            ret.triggerLoadSceneRight.Off();
-            ret.wallRight.enabled = false;
+          
             var offset = ret.JoinInfo.RightPos - fromScene.JoinInfo.LeftPos;
             
             ret.transform.position -= (Vector3)offset;
             ret.transform.SetParent(this.chunks.transform,true);
+           
             ret.transform.SetAsFirstSibling();
             UnvsCinema.Instance.UpdateWorldBound(ret);
             ret.gameObject.SetActive(true );
             fromScene.leftScene = ret;
             ret.rightScene = fromScene;
-
-
+            
 
             return ret;
         }
@@ -84,36 +84,36 @@ namespace unvs.game2d.scenes
         public async UniTask<UnvsScene> LoadChunkRightAsync(UnvsScene fromScene, string path)
         {
             this.clearChunkLeftIfExeedeAsync().Forget();
-            fromScene.triggerLoadSceneRight.Off();
+            fromScene.TurnOffRight();
            
             fromScene.wallRight.enabled = false;
             var ret = await Commons.LoadPrefabsAsync<UnvsScene>(path, this.buffer);
-            ret.triggerLoadSceneLeft.Off();
-            ret.triggerLoadSceneRight.Off();
+
+            ret.TurnOffLeft();
             this.validateCurrentActor(ret);
             
-            ret.triggerLoadSceneLeft.Off();
-            ret.wallLeft.enabled = false;
+            
             var offset = ret.JoinInfo.LeftPos - fromScene.JoinInfo.RightPos;
             ret.transform.position -= (Vector3)offset;
             ret.transform.SetParent(this.chunks.transform, true);
+           
             ret.transform.SetAsLastSibling();
             UnvsCinema.Instance.UpdateWorldBound(ret);
             ret.gameObject.SetActive(true);
             fromScene.rightScene = ret;
             ret.leftScene = fromScene;
-
+           
             return ret;
         }
         private void validateCurrentActor(UnvsScene scene)
         {
             var actor = scene.GetActiveActor();
             
-            if (actor == null || this.currentActor==null) return;
+            if (actor == null || UnvsApp.Instance.currentActor==  null) return;
             actor.GetComponent<UnvsPlayer>().enabled = false;
-            if (actor.GetType()== this.currentActor.GetType())
+            if (actor.GetType()== UnvsApp.Instance.currentActor.GetType())
             {
-                if(actor.name== this.currentActor.name)
+                if(actor.name== UnvsApp.Instance.currentActor.name)
                 {
                     (actor as MonoBehaviour).enabled = false;
                     (actor as MonoBehaviour).gameObject.SetActive(false);

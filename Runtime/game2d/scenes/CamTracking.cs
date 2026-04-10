@@ -23,9 +23,8 @@ namespace  unvs.game2d.scenes
         }
         private void OnTriggerEnter2D(Collider2D collision)
         {
-           if (UnvsSceneLoader.Instance==null) return;
-           if(UnvsSceneLoader.Instance.currentActor == null) return;
-            UnvsSceneLoader.Instance.currentActor.SayText($"OnCollisionEnter2D={collision.name}");
+          
+          
             if (collision.gameObject != Camera.main.gameObject) return;
             var scene = this.GetComponentInParent<UnvsScene>();
             if(scene == null) return;

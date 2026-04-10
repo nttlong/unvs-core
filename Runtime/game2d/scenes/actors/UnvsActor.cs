@@ -41,9 +41,12 @@ namespace unvs.game2d.scenes.actors
             var pos=new Vector2(coll.bounds.center.x,coll.bounds.max.y+2);
             UnvsActirDialogue.Instance.Show(pos,Content);
         }
+        public void SayOff()
+        {
+            UnvsActirDialogue.Instance.Hide();
+        }
 
 
-       
 
 #if UNITY_EDITOR
         [UnvsButton]
@@ -78,7 +81,9 @@ namespace unvs.game2d.scenes.actors
             this.camWatcher.position = new Vector3(this.coll.bounds.center.x, this.coll.bounds.max.y, -10);
         }
 
-       
+        
+
+
 #endif
     }
 }

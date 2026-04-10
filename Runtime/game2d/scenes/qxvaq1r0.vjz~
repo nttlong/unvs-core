@@ -52,8 +52,7 @@ namespace unvs.game2d.scenes
         public string dialogPath;
         public UnvsActor currentActor;
         public static UnvsApp Instance { get; private set; }
-        public event Action<UnvsScene> OnEnterScene;
-        public event Action<UnvsScene> OnExitScene;
+
         public  void ExitGame()
         {
            
@@ -120,56 +119,34 @@ namespace unvs.game2d.scenes
         
         
         public Dictionary<UnvsScene,string> Scenes { get; private set; }
-        private UnvsScene _LastScene;
-        private UnvsScene _LastExitScene;
-
         public void RaiseEnterScene(UnvsScene unvsScene)
         {
             if (unvsScene == null) return;
 
-            this.Scenes ??= new Dictionary<UnvsScene, string>();
-            if (this.Scenes.TryAdd(unvsScene, unvsScene.name))
+            this.Scenes ??= new List<UnvsScene>();
+            this.Scenes.Add(unvsScene);
+
+
+            void OnDestroyHandler(UnvsScene s)
             {
-
-
-                void OnDestroyHandler(UnvsScene s)
-                {
-                    unvsScene.OnDestroying -= OnDestroyHandler;
-                    this.Scenes.Remove(unvsScene);
-                }
-
-                unvsScene.OnDestroying += OnDestroyHandler;
-                if (this.Scenes.Count() > 1)
-                {
-                    var s = Scenes.Select(p => p.Key).ToList();
-                    UnvsCinema.Instance.ChangeCameraState(s);
-                }
-                
+                unvsScene.OnDestroying -= OnDestroyHandler;
+                this.Scenes.Remove(unvsScene);
             }
-            if (_LastExitScene != unvsScene)
+
+            unvsScene.OnDestroying += OnDestroyHandler;
+            if (this.Scenes.Count() > 1)
             {
-                _LastScene = unvsScene;
-                OnEnterScene?.Invoke(_LastScene);
+                UnvsApp.Instance.currentActor.SayText($"{Scenes[0].name},{Scenes[0].name}");
             }
-            
         }
 
         public void RaiseExitScene(UnvsScene unvsScene)
         {
             if (unvsScene == null) return;
 
-            this.Scenes ??= new Dictionary<UnvsScene, string>();
+            this.Scenes ??= new List<UnvsScene>();
             this.Scenes.Remove(unvsScene);
-            if (this.Scenes.Count() <2)
-            {
 
-                UnvsApp.Instance.currentActor.SayOff();
-            }
-            if (_LastExitScene != unvsScene)
-            {
-                _LastExitScene = unvsScene;
-                OnExitScene?.Invoke(_LastExitScene);
-            }
 
         }
         public override void InitRuntime()

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering.VirtualTexturing;
 using UnityEngine.UIElements;
 using unvs.shares;
+using static Unity.VisualScripting.Member;
 
 namespace unvs.ext
 {
@@ -373,6 +374,27 @@ namespace unvs.ext
             }
 
             return newColl;
+        }
+        public static Vector2[][] ClonePaths(this PolygonCollider2D source, float scaleX = 0.95f, float scaleY = 1.0f)
+        {
+            // 1. Khởi tạo mảng với kích thước bằng số lượng path của collider
+            var ret = new Vector2[source.pathCount][];
+
+            for (int i = 0; i < source.pathCount; i++)
+            {
+                Vector2[] pathPoints = source.GetPath(i);
+
+                // 2. Duyệt qua từng điểm để scale
+                for (int j = 0; j < pathPoints.Length; j++)
+                {
+                    pathPoints[j].x *= scaleX;
+                    pathPoints[j].y *= scaleY;
+                }
+
+                // Gán mảng đã scale vào mảng kết quả
+                ret[i] = pathPoints;
+            }
+            return ret;
         }
         public static PolygonCollider2D CloneAndScale(this PolygonCollider2D source, float scaleX = 0.95f, float scaleY = 1.0f, string name = "SceneTracker")
         {
