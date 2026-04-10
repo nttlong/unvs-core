@@ -1,4 +1,4 @@
-﻿/*
+/*
     this file define Virtuale scene, acctually, that is prefab of scene
     it contain Main cam
    
@@ -69,8 +69,8 @@ namespace unvs.game2d.scenes
             cam.gameObject.SetActive(false);
             vcam.enabled = false;
             vcam.gameObject.SetActive(false);
-            DestroyImmediate(cam.gameObject);
-            DestroyImmediate(vcam.gameObject);
+            Destroy(cam.gameObject);
+            Destroy(vcam.gameObject);
            
             light2d.enabled = false;
             light2d.gameObject.SetActive(false);
@@ -90,7 +90,7 @@ namespace unvs.game2d.scenes
         }
         public UnvsActor GetActiveActor()
         {
-            return this.GetComponentsInChildren<UnvsActor>().FirstOrDefault(p=>p.GetComponent<UnvsPlayer>()!=null && p.GetComponent<UnvsPlayer>().enabled);
+            return this.GetComponentsInChildren<UnvsActor>(true).FirstOrDefault(p => p.GetComponent<UnvsPlayer>() != null);
         }
         public void TurnOnLeft()
         {
@@ -113,7 +113,7 @@ namespace unvs.game2d.scenes
         public void TurnOnRight()
         {
             this.wallRight.enabled = true;
-            this.wallRight.gameObject.Serialize(true);
+            this.wallRight.gameObject.SetActive(true);
             this.triggerRight.enabled = true;
             this.triggerRight.gameObject.SetActive(true);
             this.triggerLoadSceneRight.enabled = true;
@@ -122,7 +122,7 @@ namespace unvs.game2d.scenes
         public void TurnOffRight()
         {
             this.wallRight.enabled = false;
-            this.wallRight.gameObject.Serialize(false);
+            this.wallRight.gameObject.SetActive(false);
             this.triggerRight.enabled = false;
             this.triggerRight.gameObject.SetActive(false);
             this.triggerLoadSceneRight.enabled = false;

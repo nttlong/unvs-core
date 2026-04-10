@@ -58,7 +58,7 @@ namespace unvs.game2d.scenes
             fromScene.TurnOffLeft();
             
 
-            var ret = await Commons.LoadPrefabsComponentAsync<UnvsScene>(path, this.buffer);
+            var ret = await Commons.LoadPrefabsAsync<UnvsScene>(path, this.buffer);
             ret.TurnOffRight();
 
             this.validateCurrentActor(ret);
@@ -83,14 +83,11 @@ namespace unvs.game2d.scenes
 
         public async UniTask<UnvsScene> LoadChunkRightAsync(UnvsScene fromScene, string path)
         {
-            //this.clearChunkLeftIfExeedeAsync().ContinueWith(() =>
-            //{
-
-            //}).Forget();
+            
             this.clearChunkLeftIfExeedeAsync().Forget();
             fromScene.TurnOffRight();
 
-            var ret = await Commons.LoadPrefabsComponentAsync<UnvsScene>(path, this.buffer);
+            var ret = await Commons.LoadPrefabsAsync<UnvsScene>(path, this.buffer);
 
             ret.TurnOffLeft();
             this.validateCurrentActor(ret);
@@ -112,20 +109,22 @@ namespace unvs.game2d.scenes
         {
             var actor = scene.GetActiveActor();
             
-            if (actor == null || UnvsApp.Instance.currentActor==  null) return;
-            actor.GetComponent<UnvsPlayer>().enabled = false;
-            if (actor.GetType()== UnvsApp.Instance.currentActor.GetType())
+            if (actor == null || UnvsApp.Instance.currentActor == null) return;
+            
+            // Safe disable player logic if it exists
+            var player = actor.GetComponent<UnvsPlayer>();
+            if (player != null) player.enabled = false;
+
+            if (actor.GetType() == UnvsApp.Instance.currentActor.GetType())
             {
-                if(actor.name== UnvsApp.Instance.currentActor.name)
+                if (actor.name == UnvsApp.Instance.currentActor.name)
                 {
                     (actor as MonoBehaviour).enabled = false;
                     (actor as MonoBehaviour).gameObject.SetActive(false);
-
-                     (actor as MonoBehaviour).gameObject.SafeDestroyAsync().Forget();
+                    (actor as MonoBehaviour).gameObject.SafeDestroyAsync().Forget();
                     return;
                 }
             }
-          
         }
         private async UniTask clearChunkLeftIfExeedeAsync()
         {
