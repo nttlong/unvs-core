@@ -125,9 +125,19 @@ namespace unvs.game2d.scenes
         public Dictionary<UnvsScene,string> Scenes { get; private set; }
         private UnvsScene _LastScene;
         private UnvsScene _LastExitScene;
-
-        public void RaiseEnterScene(UnvsScene unvsScene)
+        public void CleanUp()
         {
+            this.Scenes = new Dictionary<UnvsScene, string>();
+        }
+        public void RaiseEnterScene(UnvsScene unvsScene,bool reset=false)
+        {
+            if(reset)
+            {
+                if (this.Scenes == null)
+                {
+                    this.Scenes=new Dictionary<UnvsScene, string>();
+                } 
+            }
             if (unvsScene == null) return;
 
             this.Scenes ??= new Dictionary<UnvsScene, string>();
@@ -145,7 +155,7 @@ namespace unvs.game2d.scenes
                 if (this.Scenes.Count() > 1)
                 {
                     var s = Scenes.Select(p => p.Key).ToList();
-                    UnvsCinema.Instance.ChangeCameraState(s);
+                    UnvsCinema.Instance.ChangeCameraState(s, reset);
                 }
 
             }

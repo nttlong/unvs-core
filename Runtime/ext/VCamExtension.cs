@@ -2,6 +2,7 @@
 using game2d.ext;
 using System;
 using System.Collections;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -103,6 +104,7 @@ namespace unvs.ext
                 }
             }
             vcam.SetOrthoSizeImmediate(scene.OrthographicSize);
+            
         }
 
         public static async UniTask ChangeFollowOffsetSmoothAsync(this CinemachineCamera vcam, Vector3 targetOffset, CancellationToken cancellationToken, float duration = 1.0f)

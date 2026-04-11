@@ -93,7 +93,7 @@ namespace unvs.game2d.scenes
             if(!string.IsNullOrEmpty(spawnName))
             {
                 var tr = this.GetComponentInChildrenByName<Transform>(spawnName);
-                return tr.position;
+                return this.ground.GetIntersetPoint(tr.GetSegment().Center().x);
             } else
             {
                 return this.ground.GetIntersetPoint(this.startPoint.transform.GetSegment().Center().x);
@@ -110,7 +110,7 @@ namespace unvs.game2d.scenes
         {
             return this.GetComponentsInChildren<UnvsActor>(true).FirstOrDefault(p => p.GetComponent<UnvsPlayer>() != null);
         }
-        public void TurnOnLeft()
+        public UnvsScene TurnOnLeft()
         {
             this.wallLeft.enabled=true;
             this.wallLeft.gameObject.SetActive(true);
@@ -118,8 +118,9 @@ namespace unvs.game2d.scenes
             this.triggerLeft.gameObject.SetActive(true);
             this.triggerLoadSceneLeft.enabled=true;
             this.triggerLoadSceneLeft.gameObject.SetActive(true );
+            return this;
         }
-        public void TurnOffLeft()
+        public UnvsScene TurnOffLeft()
         {
             this.wallLeft.enabled = false;
             this.wallLeft.gameObject.SetActive(false);
@@ -127,8 +128,9 @@ namespace unvs.game2d.scenes
             this.triggerLeft.gameObject.SetActive(false);
             this.triggerLoadSceneLeft.enabled = false;
             this.triggerLoadSceneLeft.gameObject.SetActive(false);
+            return this;
         }
-        public void TurnOnRight()
+        public UnvsScene TurnOnRight()
         {
             this.wallRight.enabled = true;
             this.wallRight.gameObject.SetActive(true);
@@ -136,8 +138,9 @@ namespace unvs.game2d.scenes
             this.triggerRight.gameObject.SetActive(true);
             this.triggerLoadSceneRight.enabled = true;
             this.triggerLoadSceneRight.gameObject.SetActive(true);
+            return this;
         }
-        public void TurnOffRight()
+        public UnvsScene TurnOffRight()
         {
             this.wallRight.enabled = false;
             this.wallRight.gameObject.SetActive(false);
@@ -145,6 +148,7 @@ namespace unvs.game2d.scenes
             this.triggerRight.gameObject.SetActive(false);
             this.triggerLoadSceneRight.enabled = false;
             this.triggerLoadSceneRight.gameObject.SetActive(false);
+            return this;
         }
         
         public void TrimGround()

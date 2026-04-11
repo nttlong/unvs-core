@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 using unvs.actions;
 using unvs.baseobjects;
@@ -19,6 +20,11 @@ namespace unvs.actionsbasics
         public AudioInfo CloseSound;
         public async override UniTask ExecuteAsync(ActionBaseSender Sender)
         {
+            if(Sender.Source.IsDestroyed())
+            {
+                Sender.Cancel();
+                return;
+            }
             var teleportObject = Sender.Source.GetComponent<UnvsTeleport>();
             if (teleportObject == null)
             {

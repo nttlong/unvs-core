@@ -40,9 +40,21 @@ namespace unvs.game2d.scenes{
         private Light2D[] _lights=new Light2D[] { };
         public AudioSource audioSource;
 
-        public void ChangeCameraState(List<UnvsScene> s)
+        public void ChangeCameraState(List<UnvsScene> s,bool Imediately)
         {
-            UnvsScene nearset = CalculateNearestScene(s);
+            UnvsScene nearset = null;
+            if (Imediately)
+            {
+
+                vcam.SetOrthoSizeImmediate(s[0].OrthographicSize);
+                vcam.GetComponent<CinemachineFollow>().FollowOffset = s[0].followOffset;
+
+                float height = s[0].OrthographicSize * 2f;
+                float width = height * cam.aspect; // cam.aspect = Screen.width / Screen.height
+                camColl.size = new Vector2((float)width, (float)height);
+                return;
+            }
+            nearset = CalculateNearestScene(s);
             ctsChangeOffset = ctsChangeOffset.Refresh();
             ctsChangeOrthoSize = ctsChangeOrthoSize.Refresh();
             if (vcam.Lens.OrthographicSize > nearset.OrthographicSize)
@@ -167,6 +179,7 @@ namespace unvs.game2d.scenes{
         {
             this.worldBoundDict.Clear();
             this.lightDict.Clear();
+            
         }
         public override void InitEvents()
         {

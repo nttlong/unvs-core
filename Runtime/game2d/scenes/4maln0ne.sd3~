@@ -30,34 +30,21 @@ namespace unvs.game2d.scenes
         }
         public async UniTask<UnvsScene> LoadInteriorAsync(string path, string spawnName, UnvsScene fromScene)
         {
-            
-            lastInteriorScene = fromScene;
-            lastInteriorScene.transform.SetParent(this.backupInterior.transform, true);
-            lastInteriorScene.TurnOffLeft().TurnOffRight();
-            if(lastInteriorScene.leftScene != null)
-            {
-                lastInteriorScene.leftScene.rightScene = null;
-            }
-            if (lastInteriorScene.rightScene != null)
-            {
-                lastInteriorScene.rightScene.leftScene = null;
-            }
-            lastInteriorScene.leftScene = null;
-            lastInteriorScene.rightScene = null;
-            UnvsCinema.Instance.ClearWorlds();
-            UnvsApp.Instance.CleanUp();
-            this.interior.gameObject.SetActive(true);
-            this.chunks.gameObject.SetActive(false);
             await this.clearChunsAsync();
-
-            
             UnvsCinema.Instance.ClearWorlds();
-            UnvsScene ret;
+            this.chunks.gameObject.SetActive(false);
+            UnvsScene ret = null;
+            if (lastInteriorScene != null)
+            {
+                lastInteriorScene.transform.SetParent(this.backupInterior.transform, true);
+            }
             ret = this.backupInterior.GetComponentInChildrenByName<UnvsScene>(path);
             if (ret == null)
             {
                 ret = await Commons.LoadPrefabsAsync<UnvsScene>(path, this.buffer);
             }
+           
+            
             ret.transform.SetParent(this.interior.transform, true);
 
             UnvsCinema.Instance.UpdateWorld(ret);
@@ -66,30 +53,27 @@ namespace unvs.game2d.scenes
             UnvsActor actor = ret.GetActiveActor();
             if (actor != null)
             {
-                this.validateCurrentActor(ret);
+                validateCurrentActor(ret);
             }
-
-            UnvsApp.Instance.currentActor.StandBy(ret.GetStartPosition(spawnName));
-            UnvsCinema.Instance.vcam.Watch(UnvsApp.Instance.currentActor.camWatcher);
+            if (actor != null)
+            {
+                actor.StandBy(ret.GetStartPosition(spawnName));
+                UnvsCinema.Instance.vcam.Watch(actor.camWatcher);
+                UnvsApp.Instance.currentActor = actor;
+            }
+            ret.gameObject.SetActive(true);
+            
 
             UnvsCinema.Instance.UpdateMainCameraBoxCollider2dSize();
-            UnvsApp.Instance.RaiseEnterScene(ret);
-            ret.gameObject.SetActive(true);
-            ret.TurnOnLeft().TurnOnRight();
+            UnvsApp.Instance.RaiseEnterScene(ret,true);
             lastInteriorScene = ret;
             return ret;
         }
-       
         public async UniTask<UnvsScene> LoadNewAsync(string path, string spawnName)
         {
             
             await this.clearAsync();
-            this.interior.gameObject.SetActive(false);
-            if (UnvsApp.Instance.currentActor != null)
-            {
-                UnvsApp.Instance.currentActor.gameObject.SafeDestroy();
-            }
-                UnvsCinema.Instance.ClearWorlds();
+            UnvsCinema.Instance.ClearWorlds();
             var ret = await Commons.LoadPrefabsAsync<UnvsScene>(path, this.buffer);
             ret.transform.SetParent(this.chunks.transform, true);
 
@@ -101,7 +85,7 @@ namespace unvs.game2d.scenes
             {
                 actor.transform.SetParent(this.actorContainer.transform, true);
             }
-           
+            ret.gameObject.SetActive(true);
             if (actor != null)
             {
                 actor.StandBy(ret.GetStartPosition(spawnName));
@@ -111,25 +95,13 @@ namespace unvs.game2d.scenes
 
             UnvsCinema.Instance.UpdateMainCameraBoxCollider2dSize();
             UnvsApp.Instance.RaiseEnterScene(ret, true);
-            ret.gameObject.SetActive(true);
+
 
             return ret;
         }
         public async UniTask<UnvsScene> LoadChunkLeftAsync(UnvsScene fromScene, string path)
         {
-            
             this.clearChunkRightIfExeedeAsync().Forget();
-            if (fromScene.transform.parent == this.interior)
-            {
-                fromScene.transform.SetParent(this.chunks.transform, true);
-                interior.gameObject.SetActive(false);
-                backupInterior.SafeDestroyChildrenAsync().Forget();
-                this.chunks.gameObject.SetActive(true);
-            }
-            if (fromScene.transform.parent == this.interior)
-            {
-                fromScene.transform.SetParent(this.chunks.transform.parent, true);
-            }
             fromScene.TurnOffLeft();
 
 
@@ -172,13 +144,6 @@ namespace unvs.game2d.scenes
         {
 
             this.clearChunkLeftIfExeedeAsync().Forget();
-            if (fromScene.transform.parent == this.interior)
-            {
-                fromScene.transform.SetParent(this.chunks.transform, true);
-                interior.gameObject.SetActive(false);
-                backupInterior.SafeDestroyChildrenAsync().Forget();
-                this.chunks.gameObject.SetActive(true);
-            }
             fromScene.TurnOffRight();
 
             var ret = await Commons.LoadPrefabsAsync<UnvsScene>(path, this.buffer);
