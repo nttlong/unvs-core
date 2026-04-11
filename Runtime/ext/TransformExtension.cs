@@ -73,91 +73,54 @@ namespace unvs.ext
             return Math.Abs(dx);
 
         }
-        public static async UniTask<MoveInfo2D> MoveToAsync(this Transform transform, float Speed, Vector2 target, Action<MoveInfo2D> OnMoving, Action<MoveInfo2D> OnFinish, CancellationToken token, float distance = 0)
+       
+        public static async UniTask<MoveInfo2D> MoveToAsync(
+    this Transform transform,
+    float speed,
+    Vector2 target,
+    Action<MoveInfo2D> onMoving,
+    Action<MoveInfo2D> onFinish,
+    CancellationToken token, // Chuyển sang dùng CancellationToken
+    float distance = 0)
         {
             var ret = new MoveInfo2D();
 
-            // Luôn lấy hướng hiện tại từ transform trước khi bắt đầu
-            float currentDir = 0; ;
-
             try
             {
-                // Tính toán bước đầu tiên
-                float ds = transform.MoveStep(target, Speed, out currentDir);
-                ret.Direction = currentDir;
-                OnMoving?.Invoke(ret);
+                // 1. Kiểm tra ban đầu
+                if (transform == null) return ret;
+                token.ThrowIfCancellationRequested();
 
+                // 2. Tính toán bước đầu tiên
+                var ds = transform.MoveStep(target, speed, out var dir);
+                ret.Direction = dir;
+                onMoving?.Invoke(ret);
+
+                // 3. Vòng lặp di chuyển
                 while (ds > distance)
                 {
-                    // Quan trọng: UniTask.Yield với token sẽ tự ném OperationCanceledException
+                    // UniTask.Yield với token sẽ tự động hủy Task nếu token bị Cancel
+                    // PlayerLoopTiming.Update giúp đồng bộ với hệ thống vật lý/render
                     await UniTask.Yield(PlayerLoopTiming.Update, token);
 
-                    // Cập nhật vị trí và hướng
-                    ds = transform.MoveStep(target, Speed, out currentDir);
+                    // CỰC KỲ QUAN TRỌNG: Kiểm tra transform có bị Destroy trong lúc chờ không
+                    if (transform == null) return ret;
 
-                    ret.Direction = currentDir;
-                    OnMoving?.Invoke(ret);
+                    ds = transform.MoveStep(target, speed, out dir);
+                    ret.Direction = dir;
+                    onMoving?.Invoke(ret);
                 }
 
-                OnFinish?.Invoke(ret);
+                // 4. Hoàn thành
+                onFinish?.Invoke(ret);
             }
             catch (OperationCanceledException)
             {
-                // Khi bị Cancel, không trả về ret rỗng, mà có thể giữ nguyên hướng cuối
-                Debug.Log("MoveToAsync was cancelled - Switching target");
-            }
-
-            return ret;
-        }
-        public static async UniTask<MoveInfo2D> MoveToAsync(this Transform transform, float Speed, Vector2 target, Action<MoveInfo2D> OnMoving,Action<MoveInfo2D> OnFinish, CancellationTokenSource cts,float distance=0)
-        {
-           
-            var ret = new MoveInfo2D();
-            if (cts == null)
-            {
-                return ret;
-            }
-            if (cts.IsCancellationRequested) return ret;
-            cts.Token.ThrowIfCancellationRequested();
-            try
-            {
-
-                // Lấy hướng ban đầu
-                var dir = ret.Direction;
-
-                // Tính toán bước di chuyển đầu tiên
-                var ds = transform.MoveStep(target, Speed , out dir);
-
-                ret.Direction = dir; // Cập nhật hướng cho nhân vật
-                OnMoving?.Invoke(ret);
-
-                while (ds > distance)
-                {
-                    // Kiểm tra xem Task có bị hủy (cancel) không (ví dụ khi đổi mục tiêu hoặc thoát game)
-                    if (cts.Token.IsCancellationRequested)
-                    {
-                        return ret;
-                    }
-                    // Chờ đến frame tiếp theo
-                    await UniTask.Yield(PlayerLoopTiming.Update, cts.Token);
-
-                    // Tiếp tục di chuyển và cập nhật ds
-                    ds = transform.MoveStep(target, Speed, out dir);
-
-                    ret.Direction = dir; // Cập nhật hướng liên tục để nhân vật quay đúng hướng
-                    OnMoving?.Invoke(ret);
-                }
-                OnFinish?.Invoke(ret);
-            }
-            catch (OperationCanceledException)
-            {
-                // Khi bị hủy, trả về dữ liệu hướng tại thời điểm bị hủy
+                // Log hoặc xử lý riêng khi bị Cancel nếu cần
                 return ret;
             }
 
             return ret;
-
-            // Đảm bảo sau khi dừng lại, ds bằng 0 và nhân vật ở đúng đích
         }
         public static T CreateIfNoExist<T>(this Transform transform, string name)
         {

@@ -19,9 +19,9 @@ namespace unvs.game2d.objects
             this.mousePoint = UnvsInteractUI.Instance.defaultCursorIcon;
         }
 
-        public virtual Vector2 GetPosition()
+        public Vector2 GetPosition()
         {
-            return coll.bounds.center;
+            throw new NotImplementedException();
         }
     }
 #if UNITY_EDITOR

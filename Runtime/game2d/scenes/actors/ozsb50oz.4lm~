@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Triggers;
 using System;
 using System.Threading;
@@ -59,49 +59,19 @@ namespace unvs.game2d.scenes.actors
         {
             UnvsActirDialogue.Instance.Hide();
         }
-        public async UniTask MovtoTargetAsync(Vector2 pos, CancellationToken tk = default)
+        public async UniTask MovtoTargetAsync(Vector2 pos)
         {
-            // 1. Lấy CTS chính của Actor (KHÔNG đưa cái này vào using)
-            var actorCts = this.RefreshToken();
-
-            // 2. Tạo một biến đại diện cho Token sẽ dùng để di chuyển
-            CancellationToken finalToken;
-            CancellationTokenSource linkedCts = null;
-
-            if (tk != default && tk != actorCts.Token)
+            this.RefreshToken(); // luon luon bo qua moi hanh dong khac
+            await TransformExtension.MoveToAsync(this.transform, this.WalkSpeed, pos, p =>
             {
-                // Chỉ tạo Link nếu cần thiết
-                linkedCts = CancellationTokenSource.CreateLinkedTokenSource(actorCts.Token, tk);
-                finalToken = linkedCts.Token;
-            }
-            else
+                motions.direction = p.Direction;
+                motions.motions.PlayBaseLayer("walk");
+            }, p =>
             {
-                finalToken = actorCts.Token;
-            }
+                motions.direction = p.Direction;
+                motions.motions.PlayBaseLayer("Idle");
+            }, this.RefreshToken());
 
-            try
-            {
-                // 3. Thực hiện di chuyển
-                await TransformExtension.MoveToAsync(this.transform, this.WalkSpeed, pos,
-                    p => {
-                        this.motions.direction = p.Direction;
-                        this.motions.Motion("walk");
-                    },
-                    p => {
-                        this.motions.direction = p.Direction;
-                        this.motions.Motion("idle");
-
-                    },
-                    finalToken);
-            }
-            finally
-            {
-                // 4. CHỈ Dispose cái LinkedCts (cái tạm thời), KHÔNG Dispose actorCts
-                if (linkedCts != null)
-                {
-                    linkedCts.Dispose();
-                }
-            }
         }
 
         public T ScanObject<T>(params string[] layers)
