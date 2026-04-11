@@ -12,11 +12,19 @@ using unvs.shares.editor;
 namespace unvs.game2d.objects
 {
     [RequireComponent(typeof(UnvsSpawnPoint))]
+    [RequireComponent(typeof(SpriteRenderer))]
     public class UnvsTeleport : UnvsInteractObject
     {
         public AssetReference Target;
         public string TargetPath;
 
+        
+
+        public override void InitRuntime()
+        {
+
+        }
+#if UNITY_EDITOR
         public override void InitDesignTime()
         {
             base.InitDesignTime();
@@ -24,18 +32,19 @@ namespace unvs.game2d.objects
             {
                 this.TargetPath = Target.EditorGetAddressPath();
             }
-
-
-        }
-
-        public override void InitRuntime()
-        {
+            if (GetComponent<SpriteRenderer>().sprite == null)
+                GetComponent<SpriteRenderer>().sprite = Commons.LoadAsset<Sprite>("Packages/com.unvs.core/Runtime/Sprites/Square.png");
 
         }
-#if UNITY_EDITOR
-
         [UnvsButton("Apply data")]
         public void EditorApplyData()
+        {
+            if (Target != null)
+            {
+                this.TargetPath = Target.EditorGetAddressPath();
+            }
+        }
+        private void OnValidate()
         {
             if (Target != null)
             {

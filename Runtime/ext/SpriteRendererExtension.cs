@@ -95,6 +95,18 @@ namespace unvs.ext
             }
         }
 
-       
+        public static void FixCollider2DSize(this SpriteRenderer sp, BoxCollider2D coll)
+        {
+            float width = sp.sprite.rect.width / sp.sprite.pixelsPerUnit;
+            float height = sp.sprite.rect.height / sp.sprite.pixelsPerUnit;
+            coll.size = new Vector2(width, height);// sp.transform.localScale;
+        }
+        public static void FixCollider2DSize(this Sprite sp, BoxCollider2D coll)
+        {
+            float width = sp.rect.width / sp.pixelsPerUnit;
+            float height = sp.rect.height / sp.pixelsPerUnit;
+            coll.size = new Vector2(width, height);// sp.transform.localScale;
+           
+        }
     }
 }

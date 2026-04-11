@@ -15,6 +15,8 @@ namespace unvs.shares
             public const string TRIGGER_LOAD_SCENE = "TRIGGER-LOAD-SCENE";
 
             public const string PLAYER_CAM_WATCHER = "PLAYER-CAM-WATCHER";
+
+            public const string INTERACT_SCANER = "INTERACT-SCANER";
         }
 
         public class CinemachineDefaut
@@ -47,6 +49,8 @@ namespace unvs.shares
             public const string TRIGGER_LOAD_SCENE = "TRIGGER-LOAD-SCENE";
 
             public const string TRIGGER_SCENE_CHANGE = "TRIGGER-SCENE-CHANGE";
+
+            public const string INTERACT_SCANER = "INTERACT-SCANER";
         }
         public class Scenes
         {

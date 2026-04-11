@@ -55,7 +55,7 @@ namespace unvs.game2d.scenes
         }
         public async UniTask<UnvsScene> LoadChunkLeftAsync(UnvsScene fromScene,string path)
         {
-            await this.clearChunkRightIfExeedeAsync();
+            this.clearChunkRightIfExeedeAsync().Forget();
             fromScene.TurnOffLeft();
 
 

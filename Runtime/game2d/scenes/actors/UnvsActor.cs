@@ -1,5 +1,7 @@
+using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Triggers;
 using System;
+using System.Threading;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -17,8 +19,12 @@ namespace unvs.game2d.scenes.actors
     [RequireComponent(typeof(IKBoneMap))]
     [RequireComponent(typeof(AnimMap))]
     [RequireComponent(typeof(UniqueObject))]
-    public class UnvsActor : UnvsBaseComponent
+    public partial class UnvsActor : UnvsBaseComponent
     {
+        public CancellationTokenSource cts => _cls;
+
+        
+        
 
         private bool isMoving;
         private Vector2 target;
@@ -27,69 +33,119 @@ namespace unvs.game2d.scenes.actors
         public Collider2D coll;
         public Rigidbody2D body;
         public Transform camWatcher;
-       
+        public BoxCollider2D scanerBound;
         public GameObject animEle;
         public Animator animator;
         public AnimMap motions;
-       
+        private CancellationTokenSource _cls;
+
+        public virtual CancellationTokenSource RefreshToken()
+        {
+            _cls = _cls.Refresh();
+            return _cls;
+        }
         public void StandBy(Vector2 vector2)
         {
             this.transform.position = vector2;// + new Vector2((coll.bounds.max.x-coll.bounds.min.x)/2,0);
-            
+
 
         }
         public void SayText(string Content)
         {
-            var pos=new Vector2(coll.bounds.center.x,coll.bounds.max.y+2);
-            UnvsActirDialogue.Instance.Show(pos,Content);
+            var pos = new Vector2(coll.bounds.center.x, coll.bounds.max.y + 2);
+            UnvsActirDialogue.Instance.Show(pos, Content);
         }
         public void SayOff()
         {
             UnvsActirDialogue.Instance.Hide();
         }
+        public async UniTask MovtoTargetAsync(Vector2 pos)
+        {
+            this.RefreshToken();
+            await TransformExtension.MoveToAsync(this.transform, this.WalkSpeed, pos, p =>
+            {
+                motions.direction = p.Direction;
+                motions.motions.PlayBaseLayer("walk");
+            }, p =>
+            {
+                motions.direction = p.Direction;
+                motions.motions.PlayBaseLayer("Idle");
+            }, this.RefreshToken());
 
+        }
 
-
+        public T ScanObject<T>(params string[] layers)
+        {
+            var coll = GetComponent<Collider2D>();
+            return coll.bounds.center.ScanObject<T>(this.scanerBound.size, layers);
+        }
+        public T ScanObjectFromPont<T>(Vector2 pos, params string[] layers)
+        {
+            //var coll = GetComponent<Collider2D>();
+            return Vector2dExtesion.ScanObject<T>(pos, this.scanerBound.size, layers);
+            //return coll.ScanObject<T>(this.scanerBound.size.x, this.scanerBound.size.y, LayerMask.GetMask(layers));
+        }
+    }
 #if UNITY_EDITOR
+    public partial class UnvsActor : UnvsBaseComponent
+    {
+
+
         [UnvsButton]
         public void FixLayout()
         {
-            
+
             this.camWatcher.position = new Vector3(this.coll.bounds.center.x, this.coll.bounds.max.y, -10);
             var coll = this.camWatcher.AddComponentIfNotExist<BoxCollider2D>();
             coll.isTrigger = true;
             coll.SetMeOnTag(Constants.Tags.PLAYER_CAM_WATCHER);
+            if (this.scanerBound == null)
+            {
+                this.scanerBound = this.AddChildComponentIfNotExist<BoxCollider2D>("scaner-bound");
+                this.scanerBound.size = this.GetComponent<Collider2D>().bounds.size;
+                
+            }
+            this.scanerBound.SetMeOnLayer(Constants.Layers.INTERACT_SCANER);
+            this.scanerBound.SetMeOnTag(Constants.Tags.INTERACT_SCANER);
+            this.scanerBound.isTrigger = true;
+           
+
         }
         [UnvsButton("Anim controller")]
         public void GenerateAnimatorController()
         {
             this.animEle = this.GetComponentInChildren<SpriteSkin>(true).transform.parent.gameObject;
-            string folderPath=UnvsEditorUtils.EditorGetFolder(this.animEle);
-            var controller =UnvsEditorUtils.EditorCreateAnimatorController(folderPath, this.animEle.name);
-            this.animator= this.animEle.transform.AddComponentIfNotExist<Animator>();
+            string folderPath = UnvsEditorUtils.EditorGetFolder(this.animEle);
+            var controller = UnvsEditorUtils.EditorCreateAnimatorController(folderPath, this.animEle.name);
+            this.animator = this.animEle.transform.AddComponentIfNotExist<Animator>();
             this.animator.runtimeAnimatorController = controller;
         }
         [UnvsButton]
         public void Generate()
         {
-            if(this.CheckComponentIfNotExistCreate<CapsuleCollider2D>(out var _coll))
+            if (this.CheckComponentIfNotExistCreate<CapsuleCollider2D>(out var _coll))
             {
 
                 _coll.size = new Vector2(8, 20);
                 _coll.offset = new Vector2(0, 10);
                 this.coll = _coll;
             }
-            
-            
+
+
             body = this.AddComponentIfNotExist<Rigidbody2D>();
             body.freezeRotation = true;
             this.camWatcher = this.AddChildComponentIfNotExist<Transform>("cam-wacther");
             this.camWatcher.position = new Vector3(this.coll.bounds.center.x, this.coll.bounds.max.y, -10);
         }
-
         
+
+    }
+
 
 
 #endif
-    }
+
+
+
+
 }

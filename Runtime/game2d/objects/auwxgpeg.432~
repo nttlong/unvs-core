@@ -21,7 +21,6 @@ namespace unvs.game2d.objects
 #if UNITY_EDITOR
     public partial class UnvsInteractObject : UnvsComponent
     {
-        public unvs.actions.InteractionDefinition Data;
         public override void InitDesignTime()
         {
             this.SetMeOnLayer(Constants.Layers.INTERACT_OBJECT);

@@ -79,7 +79,7 @@ namespace unvs.game2d.scenes
     {
         public UnvsPlayerInputMap InputMap;
 
-        private void Awake()
+        public virtual void Awake()
         {
             if (Application.isPlaying)
             {

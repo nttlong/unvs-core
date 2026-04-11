@@ -389,5 +389,17 @@ namespace unvs.ext
             // Nếu bạn muốn set width động:
             // coll.size = new Vector2(localLength, desiredWidth);
         }
+        public static void FixBySpriteSize(this BoxCollider2D coll, SpriteRenderer sp)
+        {
+            float width = sp.sprite.rect.width / sp.sprite.pixelsPerUnit;
+            float height = sp.sprite.rect.height / sp.sprite.pixelsPerUnit;
+            coll.size = new Vector2(width, height);// sp.transform.localScale;
+        }
+        public static void FixBySpriteSize(this BoxCollider2D coll , Sprite sp)
+        {
+            float width = sp.rect.width / sp.pixelsPerUnit;
+            float height = sp.rect.height / sp.pixelsPerUnit;
+            coll.size = new Vector2(width, height);// sp.transform.localScale;
+        }
     }
 }

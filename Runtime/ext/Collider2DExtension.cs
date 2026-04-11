@@ -6,6 +6,7 @@ using System;
 using UnityEngine;
 using unvs.interfaces;
 using unvs.shares;
+using System.Linq;
 namespace unvs.ext
 {
     public static class Collider2DExtension
@@ -40,7 +41,32 @@ namespace unvs.ext
             }
             return null;
         }
+        public static T ScanObject<T>(this Collider2D coll, float ExpandWidth, float ExpandHeight, int interactableLayer)
+        {
 
+            // 1. Lấy vị trí tâm của nhân vật (hoặc một điểm phía trước mặt nhân vật)
+            Vector2 scanPoint = coll.bounds.center;
+
+            var interactSize = coll.bounds.size + new Vector3(ExpandWidth, ExpandHeight, 0);
+            // 2. Quét tất cả các Collider2D nằm trong vùng hình hộp và thuộc LayerMask
+            Collider2D[] results = Physics2D.OverlapBoxAll(scanPoint, interactSize, 0f, interactableLayer);
+            var colls= results.Where(p=>p.GetComponent<T>()!=null).ToArray();
+
+
+            // 3. Xử lý các đối tượng tìm được
+            if (colls.Length > 0)
+            {
+                // Thường chúng ta sẽ lấy vật thể gần nhất
+                GameObject closestGO = coll.bounds.center.GetClosestTarget(colls);
+                return closestGO.GetComponent<T>();
+
+            }
+            else if (results.Length == 1)
+            {
+                return results[0].GetComponent<T>();
+            }
+            return default(T);
+        }
         public static void Resize(this BoxCollider2D boxCollider2D, Transform transform)
         {
             // Vì không có SpriteRenderer, chúng ta coi kích thước chuẩn của Collider là 1x1 

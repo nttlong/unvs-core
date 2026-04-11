@@ -169,7 +169,19 @@ namespace unvs.ext
         public static float CalculateDirection(this Vector3 v,Vector2 other)
         {
             if (v.x > other.x) return 1;
-            if (v.x < other.y) return -1;
+            if (v.x < other.x) return -1;
+            return 0;
+        }
+        public static float GetDirectionTo(this Vector3 From, Vector2 To)
+        {
+            if (From.x > To.x) return -1;
+            if (From.x < To.x) return 1;
+            return 0;
+        }
+        public static float GetDirectionTo(this Vector3 From, Vector3 To)
+        {
+            if (From.x > To.x) return -1;
+            if (From.x < To.x) return 1;
             return 0;
         }
         public static Vector3 CloneToNew(this Vector3 v)
@@ -288,6 +300,18 @@ namespace unvs.ext
                 return hitObject.GetComponent<T>();
             }
             return default(T);
+        }
+        public static float GetDirection(this Vector2 v, Vector2 other)
+        {
+            if (v.x > other.x) return 1;
+            if (v.x < other.y) return -1;
+            return 0;
+        }
+        public static float GetDirection(this Vector2 v, Vector3 other)
+        {
+            if (v.x > other.x) return 1;
+            if (v.x < other.y) return -1;
+            return 0;
         }
         public static Vector2 CalculateDiection(this Vector2 v)
         {
@@ -489,5 +513,36 @@ namespace unvs.ext
 
             return points;
         }
+        public static T ScanObject<T>(this Vector3 scanPoint, Vector2 Scope, string[] layers)
+        {
+            return ScanObject<T>((Vector2)scanPoint, Scope, layers);
+        }
+        public static T ScanObject<T>(this Vector2 scanPoint,Vector2 Scope, string[] layers)
+        {
+            // 1. Lấy vị trí tâm của nhân vật (hoặc một điểm phía trước mặt nhân vật)
+            
+
+          
+            // 2. Quét tất cả các Collider2D nằm trong vùng hình hộp và thuộc LayerMask
+
+            Collider2D[] results = Physics2D.OverlapBoxAll(scanPoint, Scope, 0f, LayerMask.GetMask(layers));
+            var colls = results.Where(p => p.GetComponent<T>() != null).ToArray();
+
+
+            // 3. Xử lý các đối tượng tìm được
+            if (colls.Length > 0)
+            {
+                // Thường chúng ta sẽ lấy vật thể gần nhất
+                GameObject closestGO = scanPoint.GetClosestTarget(colls);
+                return closestGO.GetComponent<T>();
+
+            }
+            else if (results.Length == 1)
+            {
+                return results[0].GetComponent<T>();
+            }
+            return default(T);
+        }
+        
     }
 }
