@@ -39,7 +39,7 @@ namespace unvs.game2d.scenes
         public CinemachineConfiner2D confiner;
         public CinemachineFollow cinemachineFollow;
      
-        public EdgeCollider2D edgesWorldBound;
+        
         public Transform startPoint;
        
         public PolygonCollider2D worldBound;

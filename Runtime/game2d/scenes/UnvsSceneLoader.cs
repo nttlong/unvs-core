@@ -32,7 +32,7 @@ namespace unvs.game2d.scenes
             var ret= await Commons.LoadPrefabsAsync<UnvsScene>(path,this.buffer);
             ret.transform.SetParent(this.chunks.transform,true);
 
-            UnvsCinema.Instance.UpdateWorldBound(ret);
+            UnvsCinema.Instance.UpdateWorld(ret);
             UnvsCinema.Instance.vcam.UpdateByUnvsScene(ret);
             
             UnvsActor actor = ret.GetActiveActor();
@@ -70,7 +70,7 @@ namespace unvs.game2d.scenes
             ret.transform.SetParent(this.chunks.transform,false);
             ret.transform.position -= (Vector3)offset;
             ret.transform.SetAsFirstSibling();
-            UnvsCinema.Instance.UpdateWorldBound(ret);
+            UnvsCinema.Instance.UpdateWorld(ret);
             ret.gameObject.SetActive(true );
             fromScene.leftScene = ret;
             ret.rightScene = fromScene;
@@ -98,7 +98,7 @@ namespace unvs.game2d.scenes
             ret.transform.SetParent(this.chunks.transform, false);
             ret.transform.position -= (Vector3)offset;
             ret.transform.SetAsLastSibling();
-            UnvsCinema.Instance.UpdateWorldBound(ret);
+            UnvsCinema.Instance.UpdateWorld(ret);
             ret.gameObject.SetActive(true);
             fromScene.rightScene = ret;
             ret.leftScene = fromScene;

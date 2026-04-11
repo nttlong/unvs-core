@@ -1,9 +1,9 @@
-﻿using System.Collections;
-using UnityEngine;
-namespace unvs.interfaces
-{
-    public interface IGroudPhysical
-    {
+﻿//using System.Collections;
+//using UnityEngine;
+//namespace unvs.interfaces
+//{
+//    public interface IGroudPhysical
+//    {
 
-    }
-}
+//    }
+//}

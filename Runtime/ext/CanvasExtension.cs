@@ -54,9 +54,9 @@ namespace unvs.ext
             }
             UICanvas.enabled = true;
             UICanvas.gameObject.SetActive(true);
-            GlobalApplication.GlobalInput.Player.enable = false;
+            //GlobalApplication.GlobalInput.Player.enable = false;
             Time.timeScale = 0f;
-            SettingsSingleScene.Instance.CursorOn();
+            //SettingsSingleScene.Instance.CursorOn();
 
         }
         public static void DoDeactive(this Canvas UICanvas)
@@ -64,7 +64,7 @@ namespace unvs.ext
             if (UICanvas == null) return;
             UICanvas.enabled = false;
             UICanvas.gameObject.SetActive(false);
-            GlobalApplication.GlobalInput.Player.enable = true;
+            //GlobalApplication.GlobalInput.Player.enable = true;
             Time.timeScale = 1f;
         }
     }

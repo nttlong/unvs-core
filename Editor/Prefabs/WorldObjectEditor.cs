@@ -6,6 +6,7 @@ using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using unvs.game2d.scenes;
 using unvs.gameword;
 using unvs.interfaces;
 using unvs.shares;
@@ -23,7 +24,7 @@ public class WorldObjectEditor
         // Kiểm tra xem có phải là Prefab và có gắn IScene không
         if (selectedPrefab != null)
         {
-            IScenePrefab sceneObj = selectedPrefab.GetComponent<IScenePrefab>();
+            UnvsScene sceneObj = selectedPrefab.GetComponent<UnvsScene>();
             if (sceneObj != null)
             {
                 // 2. Lấy Addressable Path hoặc Path thông thường
@@ -46,41 +47,42 @@ public class WorldObjectEditor
     [MenuItem("Assets/Play This World", true)]
     private static bool ValidatePlayWorldFromProject()
     {
-        return Selection.activeObject is GameObject go && go.GetComponent<IScenePrefab>() != null;
+        return Selection.activeObject is GameObject go && go.GetComponent<UnvsScene>() != null;
     }
 
     private static void OpenSingleSceneAndPlay()
     {
-        if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
-        {
-           var s= (Selection.activeObject as GameObject).GetComponent<WorldObject>();
-            var sceneName = s.TestSceneName;
-            if (string.IsNullOrEmpty(sceneName))
-            {
-                throw new Exception($"Please, set field TestSceneName for {s.name}");
-            }
-            string[] guids = AssetDatabase.FindAssets($"{sceneName} t:Scene");
-            if (guids.Length > 0)
-            {
-                string scenePath = AssetDatabase.GUIDToAssetPath(guids[0]);
-                s.TestScensGuid = guids[0];
+        Debug.LogError("Not implemement");
+        //if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+        //{
+        //   var s= (Selection.activeObject as GameObject).GetComponent<UnvsScene>();
+        //    var sceneName = s.TestSceneName;
+        //    if (string.IsNullOrEmpty(sceneName))
+        //    {
+        //        throw new Exception($"Please, set field TestSceneName for {s.name}");
+        //    }
+        //    string[] guids = AssetDatabase.FindAssets($"{sceneName} t:Scene");
+        //    if (guids.Length > 0)
+        //    {
+        //        string scenePath = AssetDatabase.GUIDToAssetPath(guids[0]);
+        //        s.TestScensGuid = guids[0];
                 
-                var scene = EditorSceneManager.OpenScene(scenePath);
-                var singeSinge = scene.GetRootGameObjects().FirstOrDefault(p => p.GetComponent<ISingleScene>() != null);
-                if (singeSinge != null)
-                {
-                   GlobalApplication.PendingWorldPath = GetAddressableOf(Selection.activeObject);
+        //        var scene = EditorSceneManager.OpenScene(scenePath);
+        //        var singeSinge = scene.GetRootGameObjects().FirstOrDefault(p => p.GetComponent<UnvsScene>() != null);
+        //        if (singeSinge != null)
+        //        {
+        //           GlobalApplication.PendingWorldPath = GetAddressableOf(Selection.activeObject);
                    
-                    EditorApplication.isPlaying = true;
+        //            EditorApplication.isPlaying = true;
 
-                }
-                else
-                {
-                    throw new Exception($"Please add {typeof(ISingleScene)} to {scenePath} ");
-                }
-                EditorApplication.isPlaying = true;
-            }
-        }
+        //        }
+        //        else
+        //        {
+        //            throw new Exception($"Please add {typeof(UnvsScene)} to {scenePath} ");
+        //        }
+        //        EditorApplication.isPlaying = true;
+        //    }
+        //}
     }
 
     public static string GetAddressableOf(UnityEngine.Object activeObject)

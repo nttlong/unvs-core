@@ -74,6 +74,11 @@ namespace unvs.game2d.scenes
                 }
             }
         }
+
+        internal static void SetActivePlayer(bool v)
+        {
+            throw new NotImplementedException();
+        }
     }
     public struct ActionSender
     {

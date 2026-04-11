@@ -1,25 +1,25 @@
-﻿using System.Collections;
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
-namespace unvs.interfaces
-{
-    public interface IUISpeakerController
-    { 
+﻿//using System.Collections;
+//using UnityEngine;
+//using UnityEngine.UI;
+//using TMPro;
+//namespace unvs.interfaces
+//{
+//    public interface IUISpeakerController
+//    { 
         
-        float Width { get; }
-        float Height { get; }
-        Image SpeakerPanel { get; }
-        Canvas SpeakerCanvas { get; }
-        TextMeshProUGUI Text { get; }
+//        float Width { get; }
+//        float Height { get; }
+//        Image SpeakerPanel { get; }
+//        Canvas SpeakerCanvas { get; }
+//        TextMeshProUGUI Text { get; }
 
-        void Hide();
+//        void Hide();
         
         
-        void Show(Vector2 pos, string txt);
-    }
-    public interface IHubController
-    {
+//        void Show(Vector2 pos, string txt);
+//    }
+//    public interface IHubController
+//    {
 
-    }
-}
+//    }
+//}

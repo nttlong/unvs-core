@@ -7,24 +7,24 @@ using System.Threading.Tasks;
 using UnityEngine;
 using unvs.actions;
 using unvs.shares;
-namespace unvs.interfaces
-{
-    public interface ITeleportPrefab
-    {
-        AudioInfo OpenSound { get; }
-        AudioInfo CloseSound { get; }
-        string PathToWord { get; }
-        bool IsNew { get; }
-        Texture2D TextT { get; }
-        //Sprite Sprite { get; }
-        SpriteRenderer SpriteRenderer { get; }
-        string TargetName { get; }
-        bool HideSpriteWhenPlaying { get; }
-        bool HideSpriteRendererWhenRun { get; }
+//namespace unvs.interfaces
+//{
+//    public interface ITeleportPrefab
+//    {
+//        AudioInfo OpenSound { get; }
+//        AudioInfo CloseSound { get; }
+//        string PathToWord { get; }
+//        bool IsNew { get; }
+//        Texture2D TextT { get; }
+//        //Sprite Sprite { get; }
+//        SpriteRenderer SpriteRenderer { get; }
+//        string TargetName { get; }
+//        bool HideSpriteWhenPlaying { get; }
+//        bool HideSpriteRendererWhenRun { get; }
 
 
-    }
-}
+//    }
+//}
 //public interface ITeleportObject
 //{
 

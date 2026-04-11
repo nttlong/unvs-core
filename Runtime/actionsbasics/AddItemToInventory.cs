@@ -1,33 +1,33 @@
-using Cysharp.Threading.Tasks;
-using Unity.Mathematics;
-using UnityEngine;
-using UnityEngine.Localization;
-using UnityEngine.Rendering;
-using unvs.actions;
-using unvs.ext;
-using unvs.interfaces;
+//using Cysharp.Threading.Tasks;
+//using Unity.Mathematics;
+//using UnityEngine;
+//using UnityEngine.Localization;
+//using UnityEngine.Rendering;
+//using unvs.actions;
+//using unvs.ext;
+//using unvs.interfaces;
 
-namespace unvs.actionsbasics
-{
-    public class InventoryAddItem : ActionBase
-    {
-        public async override UniTask ExecuteAsync(ActionBaseSender Sender)
-        {
-            var item = Sender.GetSourceComponent<IStoragableObject>();
-            var actor = Sender.GetTargetComponent<IActorObject>();
-            if (actor == null)
-            {
-                Sender.Cancel();
-                return;
-            }
-            if (item == null)
-            {
-               await  actor.Speaker.SayIThisDoesNotDoAnythingAsync();
-                Sender.Cancel();
-                return;
-            }
-            actor.Inventory.Add(Sender.Source);
+//namespace unvs.actionsbasics
+//{
+//    public class InventoryAddItem : ActionBase
+//    {
+//        public async override UniTask ExecuteAsync(ActionBaseSender Sender)
+//        {
+//            var item = Sender.GetSourceComponent<IStoragableObject>();
+//            var actor = Sender.GetTargetComponent<IActorObject>();
+//            if (actor == null)
+//            {
+//                Sender.Cancel();
+//                return;
+//            }
+//            if (item == null)
+//            {
+//               await  actor.Speaker.SayIThisDoesNotDoAnythingAsync();
+//                Sender.Cancel();
+//                return;
+//            }
+//            actor.Inventory.Add(Sender.Source);
 
-        }
-    }
-}
+//        }
+//    }
+//}

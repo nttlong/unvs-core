@@ -1,58 +1,58 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using unvs.interfaces;
-using unvs.interfaces.sys;
-using unvs.shares;
+﻿//using System;
+//using System.Collections;
+//using System.Collections.Generic;
+//using UnityEngine;
+//using unvs.interfaces;
+//using unvs.interfaces.sys;
+//using unvs.shares;
 
-namespace unvs.sys
-{
-    public class SettingsRealTimeStats : MonoBehaviour, IRealTimeStats
-    {
-        Dictionary<string,object> trackInfo=new Dictionary<string, object>();
-        float deltaTime = 0.0f;
-        public int FrameRate = 120;
-        public bool vSync = true;
-        private void Awake()
-        {
-            GlobalApplication.RealtimeStatsInstance = this;
-            if(!vSync)
-            QualitySettings.vSyncCount =  0; // Tắt VSync
-            Application.targetFrameRate = FrameRate; // Khoá ở 60 FPS (hoặc thả rông bằng -1)
-        }
-        void Update()
-        {
-            // Tính toán dựa trên thời gian thực tế của phần cứng, không bị ảnh hưởng bởi Editor
-            deltaTime += (Time.unscaledDeltaTime - deltaTime) * 0.1f;
-        }
+//namespace unvs.sys
+//{
+//    public class SettingsRealTimeStats : MonoBehaviour, IRealTimeStats
+//    {
+//        Dictionary<string,object> trackInfo=new Dictionary<string, object>();
+//        float deltaTime = 0.0f;
+//        public int FrameRate = 120;
+//        public bool vSync = true;
+//        private void Awake()
+//        {
+//            GlobalApplication.RealtimeStatsInstance = this;
+//            if(!vSync)
+//            QualitySettings.vSyncCount =  0; // Tắt VSync
+//            Application.targetFrameRate = FrameRate; // Khoá ở 60 FPS (hoặc thả rông bằng -1)
+//        }
+//        void Update()
+//        {
+//            // Tính toán dựa trên thời gian thực tế của phần cứng, không bị ảnh hưởng bởi Editor
+//            deltaTime += (Time.unscaledDeltaTime - deltaTime) * 0.1f;
+//        }
 
-        void OnGUI()
-        {
-            int w = Screen.width, h = Screen.height;
-            GUIStyle style = new GUIStyle();
+//        void OnGUI()
+//        {
+//            int w = Screen.width, h = Screen.height;
+//            GUIStyle style = new GUIStyle();
 
-            Rect rect = new Rect(20, 20, w, h * 2 / 100);
-            style.alignment = TextAnchor.UpperLeft;
-            style.fontSize = h * 2 / 40; // Chỉnh cỡ chữ to dễ nhìn
-            style.normal.textColor = Color.green; // Màu xanh cho dễ phân biệt
+//            Rect rect = new Rect(20, 20, w, h * 2 / 100);
+//            style.alignment = TextAnchor.UpperLeft;
+//            style.fontSize = h * 2 / 40; // Chỉnh cỡ chữ to dễ nhìn
+//            style.normal.textColor = Color.green; // Màu xanh cho dễ phân biệt
 
-            float msec = deltaTime * 1000.0f;
-            float fps = 1.0f / deltaTime;
+//            float msec = deltaTime * 1000.0f;
+//            float fps = 1.0f / deltaTime;
 
-            string text = string.Format("Real Logic: {0:0.0} ms ({1:0.0} FPS)", msec, fps);
-            foreach(var p in trackInfo)
-            {
-                text += $"\n{p.Key}={p.Value}";
-            }
-            GUI.Label(rect, text, style);
-        }
+//            string text = string.Format("Real Logic: {0:0.0} ms ({1:0.0} FPS)", msec, fps);
+//            foreach(var p in trackInfo)
+//            {
+//                text += $"\n{p.Key}={p.Value}";
+//            }
+//            GUI.Label(rect, text, style);
+//        }
 
         
 
-        public void SaveTrack(string name, object value)
-        {
-            trackInfo[name]= value;
-        }
-    }
-}
+//        public void SaveTrack(string name, object value)
+//        {
+//            trackInfo[name]= value;
+//        }
+//    }
+//}

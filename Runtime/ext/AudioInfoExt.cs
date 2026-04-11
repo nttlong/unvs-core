@@ -18,11 +18,11 @@ namespace unvs.ext {
         /// <param name="source"></param>
         /// <param name="others"></param>
         /// <returns></returns>
-        public static async UniTask PlayBetterAudioClipAsync(this AudioInfo source, params AudioInfo[] others)
+        public static async UniTask PlayBetterAudioClipAsync(this AudioSource audioSource,  AudioInfo source, params AudioInfo[] others)
         {
             if (!source.IsEmpty())
             {
-                GlobalApplication.CommonAudioSource.PlayOneShot(source.Clip, source.volume);
+                audioSource.PlayOneShot(source.Clip, source.volume);
                 await UniTask.Delay(TimeSpan.FromSeconds(source.Clip.length), delayTiming: PlayerLoopTiming.Update);
                
             } else
@@ -30,17 +30,17 @@ namespace unvs.ext {
                 var first=others.FirstOrDefault(p=>!p.IsEmpty());
                 if (!first.IsEmpty())
                 {
-                    GlobalApplication.CommonAudioSource.PlayOneShot(first.Clip, first.volume);
+                    audioSource.PlayOneShot(first.Clip, first.volume);
                     await UniTask.Delay(TimeSpan.FromSeconds(first.Clip.length), delayTiming: PlayerLoopTiming.Update);
                 }
             }
 
         }
-        public static void PlayBetterAudioClip(this AudioInfo source, params AudioInfo[] others)
+        public static void PlayBetterAudioClip(this AudioSource audioSource, AudioInfo source, params AudioInfo[] others)
         {
             if (!source.IsEmpty())
             {
-                GlobalApplication.CommonAudioSource.PlayOneShot(source.Clip, source.volume);
+                audioSource.PlayOneShot(source.Clip, source.volume);
 
             }
             else
@@ -48,7 +48,7 @@ namespace unvs.ext {
                 var first = others.FirstOrDefault(p => !p.IsEmpty());
                 if (!first.IsEmpty())
                 {
-                    GlobalApplication.CommonAudioSource.PlayOneShot(first.Clip, first.volume);
+                    audioSource.PlayOneShot(first.Clip, first.volume);
                 }
             }
         }

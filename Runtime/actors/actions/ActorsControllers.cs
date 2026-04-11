@@ -1,205 +1,205 @@
-using Cysharp.Threading.Tasks;
-using Cysharp.Threading.Tasks.Triggers;
-using System;
-using Unity.VisualScripting;
-using UnityEngine;
-using unvs.ext;
-using unvs.gameobjects;
-using unvs.interfaces;
-namespace unvs.actors.actions
-{
-    public abstract class ActorsControllers : MonoBehaviour
-    {
+//using Cysharp.Threading.Tasks;
+//using Cysharp.Threading.Tasks.Triggers;
+//using System;
+//using Unity.VisualScripting;
+//using UnityEngine;
+//using unvs.ext;
+//using unvs.gameobjects;
+//using unvs.interfaces;
+//namespace unvs.actors.actions
+//{
+//    public abstract class ActorsControllers : MonoBehaviour
+//    {
         
-        private GameObject currentTaget;
-        public bool isMouseButtonIsDowning;
+//        private GameObject currentTaget;
+//        public bool isMouseButtonIsDowning;
 
-        public Action<Vector2> OnMoving { get; set; }
-        public Action OnStop { get; set; }
+//        public Action<Vector2> OnMoving { get; set; }
+//        public Action OnStop { get; set; }
 
-        public Vector2 Direction { get; set; }
+//        public Vector2 Direction { get; set; }
 
-        public Action<Vector2> OnSprint { get; set; }
-        public bool IsMoving { get; set; }
-        public float Speed { get; set; }
-        public Action<GameObject> OnInteract { get; set; }
-        public bool IsSprint { get; set; }
+//        public Action<Vector2> OnSprint { get; set; }
+//        public bool IsMoving { get; set; }
+//        public float Speed { get; set; }
+//        public Action<GameObject> OnInteract { get; set; }
+//        public bool IsSprint { get; set; }
         
-        public bool IsInteracting { get;  set; }
+//        public bool IsInteracting { get;  set; }
 
-        public Vector2 CalculateDiection(Vector2 v)
-        {
+//        public Vector2 CalculateDiection(Vector2 v)
+//        {
 
-            unvs.ext.Vector2dExtesion.CalculateDiection(v);
-            return v;
-        }
-        /// <summary>
-        /// Call when controls.Player.Move.started
-        /// <code>
-        /// controls.Player.Move.started += ctx =>
-        ///{
-        ///    
-        ///    base.ControlsPlayerMoveStart(controls.Player.Move.ReadValue());
-        ///};
-        /// </code>
-        /// </summary>
-        /// <param name="vector2"></param>
-        public void ControlsPlayerMoveStart(Vector2 vector2)
-        {
+//            unvs.ext.Vector2dExtesion.CalculateDiection(v);
+//            return v;
+//        }
+//        /// <summary>
+//        /// Call when controls.Player.Move.started
+//        /// <code>
+//        /// controls.Player.Move.started += ctx =>
+//        ///{
+//        ///    
+//        ///    base.ControlsPlayerMoveStart(controls.Player.Move.ReadValue());
+//        ///};
+//        /// </code>
+//        /// </summary>
+//        /// <param name="vector2"></param>
+//        public void ControlsPlayerMoveStart(Vector2 vector2)
+//        {
            
-            Direction = CalculateDiection(vector2);
-            IsMoving = true;
-            if (IsSprint) OnSprint?.Invoke(Direction);
-            else OnMoving?.Invoke(Direction);
-        }
-        /// <summary>
-        /// Call when contrller input Move canceled
-        /// <code>
-        /// controls.Player.Move.canceled += ctx =>
-        ///{
-        ///     
-        ///     base.ControlsPlayerMoveCanceled();
-        ///
-        /// };
-        /// </code>
-        /// </summary>
-        public void ControlsPlayerMoveCanceled()
-        {
-            IsMoving = false;
-            OnStop?.Invoke();
-        }
-        /// <summary>
-        /// <code>
-        /// controls.Player.Sprint.started += ctx =>
-        ///{
-        ///    
-        ///    base.ControlsPlayerSprintStarted();
-        ///};
-        /// </code>
-        /// </summary>
-        public void ControlsPlayerSprintStarted()
-        {
-            IsSprint = true;
-            if (IsMoving) OnSprint?.Invoke(Direction);
-        }
-        /// <summary>
-        /// <code>
-        /// controls.Player.Sprint.canceled += ctx =>
-        ///{
-        ///    base.ControlsPlayerSprintCanceled();
-        ///};
-        /// </code>
-        /// </summary>
-        public void ControlsPlayerSprintCanceled()
-        {
-            IsSprint = false;
-            if (IsMoving) OnMoving?.Invoke(Direction);
-        }
-        /// <summary>
-        /// <code>
-        /// controls.Player.Interact.started += ctx =>
-        /// {
-        ///    base.ControlsPlayerInteractStarted(controls.Player.Look.ReadValue(), ctx.control.device is Mouse);
-        ///
-        /// };
-        /// </code>
-        /// </summary>
-        /// <param name="vector2ScreenCoordinate"></param>
-        /// <param name="isUsingMouse"></param>
-        public void ControlsPlayerInteractStarted(Vector2 vector2ScreenCoordinate, bool isUsingMouse)
-        {
-            var actor = GetComponent<IActorObject>();
-            if (actor == null) return;
-            var interactable = actor.Interactable;
-            GameObject scanResult = null;
-            if (isUsingMouse)
-            {
-                isMouseButtonIsDowning = true;
+//            Direction = CalculateDiection(vector2);
+//            IsMoving = true;
+//            if (IsSprint) OnSprint?.Invoke(Direction);
+//            else OnMoving?.Invoke(Direction);
+//        }
+//        /// <summary>
+//        /// Call when contrller input Move canceled
+//        /// <code>
+//        /// controls.Player.Move.canceled += ctx =>
+//        ///{
+//        ///     
+//        ///     base.ControlsPlayerMoveCanceled();
+//        ///
+//        /// };
+//        /// </code>
+//        /// </summary>
+//        public void ControlsPlayerMoveCanceled()
+//        {
+//            IsMoving = false;
+//            OnStop?.Invoke();
+//        }
+//        /// <summary>
+//        /// <code>
+//        /// controls.Player.Sprint.started += ctx =>
+//        ///{
+//        ///    
+//        ///    base.ControlsPlayerSprintStarted();
+//        ///};
+//        /// </code>
+//        /// </summary>
+//        public void ControlsPlayerSprintStarted()
+//        {
+//            IsSprint = true;
+//            if (IsMoving) OnSprint?.Invoke(Direction);
+//        }
+//        /// <summary>
+//        /// <code>
+//        /// controls.Player.Sprint.canceled += ctx =>
+//        ///{
+//        ///    base.ControlsPlayerSprintCanceled();
+//        ///};
+//        /// </code>
+//        /// </summary>
+//        public void ControlsPlayerSprintCanceled()
+//        {
+//            IsSprint = false;
+//            if (IsMoving) OnMoving?.Invoke(Direction);
+//        }
+//        /// <summary>
+//        /// <code>
+//        /// controls.Player.Interact.started += ctx =>
+//        /// {
+//        ///    base.ControlsPlayerInteractStarted(controls.Player.Look.ReadValue(), ctx.control.device is Mouse);
+//        ///
+//        /// };
+//        /// </code>
+//        /// </summary>
+//        /// <param name="vector2ScreenCoordinate"></param>
+//        /// <param name="isUsingMouse"></param>
+//        //public void ControlsPlayerInteractStarted(Vector2 vector2ScreenCoordinate, bool isUsingMouse)
+//        //{
+//        //    var actor = GetComponent<IActorObject>();
+//        //    if (actor == null) return;
+//        //    var interactable = actor.Interactable;
+//        //    GameObject scanResult = null;
+//        //    if (isUsingMouse)
+//        //    {
+//        //        isMouseButtonIsDowning = true;
                 
-                var input = vector2ScreenCoordinate.ToWorld();
+//        //        var input = vector2ScreenCoordinate.ToWorld();
                 
-                if (IsMoving) return;
-                IsInteracting = false;
-                var actorPos = actor.Coll.bounds.center;
-                Direction = new Vector2(actorPos.x > input.x ? -1 : 1, 0);
-                IsMoving = true;
-                OnMoving?.Invoke(Direction);
+//        //        if (IsMoving) return;
+//        //        IsInteracting = false;
+//        //        var actorPos = actor.Coll.bounds.center;
+//        //        Direction = new Vector2(actorPos.x > input.x ? -1 : 1, 0);
+//        //        IsMoving = true;
+//        //        OnMoving?.Invoke(Direction);
                
 
-            }
-            else
-            {
-                scanResult = interactable.ScanObject();
-            }
-            if (scanResult != null)
-            {
-                IsInteracting = true;
-                IsMoving = false;
-                IsSprint = false;
-                OnInteract?.Invoke(scanResult);
-                return;
-            }
-        }
-        /// <summary>
-        /// <code>
-        /// controls.Player.Interact.canceled += ctx =>
-        ///{
-        ///    
-        ///    base.ControlsPlayerInteractCanceled(ctx.control.device is Mouse);
-        /// };
-        /// </code>
-        /// </summary>
-        /// <param name="IsUsingMouse"></param>
-        public void ControlsPlayerInteractCanceled(Vector2 vector2ScreenCoordinate, bool IsUsingMouse)
-        {
-            if (IsUsingMouse)
-            {
-                isMouseButtonIsDowning = false;
-                var actor = GetComponent<IActorObject>();
-                var interactable = actor.Interactable;
-                var input = vector2ScreenCoordinate.ToWorld();
-                //If is mouse using use 
-                var scanResult = interactable.GetObject(input);
+//        //    }
+//        //    else
+//        //    {
+//        //        scanResult = interactable.ScanObject();
+//        //    }
+//        //    if (scanResult != null)
+//        //    {
+//        //        IsInteracting = true;
+//        //        IsMoving = false;
+//        //        IsSprint = false;
+//        //        OnInteract?.Invoke(scanResult);
+//        //        return;
+//        //    }
+//        //}
+//        /// <summary>
+//        /// <code>
+//        /// controls.Player.Interact.canceled += ctx =>
+//        ///{
+//        ///    
+//        ///    base.ControlsPlayerInteractCanceled(ctx.control.device is Mouse);
+//        /// };
+//        /// </code>
+//        /// </summary>
+//        /// <param name="IsUsingMouse"></param>
+//        public void ControlsPlayerInteractCanceled(Vector2 vector2ScreenCoordinate, bool IsUsingMouse)
+//        {
+//            if (IsUsingMouse)
+//            {
+//                isMouseButtonIsDowning = false;
+//                var actor = GetComponent<IActorObject>();
+//                var interactable = actor.Interactable;
+//                var input = vector2ScreenCoordinate.ToWorld();
+//                //If is mouse using use 
+//                var scanResult = interactable.GetObject(input);
                
-                if (scanResult != null)
-                {
-                    IsInteracting = true;
-                    IsMoving = false;
-                    IsSprint = false;
-                    OnInteract?.Invoke(scanResult);
+//                if (scanResult != null)
+//                {
+//                    IsInteracting = true;
+//                    IsMoving = false;
+//                    IsSprint = false;
+//                    OnInteract?.Invoke(scanResult);
                    
-                    this.currentTaget = scanResult;
-                    return;
-                } else
-                {
-                    IsInteracting=false;
-                    IsMoving = false;
-                    IsSprint = false;
-                    OnStop?.Invoke();
-                }
+//                    this.currentTaget = scanResult;
+//                    return;
+//                } else
+//                {
+//                    IsInteracting=false;
+//                    IsMoving = false;
+//                    IsSprint = false;
+//                    OnStop?.Invoke();
+//                }
                 
-            }
+//            }
            
             
             
-        }
-        public abstract void OnControllerEnable();
-        public abstract void OnControllerDisable();
-        public abstract void OnInitController();
-        private void Awake()
-        {
-            OnInitController();
-        }
+//        }
+//        public abstract void OnControllerEnable();
+//        public abstract void OnControllerDisable();
+//        public abstract void OnInitController();
+//        private void Awake()
+//        {
+//            OnInitController();
+//        }
 
         
 
-        public  void OnEnable()
-        {
-            OnControllerEnable();
-        }
-        public void OnDisable()
-        {
-            OnControllerDisable();
-        }
-    }
-}
+//        public  void OnEnable()
+//        {
+//            OnControllerEnable();
+//        }
+//        public void OnDisable()
+//        {
+//            OnControllerDisable();
+//        }
+//    }
+//}

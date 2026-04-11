@@ -189,40 +189,7 @@ namespace unvs.ext
             return new Vector2(-v.x, v.y);
         }
 
-        public static IScenePrefab GetNearsetScene(this Vector3 position, IScenePrefab[] _scenesList)
-        {
-            if (_scenesList.Length == 0) return null;
-            if (_scenesList.Length == 1) return _scenesList[0];
-
-            IScenePrefab nearest = null;
-            float maxInsideDistance = float.MinValue; // Càng lớn nghĩa là càng nằm sâu trong Scene
-            Vector2 currentPos = position;
-
-            foreach (var sc in _scenesList.Where(p => !p.GoWorld.IsDestroyed()))
-            {
-                if (sc == null || sc.LeftWall == null || sc.RightWall == null) continue;
-
-                // Lấy biên phải của tường trái và biên trái của tường phải
-                float leftBoundary = sc.LeftWall.bounds.max.x;
-                float rightBoundary = sc.RightWall.bounds.min.x;
-
-                // Nếu currentPos.x nằm giữa leftBoundary và rightBoundary:
-                // Ta tính xem nó cách biên gần nhất là bao nhiêu.
-                // Giá trị này càng lớn thì đối tượng càng ở gần "tâm ngang" của Scene.
-                float distFromLeft = currentPos.x - leftBoundary;
-                float distFromRight = rightBoundary - currentPos.x;
-
-                // Khoảng cách an toàn tối thiểu so với cả 2 biên
-                float internalDist = Mathf.Min(distFromLeft, distFromRight);
-
-                if (internalDist > maxInsideDistance)
-                {
-                    maxInsideDistance = internalDist;
-                    nearest = sc;
-                }
-            }
-            return nearest;
-        }
+      
 
         public static GameObject GetObjectInLayer(this Vector2 point, int LayerMask)
         {

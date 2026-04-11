@@ -1,14 +1,14 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿//using System.Collections;
+//using UnityEngine;
 
-namespace unvs.interfaces
-{
-    public interface IInteriorSceneContainer
-    {
+//namespace unvs.interfaces
+//{
+//    public interface IInteriorSceneContainer
+//    {
 
-    }
-    public interface IBackupInteriorSceneContainer
-    {
+//    }
+//    public interface IBackupInteriorSceneContainer
+//    {
 
-    }
-}
+//    }
+//}

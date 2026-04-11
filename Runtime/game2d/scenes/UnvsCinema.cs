@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks.Triggers;
 using game2d.scenes;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using Unity.Cinemachine;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 using unvs.ext;
 using unvs.interfaces;
@@ -16,21 +18,27 @@ using unvs.shares;
 namespace unvs.game2d.scenes{
     public class UnvsCinema : UnvsUIComponentInstance<UnvsCinema>
     {
+        public event Action<UnvsScene> BeforeUpdate;
+        public event Action<UnvsScene> AfterUpdate;
         public Camera cam;
         public CinemachineCamera vcam;
         public CompositeCollider2D compositeCollider2D;
         public CinemachineConfiner2D confiner;
        
         public BoxCollider2D camColl;
-        private MonoBehaviour camTracking;
+        
         Dictionary<UnvsScene,PolygonCollider2D> worldBoundDict=new Dictionary<UnvsScene, PolygonCollider2D>();
+        Dictionary<UnvsScene, Light2D> lightDict = new Dictionary<UnvsScene, Light2D>();
         public PolygonCollider2D worldBoundCollider2d;
         public Transform centerWatch;
         CancellationTokenSource ctsChangeOffset;
         CancellationTokenSource ctsChangeOrthoSize;
         public Transform sceneLoaderTracing;
         public BoxCollider2D centerCamTracing;
+        public Light2D globalLight;
         public float DurationTimeSmoothChangeSate = 1.5f;
+        private Light2D[] _lights=new Light2D[] { };
+
         public void ChangeCameraState(List<UnvsScene> s)
         {
             UnvsScene nearset = CalculateNearestScene(s);
@@ -120,14 +128,29 @@ namespace unvs.game2d.scenes{
 
             camColl.offset = Vector2.zero;
         }
-        public void UpdateWorldBound(UnvsScene ret)
+        /// <summary>
+        /// This method update cam worls bound. light,...
+        /// The next pharse is ambient
+        /// </summary>
+        /// <param name="ret"></param>
+        public void UpdateWorld(UnvsScene ret)
         {
+            this.BeforeUpdate?.Invoke(ret);
             
             this.worldBoundDict.Add(ret, ret.worldBound);
+            if(ret.light2d!=null)
+            {
+                ret.light2d.enabled = false;
+                ret.light2d.gameObject.SetActive(false);
+                ret.light2d.transform.position=ret.worldBound.bounds.center;
+                this.lightDict.Add(ret, ret.light2d);
+            }
+           
             Action<UnvsScene> OnSceneDestroyTmp = null;
             Action<UnvsScene> OnSceneDestroy = (s) =>
             {
                 this.worldBoundDict.Remove(s);
+                this.lightDict.Remove(s);
                 ret.OnDestroying -= OnSceneDestroyTmp;
 
             };
@@ -136,6 +159,8 @@ namespace unvs.game2d.scenes{
             var bounds= this.worldBoundDict.Where(p=>p.Key!=null && !p.Key.IsDestroying && !p.Key.IsDestroyed()).Select(p=>p.Value).ToArray();
             this.worldBoundCollider2d.points=   bounds.CreateRectFromVectorList();
             this.confiner.InvalidateBoundingShapeCache();
+            _lights = this.lightDict.Select(p => p.Value).ToArray();
+            this.AfterUpdate?.Invoke(ret);
         }
         public override void InitEvents()
         {
@@ -145,6 +170,9 @@ namespace unvs.game2d.scenes{
         {
             this.sceneLoaderTracing.transform.position=this.cam.transform.position;
             this.centerWatch.transform.position = this.camColl.bounds.center;
+            var data= Light2DExtension.MixGlobalLightSources(this.camColl.bounds.center, _lights);
+            this.globalLight.intensity = data.Intensity;
+            this.globalLight.color = data.Color;
         }
 
 
@@ -196,6 +224,10 @@ namespace unvs.game2d.scenes{
             cwc.SetMeOnTag(Constants.Layers.TRIGGER_SCENE_CHANGE);
             cwc.isTrigger = true;
             this.centerCamTracing= cwc;
+            this.globalLight = this.AddChildComponentIfNotExist<Light2D>("globalLight");
+            this.globalLight.lightType = Light2D.LightType.Global;
+            this.globalLight.enabled = true;
+
 
         }
 

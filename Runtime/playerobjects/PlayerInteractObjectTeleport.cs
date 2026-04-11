@@ -1,9 +1,9 @@
-using UnityEngine;
+//using UnityEngine;
 
-namespace unvs.playerobjects
-{
-    public  class PlayerInteractObjectTeleport : PlayerInteractObject
-    {
+//namespace unvs.playerobjects
+//{
+//    public  class PlayerInteractObjectTeleport : PlayerInteractObject
+//    {
 
-    }
-}
+//    }
+//}

@@ -2,6 +2,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using unvs.game2d.scenes;
 using unvs.shares;
 namespace unvs.ui
 {
@@ -80,8 +81,8 @@ namespace unvs.ui
 
         private void Update()
         {
-            if(GlobalApplication.GlobalInput==null) return;
-            var ui = GlobalApplication.GlobalInput.UI;
+            if(UnvsGlobalInput.UI==null|| UnvsGlobalInput.UI.Count==0) return;
+            var ui = UnvsGlobalInput.UI;
 
             // 1. CẬP NHẬT TỌA ĐỘ (HYBRID LOGIC)
             if (Gamepad.current != null && Gamepad.current.leftStick.ReadValue().magnitude > 0.1f)
@@ -102,7 +103,7 @@ namespace unvs.ui
 
             // 2. XỬ LÝ CLICK (BẤM NÚT)
             // Click.started (Gamepad Button South hoặc Mouse Left Click)
-            if (ui.Click.WasPressedThisFrame())
+            if (ui["Click"].WasPressedThisFrame())
             {
                 _draggingItem = FindItemUnderPointer(_pointerPosition);
                 if (_draggingItem != null)
@@ -113,14 +114,14 @@ namespace unvs.ui
                     // Tính Offset để tâm vật thể không bị nhảy về tâm trỏ
                     RectTransformUtility.ScreenPointToLocalPointInRectangle(
                         _draggingItem, _pointerPosition, null, out _dragOffset);
-                    GlobalApplication.GlobalInput.Player.enable=false;
+                    UnvsGlobalInput.SetActivePlayer(false);
                     OnDragBegin?.Invoke( dragInfo );
                     //_draggingItem.SetAsLastSibling(); // Đưa lên trên cùng
                 }
             }
 
             // 3. XỬ LÝ DRAG (KÉO)
-            if (_draggingItem != null && ui.Click.IsPressed())
+            if (_draggingItem != null && ui["Click"].IsPressed())
             {
                 RectTransformUtility.ScreenPointToLocalPointInRectangle(
                     interactContainer, _pointerPosition, null, out Vector2 localPos);
@@ -130,7 +131,7 @@ namespace unvs.ui
             }
 
             // 4. XỬ LÝ DROP (THẢ)
-            if (ui.Click.WasReleasedThisFrame())
+            if (ui["Click"].WasReleasedThisFrame())
             {
                 if (_draggingItem != null)
                 {
@@ -139,7 +140,7 @@ namespace unvs.ui
                     OnDrop?.Invoke(dragInfo);
                     _draggingItem = null;
                     dragInfo.Empty();
-                    GlobalApplication.GlobalInput.Player.enable = true;
+                    UnvsGlobalInput.SetActivePlayer(true);
                 }
             }
         }
