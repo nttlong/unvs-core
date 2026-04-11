@@ -30,7 +30,7 @@ namespace unvs.game2d.scenes
         }
         public async UniTask<UnvsScene> LoadInteriorAsync(string path, string spawnName, UnvsScene fromScene)
         {
-            
+            if (fromScene == null) return null;
             lastInteriorScene = fromScene;
             lastInteriorScene.transform.SetParent(this.backupInterior.transform, true);
             lastInteriorScene.TurnOffLeft().TurnOffRight();
