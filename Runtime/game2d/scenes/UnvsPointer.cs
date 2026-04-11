@@ -103,14 +103,30 @@ namespace unvs.game2d.scenes
         }
         private void LateUpdate()
         {
+
+            if(UnvsCinema.Instance==null) return;
+            //if (UnvsCinema.Instance.IsInUpdateState) return;
             if (cursor == null) return;
             UpdateCursorPosition();
+
             var pos = (Vector2)_virtualMousePos;
+            Camera cam = Camera.main; // Đảm bảo lấy đúng camera đang dùng
+
+            if (cam == null) return;
+
+            // Thay vì dùng Screen, hãy dùng pixelRect của chính Camera đó
+            Rect safeRect = cam.pixelRect;
+
+            if (!safeRect.Contains(pos))
+            {
+                cursor.sprite = defautlSprite;
+                return;
+            }
             var interactObject = pos.GetHitCollider<Transform>(Constants.Layers.INTERACT_OBJECT);
+
             if (interactObject != null)
             {
                 OnHoverInteractObject?.Invoke(pos, this.cursor, interactObject.gameObject);
-               
             }
             else
             {

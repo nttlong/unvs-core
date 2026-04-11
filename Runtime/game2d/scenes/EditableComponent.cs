@@ -1,7 +1,9 @@
 using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.UI;
 using unvs.ext;
 namespace unvs.game2d.scenes
@@ -37,7 +39,7 @@ namespace unvs.game2d.scenes
         public virtual void Awake()
         {
             if (Application.isPlaying)
-                
+
                 InitRuntime();
             else
                 InitDesignTime();
@@ -49,12 +51,13 @@ namespace unvs.game2d.scenes
     }
     public abstract class UnvsBaseComponent : MonoBehaviour
     {
-        
+
        
 
 
+
     }
-    public abstract class UnvsUIComponent: UnvsBaseComponent
+    public abstract class UnvsUIComponent : UnvsBaseComponent
     {
         public Canvas canvas;
 
@@ -64,9 +67,9 @@ namespace unvs.game2d.scenes
         public virtual void Hide()
         {
             this.enabled = false;
-            if(canvas == null)
+            if (canvas == null)
                 canvas = this.GetComponentInChildren<Canvas>(true);
-            if(canvas != null )
+            if (canvas != null)
             {
                 canvas.enabled = false;
                 canvas.gameObject.SetActive(false);
@@ -81,7 +84,7 @@ namespace unvs.game2d.scenes
                 canvas = this.GetComponentInChildren<Canvas>(true);
                 if (canvas != null) canvas.FullSize();
             }
-                
+
             if (canvas != null)
             {
                 canvas.enabled = true;
@@ -101,32 +104,32 @@ namespace unvs.game2d.scenes
         }
         public virtual void Awake()
         {
-            
+
             if (Application.isPlaying)
             {
                 InitRunTime();
-               
-               
+
+
                 //if (canvas == null)
                 //    canvas = this.GetComponentInChildren<Canvas>(true);
                 if (canvas != null)
                 {
                     canvas.FullSize();
-                    
+
                 }
 
             }
         }
     }
-    public abstract class UnvsUIComponentInstance<T>: UnvsUIComponent where T : Component
+    public abstract class UnvsUIComponentInstance<T> : UnvsUIComponent where T : Component
     {
-        
+
         public static T Instance;
         public override void InitRunTime()
         {
             Instance = this as T;
 
-            
+
         }
 
     }

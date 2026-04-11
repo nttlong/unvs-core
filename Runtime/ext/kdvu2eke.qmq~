@@ -403,19 +403,29 @@ namespace unvs.ext
         }
         public static T GetHitCollider<T>(this Vector2 pos, params string[] layers)
         {
-            if(Camera.main==null) return default(T);
-            // 1. Validate input and layers
-            if (layers == null || layers.Length == 0) return default(T);
+            Camera mainCam = Camera.main;
+            if (mainCam == null) return default(T);
 
-            // 2. Create the layer mask from names
+            // 1. Chuyển đổi sang Viewport Point (0->1)
+            Vector3 viewportPos = mainCam.ScreenToViewportPoint(pos);
+
+            // 2. Kiểm tra an toàn: Nếu tọa độ nằm ngoài vùng nhìn của Camera thì thoát luôn
+            if (viewportPos.x < 0f || viewportPos.x > 1f || viewportPos.y < 0f || viewportPos.y > 1f)
+            {
+                return default(T);
+            }
+
+            // 3. Bắn Ray từ Viewport (Cực kỳ ổn định, ít lỗi hơn ScreenPoint)
+            // Giữ nguyên Z là nearClipPlane để tránh lỗi Frustum
+            viewportPos.z = mainCam.nearClipPlane;
+            Ray ray = mainCam.ViewportPointToRay(viewportPos);
+
+            // 4. Các bước LayerMask và Raycast tiếp theo...
             int layerMask = LayerMask.GetMask(layers);
-
-            // 3. Generate a 3D ray from the perspective camera
-            Ray ray = Camera.main.ScreenPointToRay(pos); 
-
-            // 4. CRITICAL FIX: Use Physics2D.GetRayIntersectionAll for 2.5D
-            // Standard Physics.RaycastAll ignores BoxCollider2D.
             RaycastHit2D[] hits = Physics2D.GetRayIntersectionAll(ray, Mathf.Infinity, layerMask);
+
+            // ... (Giữ nguyên logic Sorting của bạn)
+            if (hits == null || hits.Length == 0) return default(T);
 
             if (hits == null || hits.Length == 0) return default(T);
 

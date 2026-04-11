@@ -64,8 +64,8 @@ namespace unvs.game2d.scenes.actors
         public void GenerateAnimatorController()
         {
             this.animEle = this.GetComponentInChildren<SpriteSkin>(true).transform.parent.gameObject;
-            string folderPath=EditorUtils.EditorGetFolder(this.animEle);
-            var controller =EditorUtils.EditorCreateAnimatorController(folderPath, this.animEle.name);
+            string folderPath=UnvsEditorUtils.EditorGetFolder(this.animEle);
+            var controller =UnvsEditorUtils.EditorCreateAnimatorController(folderPath, this.animEle.name);
             this.animator= this.animEle.transform.AddComponentIfNotExist<Animator>();
             this.animator.runtimeAnimatorController = controller;
         }

@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Triggers;
 using game2d.scenes;
 using System;

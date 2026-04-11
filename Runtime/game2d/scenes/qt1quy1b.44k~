@@ -282,11 +282,7 @@ namespace unvs.game2d.scenes
             if (this.worldBound != null) this.worldBound.GizmosDraw(Color.green, 1);
             if (this.defaulCamWatcher != null) this.defaulCamWatcher.transform.GetSegment().Center().DrawCircle(1f,Color.red);
             if(this.startPoint!=null) this.startPoint.GetSegment().Center().DrawCircle(1f, Color.green);
-            if(!Application.isPlaying)
-            {
-                calculateJoinPoint();
-            }
-            if(this.JoinInfo!=null)
+            if(calculateJoinPoint())
             {
                 this.JoinInfo.LeftPos.DrawCircle(1,Color.red);
                 this.JoinInfo.RightPos.DrawCircle(1,Color.red);

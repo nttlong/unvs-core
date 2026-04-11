@@ -84,6 +84,7 @@ namespace unvs.ext
         /// </summary>
         public static float GetOrthoSize(this CinemachineCamera vcam)
         {
+            if(vcam == null) { return 0; }
             return vcam.Lens.OrthographicSize;
         }
         public static void UpdateByUnvsScene(this CinemachineCamera vcam, UnvsScene scene)
@@ -173,6 +174,7 @@ namespace unvs.ext
 
         public static async UniTask SetOrthoSizeSmoothlyAsync(this CinemachineCamera vcam, float targetSize, float duration = -1f, float zoomSpeed = 3f, CancellationToken cancellationToken = default, Action<float> OnUpdating = null)
         {
+            if(targetSize==0) return;
             try
             {
                 if (vcam == null) return;
