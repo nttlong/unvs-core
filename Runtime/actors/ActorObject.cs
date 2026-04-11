@@ -35,7 +35,7 @@ namespace unvs.actors
     {
         //IActorObject instance;
         //private IActorMotion motion;
-        private ISpeakableObject speaker;
+        //private ISpeakableObject speaker;
         private ICamWacher camWacher;
         //private IActorMovable movable;
         //private IActorInteractable interactable;
@@ -52,7 +52,7 @@ namespace unvs.actors
         public CancellationTokenSource Cts { get; set; }
         //public IActorMotion Motion => motion;
 
-        public ISpeakableObject Speaker => speaker;
+        //public ISpeakableObject Speaker => speaker;
 
         public ICamWacher CamWacher
         {
@@ -153,7 +153,7 @@ namespace unvs.actors
             //motion = GetComponent<IActorMotion>();
             //movable = GetComponent<ActorMovableObject>();
             SetupRigidBody();
-            speaker = GetComponent<ISpeakableObject>();
+            //speaker = GetComponent<ISpeakableObject>();
             //interactable = GetComponent<IActorInteractable>();
             //physical = GetComponent<IActorPhysical>();
             

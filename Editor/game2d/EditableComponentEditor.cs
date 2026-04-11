@@ -7,6 +7,7 @@ using unvs.game2d.scenes;
 using UnityEditor;
 
 using game2d.ext;
+using System.Linq;
 namespace editor.game2d
 {
    
@@ -56,6 +57,43 @@ namespace editor.game2d
                     GUILayout.Space(2);
                 }
             }
+            // Lấy danh sách các Property có gắn UnvsPropertyAttribute
+            var fieldList = targetType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .Where(f => f.GetCustomAttribute<UnvsPropertyAttribute>() != null);
+
+            foreach (var property in fieldList)
+            {
+                var attr = property.GetCustomAttribute<UnvsPropertyAttribute>();
+
+                EditorGUILayout.BeginHorizontal();
+
+                // 1. Hiển thị Label và Value của Property
+                // Lấy giá trị hiện tại của Property
+                object value = property.GetValue(target);
+
+                // Tùy vào PType mà bạn có thể vẽ các kiểu ô nhập khác nhau
+                // Ở đây tôi ví dụ vẽ một TextField chung
+                EditorGUILayout.PrefixLabel(property.Name);
+                string stringValue = value?.ToString() ?? "";
+                string newValue = EditorGUILayout.TextField(stringValue);
+
+                // Nếu giá trị thay đổi thì cập nhật lại
+                if (newValue != stringValue)
+                {
+                    property.SetValue(target, newValue);
+                    target.EditorSetDirty();
+                }
+
+                // 2. Vẽ nút bấm bên cạnh (Ví dụ nút Fix AI)
+                //if (GUILayout.Button("Fix", GUILayout.Width(50)))
+                //{
+                //    // Thực hiện logic xử lý dựa trên PType
+                //    HandlePropertyAction(property, attr.PType);
+                //}
+
+                EditorGUILayout.EndHorizontal();
+            }
+
         }
     }
 }

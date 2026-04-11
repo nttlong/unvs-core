@@ -1,54 +1,63 @@
-//using Cysharp.Threading.Tasks;
-//using UnityEngine;
-//using unvs.actions;
-//using unvs.baseobjects;
-//using unvs.ext;
-//using unvs.interfaces;
-//using unvs.manager;
-//using unvs.shares;
-//namespace unvs.actionsbasics
-//{
-//    public class TeleportAction : unvs.actions.ActionBase
-//    {
-//        [SerializeField]
-//        public AudioInfo OpenSound;
-//        [SerializeField]
-//        public AudioInfo CloseSound;
-//        public async override UniTask ExecuteAsync(ActionBaseSender Sender)
-//        {
-//            var teleportObject = Sender.Source.GetComponent<ITeleportPrefab>();
-//            if(teleportObject == null)
-//            {
-//                Sender.Cancel();
-//                return;
-//            }
-//            if (string.IsNullOrEmpty(teleportObject.PathToWord))
-//            {
-//               await Sender.Target.GetComponent<ISpeakableObject>().SayIThisDoesNotDoAnythingAsync();
-//                Sender.Target.GetComponent<IActorObject>().OnMoving += TeleportAction_OnMoving1;
-//                Sender.Cancel();
-//                return;
-//            }
-//            teleportObject.OpenSound.PlayBetterAudioClip();
-//            if (teleportObject.IsNew)
-//            {
-//                await GlobalApplication.SceneLoaderManagerInstance.LoadNewAsync(teleportObject.PathToWord, teleportObject.TargetName);
+using Cysharp.Threading.Tasks;
+using UnityEngine;
+using unvs.actions;
+using unvs.baseobjects;
+using unvs.ext;
+using unvs.game2d.objects;
+using unvs.game2d.scenes;
+using unvs.game2d.scenes.actors;
+using unvs.interfaces;
 
-//            } else
-//            {
-//                var fromScene=Sender.Source.GetComponentInParent<IScenePrefab>();
-//                await GlobalApplication.SceneLoaderManagerInstance.LoadInteriorAsync(teleportObject.PathToWord, teleportObject.TargetName, fromScene);
-//            }
-//            await teleportObject.CloseSound.PlayBetterAudioClipAsync(CloseSound);
-//        }
+using unvs.shares;
+namespace unvs.actionsbasics
+{
+    public class TeleportAction : unvs.actions.ActionBase
+    {
+        [SerializeField]
+        public AudioInfo OpenSound;
+        [SerializeField]
+        public AudioInfo CloseSound;
+        public async override UniTask ExecuteAsync(ActionBaseSender Sender)
+        {
+            var teleportObject = Sender.Source.GetComponent<UnvsTeleport>();
+            if (teleportObject == null)
+            {
+                Sender.Cancel();
+                return;
+            }
+            var actor = Sender.GetTargetComponent<UnvsActor>();
+            if (actor == null)
+            {
+                Sender.Cancel();
+                return;
+            }
+            if (string.IsNullOrEmpty(teleportObject.TargetPath))
+            {
+                actor.speaker.SayIThisDoesNotDoAnything();
+                
+                Sender.Cancel();
+                return;
+            }
+            UnvsCinema.Instance.audioSource = new AudioSource();
 
-//        private void TeleportAction_OnMoving1(IActorObject obj)
-//        {
-//            obj.Speaker.Off();
-//            obj.OnMoving -= TeleportAction_OnMoving1;
-//        }
+            teleportObject.OpenSound.PlayBetterAudioClipAsync(OpenSound).Forget();
+            if (teleportObject.IsNew)
+            {
+                await UnvsSceneLoader.Instance.LoadNewAsync(teleportObject.TargetPath, teleportObject.SpawnName);
+                
+
+            }
+            else
+            {
+                var fromScene = Sender.Source.GetComponentInParent<UnvsScene>();
+                await UnvsSceneLoader.Instance.LoadInteriorAsync(teleportObject.TargetPath, teleportObject.SpawnName, fromScene);
+            }
+            await teleportObject.CloseSound.PlayBetterAudioClipAsync(CloseSound);
+        }
 
        
-//    }
-//}
+
+
+    }
+}
 

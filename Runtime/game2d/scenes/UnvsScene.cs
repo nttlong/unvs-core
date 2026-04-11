@@ -64,6 +64,8 @@ namespace unvs.game2d.scenes
         public Transform sceneTracker;
 
         public bool IsDestroying { get; private set; }
+        public EditorUnvsSceneSpawPointEditor SpawnPoints { get; private set; }
+
         public event Action<UnvsScene> OnDestroying;
         async UniTask initAsync()
         {
@@ -86,9 +88,19 @@ namespace unvs.game2d.scenes
            
            
         }
-        public Vector2 GetStartPosition()
+        public Vector2 GetStartPosition(string spawnName)
         {
-            return this.ground.GetIntersetPoint(this.startPoint.transform.GetSegment().Center().x);
+            if(!string.IsNullOrEmpty(spawnName))
+            {
+                var tr = this.GetComponentInChildrenByName<Transform>(spawnName);
+                return tr.position;
+            } else
+            {
+                return this.ground.GetIntersetPoint(this.startPoint.transform.GetSegment().Center().x);
+            }
+
+
+               
         }
         public override void InitDesignTime()
         {
@@ -160,7 +172,7 @@ namespace unvs.game2d.scenes
             this.actor = this.GetComponentInChildren<UnvsActor>();
             if(this.actor != null )
             {
-                this.actor.StandBy(this.GetStartPosition());
+                this.actor.StandBy(this.GetStartPosition(""));
                 this.vcam.Watch(this.actor.camWatcher);
                 
             } else
@@ -169,6 +181,7 @@ namespace unvs.game2d.scenes
                 this.vcam.Watch(defaulCamWatcher);
                
             }
+            
             //this.vcam.GetComponent<CinemachineConfiner2D>().BoundingShape2D = this.worldBound;
         }
         [UnvsButton("Apply require components")]
@@ -200,6 +213,10 @@ namespace unvs.game2d.scenes
             if (this.triggerRight != null) this.triggerRight.isTrigger = true;
 
             this.sceneTracker.AddComponentIfNotExist<UnvsSceneTracker>();
+            if (this.SpawnPoints == null)
+            {
+                this.SpawnPoints = this.AddChildComponentIfNotExist<EditorUnvsSceneSpawPointEditor>("Spawn-Points");
+            }
             syncWorldBoundAndScencTracker();
         }
 

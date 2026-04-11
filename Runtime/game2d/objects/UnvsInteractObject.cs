@@ -4,15 +4,21 @@ using unvs.shares;
 using UnityEngine;
 using Unity.VisualScripting;
 using System;
+using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
+using System.Threading;
+using unvs.actions;
 namespace unvs.game2d.objects
 {
+
     [ExecuteAlways]
     [RequireComponent(typeof(BoxCollider2D))]
     public partial class UnvsInteractObject : UnvsComponent
     {
+        [Header("Interact info")]
         public BoxCollider2D coll;
         public Texture2D mousePoint;
-
+        public InteractionDefinition Data;
         public override void InitRuntime()
         {
             if(this.mousePoint==null)
@@ -23,11 +29,30 @@ namespace unvs.game2d.objects
         {
             return coll.bounds.center;
         }
+
+        public async UniTask ExecuteAsync(MonoBehaviour target, CancellationTokenSource cts)
+        {
+            if (Data == null) return;
+           
+            var sender = new ActionBaseSender()
+            {
+                Target = target,
+                Source=this,
+                Cts = cts
+            };
+            foreach (var item in Data.actions)
+            {
+                if(item==null) continue;
+                await item.ExecuteAsync(sender);
+                if (sender.IsCancel) return;
+            }
+            
+        }
     }
 #if UNITY_EDITOR
     public partial class UnvsInteractObject : UnvsComponent
     {
-        public unvs.actions.InteractionDefinition Data;
+       
         public override void InitDesignTime()
         {
             this.SetMeOnLayer(Constants.Layers.INTERACT_OBJECT);

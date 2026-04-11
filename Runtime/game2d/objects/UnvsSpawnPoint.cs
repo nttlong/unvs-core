@@ -6,7 +6,7 @@ namespace unvs.game2d.objects
     [RequireComponent(typeof(BoxCollider2D))]
     public partial class UnvsSpawnPoint : UnvsBaseComponent
     {
-
+        public string Name;
     }
 #if UNITY_EDITOR
     public partial class UnvsSpawnPoint : UnvsBaseComponent

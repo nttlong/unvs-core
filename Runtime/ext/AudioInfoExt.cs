@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using unvs.game2d.scenes;
 using unvs.shares;
 
 namespace unvs.ext {
@@ -34,6 +35,11 @@ namespace unvs.ext {
                     await UniTask.Delay(TimeSpan.FromSeconds(first.Clip.length), delayTiming: PlayerLoopTiming.Update);
                 }
             }
+
+        }
+        public static async UniTask PlayBetterAudioClipAsync(this AudioInfo source, params AudioInfo[] others)
+        {
+           await UnvsCinema.Instance.audioSource.PlayBetterAudioClipAsync(source, others);
 
         }
         public static void PlayBetterAudioClip(this AudioSource audioSource, AudioInfo source, params AudioInfo[] others)

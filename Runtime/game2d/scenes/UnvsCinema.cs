@@ -38,6 +38,7 @@ namespace unvs.game2d.scenes{
         public Light2D globalLight;
         public float DurationTimeSmoothChangeSate = 1.5f;
         private Light2D[] _lights=new Light2D[] { };
+        public AudioSource audioSource;
 
         public void ChangeCameraState(List<UnvsScene> s)
         {
@@ -162,6 +163,11 @@ namespace unvs.game2d.scenes{
             _lights = this.lightDict.Select(p => p.Value).ToArray();
             this.AfterUpdate?.Invoke(ret);
         }
+        public void ClearWorlds()
+        {
+            this.worldBoundDict.Clear();
+            this.lightDict.Clear();
+        }
         public override void InitEvents()
         {
             //throw new System.NotImplementedException();
@@ -227,11 +233,15 @@ namespace unvs.game2d.scenes{
             this.globalLight = this.AddChildComponentIfNotExist<Light2D>("globalLight");
             this.globalLight.lightType = Light2D.LightType.Global;
             this.globalLight.enabled = true;
-
+            this.audioSource = this.AddChildComponentIfNotExist<AudioSource>("audio-source");
 
         }
 
-        
+       
+
+
+
+
 
 
 

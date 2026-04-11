@@ -18,6 +18,20 @@ namespace unvs.game2d.scenes
             ButtonName = buttonName;
         }
     }
+    public enum UnvsPropertyTypeEnum
+    {
+        List
+    }
+    [AttributeUsage(AttributeTargets.Field)]
+    public class UnvsPropertyAttribute : Attribute
+    {
+       
+        public UnvsPropertyTypeEnum PType { get; }
+        public UnvsPropertyAttribute(UnvsPropertyTypeEnum pType)
+        {
+            PType = pType;
+        }
+    }
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class EditButtons : Attribute
     {
@@ -48,6 +62,10 @@ namespace unvs.game2d.scenes
         public abstract void InitDesignTime();
 
         public abstract void InitRuntime();
+    }
+    public abstract class UnvsList
+    {
+
     }
     public abstract class UnvsBaseComponent : MonoBehaviour
     {

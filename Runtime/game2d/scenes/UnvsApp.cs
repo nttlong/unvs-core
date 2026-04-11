@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
@@ -15,13 +16,16 @@ using unvs.game2d.scenes.actors;
 using unvs.interfaces;
 using unvs.interfaces.sys;
 using unvs.shares;
+using unvs.shares.editor;
 
 namespace unvs.game2d.scenes
 {
     
     public class UnvsApp : UnvsComponent
     {
-
+        [Header("Sart Path")]
+        public string startScenePath;
+        public AssetReference startScene;
         [Header("Components")]
         public UnvsPlayerInput playerInput;
         public UnvsMainMenu MainMenu;
@@ -35,8 +39,7 @@ namespace unvs.game2d.scenes
         public UnvsDialog dialog;
         public UnvsInteractUI InteractUI;
         public UnvsActirDialogue ActorDialogue;
-        [Header("Components Path")]
-        public string startScene;
+       
 
 
         public string ActorDialoguePath;
@@ -92,7 +95,7 @@ namespace unvs.game2d.scenes
 
             MainMenu.btnStart.onClick.AddListener(() =>
             {
-                SceneLoader.LoadNewAsync(this.startScene).ContinueWith(s =>
+                SceneLoader.LoadNewAsync(this.startScenePath,"").ContinueWith(s =>
                 {
                     MainMenu.Hide();
                 }).Forget();
@@ -100,7 +103,7 @@ namespace unvs.game2d.scenes
 
             MainMenu.btnExit.onClick.AddListener(() =>
             {
-                SceneLoader.LoadNewAsync(this.startScene).ContinueWith(s =>
+                SceneLoader.LoadNewAsync(this.startScenePath, "").ContinueWith(s =>
                 {
                     MainMenu.Hide();
                 }).Forget();
@@ -182,6 +185,13 @@ namespace unvs.game2d.scenes
         }
 
 #if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if(startScene!=null)
+            {
+                startScenePath = startScene.EditorGetAddressPath();
+            }
+        }
         [UnvsButton]
         public void GenerateUIEvents()
         {

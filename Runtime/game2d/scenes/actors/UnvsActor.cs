@@ -18,14 +18,15 @@ namespace unvs.game2d.scenes.actors
 {
     [RequireComponent(typeof(IKBoneMap))]
     [RequireComponent(typeof(AnimMap))]
+    [RequireComponent(typeof(UnvsActorSpeaker))]
     [RequireComponent(typeof(UniqueObject))]
     public partial class UnvsActor : UnvsBaseComponent
     {
         public CancellationTokenSource cts => _cls;
 
-        
-        
 
+
+        public UnvsActorSpeaker speaker;
         private bool isMoving;
         private Vector2 target;
         private Vector2 direction;
@@ -62,7 +63,7 @@ namespace unvs.game2d.scenes.actors
         public async UniTask MovtoTargetAsync(Vector2 pos, CancellationToken tk = default)
         {
             // 1. Lấy CTS chính của Actor (KHÔNG đưa cái này vào using)
-            var actorCts = this.RefreshToken();
+            var actorCts = this.cts;
 
             // 2. Tạo một biến đại diện cho Token sẽ dùng để di chuyển
             CancellationToken finalToken;
@@ -70,12 +71,14 @@ namespace unvs.game2d.scenes.actors
 
             if (tk != default && tk != actorCts.Token)
             {
+                if(actorCts==null) actorCts=this.RefreshToken();
                 // Chỉ tạo Link nếu cần thiết
                 linkedCts = CancellationTokenSource.CreateLinkedTokenSource(actorCts.Token, tk);
                 finalToken = linkedCts.Token;
             }
             else
             {
+                actorCts = this.RefreshToken();
                 finalToken = actorCts.Token;
             }
 
@@ -111,7 +114,7 @@ namespace unvs.game2d.scenes.actors
         }
         public T ScanObjectFromPont<T>(Vector2 pos, params string[] layers)
         {
-            //var coll = GetComponent<Collider2D>();
+            if(this.IsDestroyed()||this.gameObject.IsDestroyed()) return default(T);
             return Vector2dExtesion.ScanObject<T>(pos, this.scanerBound.size, layers);
             //return coll.ScanObject<T>(this.scanerBound.size.x, this.scanerBound.size.y, LayerMask.GetMask(layers));
         }
@@ -119,7 +122,7 @@ namespace unvs.game2d.scenes.actors
 #if UNITY_EDITOR
     public partial class UnvsActor : UnvsBaseComponent
     {
-
+        
 
         [UnvsButton]
         public void FixLayout()
@@ -138,6 +141,10 @@ namespace unvs.game2d.scenes.actors
             this.scanerBound.SetMeOnLayer(Constants.Layers.INTERACT_SCANER);
             this.scanerBound.SetMeOnTag(Constants.Tags.INTERACT_SCANER);
             this.scanerBound.isTrigger = true;
+            if (this.speaker == null)
+            {
+                speaker = GetComponent<UnvsActorSpeaker>();
+            }
            
 
         }
