@@ -74,6 +74,7 @@ namespace unvs.game2d.scenes
 
             UnvsCinema.Instance.UpdateMainCameraBoxCollider2dSize();
             UnvsApp.Instance.RaiseEnterScene(ret);
+            UnvsCinema.Instance.vcam.UpdateOffset2D(ret.followOffset);
             ret.gameObject.SetActive(true);
             ret.TurnOnLeft().TurnOnRight();
             lastInteriorScene = ret;

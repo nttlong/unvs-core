@@ -88,6 +88,11 @@ namespace unvs.ext
             if(vcam == null) { return 0; }
             return vcam.Lens.OrthographicSize;
         }
+        public static CinemachineCamera UpdateOffset2D(this CinemachineCamera vcam,Vector2 Offset)
+        {
+            vcam.GetComponent<CinemachineFollow>().FollowOffset = new Vector3(Offset.x, Offset.y, -10);
+            return vcam;
+        }
         public static void UpdateByUnvsScene(this CinemachineCamera vcam, UnvsScene scene)
         {
             var state = vcam.AddComponentIfNotExist<UnvsCamStaus>();
