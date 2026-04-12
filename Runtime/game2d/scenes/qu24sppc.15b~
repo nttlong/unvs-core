@@ -1,22 +1,17 @@
 ﻿using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Triggers;
 using game2d.scenes;
-using PlasticGui.WorkspaceWindow.Locks;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using Unity.Cinemachine;
 using Unity.Mathematics;
 using Unity.VisualScripting;
-using Unity.VisualScripting.YamlDotNet.Core.Tokens;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 using unvs.ext;
-using unvs.game2d.scenes.actors;
 using unvs.interfaces;
 using unvs.shares;
 
@@ -44,7 +39,6 @@ namespace unvs.game2d.scenes{
         public float DurationTimeSmoothChangeSate = 1.5f;
         private Light2D[] _lights=new Light2D[] { };
         public AudioSource audioSource;
-
 
         public void ChangeCameraState(List<UnvsScene> s,bool Imediately)
         {
@@ -152,15 +146,10 @@ namespace unvs.game2d.scenes{
         /// The next pharse is ambient
         /// </summary>
         /// <param name="ret"></param>
-        public void UpdateWorld(UnvsScene ret,bool reset)
+        public void UpdateWorld(UnvsScene ret)
         {
-            if (reset)
-            {
-                this.worldBoundDict = new Dictionary<UnvsScene, PolygonCollider2D>();
-                this.lightDict.Clear();
-            }
             this.BeforeUpdate?.Invoke(ret);
-            
+
             this.worldBoundDict.Add(ret, ret.worldBound);
             if (ret.light2d != null)
             {
@@ -174,42 +163,29 @@ namespace unvs.game2d.scenes{
             Action<UnvsScene> OnSceneDestroy = (s) =>
             {
                 this.worldBoundDict.Remove(s);
-                //UpdateWorldBoundAsync().Forget();
+                updateWorldBoundasync().Forget();
                 this.lightDict.Remove(s);
                 ret.OnDestroying -= OnSceneDestroyTmp;
-                //requestUpdate = true;
 
             };
             OnSceneDestroyTmp = OnSceneDestroy;
             ret.OnDestroying += OnSceneDestroy;
-           
+            updateWorldBoundasync().Forget();
             _lights = this.lightDict.Select(p => p.Value).ToArray();
             this.AfterUpdate?.Invoke(ret);
-            if (reset)
-            {
-                updateWorldBound();
-                requestUpdate = false;
-            }
-
-            else
-            {
-                requestUpdate = true;
-            }
-                
-                
-         
         }
-        
 
-        bool hasUpdate;
+        private async UniTask updateWorldBoundasync()
+        {
+            await UniTask.WaitForFixedUpdate();
+            updateWorldBound();
+        }
+
         private void updateWorldBound()
         {
-            
             var bounds = this.worldBoundDict.Where(p => p.Key != null && !p.Key.IsDestroying && !p.Key.IsDestroyed()).Select(p => p.Value).ToArray();
-          
-            this.worldBoundCollider2d.SetPath(0, bounds.CreateRectFromVectorList());
+            this.worldBoundCollider2d.points = bounds.CreateRectFromVectorList();
             this.confiner.InvalidateBoundingShapeCache();
-
         }
 
         public void ClearWorlds()
@@ -222,66 +198,11 @@ namespace unvs.game2d.scenes{
         {
             //throw new System.NotImplementedException();
         }
-        public event Action OnCameraMove;
-        public event Action OnCameraStop;
-        bool requestUpdate;
-        float _lastPosition = 0;
-        bool _wasMoving;
-        float getValue(float x)
-        {
-            return Mathf.Round(x * 10f) / 10f;
-        }
-        public override void InitRunTime()
-        {
-            base.InitRunTime();
-            _lastPosition = getValue(cam.transform.position.x);
-
-        }
-        void OnEnable()
-        {
-            
-            RenderPipelineManager.endCameraRendering += (context, cam) =>
-            {
-                if (requestUpdate)
-                {
-                    
-                    requestUpdate = false;
-                    updateWorldBound();
-                }
-            };
-        }
-
         private void LateUpdate()
         {
-            float newPos = getValue(cam.transform.position.x);
-            // Tính toán độ lệch
-            float delta = Mathf.Abs(newPos - _lastPosition);
-
-            // Kiểm tra nếu đang di chuyển (vượt ngưỡng)
-            if (delta > 0.01f) // Ngưỡng nhỏ để nhạy hơn
-            {
-                OnCameraMove?.Invoke();
-                
-                _wasMoving = true; // Đánh dấu là đang di chuyển
-            }
-            else
-            {
-                // Nếu trước đó đang di chuyển mà giờ dừng lại (hoặc dưới ngưỡng)
-                if (_wasMoving)
-                {
-                    OnCameraStop?.Invoke();
-                   
-                    _wasMoving = false;
-                   
-                }
-            }
-
-            _lastPosition = newPos;
-
-            // Các logic về Light và Tracing giữ nguyên
-            this.sceneLoaderTracing.transform.position = this.cam.transform.position;
+            this.sceneLoaderTracing.transform.position=this.cam.transform.position;
             this.centerWatch.transform.position = this.camColl.bounds.center;
-            var data = Light2DExtension.MixGlobalLightSources(this.camColl.bounds.center, _lights);
+            var data= Light2DExtension.MixGlobalLightSources(this.camColl.bounds.center, _lights);
             this.globalLight.intensity = data.Intensity;
             this.globalLight.color = data.Color;
         }
@@ -339,9 +260,6 @@ namespace unvs.game2d.scenes{
             this.globalLight.lightType = Light2D.LightType.Global;
             this.globalLight.enabled = true;
             this.audioSource = this.AddChildComponentIfNotExist<AudioSource>("audio-source");
-            
-          
-            
 
         }
 

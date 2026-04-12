@@ -23,10 +23,12 @@ namespace unvs.game2d.scenes
     
     public class UnvsApp : UnvsComponent
     {
+        public int ChunLenght = 3;
         [Header("Sart Path")]
         public string startScenePath;
         public AssetReference startScene;
         [Header("Components")]
+        
         public UnvsPlayerInput playerInput;
         public UnvsMainMenu MainMenu;
         public UnvsPauseMenu PauseMenu;
@@ -125,6 +127,8 @@ namespace unvs.game2d.scenes
         public Dictionary<UnvsScene,string> Scenes { get; private set; }
         private UnvsScene _LastScene;
         private UnvsScene _LastExitScene;
+       
+
         public void CleanUp()
         {
             this.Scenes = new Dictionary<UnvsScene, string>();

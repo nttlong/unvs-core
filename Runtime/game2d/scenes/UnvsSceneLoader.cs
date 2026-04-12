@@ -60,7 +60,7 @@ namespace unvs.game2d.scenes
             }
             ret.transform.SetParent(this.interior.transform, true);
 
-            UnvsCinema.Instance.UpdateWorld(ret);
+            UnvsCinema.Instance.UpdateWorld(ret,true);
             UnvsCinema.Instance.vcam.UpdateByUnvsScene(ret);
 
             UnvsActor actor = ret.GetActiveActor();
@@ -75,8 +75,10 @@ namespace unvs.game2d.scenes
             UnvsCinema.Instance.UpdateMainCameraBoxCollider2dSize();
             UnvsApp.Instance.RaiseEnterScene(ret);
             UnvsCinema.Instance.vcam.UpdateOffset2D(ret.followOffset);
-            ret.gameObject.SetActive(true);
+            CenterScene();
             ret.TurnOnLeft().TurnOnRight();
+            ret.gameObject.SetActive(true);
+           
             lastInteriorScene = ret;
             return ret;
         }
@@ -94,7 +96,7 @@ namespace unvs.game2d.scenes
             var ret = await Commons.LoadPrefabsAsync<UnvsScene>(path, this.buffer);
             ret.transform.SetParent(this.chunks.transform, true);
 
-            UnvsCinema.Instance.UpdateWorld(ret);
+            UnvsCinema.Instance.UpdateWorld(ret,true);
             UnvsCinema.Instance.vcam.UpdateByUnvsScene(ret);
 
             UnvsActor actor = ret.GetActiveActor();
@@ -112,6 +114,7 @@ namespace unvs.game2d.scenes
 
             UnvsCinema.Instance.UpdateMainCameraBoxCollider2dSize();
             UnvsApp.Instance.RaiseEnterScene(ret, true);
+            CenterScene();
             ret.gameObject.SetActive(true);
 
             return ret;
@@ -148,24 +151,31 @@ namespace unvs.game2d.scenes
             ret.JoinInfo.LeftPos -= offset;
             ret.JoinInfo.RightPos -= offset;
             ret.transform.SetAsFirstSibling();
-            UnvsCinema.Instance.UpdateWorld(ret);
+            UnvsCinema.Instance.UpdateWorld(ret,false);
+            CenterScene();
             ret.gameObject.SetActive(true);
             fromScene.leftScene = ret;
             ret.rightScene = fromScene;
-            CenterScene();
+            //CenterScene();
 
             return ret;
         }
 
         private void CenterScene()
         {
-            if (chunks.GetComponentsInChildren<UnvsScene>().Length > 1)
-            {
-                var center = chunks.GetComponentsInChildren<UnvsScene>()[1];
-                var of = Vector2.zero - (Vector2)center.transform.position;
-                this.chunks.transform.position = of;
-                this.actorContainer.transform.position = of;
-            }
+          //  var center = UnvsCinema.Instance.worldBoundCollider2d.bounds.center;
+           // UnvsApp.Instance.container.transform.position -= center;
+            //if (chunks.GetComponentsInChildren<UnvsScene>().Length > 1)
+            //{
+            //var center = chunks.GetComponentsInChildren<UnvsScene>()[1];
+            //var of = Vector2.zero - center;
+            //UnvsCinema.Instance.vcam.PreviousStateIsValid = false;
+            //UnvsApp.Instance.transform.position += center;
+            //this.chunks.transform.position -= center;
+            //this.actorContainer.transform.position -= center;
+            //this.interior.transform.position -= center;
+            //UnvsCinema.Instance.worldBoundCollider2d.transform.position -= center;
+            //}
         }
 
 
@@ -194,8 +204,8 @@ namespace unvs.game2d.scenes
             ret.transform.position -= (Vector3)offset;
             ret.JoinInfo.LeftPos -= offset;
             ret.JoinInfo.RightPos -= offset;
-            ret.transform.SetAsLastSibling();
-            UnvsCinema.Instance.UpdateWorld(ret);
+          //  ret.transform.SetAsLastSibling();
+            UnvsCinema.Instance.UpdateWorld(ret,false);
             ret.gameObject.SetActive(true);
             fromScene.rightScene = ret;
             ret.leftScene = fromScene;
@@ -226,7 +236,7 @@ namespace unvs.game2d.scenes
         private async UniTask clearChunkLeftIfExeedeAsync()
         {
             var len = this.chunks.GetComponentsInChildren<UnvsScene>().Length;
-            if (len >= 3)
+            if (len >= UnvsApp.Instance.ChunLenght)
             {
                 var deleteScene = this.chunks.GetComponentsInChildren<UnvsScene>()[0];
                 if (deleteScene.rightScene != null)
@@ -240,9 +250,9 @@ namespace unvs.game2d.scenes
         private async UniTask clearChunkRightIfExeedeAsync()
         {
             var len = this.chunks.GetComponentsInChildren<UnvsScene>().Length;
-            if (len >= 3)
+            if (len >= UnvsApp.Instance.ChunLenght)
             {
-                var deleteScene = this.chunks.GetComponentsInChildren<UnvsScene>()[len - 1];
+                var deleteScene = this.chunks.GetComponentsInChildren<UnvsScene>()[UnvsApp.Instance.ChunLenght - 1];
                 if (deleteScene.leftScene != null)
                 {
                     deleteScene.leftScene.TurnOnRight();

@@ -4,7 +4,6 @@ using game2d.scenes;
 using PlasticGui.WorkspaceWindow.Locks;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using Unity.Cinemachine;
@@ -12,7 +11,6 @@ using Unity.Mathematics;
 using Unity.VisualScripting;
 using Unity.VisualScripting.YamlDotNet.Core.Tokens;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 using unvs.ext;
@@ -152,15 +150,10 @@ namespace unvs.game2d.scenes{
         /// The next pharse is ambient
         /// </summary>
         /// <param name="ret"></param>
-        public void UpdateWorld(UnvsScene ret,bool reset)
+        public void UpdateWorld(UnvsScene ret)
         {
-            if (reset)
-            {
-                this.worldBoundDict = new Dictionary<UnvsScene, PolygonCollider2D>();
-                this.lightDict.Clear();
-            }
             this.BeforeUpdate?.Invoke(ret);
-            
+
             this.worldBoundDict.Add(ret, ret.worldBound);
             if (ret.light2d != null)
             {
@@ -177,39 +170,46 @@ namespace unvs.game2d.scenes{
                 //UpdateWorldBoundAsync().Forget();
                 this.lightDict.Remove(s);
                 ret.OnDestroying -= OnSceneDestroyTmp;
-                //requestUpdate = true;
 
             };
             OnSceneDestroyTmp = OnSceneDestroy;
             ret.OnDestroying += OnSceneDestroy;
-           
+            //UpdateWorldBoundAsync().Forget();
             _lights = this.lightDict.Select(p => p.Value).ToArray();
             this.AfterUpdate?.Invoke(ret);
-            if (reset)
-            {
-                updateWorldBound();
-                requestUpdate = false;
-            }
-
-            else
-            {
-                requestUpdate = true;
-            }
-                
-                
-         
+            confiner.enabled = false;
+            updateWorldBound();
         }
-        
 
-        bool hasUpdate;
+        private async UniTask UpdateWorldBoundAsync()  // ← Đổi thành async UniTask
+        {
+            // 1. Cập nhật points
+            var bounds = this.worldBoundDict
+                .Where(p => p.Key != null && !p.Key.IsDestroying && !p.Key.IsDestroyed())
+                .Select(p => p.Value)
+                .ToArray();
+
+            this.worldBoundCollider2d.points = bounds.CreateRectFromVectorList();
+            //await UniTask.DelayFrame(30, PlayerLoopTiming.LastUpdate);
+            // 2. Delay đến timing tốt nhất cho Cinemachine
+            //await UniTask.Yield(PlayerLoopTiming.PostLateUpdate);
+            // Hoặc thử cái này nếu vẫn giật: await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate);
+            this.confiner.enabled = false;
+            // 3. Invalidate
+            this.confiner.InvalidateBoundingShapeCache();
+            UniTask.DelayFrame(30, PlayerLoopTiming.LastUpdate).ContinueWith(()=>{
+                this.confiner.enabled = true;
+            }).Forget();
+        }
+
         private void updateWorldBound()
         {
-            
             var bounds = this.worldBoundDict.Where(p => p.Key != null && !p.Key.IsDestroying && !p.Key.IsDestroyed()).Select(p => p.Value).ToArray();
+            this.worldBoundCollider2d.points = bounds.CreateRectFromVectorList();
+           
           
-            this.worldBoundCollider2d.SetPath(0, bounds.CreateRectFromVectorList());
             this.confiner.InvalidateBoundingShapeCache();
-
+           
         }
 
         public void ClearWorlds()
@@ -224,7 +224,7 @@ namespace unvs.game2d.scenes{
         }
         public event Action OnCameraMove;
         public event Action OnCameraStop;
-        bool requestUpdate;
+
         float _lastPosition = 0;
         bool _wasMoving;
         float getValue(float x)
@@ -237,19 +237,7 @@ namespace unvs.game2d.scenes{
             _lastPosition = getValue(cam.transform.position.x);
 
         }
-        void OnEnable()
-        {
-            
-            RenderPipelineManager.endCameraRendering += (context, cam) =>
-            {
-                if (requestUpdate)
-                {
-                    
-                    requestUpdate = false;
-                    updateWorldBound();
-                }
-            };
-        }
+
 
         private void LateUpdate()
         {
@@ -261,7 +249,7 @@ namespace unvs.game2d.scenes{
             if (delta > 0.01f) // Ngưỡng nhỏ để nhạy hơn
             {
                 OnCameraMove?.Invoke();
-                
+                UnvsApp.Instance?.currentActor?.SayText("Moving");
                 _wasMoving = true; // Đánh dấu là đang di chuyển
             }
             else
@@ -270,9 +258,8 @@ namespace unvs.game2d.scenes{
                 if (_wasMoving)
                 {
                     OnCameraStop?.Invoke();
-                   
+                    UnvsApp.Instance?.currentActor?.SayText("Stop");
                     _wasMoving = false;
-                   
                 }
             }
 

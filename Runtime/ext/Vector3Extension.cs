@@ -178,6 +178,12 @@ namespace unvs.ext
             if (From.x < To.x) return 1;
             return 0;
         }
+        public static Vector2 GetVector2DirectionTo(this Vector3 From, Vector2 To)
+        {
+            var ret = To - (Vector2)From;
+            return new Vector2(Math.Sign(ret.x), Math.Sign(ret.y));
+        }
+        
         public static float GetDirectionTo(this Vector3 From, Vector3 To)
         {
             if (From.x > To.x) return -1;
