@@ -721,5 +721,28 @@ namespace unvs.ext
             //var (v1, v2) = this.floor.CalculateIntersection(this.leftWall.bounds.max.x, this.rightWall.bounds.min.x);
 
         }
+
+        public static Vector2[] MakeThicnessPoly(this EdgeCollider2D ground,float thickness, float minX, float maxX)
+        {
+            var tmp = ground.transform.parent.AddChildComponentIfNotExist<EdgeCollider2D>($"TrimLeftAndRightToNew-{ground.name}-tmp");
+            tmp.points = ground.points;
+            tmp.ClipByFirstEdgeByX( minX );
+            tmp.ClipLastEdgeByX( maxX );
+            var ret = tmp.points.CreateThicknessDownPolygonFromLines(thickness);
+            UnityEngine.Object.DestroyImmediate(tmp.gameObject );
+            return ret;
+
+        }
+        public static Vector2[] MakeThicnessPolyWithFlatBottom(this EdgeCollider2D ground, float thickness, float minX, float maxX)
+        {
+            var tmp = ground.transform.parent.AddChildComponentIfNotExist<EdgeCollider2D>($"TrimLeftAndRightToNew-{ground.name}-tmp");
+            tmp.points = ground.points;
+            tmp.ClipByFirstEdgeByX(minX);
+            tmp.ClipLastEdgeByX(maxX);
+            var ret = tmp.points.CreateThicknessPolygonWithFlatBottomFromLines(thickness);
+            UnityEngine.Object.DestroyImmediate(tmp.gameObject);
+            return ret;
+
+        }
     }
 }

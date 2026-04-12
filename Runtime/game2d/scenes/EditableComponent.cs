@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.UI;
 using unvs.ext;
+using unvs.shares;
 namespace unvs.game2d.scenes
 {
     [AttributeUsage(AttributeTargets.Method)]
@@ -55,13 +56,19 @@ namespace unvs.game2d.scenes
             if (Application.isPlaying)
 
                 InitRuntime();
-            else
-                InitDesignTime();
+
         }
 
-        public abstract void InitDesignTime();
 
         public abstract void InitRuntime();
+    }
+    public abstract class UnvsComponentEvetns: UnvsComponent
+    {
+        internal Action onDisable;
+        private void OnDisable()
+        {
+            onDisable.Invoke();
+        }
     }
     public abstract class UnvsList
     {
@@ -78,7 +85,7 @@ namespace unvs.game2d.scenes
     public abstract class UnvsUIComponent : UnvsBaseComponent
     {
         public Canvas canvas;
-
+        public bool IsShow;
         public abstract void InitEvents();
         public abstract void InitRunTime();
 
@@ -92,6 +99,7 @@ namespace unvs.game2d.scenes
                 canvas.enabled = false;
                 canvas.gameObject.SetActive(false);
             }
+            IsShow = false;
         }
         public virtual void Show()
         {
@@ -108,7 +116,9 @@ namespace unvs.game2d.scenes
                 canvas.enabled = true;
                 canvas.gameObject.SetActive(true);
             }
+           
             this.ApplyNavigate<Button>();
+            IsShow=true;
         }
         public virtual void Activate()
         {
@@ -135,7 +145,7 @@ namespace unvs.game2d.scenes
                     canvas.FullSize();
 
                 }
-
+                InitEvents();
             }
         }
     }
@@ -146,9 +156,11 @@ namespace unvs.game2d.scenes
         public override void InitRunTime()
         {
             Instance = this as T;
+           
 
 
         }
 
     }
+    
 }

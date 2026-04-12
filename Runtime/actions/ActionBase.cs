@@ -17,12 +17,19 @@ namespace unvs.actions
     {
         public MonoBehaviour Source;
         public MonoBehaviour Target;
-        public bool IsCancel;
+        public bool IsCancel
+        {
+            get
+            {
+                return _isCancle || Cts.Token.IsCancellationRequested;
+            }
+        }
         public CancellationTokenSource Cts;
+        private bool _isCancle;
 
         public void Cancel()
         {
-            IsCancel=true;
+            _isCancle = true;
             this.Cts?.Cancel();
         }
 

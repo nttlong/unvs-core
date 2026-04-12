@@ -3,6 +3,7 @@ using game2d.scenes;
 using System;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using unvs.ext;
 
@@ -18,13 +19,52 @@ namespace unvs.game2d.scenes
        
         public Action OnMainMenu;
         public Action OnExit;
+        private InputAction actionPause;
+        private bool isShow;
+
+        public override void InitRunTime()
+        {
+           
+            base.InitRunTime();
+            this.panel.DockFull();
+        }
+        public override void Show()
+        {
+            base.Show();
+           
+        }
+        public virtual void Toggle()
+        {
+            isShow = !isShow;
+            if(isShow ) Show();
+            else Hide();
+        }
+        public override void Hide()
+        {
+            base.Hide();
+            //if(actionPause != null)
+            //actionPause.started -= ActionPause_started;
+        }
+        
         public override void InitEvents()
         {
+           
             this.btnExit.onClick.AddListener(() =>
             {
-                OnExit?.Invoke();
+                if (OnExit != null)
+                    OnExit.Invoke();
+                else
+                    UnvsApp.Instance.ExitGame();
             });
-            this.btnMainMenu.onClick.AddListener(() => { OnMainMenu?.Invoke(); });
+            this.btnMainMenu.onClick.AddListener(() => {
+                if(OnMainMenu!=null) OnMainMenu.Invoke();
+                else
+                {
+                    UnvsSceneLoader.Instance.ClearUpAll();
+                    Hide();
+                    UnvsApp.Instance.MainMenu.Show();
+                }
+            });
             this.btnResume.onClick.AddListener(() => {
                 base.Hide();
             });

@@ -16,8 +16,8 @@ namespace unvs.game2d.scenes
         [SerializeField]
         [UnvsProperty(UnvsPropertyTypeEnum.List)]
         public SpawnPointInfo[] spawnPoints;
-#if UNITY_EDITOR
+//#if UNITY_EDITOR
 
-#endif
+//#endif
     }
 }

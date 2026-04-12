@@ -12,12 +12,17 @@ using unvs.shares;
 
 namespace unvs.game2d.scenes.actors
 {
-    public class AnimMap : UnvsBaseComponent
+    [RequireComponent(typeof(AudioSource))]
+    public class UnvsAnimStates : UnvsBaseComponent
     {
+       
+       
         private UnvsActor actor;
         private Vector3 oririnalScale;
         [SerializeField]
-        public BlendTreeInfo[] motions;
+        public MotionAudio[] motionAudio;
+        [SerializeField]
+        public BlendTreeInfo[] animStates;
         private Collider2D coll;
         private float _direction;
 
@@ -33,22 +38,22 @@ namespace unvs.game2d.scenes.actors
                 if (_direction > 0)
                 {
                     transform.localScale = oririnalScale;
-                } 
-                if(_direction < 0)
+                }
+                if (_direction < 0)
                 {
-                    transform.localScale= new Vector3(-oririnalScale.x, oririnalScale.y, oririnalScale.z);
+                    transform.localScale = new Vector3(-oririnalScale.x, oririnalScale.y, oririnalScale.z);
                 }
             }
         }
 
         public virtual void Awake()
         {
-            if(Application.isPlaying)
+            if (Application.isPlaying)
             {
                 actor = GetComponent<UnvsActor>();
                 oririnalScale = this.transform.localScale.CloneToNew();
                 actor.motions = this;
-                coll=this.GetComponent<Collider2D>();
+                coll = this.GetComponent<Collider2D>();
             }
         }
         public void DirectionTo(Vector3 direction)
@@ -64,22 +69,40 @@ namespace unvs.game2d.scenes.actors
         }
         public void Motion(string name)
         {
-            this.motions.PlayBaseLayer(name);
+            this.animStates.PlayBaseLayer(name);
         }
         public void AddtiveMotion(string name)
         {
-            this.motions.PlayAddtiveMotion(name);
+            this.animStates.PlayAddtiveMotion(name);
         }
 #if UNITY_EDITOR
         [UnvsButton("Load Motions")]
         public void LoadMotions()
         {
+            this.GetComponentInChildren<Animator>().AddComponentIfNotExist<UnsvPalyerAnimatorEvent>();
             var animController = this.GetComponentInChildren<Animator>();
-            if(animController == null)
+            if (animController == null)
             {
                 throw new Exception($"{typeof(Animator)} was not found in {name}");
             }
-           this.motions=  animController.EditorExtractAllMotions().ToArray();
+            this.animStates = animController.EditorExtractAllMotions().ToArray();
+            var lsAudio = this.motionAudio.Cast<MotionAudio?>().ToList();
+            foreach (var mot in this.animStates)
+            {
+                var audio = lsAudio.FirstOrDefault(p => p?.name == mot.motionName && p?.LayerIndex==mot.layerIndex);
+                if (audio == null)
+                {
+                    lsAudio.Add(new MotionAudio
+                    {
+                        name = mot.motionName,
+                        LayerIndex= mot.layerIndex,
+                        LayerName= mot.layerName,
+                        blendName = mot.blendName,
+                        value = mot.value,
+                    });
+                }
+            }
+            this.motionAudio = lsAudio.Cast<MotionAudio>().ToArray();
         }
 #endif
     }

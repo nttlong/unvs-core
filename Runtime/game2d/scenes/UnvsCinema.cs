@@ -1,7 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
-using Cysharp.Threading.Tasks.Triggers;
+
 using game2d.scenes;
-using PlasticGui.WorkspaceWindow.Locks;
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,7 +10,7 @@ using System.Threading;
 using Unity.Cinemachine;
 using Unity.Mathematics;
 using Unity.VisualScripting;
-using Unity.VisualScripting.YamlDotNet.Core.Tokens;
+
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -43,7 +43,7 @@ namespace unvs.game2d.scenes{
         public Light2D globalLight;
         public float DurationTimeSmoothChangeSate = 1.5f;
         private Light2D[] _lights=new Light2D[] { };
-        public AudioSource audioSource;
+        [SerializeField] public AudioSource audioSource;
 
 
         public void ChangeCameraState(List<UnvsScene> s,bool Imediately)
@@ -235,6 +235,7 @@ namespace unvs.game2d.scenes{
         {
             base.InitRunTime();
             _lastPosition = getValue(cam.transform.position.x);
+            audioSource=this.GetComponentInChildren<AudioSource>(true);
 
         }
         void OnEnable()

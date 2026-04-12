@@ -19,11 +19,6 @@ namespace unvs.game2d.scenes.actors
 {
     public class UnvsActorSpeaker : UnvsComponent
     {
-        public override void InitDesignTime()
-        {
-           
-        }
-
         public override void InitRuntime()
         {
             
@@ -34,4 +29,5 @@ namespace unvs.game2d.scenes.actors
             Debug.LogWarning($"{typeof(UnvsActorSpeaker)}.{nameof(SayIThisDoesNotDoAnything)} was not implement");
         }
     }
+
 }

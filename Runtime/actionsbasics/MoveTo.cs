@@ -27,8 +27,7 @@ namespace unvs.actionsbasics
             if (actor != null)
             {
                 actor.motions.Motion("walk");
-                await actor.MovtoTargetAsync(iteractSource.GetPosition(),sender.Cts.Token); // ham nay lai dang su dung  actor.cts
-                                                                           //await actor.MoveToAsync(iteractSource.GetPosition(), sender.Cts);
+                await actor.MovtoTargetAsync(iteractSource.GetPosition(),sender.Cts.Token); 
             }
             else
             {

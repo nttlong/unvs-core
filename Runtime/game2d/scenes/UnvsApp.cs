@@ -16,7 +16,9 @@ using unvs.game2d.scenes.actors;
 using unvs.interfaces;
 using unvs.interfaces.sys;
 using unvs.shares;
-using unvs.shares.editor;
+#if UNITY_EDITOR
+using unvs.shares.editor; 
+#endif
 
 namespace unvs.game2d.scenes
 {
@@ -72,32 +74,34 @@ namespace unvs.game2d.scenes
                 System.Diagnostics.Process.GetCurrentProcess().Kill();
             #endif
         }
-        public override void InitDesignTime()
-        {
-           
-        }
+       
         public virtual async UniTask InitRuntimeAsync()
         {
-            
+
             container = transform.CreateIfNoExist<Transform>("container");
             container.gameObject.SetActive(false);
-            SceneLoader = await Commons.LoadPrefabsAsync<UnvsSceneLoader>(SceneLoaderPath, container,true);
+            SceneLoader = await Commons.LoadPrefabsAsync<UnvsSceneLoader>(SceneLoaderPath, container, true);
             cinema = await Commons.LoadPrefabsAsync<UnvsCinema>(cinemaPath, container, true);
             MainMenu = await Commons.LoadPrefabsAsync<UnvsMainMenu>(mainMenuPath, container, true);
             PauseMenu = await Commons.LoadPrefabsAsync<UnvsPauseMenu>(pauseMenuPath, container, true);
             dialog = await Commons.LoadPrefabsAsync<UnvsDialog>(dialogPath, container, true);
             playerInput = await Commons.LoadPrefabsAsync<UnvsPlayerInput>(playerInputPath, container, true);
-            InteractUI =await Commons.LoadPrefabsAsync<UnvsInteractUI>(InteractUIPath, container, true);
-            ActorDialogue =await Commons.LoadPrefabsAsync<UnvsActirDialogue>(ActorDialoguePath, container, true);
+            InteractUI = await Commons.LoadPrefabsAsync<UnvsInteractUI>(InteractUIPath, container, true);
+            ActorDialogue = await Commons.LoadPrefabsAsync<UnvsActirDialogue>(ActorDialoguePath, container, true);
             MainMenu.Show();
             ActorDialogue.Hide();
             dialog.Hide();
             PauseMenu.Hide();
 
+            InitEvents();
 
+        }
+
+        public virtual void InitEvents()
+        {
             MainMenu.btnStart.onClick.AddListener(() =>
             {
-                SceneLoader.LoadNewAsync(this.startScenePath,"").ContinueWith(s =>
+                SceneLoader.LoadNewAsync(this.startScenePath, "").ContinueWith(s =>
                 {
                     MainMenu.Hide();
                 }).Forget();
@@ -112,9 +116,16 @@ namespace unvs.game2d.scenes
             });
             container.gameObject.SetActive(true);
             InteractUI.Activate();
-
-
+            var back = UnvsGlobalInput.UI["Pause"];
+            back.started += Back_started;
         }
+
+        private void Back_started(InputAction.CallbackContext obj)
+        {
+            if (MainMenu.IsShow) return;
+            UnvsPauseMenu.Instance.Toggle();
+        }
+
         public event Action<UnvsScene> OnScenseDestroying;
         public void RaiseEventScenseDestroying(UnvsScene unvsScene)
         {
@@ -199,6 +210,7 @@ namespace unvs.game2d.scenes
         }
 
 #if UNITY_EDITOR
+       
         private void OnValidate()
         {
             if(startScene!=null)

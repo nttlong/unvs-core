@@ -51,6 +51,8 @@ namespace unvs.shares
             public const string TRIGGER_SCENE_CHANGE = "TRIGGER-SCENE-CHANGE";
 
             public const string INTERACT_SCANER = "INTERACT-SCANER";
+
+            public const string GROUND_FLOOR = "GROUND-FLOOR";
         }
         public class Scenes
         {

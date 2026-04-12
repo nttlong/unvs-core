@@ -13,8 +13,10 @@ using unvs.sys;
 namespace unvs.game2d.scenes.actors {
     public class UnvsPlayer : UnvsBaseComponent
     {
-        private AnimMap motions;
+        private UnvsAnimStates motions;
         private UnvsActor actor;
+        
+        private InputAction actionMove;
         private Vector2 direction;
         private bool isMoving;
         private Vector2 target;
@@ -24,29 +26,38 @@ namespace unvs.game2d.scenes.actors {
            
             if (Application.isPlaying )
             {
-                this.motions = this.GetComponent<AnimMap>();
+                this.motions = this.GetComponent<UnvsAnimStates>();
                 this.actor=this.GetComponent<UnvsActor>();
-              
-                UnvsGlobalInput.Player["Move"].started += c =>
-                {
-                    this.motions.Motion("walk");
-                    isMoving = true;
-                    this.isMoving = true;
-                    this.direction = c.ReadValue<Vector2>();
-                    this.motions.DirectionBy(direction);
-                    this.target = new Vector2(this.transform.position.x + direction.x * 100000, 0);
-                };
-                UnvsGlobalInput.Player["Move"].canceled += c =>
-                {
-                    this.direction = c.ReadValue<Vector2>();
-                    this.motions.DirectionBy(direction);
-                    this.isMoving = false;
-                    this.motions.Motion("idle");
-
-                };
+                actionMove = UnvsGlobalInput.Player["Move"];
+                actionMove.started += ActionMoveStart_started;
+                actionMove.canceled += ActionMove_canceled;
+               
                 
             }
         }
+        private void OnDisable()
+        {
+            actionMove.started -= ActionMoveStart_started;
+            actionMove.canceled -= ActionMove_canceled;
+        }
+        private void ActionMove_canceled(InputAction.CallbackContext obj)
+        {
+            this.direction = obj.ReadValue<Vector2>();
+            this.motions.DirectionBy(direction);
+            this.isMoving = false;
+            this.motions.Motion("idle");
+        }
+
+        private void ActionMoveStart_started(InputAction.CallbackContext obj)
+        {
+            this.motions.Motion("walk");
+            isMoving = true;
+            this.isMoving = true;
+            this.direction = obj.ReadValue<Vector2>();
+            this.motions.DirectionBy(direction);
+            this.target = new Vector2(this.transform.position.x + direction.x * 100000, 0);
+        }
+
         private void Update()
         {
             if (isMoving)

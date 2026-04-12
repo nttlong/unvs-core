@@ -178,7 +178,20 @@ namespace unvs.game2d.scenes
             //}
         }
 
-
+        public void ClearUpAll()
+        {
+            UnvsCinema.Instance.ClearWorlds();
+            if(UnvsApp.Instance.currentActor!= null)
+            {
+                UnvsApp.Instance.currentActor.gameObject.SafeDestroyAsync().Forget();
+            }
+            this.actorContainer.SafeDestroyChildrenAsync().Forget();
+            this.chunks.SafeDestroyChildrenAsync().Forget();
+            this.interior.SafeDestroyChildrenAsync().Forget();
+            this.buffer.SafeDestroyChildrenAsync().Forget();
+            this.backupInterior.SafeDestroyChildrenAsync().Forget();
+            
+        }
         public async UniTask<UnvsScene> LoadChunkRightAsync(UnvsScene fromScene, string path)
         {
 
@@ -283,6 +296,8 @@ namespace unvs.game2d.scenes
             }
             await this.bufferDelete.SafeDestroyChildrenAsync();
         }
+
+        
     }
 #if UNITY_EDITOR
     public partial class UnvsSceneLoader : UnvsUIComponentInstance<UnvsSceneLoader>

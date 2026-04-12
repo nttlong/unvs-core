@@ -24,18 +24,23 @@ namespace unvs.game2d.scenes
     
     public partial class UnvsScene : UnvsComponent
     {
-        
 
 
+        [Header("Links scene", order = -1)]
+        [SerializeField]
+#if UNITY_EDITOR
+        public _UnvsSceneEditorObject Links; 
+#endif
         public string SceneLeft;
         public string SceneRight;
+        public EditorUnvsSceneSpawPointEditor SpawnPoints;
         [SerializeField]
         [Header("Sene game world info")]
         public WorldJoinInfo JoinInfo = new WorldJoinInfo();
         [SerializeField] public float OrthographicSize = 20;
         [SerializeField]
         public Vector2 followOffset;
-       
+        public Transform support;
         public Camera cam;
         public CinemachineCamera vcam;
         public Transform defaulCamWatcher;
@@ -59,9 +64,11 @@ namespace unvs.game2d.scenes
         internal UnvsScene rightScene;
         private bool _hastrimEdge;
         public Transform sceneTracker;
+        public UnvsBackgound background;
+        internal PolygonCollider2D groundThickness;
 
         public bool IsDestroying { get; private set; }
-        public EditorUnvsSceneSpawPointEditor SpawnPoints { get; private set; }
+        
 
         public event Action<UnvsScene> OnDestroying;
         async UniTask initAsync()
@@ -99,10 +106,7 @@ namespace unvs.game2d.scenes
 
                
         }
-        public override void InitDesignTime()
-        {
-            //throw new System.NotImplementedException();
-        }
+       
         public UnvsActor GetActiveActor()
         {
             return this.GetComponentsInChildren<UnvsActor>(true).FirstOrDefault(p => p.GetComponent<UnvsPlayer>() != null);

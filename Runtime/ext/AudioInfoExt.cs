@@ -39,7 +39,13 @@ namespace unvs.ext {
         }
         public static async UniTask PlayBetterAudioClipAsync(this AudioInfo source, params AudioInfo[] others)
         {
-           await UnvsCinema.Instance.audioSource.PlayBetterAudioClipAsync(source, others);
+            if (UnvsCinema.Instance==null)
+            {
+                Debug.LogWarning("UnvsCinema.Instance.audioSource==null");
+                return;
+            }
+            if (UnvsCinema.Instance.audioSource == null) UnvsCinema.Instance.audioSource=UnvsCinema.Instance.GetComponentInChildren<AudioSource>();
+            await UnvsCinema.Instance.audioSource.PlayBetterAudioClipAsync(source, others);
 
         }
         public static void PlayBetterAudioClip(this AudioSource audioSource, AudioInfo source, params AudioInfo[] others)

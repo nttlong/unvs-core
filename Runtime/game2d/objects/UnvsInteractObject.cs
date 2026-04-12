@@ -38,13 +38,14 @@ namespace unvs.game2d.objects
             {
                 Target = target,
                 Source=this,
-                Cts = cts
+                Cts= cts
             };
+            //sender.Cts = sender.Cts.Refresh();
             foreach (var item in Data.actions)
             {
                 if(item==null) continue;
                 await item.ExecuteAsync(sender);
-                if (sender.IsCancel) return;
+                if (sender.IsCancel ) return;
             }
             
         }
@@ -52,8 +53,8 @@ namespace unvs.game2d.objects
 #if UNITY_EDITOR
     public partial class UnvsInteractObject : UnvsComponent
     {
-       
-        public override void InitDesignTime()
+
+        private void OnValidate()
         {
             this.SetMeOnLayer(Constants.Layers.INTERACT_OBJECT);
         }

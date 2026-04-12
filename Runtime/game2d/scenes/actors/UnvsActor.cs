@@ -17,9 +17,11 @@ using unvs.sys;
 namespace unvs.game2d.scenes.actors
 {
     [RequireComponent(typeof(IKBoneMap))]
-    [RequireComponent(typeof(AnimMap))]
+    [RequireComponent(typeof(UnvsAnimStates))]
     [RequireComponent(typeof(UnvsActorSpeaker))]
     [RequireComponent(typeof(UniqueObject))]
+    [RequireComponent(typeof(UnvsPlayer))]
+    [RequireComponent (typeof(AudioSource))]
     public partial class UnvsActor : UnvsBaseComponent
     {
         public CancellationTokenSource cts => _cls;
@@ -37,7 +39,7 @@ namespace unvs.game2d.scenes.actors
         public BoxCollider2D scanerBound;
         public GameObject animEle;
         public Animator animator;
-        public AnimMap motions;
+        public UnvsAnimStates motions;
         private CancellationTokenSource _cls;
 
         public virtual CancellationTokenSource RefreshToken()
@@ -60,51 +62,25 @@ namespace unvs.game2d.scenes.actors
         {
             UnvsActirDialogue.Instance.Hide();
         }
-        public async UniTask MovtoTargetAsync(Vector2 pos, CancellationToken tk = default)
+        public async UniTask MovtoTargetAsync(Vector2 pos, CancellationToken tk=default )
         {
-            // 1. Lấy CTS chính của Actor (KHÔNG đưa cái này vào using)
-            var actorCts = this.cts;
-
-            // 2. Tạo một biến đại diện cho Token sẽ dùng để di chuyển
-            CancellationToken finalToken;
-            CancellationTokenSource linkedCts = null;
-
-            if (tk != default && tk != actorCts.Token)
+            if(tk== default)
             {
-                if(actorCts==null) actorCts=this.RefreshToken();
-                // Chỉ tạo Link nếu cần thiết
-                linkedCts = CancellationTokenSource.CreateLinkedTokenSource(actorCts.Token, tk);
-                finalToken = linkedCts.Token;
+                tk = this.RefreshToken().Token;
             }
-            else
-            {
-                actorCts = this.RefreshToken();
-                finalToken = actorCts.Token;
-            }
+            
 
-            try
-            {
-                // 3. Thực hiện di chuyển
-                await TransformExtension.MoveToAsync(this.transform, this.WalkSpeed, pos,
-                    p => {
-                        this.motions.direction = p.Direction;
-                        this.motions.Motion("walk");
-                    },
-                    p => {
-                        this.motions.direction = p.Direction;
-                        this.motions.Motion("idle");
+            await TransformExtension.MoveToAsync(this.transform, this.WalkSpeed, pos,
+                   p => {
+                       this.motions.direction = p.Direction;
+                       this.motions.Motion("walk");
+                   },
+                   p => {
+                       this.motions.direction = p.Direction;
+                       this.motions.Motion("idle");
 
-                    },
-                    finalToken);
-            }
-            finally
-            {
-                // 4. CHỈ Dispose cái LinkedCts (cái tạm thời), KHÔNG Dispose actorCts
-                if (linkedCts != null)
-                {
-                    linkedCts.Dispose();
-                }
-            }
+                   },
+                   tk);
         }
 
         public T ScanObject<T>(params string[] layers)

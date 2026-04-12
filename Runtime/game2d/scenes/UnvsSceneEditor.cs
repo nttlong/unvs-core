@@ -24,9 +24,8 @@ namespace unvs.game2d.scenes
     
     public partial class UnvsScene : UnvsComponent
     {
-        [Header("Links scene")]
-        [SerializeField]
-        public _UnvsSceneEditorObject Links;
+        
+
         [UnvsButton("Review")]
         public void Review()
         {
@@ -44,12 +43,17 @@ namespace unvs.game2d.scenes
                 this.vcam.Watch(defaulCamWatcher);
 
             }
-
+            if (this.ground != null)
+            {
+                this.ground.SetMeOnLayer(Constants.Layers.GROUND_FLOOR);
+                this.ground.AddComponentIfNotExist<UnvsAudible>();
+            }
             //this.vcam.GetComponent<CinemachineConfiner2D>().BoundingShape2D = this.worldBound;
         }
         [UnvsButton("Apply require components")]
         public void ApplyRequireComponents()
         {
+            if (this.support == null) this.support = this.AddChildComponentIfNotExist<Transform>("support");
             if (this.vcam != null)
             {
                 this.vcam.Lens.OrthographicSize = this.OrthographicSize;
@@ -67,7 +71,7 @@ namespace unvs.game2d.scenes
             }
             if (this.sceneTracker == null)
             {
-                this.sceneTracker = this.AddChildComponentIfNotExist<Transform>("scene-tracker");
+                this.sceneTracker = this.support.AddChildComponentIfNotExist<Transform>("scene-tracker");
                 var poly = this.sceneTracker.AddComponentIfNotExist<PolygonCollider2D>();
                 poly.isTrigger = true;
                 poly.SetMeOnLayer(Constants.Layers.TRIGGER_SCENE_CHANGE);
@@ -81,6 +85,21 @@ namespace unvs.game2d.scenes
                 this.SpawnPoints = this.AddChildComponentIfNotExist<EditorUnvsSceneSpawPointEditor>("Spawn-Points");
             }
             syncWorldBoundAndScencTracker();
+            
+            if(this.cam!=null) this.cam.transform.SetParent(this.support.transform);
+
+            if (this.vcam != null) this.vcam.transform.SetParent(this.support.transform);
+            if (this.defaulCamWatcher != null) this.defaulCamWatcher.transform.SetParent(this.support.transform, true);
+            if (this.startPoint != null) this.startPoint.transform.SetParent(this.support.transform, true);
+            if (this.worldBound != null) this.worldBound.transform.SetParent(this.support.transform, true);
+            if (this.triggerLeft != null) this.triggerLeft.transform.SetParent(this.support.transform, true);
+            if(this.triggerRight!=null) this.triggerRight.transform.SetParent(this.support.transform, true);
+            if(this.wallLeft!=null) this.wallLeft.transform.SetParent(this.support.transform, true);
+            if (this.wallRight != null) this.wallRight.transform.SetParent(this.support.transform, true);
+            if(this.ground!=null) this.ground.transform.SetParent(this.support.transform, true);
+            if (this.light2d != null) this.light2d.transform.SetParent(this.support.transform, true);
+            if (this.sceneTracker != null) this.sceneTracker.transform.SetParent(this.support.transform, true);
+            if(this.background==null) this.background = this.AddChildComponentIfNotExist<UnvsBackgound>("background");
         }
 
         private void syncWorldBoundAndScencTracker()
@@ -97,45 +116,50 @@ namespace unvs.game2d.scenes
         [UnvsButton("Generate elements")]
         public void Generate()
         {
-            this.cam = this.AddChildComponentIfNotExist<Camera>("Main Camera");
+            this.support = this.AddChildComponentIfNotExist<Transform>("support");
+            this.cam = this.support.AddChildComponentIfNotExist<Camera>("Main Camera");
             this.cam.tag = "MainCamera";
             this.cam.orthographic = true;
             this.cam.AddComponentIfNotExist<CinemachineBrain>();
-            this.vcam = this.AddChildComponentIfNotExist<CinemachineCamera>("vcam");
-            this.defaulCamWatcher = this.AddChildComponentIfNotExist<Transform>("default-cam-watcher");
+            this.vcam = this.support.AddChildComponentIfNotExist<CinemachineCamera>("vcam");
+            this.defaulCamWatcher = this.support.AddChildComponentIfNotExist<Transform>("default-cam-watcher");
             this.confiner = this.vcam.GetOrAddComponent<CinemachineConfiner2D>();
             this.cinemachineFollow = this.vcam.GetOrAddComponent<CinemachineFollow>();
             this.vcam.Follow = this.defaulCamWatcher;
             this.JoinInfo.Size = this.cam.GetCameraWorldSize();
             //this.edgesWorldBound = this.AddChildComponentIfNotExist<EdgeCollider2D>("edgesWorldBound");
-            this.startPoint = this.AddChildComponentIfNotExist<Transform>("start-point");
+            this.startPoint = this.support.AddChildComponentIfNotExist<Transform>("start-point");
             this.startPoint.transform.position = new Vector3(this.JoinInfo.Size.x / 2, 0, -10);
             this.defaulCamWatcher.transform.position = this.JoinInfo.Size / 2;
-            this.worldBound = this.AddChildComponentIfNotExist<PolygonCollider2D>("world-bound");
+            this.worldBound = this.support.AddChildComponentIfNotExist<PolygonCollider2D>("world-bound");
             this.worldBound.SetMeOnLayer(Constants.Layers.WORLD_BOUND);
             this.worldBound.isTrigger = true;
             this.worldBound.points = this.defaulCamWatcher.GetSegment().Center().CreateRectFromCenter(this.JoinInfo.Size);
-            this.triggerLeft = this.AddChildComponentIfNotExist<BoxCollider2D>("trigger-left");
+            this.triggerLeft = this.support.AddChildComponentIfNotExist<BoxCollider2D>("trigger-left");
             this.triggerLeft.SetMeOnLayer(Constants.Layers.TRIGGER_LOAD_SCENE);
             this.triggerLeft.SetMeOnTag(Constants.Tags.TRIGGER_LOAD_SCENE_LEFT);
 
-            this.triggerRight = this.AddChildComponentIfNotExist<BoxCollider2D>("trigger-right");
+            this.triggerRight = this.support.AddChildComponentIfNotExist<BoxCollider2D>("trigger-right");
             this.triggerRight.SetMeOnLayer(Constants.Layers.TRIGGER_LOAD_SCENE);
             this.triggerRight.SetMeOnTag(Constants.Tags.TRIGGER_LOAD_SCENE_LEFT);
-            this.wallLeft = this.AddChildComponentIfNotExist<BoxCollider2D>("wall-left");
-            this.wallRight = this.AddChildComponentIfNotExist<BoxCollider2D>("wall-right");
-            this.ground = this.AddChildComponentIfNotExist<EdgeCollider2D>("ground");
+            this.wallLeft = this.support.AddChildComponentIfNotExist<BoxCollider2D>("wall-left");
+            this.wallRight = this.support.AddChildComponentIfNotExist<BoxCollider2D>("wall-right");
+            this.ground = this.support.AddChildComponentIfNotExist<EdgeCollider2D>("ground");
             var dx = this.defaulCamWatcher.transform.GetSegment().Center().x;
             this.ground.points = new Vector2[] { new Vector2(dx - this.JoinInfo.Size.x / 2 - 5, 0), new Vector2(dx + this.JoinInfo.Size.x / 2 + 5, 0) };
 
             this.worldBound.AlignWall(this.wallLeft, this.wallRight);
             this.worldBound.AlignWall(this.triggerLeft, this.triggerRight, true);
-            this.light2d = this.AddChildComponentIfNotExist<Light2D>("light2d");
+            this.light2d = this.support.AddChildComponentIfNotExist<Light2D>("light2d");
             this.light2d.lightType = Light2D.LightType.Global;
-
+            this.sceneTracker = this.support.AddChildComponentIfNotExist<Transform>("scene-tracker");
+            var poly = this.sceneTracker.AddComponentIfNotExist<PolygonCollider2D>();
+            poly.isTrigger = true;
+            poly.SetMeOnLayer(Constants.Layers.TRIGGER_SCENE_CHANGE);
 
             this.ApplyRequireComponents();
             calculateJoinPoint();
+            this.background = this.AddChildComponentIfNotExist<UnvsBackgound>("background");
         }
 
         private bool calculateJoinPoint()
@@ -211,7 +235,7 @@ namespace unvs.game2d.scenes
 
 
         [Serializable]
-        public class _UnvsSceneEditorObject
+        public struct _UnvsSceneEditorObject
         {
             public AssetReference LeftScene;
             public AssetReference RightScene;

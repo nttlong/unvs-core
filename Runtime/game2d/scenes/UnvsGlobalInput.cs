@@ -1,14 +1,22 @@
 
+using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static UnityEngine.InputSystem.DefaultInputActions;
+using static UnityEngine.InputSystem.InputAction;
 
 namespace unvs.game2d.scenes
 {
+    public class UnvsEventAction
+    {
+        public Action<CallbackContext> Started;
+        public Action<CallbackContext> Cancel;
+    }
     public class UnvsGlobalInput
     {
         public static Dictionary<string, InputAction> Player;
@@ -78,6 +86,52 @@ namespace unvs.game2d.scenes
         internal static void SetActivePlayer(bool v)
         {
             throw new NotImplementedException();
+        }
+        
+        public static void RegisterPlayer<T>(T component, Func<string, UnvsEventAction> OnRegsietEvent) where T : UnvsComponentEvetns
+        {
+            var dict = new Dictionary<string, Action<CallbackContext>>();
+            foreach (var key in Player.Keys)
+            {
+                var action= OnRegsietEvent(key);
+                if(action != null)
+                {
+                    
+                    if (action.Started != null)
+                    {
+                        void start(CallbackContext ctx)
+                        {
+                            action.Started.Invoke(ctx);
+                        }
+                        dict[$"{key}.start"] = start;
+                        Player[key].started += start;
+                    }
+                    if (action.Cancel != null)
+                    {
+                        void cancel(CallbackContext ctx)
+                        {
+                            action.Cancel.Invoke(ctx);
+                        }
+                        dict[$"{key}.cancel"] = cancel;
+                        Player[key].started += cancel;
+                    }
+                }
+            }
+            component.onDisable = () =>
+            {
+                foreach (var key in dict.Keys)
+                {
+                    var items = key.Split('.');
+                    if (items[1]=="start")
+                    {
+                        Player[key].started -= dict[key];
+                    }
+                    if (items[1] == "cancel")
+                    {
+                        Player[key].canceled -= dict[key];
+                    }
+                }
+            };
         }
     }
     public struct ActionSender

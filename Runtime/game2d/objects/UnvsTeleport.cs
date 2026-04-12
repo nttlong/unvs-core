@@ -40,15 +40,30 @@ namespace unvs.game2d.objects
 
         }
 #if UNITY_EDITOR
-        public override void InitDesignTime()
+        public void OnValidate()
         {
-            base.InitDesignTime();
+            
+        
+           
             if (Target != null)
             {
                 this.TargetPath = Target.EditorGetAddressPath();
             }
             if (GetComponent<SpriteRenderer>().sprite == null)
                 GetComponent<SpriteRenderer>().sprite = Commons.LoadAsset<Sprite>("Packages/com.unvs.core/Runtime/Sprites/Square.png");
+            if (Target != null)
+            {
+                this.TargetPath = Target.EditorGetAddressPath();
+                if (SpawnList != null)
+                {
+                    var selected = SpawnList.FirstOrDefault(p => p.IsSelected);
+                    if (selected.IsSelected)
+                    {
+                        this.SpawnName = selected.name;
+                    }
+                }
+
+            }
 
         }
         [UnvsButton("Read all Spawn points")]
@@ -92,22 +107,7 @@ namespace unvs.game2d.objects
                 this.TargetPath = Target.EditorGetAddressPath();
             }
         }
-        private void OnValidate()
-        {
-            if (Target != null)
-            {
-                this.TargetPath = Target.EditorGetAddressPath();
-                if(SpawnList != null)
-                {
-                    var selected = SpawnList.FirstOrDefault(p => p.IsSelected);
-                    if (selected.IsSelected)
-                    {
-                        this.SpawnName = selected.name;
-                    }
-                }
-
-            }
-        }
+        
 #endif
     }
 
