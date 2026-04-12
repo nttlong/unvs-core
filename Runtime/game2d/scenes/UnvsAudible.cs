@@ -24,7 +24,8 @@ namespace unvs.game2d.scenes
             var polygonName = $"{name}-thickness";
             var scene=this.GetComponentInParent<UnvsScene>();
             scene.groundThickness = this.transform.parent.AddChildComponentIfNotExist<PolygonCollider2D>(polygonName);
-            if(polyType==PotyType.Parallel)
+            scene.groundThickness.SetMeOnLayer(Constants.Layers.GROUND_FLOOR);
+            if (polyType==PotyType.Parallel)
             scene.groundThickness.points = EdgeCollider2DExtension.MakeThicnessPoly(
                 this.GetComponent<EdgeCollider2D>(), 
                 ThiknessDown,scene.wallLeft.bounds.max.x, 
