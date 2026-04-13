@@ -313,7 +313,7 @@ namespace unvs.ext
                 elapsed += Time.deltaTime;
                 float percent = Mathf.Clamp01(elapsed / duration);
                 float curve = Mathf.SmoothStep(0, 1, percent);
-
+                target.gameObject.transform.hasChanged = false;
                 // 2. Cập nhật vị trí
                 target.position = Vector3.Lerp(startPos, targetPos, curve);
 

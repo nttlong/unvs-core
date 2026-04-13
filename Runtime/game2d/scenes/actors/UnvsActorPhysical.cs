@@ -43,7 +43,7 @@ namespace unvs.game2d.scenes.actors
                 {
                     _socketHandBackController=new UnvsActorPhysicalSolverRuntime();
                     _socketHandBackController.target= GetTargetByName(socketHandBack.parent.name);
-                    _socketHandBackController.solver = GetSolver2DByName(socketHandBack.parent.name);
+                    //_socketHandBackController.solver = GetSolver2DByName(socketHandBack.parent.name);
                 }
                return _socketHandBackController;
             }
@@ -56,7 +56,7 @@ namespace unvs.game2d.scenes.actors
                 {
                     _socketHandFrontController = new UnvsActorPhysicalSolverRuntime();
                     _socketHandFrontController.target= GetTargetByName(socketHandBack.parent.name);
-                    _socketHandFrontController.solver = GetSolver2DByName(socketHandBack.parent.name);
+                    //_socketHandFrontController.solver = GetSolver2DByName(socketHandBack.parent.name);
                 }
                return _socketHandFrontController;
             }
@@ -65,7 +65,7 @@ namespace unvs.game2d.scenes.actors
         {
             // Kiểm tra an toàn trước khi chạy
 
-            await this.ikManager.MoveTargetToPointAsync(socketHandFrontController.target, pos, duration, token);
+            await this.ikManager.MoveTargetToPointAsync(GetTargetByName(socketHandBack.parent.name), pos, duration, token);
         }
         public Solver2D GetSolver2DByName(string name)
         {

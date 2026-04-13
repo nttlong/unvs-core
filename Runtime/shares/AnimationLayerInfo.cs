@@ -51,11 +51,11 @@ namespace unvs.shares
     public struct UnvsActorPhysicalSolverRuntime
     {
         public Transform target;
-        public Solver2D solver;
+        //public Solver2D solver;
 
         public bool IsEmpty()
         {
-            return solver == null;
+            return target == null;
         }
     }
 }

@@ -37,7 +37,7 @@ namespace unvs.actionsbasics
             //animator.Play("collect-item", pickLayer, 0f);
             //actor.motions.animStates.PlayMotion("bend-down", "collect-item");
             await actor.motions.animStates.PlayMotionAsync("bend-down");
-            var socketController = actor.physical.socketHandBackController;
+           
             //UnvsActorPhysicalSolverRuntimeExt.MoveToAsync(socketController, st.GetPosition(), Sender.Cts.Token);
             //await socketController.target.MoveToTargetAsync( st.GetPosition(), Sender.Cts.Token);
             var pos= new Vector2(actor.coll.bounds.center.x-actor.physical.ArmLen,actor.coll.bounds.max.y);
