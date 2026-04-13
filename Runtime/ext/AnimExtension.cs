@@ -73,12 +73,17 @@ namespace unvs.ext
                 anim.SetLayerWeight(i, 0);
             }
         }
-        public static void ResetAllAddtiveLayers(this Animator anim,bool IncludingBaseLayer=false)
+        /// <summary>
+        /// Reset all layer 
+        /// </summary>
+        /// <param name="anim"></param>
+        /// <param name="ExcludeLayers">skip if match</param>
+        public static void ResetAllOverideLayers(this Animator anim,params int[] ExcludeLayers)
         {
             if(anim==null || anim.IsDestroyed()) return;
             for (int i = 0; i < anim.layerCount; i++)
             {
-                if (i == 1 && !IncludingBaseLayer) continue;
+                if (ExcludeLayers.Contains(i)) continue;
                 anim.SetLayerWeight(i, 0);
             }
         }

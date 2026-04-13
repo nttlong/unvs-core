@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.U2D.IK;
 
 namespace unvs.shares
 {
@@ -44,7 +45,17 @@ namespace unvs.shares
                 volume = 1f
             };
         }
+        
     }
+    [Serializable]
+    public struct UnvsActorPhysicalSolverRuntime
+    {
+        public Transform target;
+        public Solver2D solver;
 
-    
+        public bool IsEmpty()
+        {
+            return solver == null;
+        }
+    }
 }

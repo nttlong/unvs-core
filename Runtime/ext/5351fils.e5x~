@@ -247,13 +247,32 @@ namespace unvs.ext
                 Debug.Log($"{s.transform.name}");
             }
         }
+        public static async UniTask PlayAnimationAsync(this Animator animator, string stateName, int layer,Action OnFinish, CancellationToken ct, float normalizedTime=1f)
+        {
+            // 1. Kích hoạt Animation
+            animator.PlayInFixedTime(stateName, layer);
+
+            // 2. Đợi 1 frame để Animator chuyển sang State mới 
+            // (Nếu không nó sẽ lấy thông tin của State cũ)
+            await UniTask.Yield();
+            
+            // 3. Đợi cho đến khi Animation chạy đến cuối (normalizedTime >= 1)
+            await UniTask.WaitUntil(() =>
+               // animator.GetCurrentAnimatorStateInfo(layer).IsName(stateName) &&
+               
+                animator.GetCurrentAnimatorStateInfo(layer).normalizedTime >= animator.GetCurrentAnimatorStateInfo(layer).length,
+                cancellationToken: ct
+            );
+
+            OnFinish?.Invoke();
+        }
         public static async UniTask PlayAnimationAsync(
-                 this Animator animator,
-                 string stateName,
-                 int layer,
-                 Action onFinish,
-                 CancellationToken ct,
-                 float normalizedEnd = 1f)
+    this Animator animator,
+    string stateName,
+    int layer,
+    Action onFinish,
+    CancellationToken ct,
+    float normalizedEnd = 1f)
         {
             animator.Play(stateName, layer, 0f);
 
@@ -271,68 +290,6 @@ namespace unvs.ext
             }, cancellationToken: ct);
 
             onFinish?.Invoke();
-        }
-        public static async UniTask PlayAnimationAsync(
-            this Animator animator,
-            string stateName,
-            int layer,
-            Action onStart = null,
-            CancellationToken ct = default)
-                {
-            animator.ResetAllOverideLayers();
-            animator.SetLayerWeight(layer, 1f);
-
-            animator.Play(stateName, layer, 0f);
-            onStart?.Invoke();
-
-            await UniTask.Yield(PlayerLoopTiming.Update, ct);
-
-            await UniTask.WaitUntil(() =>
-            {
-                var info = animator.GetCurrentAnimatorStateInfo(layer);
-                return info.IsName(stateName) && info.normalizedTime >= 1f;
-            }, cancellationToken: ct);
-        }
-    }
-    public static class IKManagerExt
-    {
-        public static async UniTask MoveTargetToPointAsync(this IKManager2D ik, Transform target, Vector2 pos, float duration = 1f, CancellationToken token = default)
-        {
-            // 1. Kiểm tra an toàn
-            if (target == null || ik == null) return;
-
-            Vector3 startPos = target.position;
-            // Giữ nguyên Z để không làm hỏng tính toán của Solver 2D
-            Vector3 targetPos = new Vector3(pos.x, pos.y, target.position.z);
-            float elapsed = 0f;
-
-            while (elapsed < duration)
-            {
-                if (token.IsCancellationRequested) return;
-
-                elapsed += Time.deltaTime;
-                float percent = Mathf.Clamp01(elapsed / duration);
-                float curve = Mathf.SmoothStep(0, 1, percent);
-
-                // 2. Cập nhật vị trí
-                target.position = Vector3.Lerp(startPos, targetPos, curve);
-
-                // 3. Cập nhật IK - Đây là phần quan trọng
-                // Đôi khi UpdateManager không đủ, ta cần đảm bảo các solver được đánh dấu là "bẩn" (dirty)
-                ik.UpdateManager();
-
-                // 4. Chờ đến LastUpdate - Đây là thời điểm VÀNG
-                // Nó chạy SAU Animator nhưng TRƯỚC khi Render
-                await UniTask.Yield(PlayerLoopTiming.LastUpdate, token);
-
-                // Nếu sau khi Yield mà thấy target bị Animator kéo lại, 
-                // ta gán lại một lần nữa ngay tại đây.
-                target.position = Vector3.Lerp(startPos, targetPos, curve);
-            }
-
-            // 5. Đảm bảo kết thúc chính xác
-            target.position = targetPos;
-            ik.UpdateManager();
         }
     }
 }

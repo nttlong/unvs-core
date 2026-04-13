@@ -67,9 +67,9 @@ namespace unvs.game2d.scenes.actors
             if (direction.x < 0)
                 this.direction = -1;
         }
-        public void BaseMotion(string name)
+        public void BaseMotion(string name,string overideState=null)
         {
-            this.animStates.PlayBaseLayer(name);
+            this.animStates.PlayBaseLayer(name, overideState);
         }
         public void Motion(string name)
         {
@@ -78,6 +78,14 @@ namespace unvs.game2d.scenes.actors
         public void AddtiveMotion(string name)
         {
             this.animStates.PlayAddtiveMotion(name);
+        }
+        public void Disable()
+        {
+           this.GetComponentInChildren<Animator>().enabled = false;
+        }
+        public void Enalbee()
+        {
+            this.GetComponentInChildren<Animator>().enabled = true;
         }
 #if UNITY_EDITOR
         [UnvsButton("Load Motions")]
@@ -108,6 +116,8 @@ namespace unvs.game2d.scenes.actors
             }
             this.motionAudio = lsAudio.Cast<MotionAudio>().ToArray();
         }
+
+        
 #endif
     }
 }

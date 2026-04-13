@@ -15,39 +15,41 @@ namespace unvs.ext
     {
         public static void PlayBaseLayer(this BlendTreeInfo[] blendTreeAnim, string motionName, string overideState=null)
         {
-            var item = blendTreeAnim.FirstOrDefault(p => p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase)
-            && !string.IsNullOrEmpty(p.blendName));
-            if (item == null)
-            {
-                throw new Exception($"Can not find {motionName}");
-            }
-            item.animationController.ResetAllOverideLayers();
-
-            item.animationController.SetLayerWeight(item.layerIndex, 1f);
-            item.animationController.SetFloat(item.paramName, item.value);
-            if (overideState != null)
-            {
-                var overideStateItem = blendTreeAnim.FirstOrDefault(p => p.layerIndex != item.layerIndex && p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase));
-                overideStateItem.animationController.SetLayerWeight(overideStateItem.layerIndex, 1f);
-                overideStateItem.animationController.PlayInFixedTime(overideStateItem.motionName, overideStateItem.layerIndex);
-            }
-        }
-        public static void PlayBlendTree(this BlendTreeInfo[] blendTreeAnim,  string motionName)
-        {
-            
-            var item= blendTreeAnim.FirstOrDefault(p=>p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase)
-            && !string.IsNullOrEmpty( p.blendName));
-            if (item == null)
-            {
-                throw new Exception($"Can not find {motionName}");
-            }
-            
+            var item = blendTreeAnim.FirstOrDefault(p => p.layerIndex==0 &&
+             p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase) );
+            if (item==null|| item.animationController == null || item.animationController.gameObject.IsDestroyed()) return;
             item.animationController.ResetAllOverideLayers();
             item.animationController.SetLayerWeight(item.layerIndex, 1f);
             item.animationController.SetFloat( item.paramName, item.value);
+            if( overideState != null )
+            {
+                var overideItem = blendTreeAnim.FirstOrDefault(p => p.layerIndex > 0 && p.motionName.Equals(overideState, StringComparison.OrdinalIgnoreCase));
+                //clear all 
+                overideItem.animationController.ResetAllOverideLayers(overideItem.layerIndex);
+                overideItem.animationController.SetLayerWeight(overideItem.layerIndex, 1);
+                overideItem.animationController.Play(overideItem.motionName, overideItem.layerIndex, 0f);
+            }
+        }
+        public static void PlayBlendTree(this BlendTreeInfo[] blendTreeAnim, string layerName,string blenderName, string motionName)
+        {
+            
+            var item= blendTreeAnim.FirstOrDefault(p=>p.layerName.Equals(layerName,StringComparison.OrdinalIgnoreCase)
+            && p.blendName.Equals(blenderName,StringComparison.OrdinalIgnoreCase)
+            &&p.motionName.Equals(motionName,StringComparison.OrdinalIgnoreCase));
+            if (item == null)
+            {
+                throw new Exception($"Can not find {layerName}.{motionName}");
+            }
+            if(item.animationController==null)
+            {
+                throw new NullReferenceException($"animationController is null, refer {layerName}.{motionName}");
+            }
+            item.animationController.ResetAllOverideLayers();
+            item.animationController.SetLayerWeight(0,1f);
+            item.animationController.SetFloat( item.paramName, item.value);
         }
        
-        public static void PlayMotion(this BlendTreeInfo[] blendTreeAnim, string motionName,string overideState)
+        public static void PlayMotion(this BlendTreeInfo[] blendTreeAnim, string motionName)
         {
             var item = blendTreeAnim.FirstOrDefault(p => p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase));
             if (item == null)
@@ -58,33 +60,20 @@ namespace unvs.ext
             {
                 throw new NullReferenceException($"animationController is null, refer {motionName}");
             }
-            if(overideState!=null)
+            item.animationController.ResetAllOverideLayers();
+            item.animationController.SetLayerWeight(item.layerIndex, 1);
+            if (item.blendIndex > 0)
             {
-                var overideStateItem = blendTreeAnim.FirstOrDefault(p => p.layerIndex != item.layerIndex && p.motionName.Equals(overideState, StringComparison.OrdinalIgnoreCase));
-                item.animationController.ResetAllOverideLayers();
-                item.animationController.SetLayerWeight(item.layerIndex, 1);
-                item.animationController.PlayInFixedTime(motionName, item.layerIndex, 1f);
-                overideStateItem.animationController.SetLayerWeight(overideStateItem.layerIndex, 1f);
-                overideStateItem.animationController.PlayInFixedTime(overideStateItem.motionName, overideStateItem.layerIndex);
-            } else
-            {
-                item.animationController.ResetAllOverideLayers();
-                item.animationController.SetLayerWeight(item.layerIndex, 1);
-                if (item.blendIndex > 0)
-                {
-
-                    item.animationController.SetFloat(item.paramName, item.value);
-                }
-                else
-                    item.animationController.PlayInFixedTime(motionName, item.layerIndex, 1f);
-            }
                 
+                item.animationController.SetFloat(item.paramName, item.value);
+            } else 
+                item.animationController.PlayInFixedTime(motionName, item.layerIndex, 1f);
 
            
         }
-        public static async UniTask PlayMotionAsync(this BlendTreeInfo[] blendTreeAnim, string motionName,string ovveriSate=null)
+        public static async UniTask PlayMotionAsync(this BlendTreeInfo[] blendTreeAnim, string motionName,string addtiveName=null)
         {
-            if(ovveriSate == null)
+            if(blendTreeAnim == null)
             {
                 var item = blendTreeAnim.FirstOrDefault(p => p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase));
                 item.animationController.ResetAllOverideLayers();
@@ -94,19 +83,39 @@ namespace unvs.ext
                 });
             } else
             {
-                
+                item.animationController.ResetAllOverideLayers();
                 var item = blendTreeAnim.FirstOrDefault(p => p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase));
-                var ovveriSateItem = blendTreeAnim.FirstOrDefault(p => p.layerIndex != item.layerIndex && p.motionName.Equals(ovveriSate, StringComparison.OrdinalIgnoreCase));
+                var addtineItem = blendTreeAnim.FirstOrDefault(p => p.layerIndex != item.layerIndex && p.motionName.Equals(addtiveName, StringComparison.OrdinalIgnoreCase));
                 
                 await item.animationController.PlayAnimationAsync(motionName, item.layerIndex, () =>
                 {
+                    addtineItem.animationController.ResetAllOverideLayers(addtineItem.layerIndex);
 
-
-                    ovveriSateItem.animationController.SetLayerWeight(ovveriSateItem.layerIndex, 1);
-                    ovveriSateItem.animationController.PlayInFixedTime(ovveriSateItem.motionName, ovveriSateItem.layerIndex, 0f);
+                    addtineItem.animationController.SetLayerWeight(addtineItem.layerIndex, 1);
+                    addtineItem.animationController.Play(addtineItem.motionName, addtineItem.layerIndex, 0f);
                 });
             }
-            
+            //var item = blendTreeAnim.FirstOrDefault(p => p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase));
+            //if (item == null)
+            //{
+            //    throw new Exception($"Can not find {motionName}");
+            //}
+            //if (item.animationController == null)
+            //{
+            //    throw new NullReferenceException($"animationController is null, refer {motionName}");
+            //}
+            //item.animationController.ResetAllAddtiveLayers(true);
+            //if (addtiveName != null)
+            //{
+            //    blendTreeAnim.PlayAddtiveMotion(addtiveName);
+            //}
+            //item.animationController.SetLayerWeight(item.layerIndex, 1);
+
+            //await item.animationController.PlayAnimationAsync(motionName, item.layerIndex, () =>
+            //{
+
+            //});
+
 
         }
         public static async UniTask PlayMotionAsync(this BlendTreeInfo[] blendTreeAnim, string motionName,Action OnFinish,CancellationToken ct)
