@@ -1,44 +1,33 @@
-//using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
-//using System.Collections;
-//using UnityEngine;
-//using unvs.actions;
-//using unvs.ext;
-//using unvs.interfaces;
+using System.Collections;
+using UnityEngine;
+using unvs.actions;
+using unvs.ext;
+using unvs.game2d.objects;
+using unvs.game2d.scenes.actors;
+using unvs.interfaces;
 
-//namespace unvs.actionsbasics
-//{
-//    public class MoveToPickabeItem : ActionBase
-//    {
-//        public override async UniTask ExecuteAsync(ActionBaseSender Sender)
-//        {
-//            var actor=Sender.Target.GetComponent<IActorObject>();
-//            if(actor==null)
-//            {
-//                Sender.Cancel();
-//                return;
-//            }
-//            var pickableItem = Sender.Source.GetComponent<IPickableObject>();
-//            if (pickableItem == null)
-//            {
-//               await actor.Speaker.SayIThisDoesNotDoAnythingAsync();
-//            }
-//            actor.Movable.Direction = ((Vector2)Sender.GetSourceComponent<BoxCollider2D>().bounds.center - actor.Physical.GetPosition()).CalculateDiection();
-//            var lengOfArm = actor.Physical.ArmLen;
-//            actor.Motion.Flip(actor.Movable.Direction.x);
-//            actor.Motion.Walk();
-          
-//            var p = pickableItem.GetPosition(actor.Movable.Direction.x, actor.Physical.ArmLen);
-//            p = new Vector2(p.x, 0);
-//            await actor.Movable.MoveToAsync(p, dir =>
-//            {
-//                actor.Physical.Direction = (dir > 0) ? DirectionEnum.Forward : DirectionEnum.Backward;
-//                actor.Motion.Flip(dir);
-//                actor.Motion.Walk();
-//            }, () =>
-//            {
-//                actor.Motion.Idle();
-//            }, Sender.Cts);
-//        }
-//    }
-//}
+namespace unvs.actionsbasics
+{
+    public class MoveToPickabeItem : ActionBase
+    {
+        public override async UniTask ExecuteAsync(ActionBaseSender Sender)
+        {
+            var actor = Sender.Target.GetComponent<UnvsActor>();
+            if (actor == null)
+            {
+                Sender.Cancel();
+                return;
+            }
+            var pickableItem = Sender.Source.GetComponent<UnvsPickableObject>();
+            if (pickableItem == null)
+            {
+                actor.speaker.SayIThisDoesNotDoAnything();
+            }
+            Vector2 pos = actor.physical.GetReachPoint(pickableItem.GetPosition());
+
+            await actor.MovtoTargetAsync(pos,  Sender.Cts.Token);
+        }
+    }
+}

@@ -3,6 +3,7 @@ using System;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 using UnityEngine.U2D.Animation;
 using unvs.ext;
 #if UNITY_EDITOR
@@ -11,6 +12,7 @@ using unvs.sys;
 #endif
 
 namespace unvs.game2d.scenes.actors {
+    
     public class UnvsPlayer : UnvsBaseComponent
     {
         private UnvsAnimStates motions;
@@ -18,7 +20,7 @@ namespace unvs.game2d.scenes.actors {
         
         private InputAction actionMove;
         private Vector2 direction;
-        private bool isMoving;
+        public bool isMoving;
         private Vector2 target;
 
         private void Awake()
@@ -45,12 +47,12 @@ namespace unvs.game2d.scenes.actors {
             this.direction = obj.ReadValue<Vector2>();
             this.motions.DirectionBy(direction);
             this.isMoving = false;
-            this.motions.Motion("idle");
+            this.motions.BaseMotion("idle");
         }
 
         private void ActionMoveStart_started(InputAction.CallbackContext obj)
         {
-            this.motions.Motion("walk");
+            this.motions.BaseMotion("walk");
             isMoving = true;
             this.isMoving = true;
             this.direction = obj.ReadValue<Vector2>();

@@ -5,6 +5,7 @@ using System.Threading;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 using UnityEngine.U2D.Animation;
 using unvs.ext;
 using unvs.shares;
@@ -22,12 +23,15 @@ namespace unvs.game2d.scenes.actors
     [RequireComponent(typeof(UniqueObject))]
     [RequireComponent(typeof(UnvsPlayer))]
     [RequireComponent (typeof(AudioSource))]
+    [RequireComponent(typeof(SortingGroup))]
+    [RequireComponent(typeof(UnvsActorPhysical))]
     public partial class UnvsActor : UnvsBaseComponent
     {
         public CancellationTokenSource cts => _cls;
 
+        public UnvsActorPhysical physical;
 
-
+        public UnvsPlayer player;
         public UnvsActorSpeaker speaker;
         private bool isMoving;
         private Vector2 target;
@@ -73,11 +77,11 @@ namespace unvs.game2d.scenes.actors
             await TransformExtension.MoveToAsync(this.transform, this.WalkSpeed, pos,
                    p => {
                        this.motions.direction = p.Direction;
-                       this.motions.Motion("walk");
+                       this.motions.BaseMotion("walk");
                    },
                    p => {
                        this.motions.direction = p.Direction;
-                       this.motions.Motion("idle");
+                       this.motions.BaseMotion("idle");
 
                    },
                    tk);
@@ -94,6 +98,15 @@ namespace unvs.game2d.scenes.actors
             return Vector2dExtesion.ScanObject<T>(pos, this.scanerBound.size, layers);
             //return coll.ScanObject<T>(this.scanerBound.size.x, this.scanerBound.size.y, LayerMask.GetMask(layers));
         }
+        private void Awake()
+        {
+            if (Application.isPlaying)
+            {
+                player = GetComponent<UnvsPlayer>();
+                physical= GetComponent<UnvsActorPhysical>();
+            }
+
+        }
     }
 #if UNITY_EDITOR
     public partial class UnvsActor : UnvsBaseComponent
@@ -108,6 +121,8 @@ namespace unvs.game2d.scenes.actors
             var coll = this.camWatcher.AddComponentIfNotExist<BoxCollider2D>();
             coll.isTrigger = true;
             coll.SetMeOnTag(Constants.Tags.PLAYER_CAM_WATCHER);
+            this.SetMeOnLayer(Constants.Layers.ACTOR);
+            this.SetMeOnSortLayer(Constants.Layers.ACTOR);
             if (this.scanerBound == null)
             {
                 this.scanerBound = this.AddChildComponentIfNotExist<BoxCollider2D>("scaner-bound");

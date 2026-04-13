@@ -15,9 +15,11 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Rendering.Universal;
 using unvs.ext;
+using unvs.game2d.objects;
 using unvs.game2d.scenes.actors;
 using unvs.interfaces;
 using unvs.shares;
+using unvs.shares.editor;
 #if UNITY_EDITOR
 namespace unvs.game2d.scenes
 {
@@ -100,6 +102,8 @@ namespace unvs.game2d.scenes
             if (this.light2d != null) this.light2d.transform.SetParent(this.support.transform, true);
             if (this.sceneTracker != null) this.sceneTracker.transform.SetParent(this.support.transform, true);
             if(this.background==null) this.background = this.AddChildComponentIfNotExist<UnvsBackgound>("background");
+            if (this.pickableItems == null)  this.pickableItems = this.AddChildComponentIfNotExist<Transform>("pickable-items");
+            UnvsEditorUtils.CollecteAllTo<UnvsPickableObject>(this.pickableItems);
         }
 
         private void syncWorldBoundAndScencTracker()
@@ -160,6 +164,7 @@ namespace unvs.game2d.scenes
             this.ApplyRequireComponents();
             calculateJoinPoint();
             this.background = this.AddChildComponentIfNotExist<UnvsBackgound>("background");
+            this.pickableItems = this.AddChildComponentIfNotExist<Transform>("pickable-items");
         }
 
         private bool calculateJoinPoint()
@@ -230,7 +235,10 @@ namespace unvs.game2d.scenes
                 if (this.sceneTracker.GetComponent<PolygonCollider2D>() != null)
                     this.sceneTracker.GetComponent<PolygonCollider2D>().GizmosDraw(Color.azure, 2f);
             }
-            
+            if (groundThickness != null)
+            {
+                groundThickness.GizmosDraw(Color.black,3f);
+            }
         }
 
 

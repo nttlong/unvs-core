@@ -67,9 +67,13 @@ namespace unvs.game2d.scenes.actors
             if (direction.x < 0)
                 this.direction = -1;
         }
-        public void Motion(string name)
+        public void BaseMotion(string name)
         {
             this.animStates.PlayBaseLayer(name);
+        }
+        public void Motion(string name)
+        {
+            this.animStates.PlayCrossFadeMotion(name);
         }
         public void AddtiveMotion(string name)
         {

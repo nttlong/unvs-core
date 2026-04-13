@@ -47,6 +47,52 @@
 
     public static class LayerHelper
     {
+        public static void AddSortingLayerIfNotExist(string name)
+        {
+            // 1. Load TagManager
+            SerializedObject tagManager = new SerializedObject(
+                AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]
+            );
+
+            // 2. Truy cập vào thuộc tính mảng "m_SortingLayers"
+            SerializedProperty sortingLayersProp = tagManager.FindProperty("m_SortingLayers");
+
+            // 3. Kiểm tra xem tên Layer này đã tồn tại trong mảng chưa
+            bool exists = false;
+            for (int i = 0; i < sortingLayersProp.arraySize; i++)
+            {
+                SerializedProperty entry = sortingLayersProp.GetArrayElementAtIndex(i);
+                SerializedProperty nameProp = entry.FindPropertyRelative("name");
+
+                if (nameProp.stringValue == name)
+                {
+                    exists = true;
+                    break;
+                }
+            }
+
+            // 4. Nếu chưa có thì mới tiến hành thêm mới
+            if (!exists)
+            {
+                int newIndex = sortingLayersProp.arraySize;
+                sortingLayersProp.InsertArrayElementAtIndex(newIndex);
+
+                SerializedProperty newLayer = sortingLayersProp.GetArrayElementAtIndex(newIndex);
+
+                // Thiết lập tên cho Sorting Layer mới
+                newLayer.FindPropertyRelative("name").stringValue = name;
+
+                // Thiết lập ID duy nhất (Unity yêu cầu ID để quản lý nội bộ)
+                // Sử dụng hàm băm từ tên hoặc lấy giá trị ngẫu nhiên độc nhất
+                newLayer.FindPropertyRelative("uniqueID").intValue = name.GetHashCode();
+
+                // 5. Lưu thay đổi
+                tagManager.ApplyModifiedProperties();
+                AssetDatabase.SaveAssets();
+
+                Debug.Log($"<color=cyan>SortingLayer:</color> Đã tạo mới '{name}'.");
+            }
+        }
         public static void AddLayer(string layerName)
         {
             // 1. Mở TagManager.asset

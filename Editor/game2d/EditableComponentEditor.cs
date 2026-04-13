@@ -24,7 +24,7 @@ namespace editor.game2d
             // Lấy tất cả các method (Public, NonPublic, Instance)
             var methods = targetType.GetMethods(BindingFlags.Instance | BindingFlags.Static |
                                                BindingFlags.Public | BindingFlags.NonPublic);
-
+            
             // Thiết lập Style cho nút (Căn giữa, Cao, Gọn)
             GUIStyle buttonStyle = new GUIStyle(GUI.skin.button)
             {
@@ -32,7 +32,12 @@ namespace editor.game2d
                 fixedWidth = 180,
                 fontStyle = FontStyle.Bold
             };
-
+            var errMsg = string.Empty;
+            ((UnvsBaseComponent)target).OnEditorError = err =>
+            {
+                errMsg = err;
+               
+            };
             foreach (var method in methods)
             {
                 // Kiểm tra xem method có gắn attribute không
@@ -44,14 +49,18 @@ namespace editor.game2d
 
                     EditorGUILayout.BeginHorizontal();
                     GUILayout.FlexibleSpace();
-
+                    
                     if (GUILayout.Button(displayName, buttonStyle))
                     {
                         // Thực thi method
                         method.Invoke(target, null);
                         target.EditorSetDirty();
                     }
-
+                    if (!string.IsNullOrEmpty(errMsg))
+                    {
+                        EditorGUILayout.Space();
+                        EditorGUILayout.HelpBox(errMsg, MessageType.Warning);
+                    }
                     GUILayout.FlexibleSpace();
                     EditorGUILayout.EndHorizontal();
                     GUILayout.Space(2);

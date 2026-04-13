@@ -40,6 +40,7 @@ namespace unvs.ext
             item.animationController.SetLayerWeight(0,1f);
             item.animationController.SetFloat( item.paramName, item.value);
         }
+       
         public static void PlayMotion(this BlendTreeInfo[] blendTreeAnim, string motionName)
         {
             var item = blendTreeAnim.FirstOrDefault(p => p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase));

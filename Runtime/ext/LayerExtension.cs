@@ -40,25 +40,24 @@ namespace unvs.ext
             }
             
         }
-      //  [System.Diagnostics.DebuggerStepThrough]
-        //public static void SetMeSortingGroup(this Behaviour behaviour, string layerName, bool applyAllChildren = false)
-        //{
-        //    var st = behaviour.GetComponent<SortingGroup>();
-        //    if (st != null)
-        //    {
-        //        st.sortingLayerName = layerName;
-        //    }
+        public static void SetMeOnSortLayer(this Behaviour behaviour, string layerName)
+        {
+#if UNITY_EDITOR
+            if (behaviour.GetComponent<SortingGroup>() == null)
+            {
+                Debug.LogWarning($"SortingGroup is requirement in {behaviour.name}");
+                return;
+            }
+            LayerHelper.AddSortingLayerIfNotExist(layerName);
 
-        //    if (applyAllChildren)
-        //    {
-        //        // Sử dụng Transform để lấy tất cả thành phần Transform của con và chính nó
-        //        var allTransforms = behaviour.GetComponentsInChildren<SortingGroup>(true);
-        //        foreach (var t in allTransforms)
-        //        {
-        //            st.sortingLayerName = layerName;
-        //        }
-        //    }
-        //}
+#endif
+            if (behaviour.GetComponent<SortingGroup>() != null)
+            {
+                behaviour.GetComponent<SortingGroup>().name = layerName;
+            }
+             
+
+        }
         public static void SetMeOnLayer(this GameObject go, string layerName, bool applyAllChildren = false)
         {
             var index = LayerMask.NameToLayer(layerName);

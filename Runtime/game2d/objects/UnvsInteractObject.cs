@@ -8,17 +8,20 @@ using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using System.Threading;
 using unvs.actions;
+using UnityEngine.Rendering;
 namespace unvs.game2d.objects
 {
 
     [ExecuteAlways]
     [RequireComponent(typeof(BoxCollider2D))]
+    [RequireComponent(typeof(SortingGroup))]
     public partial class UnvsInteractObject : UnvsComponent
     {
         [Header("Interact info")]
         public BoxCollider2D coll;
         public Texture2D mousePoint;
         public InteractionDefinition Data;
+        
         public override void InitRuntime()
         {
             if(this.mousePoint==null)
@@ -30,9 +33,9 @@ namespace unvs.game2d.objects
             return coll.bounds.center;
         }
 
-        public async UniTask ExecuteAsync(MonoBehaviour target, CancellationTokenSource cts)
+        public async UniTask<ActionBaseSender> ExecuteAsync(MonoBehaviour target, CancellationTokenSource cts)
         {
-            if (Data == null) return;
+            
            
             var sender = new ActionBaseSender()
             {
@@ -40,25 +43,33 @@ namespace unvs.game2d.objects
                 Source=this,
                 Cts= cts
             };
+            if (Data == null)
+            {
+                sender.Cancel();
+                return sender;
+
+            }
             //sender.Cts = sender.Cts.Refresh();
             foreach (var item in Data.actions)
             {
                 if(item==null) continue;
                 await item.ExecuteAsync(sender);
-                if (sender.IsCancel ) return;
+                if (sender.IsCancel ) return sender;
             }
-            
+            return sender;
         }
+
+        
     }
 #if UNITY_EDITOR
     public partial class UnvsInteractObject : UnvsComponent
     {
 
-        private void OnValidate()
+        public virtual void OnValidate()
         {
             this.SetMeOnLayer(Constants.Layers.INTERACT_OBJECT);
         }
-        private void OnDrawGizmos()
+        public virtual void OnDrawGizmos()
         {
             if(coll==null)
             coll=this.GetComponent<BoxCollider2D>();

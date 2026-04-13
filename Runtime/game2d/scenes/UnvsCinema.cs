@@ -184,17 +184,9 @@ namespace unvs.game2d.scenes{
             ret.OnDestroying += OnSceneDestroy;
            
             _lights = this.lightDict.Select(p => p.Value).ToArray();
+            updateWorldBound();
             this.AfterUpdate?.Invoke(ret);
-            if (reset)
-            {
-                updateWorldBound();
-                requestUpdate = false;
-            }
-
-            else
-            {
-                requestUpdate = true;
-            }
+            
                 
                 
          
@@ -224,7 +216,7 @@ namespace unvs.game2d.scenes{
         }
         public event Action OnCameraMove;
         public event Action OnCameraStop;
-        bool requestUpdate;
+        
         float _lastPosition = 0;
         bool _wasMoving;
         float getValue(float x)
@@ -238,19 +230,7 @@ namespace unvs.game2d.scenes{
             audioSource=this.GetComponentInChildren<AudioSource>(true);
 
         }
-        void OnEnable()
-        {
-            
-            RenderPipelineManager.endCameraRendering += (context, cam) =>
-            {
-                if (requestUpdate)
-                {
-                    
-                    requestUpdate = false;
-                    updateWorldBound();
-                }
-            };
-        }
+       
 
         private void LateUpdate()
         {

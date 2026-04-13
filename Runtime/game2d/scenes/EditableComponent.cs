@@ -77,8 +77,14 @@ namespace unvs.game2d.scenes
     public abstract class UnvsBaseComponent : MonoBehaviour
     {
 
-       
 
+#if UNITY_EDITOR
+        public Action<string> OnEditorError;
+        public void RaiseEditorError(string error)
+        {
+            OnEditorError?.Invoke(error);
+        }
+#endif
 
 
     }

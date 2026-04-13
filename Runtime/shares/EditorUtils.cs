@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using System;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
@@ -101,6 +102,27 @@ namespace unvs.shares.editor
             return string.Empty;
         }
 
+        public static void CollecteAllTo<T>(Transform tr)
+        {
+            var items = tr.parent.GetComponentsInChildren<T>();
+            foreach ( var item in items )
+            {
+                if (typeof(T) == typeof(Transform))
+                {
+                   if(((Transform)(object)item).parent == tr.parent)
+                    {
+                        ((Transform)(object)item).SetParent(tr,true);
+                    }
+                }
+                if (typeof(T) == typeof(MonoBehaviour))
+                {
+                    if (((MonoBehaviour)(object)item).transform.parent == tr.parent)
+                    {
+                        ((MonoBehaviour)(object)item).transform.SetParent(tr, true);
+                    }
+                }
+            }
+        }
     }
 
 

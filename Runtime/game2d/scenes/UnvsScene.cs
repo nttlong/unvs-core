@@ -65,6 +65,7 @@ namespace unvs.game2d.scenes
         private bool _hastrimEdge;
         public Transform sceneTracker;
         public UnvsBackgound background;
+        private Transform pickableItems;
         internal PolygonCollider2D groundThickness;
 
         public bool IsDestroying { get; private set; }
