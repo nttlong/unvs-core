@@ -28,6 +28,7 @@ namespace unvs.actionsbasics
             Vector2 pos = actor.physical.GetReachPoint(pickableItem.GetPosition());
 
             await actor.MovtoTargetAsync(pos,  Sender.Cts.Token);
+            actor.motions.direction = actor.coll.bounds.center.GetDirectionTo(pickableItem.GetPosition());
         }
     }
 }

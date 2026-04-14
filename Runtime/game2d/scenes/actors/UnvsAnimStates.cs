@@ -83,7 +83,7 @@ namespace unvs.game2d.scenes.actors
         {
            this.GetComponentInChildren<Animator>().enabled = false;
         }
-        public void Enalbee()
+        public void Enable()
         {
             this.GetComponentInChildren<Animator>().enabled = true;
         }
@@ -117,7 +117,9 @@ namespace unvs.game2d.scenes.actors
             this.motionAudio = lsAudio.Cast<MotionAudio>().ToArray();
         }
 
-        
+       
+
+
 #endif
     }
 }

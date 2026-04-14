@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.U2D.IK;
 using unvs.ext;
@@ -9,7 +10,28 @@ using  unvs.shares;
 
 namespace unvs.game2d.scenes.actors
 {
-    
+    [Serializable]
+    public struct MovingInfo
+    {
+        public bool isMoving;
+        public Vector2 target;
+        public float speed;
+        public Vector2 direction2;
+
+        public void MoveStep(Transform transform)
+        {
+            if (Application.isPlaying)
+            {
+                if (isMoving)
+                {
+                    
+                    transform.MoveStep(this.target, speed, out var dir, direction2.x);
+                    
+                }
+            }
+           
+        }
+    }
     public partial class UnvsActorPhysical : UnvsBaseComponent
     {
         public float ArmLen;
@@ -22,6 +44,8 @@ namespace unvs.game2d.scenes.actors
         private UnvsActorPhysicalSolverRuntime _socketHandBackController;
         private UnvsActorPhysicalSolverRuntime _socketHandFrontController;
         private IKManager2D _ikManager;
+        [SerializeField]
+        public MovingInfo movingInfo;
 
         private  IKManager2D ikManager
         {
@@ -117,7 +141,11 @@ namespace unvs.game2d.scenes.actors
             if(dir > 1) return pos + new Vector2(-this.ArmLen, 0);
             return pos;
         }
-       
+        private void Update()
+        {
+            this.movingInfo.MoveStep(this.transform);
+            
+        }
 
     }
 #if UNITY_EDITOR
