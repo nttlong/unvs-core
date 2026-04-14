@@ -14,7 +14,7 @@ namespace unvs.game2d.objects
 
     [ExecuteAlways]
     [RequireComponent(typeof(BoxCollider2D))]
-    [RequireComponent(typeof(SortingGroup))]
+  
     public partial class UnvsInteractObject : UnvsComponent
     {
         [Header("Interact info")]

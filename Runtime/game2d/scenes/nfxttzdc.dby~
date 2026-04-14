@@ -34,7 +34,7 @@ namespace unvs.game2d.scenes
         public CinemachineConfiner2D confiner;
         public CinemachineFollow cinemachineFollow;
      
-        public EdgeCollider2D edgesWorldBound;
+        //public EdgeCollider2D edgesWorldBound;
         public Transform startPoint;
        
         public PolygonCollider2D worldBound;
@@ -64,7 +64,7 @@ namespace unvs.game2d.scenes
             this.cinemachineFollow = this.vcam.GetOrAddComponent<CinemachineFollow>();
             this.vcam.Follow = this.defaulCamWatcher;
             this.defaultSize = this.cam.GetCameraWorldSize();
-            this.edgesWorldBound = this.AddChildComponentIfNotExist<EdgeCollider2D>("edgesWorldBound");
+           // this.edgesWorldBound = this.AddChildComponentIfNotExist<EdgeCollider2D>("edgesWorldBound");
             this.startPoint = this.AddChildComponentIfNotExist<Transform>("start-point");
             this.startPoint.transform.position = new Vector3(this.defaultSize.x / 2, 0, 0);
             this.defaulCamWatcher.transform.position = this.defaultSize / 2;

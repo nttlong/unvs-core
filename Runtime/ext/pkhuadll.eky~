@@ -112,31 +112,17 @@ namespace unvs.ext
         public static Vector2 ToWorld(this Vector2 position)
         {
             if (Camera.main == null) throw new Exception("Camera.main is null");
+            // 1. Lấy vị trí chuột trên màn hình (Pixels)
 
-            if (Camera.main.orthographic)
-            {
-                // Chế độ Orthographic: Z không ảnh hưởng đến phép tính XY
-                return Camera.main.ScreenToWorldPoint(position);
-            }
-            else
-            {
-                // Chế độ Perspective: Phải tính toán dựa trên tia (Ray)
-                Ray ray = Camera.main.ScreenPointToRay(position);
 
-                // Tạo một mặt phẳng ảo nằm ngang tại Z = 0 
-                // (Vector3.forward là hướng của mặt phẳng, Vector3.zero là gốc tọa độ)
-                Plane xyPlane = new Plane(Vector3.forward, Vector3.zero);
 
-                if (xyPlane.Raycast(ray, out float distance))
-                {
-                    // Lấy điểm tại khoảng cách mà tia chạm vào mặt phẳng Z=0
-                    Vector3 worldPoint = ray.GetPoint(distance);
-                    return new Vector2(worldPoint.x, worldPoint.y);
-                }
 
-                // Trường hợp tia không chạm mặt phẳng (ví dụ nhìn ra vô cực)
-                return Vector2.zero;
-            }
+            // 3. Chuyển đổi
+            Vector2 worldPos = Camera.main.ScreenToWorldPoint(position);
+
+
+
+            return worldPos;
         }
         /// <summary>
         /// Chuyển đổi tọa độ World sang tọa độ Screen (Pixel)

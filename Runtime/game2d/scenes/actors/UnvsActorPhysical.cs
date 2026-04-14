@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -55,17 +55,34 @@ namespace unvs.game2d.scenes.actors
                 if (_socketHandFrontController.IsEmpty())
                 {
                     _socketHandFrontController = new UnvsActorPhysicalSolverRuntime();
-                    _socketHandFrontController.target= GetTargetByName(socketHandBack.parent.name);
-                    //_socketHandFrontController.solver = GetSolver2DByName(socketHandBack.parent.name);
+                    _socketHandFrontController.target= GetTargetByName(socketHandFront.parent.name);
+                    //_socketHandFrontController.solver = GetSolver2DByName(socketHandFront.parent.name);
                 }
                return _socketHandFrontController;
             }
         }
         public async UniTask MoveSocketHandBackToAsync(Vector2 pos, float duration = 1f, CancellationToken token = default)
         {
-            // Kiểm tra an toàn trước khi chạy
+            // 1. Lấy tham chiếu các thành phần
+            var bone = this.socketHandBack.parent; 
+            var target = GetTargetByName(bone.name);
+            var solver = GetSolver2DByName(bone.name);
 
-            await this.ikManager.MoveTargetToPointAsync(GetTargetByName(socketHandBack.parent.name), pos, duration, token);
+            if (target == null)
+            {
+                Debug.LogWarning($"[UnvsActorPhysical] Target for bone {bone.name} not found.");
+                return;
+            }
+
+            // 2. Đồng bộ target với xương trước khi bật Solver để tránh méo mó (Restore Pose logic)
+            target.position = bone.position;
+
+            // 3. Kích hoạt Solver (Bỏ qua vì Animator sẽ quản lý việc này)
+            // if (solver != null) solver.enabled = true;
+
+            // 4. Thực hiện di chuyển
+            //await this.ikManager.MoveTargetToPointAsync(target, pos, 1f,token);
+            await this.ikManager.MoveTargetDirectTestAsync(target, pos);
         }
         public Solver2D GetSolver2DByName(string name)
         {

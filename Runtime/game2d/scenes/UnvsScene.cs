@@ -25,7 +25,11 @@ namespace unvs.game2d.scenes
     public partial class UnvsScene : UnvsComponent
     {
 
-
+        [Header("Sene game world info")]
+        public WorldJoinInfo JoinInfo = new WorldJoinInfo();
+        [SerializeField] public float OrthographicSize = 20;
+        [SerializeField]
+        public Vector2 followOffset = new Vector3(0, 4);
         [Header("Links scene", order = -1)]
         [SerializeField]
 #if UNITY_EDITOR
@@ -35,11 +39,7 @@ namespace unvs.game2d.scenes
         public string SceneRight;
         public EditorUnvsSceneSpawPointEditor SpawnPoints;
         [SerializeField]
-        [Header("Sene game world info")]
-        public WorldJoinInfo JoinInfo = new WorldJoinInfo();
-        [SerializeField] public float OrthographicSize = 20;
-        [SerializeField]
-        public Vector2 followOffset;
+        
         public Transform support;
         public Camera cam;
         public CinemachineCamera vcam;

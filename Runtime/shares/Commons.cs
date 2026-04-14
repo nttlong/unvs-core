@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Unity.Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AddressableAssets; // Cần cái này
@@ -11,6 +12,7 @@ using UnityEngine.Localization;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using unvs.game2d.scenes;
 using unvs.ui;
 namespace unvs.shares
 {
@@ -303,10 +305,27 @@ namespace unvs.shares
         }
         public static Vector2 GetCameraWorldSize(this Camera cam)
         {
-           
-            float height = cam.orthographicSize * 2f;
-            float width = height * cam.aspect; // cam.aspect = Screen.width / Screen.height
-            return new Vector2(width, height);
+            if (cam.orthographic)
+            {
+                float height = cam.orthographicSize * 2f;
+                float width = height * cam.aspect; // cam.aspect = Screen.width / Screen.height
+                return new Vector2(width, height);
+            } else if(UnvsCinema.Instance!=null)
+            {
+                var follow = UnvsCinema.Instance.vcam;
+                var followOffset = follow.GetComponent<CinemachineFollow>().FollowOffset;
+
+                // NOTE: followOffset.z lúc này là DESIGN camera distance của scene
+                float distance = Mathf.Max(0.01f, Mathf.Abs(followOffset.z));
+
+                float halfFov = cam.fieldOfView * 0.5f * Mathf.Deg2Rad;
+
+                float height = 2f * distance * Mathf.Tan(halfFov);
+                float width = height * cam.aspect;
+
+                return new Vector2(width, height);
+            }
+            return Vector2.zero;
         }
         public static void DoMapAction(object source, object target)
         {

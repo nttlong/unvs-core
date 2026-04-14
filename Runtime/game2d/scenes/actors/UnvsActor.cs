@@ -23,7 +23,7 @@ namespace unvs.game2d.scenes.actors
     [RequireComponent(typeof(UniqueObject))]
     [RequireComponent(typeof(UnvsPlayer))]
     [RequireComponent (typeof(AudioSource))]
-    [RequireComponent(typeof(SortingGroup))]
+ 
     [RequireComponent(typeof(UnvsActorPhysical))]
     public partial class UnvsActor : UnvsBaseComponent
     {

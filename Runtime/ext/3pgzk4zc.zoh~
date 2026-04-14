@@ -93,18 +93,13 @@ namespace unvs.ext
             vcam.GetComponent<CinemachineFollow>().FollowOffset = new Vector3(Offset.x, Offset.y, -10);
             return vcam;
         }
-        /// <summary>
-        /// Setup cam an vcam
-        /// </summary>
-        /// <param name="vcam"></param>
-        /// <param name="scene"></param>
         public static void UpdateByUnvsScene(this CinemachineCamera vcam, UnvsScene scene)
         {
             var state = vcam.AddComponentIfNotExist<UnvsCamStaus>();
 
             if (UnvsCinema.Instance.cam.orthographic)
             {
-                if (scene.followOffset != Vector2.zero)
+                if (scene.followOffset != Vector3.zero)
                 {
 
                     vcam.GetComponent<CinemachineFollow>().FollowOffset = scene.followOffset;
@@ -115,18 +110,11 @@ namespace unvs.ext
                     }
                 }
                 vcam.SetOrthoSizeImmediate(scene.OrthographicSize);
-                return;
-            } else
-            {
-               
-                //if (scene.followOffset.z <0)
-                //{
-                //    z = scene.followOffset.z;
-                //}
-                var z = UnvsCinema.Instance.cam.OrthoSizeToPerspectiveDistance(scene.OrthographicSize);
-                vcam.GetComponent<CinemachineFollow>().FollowOffset = new Vector3(scene.followOffset.x, scene.followOffset.y, z);
             }
-               
+            var x = UnvsCinema.Instance.DefaultOffset.x;
+            var y= UnvsCinema.Instance.DefaultOffset.y;
+            var z = UnvsCinema.Instance.DefaultOffset.x;
+            if (scene.followOffset.x)
         }
 
         public static async UniTask ChangeFollowOffsetSmoothAsync(this CinemachineCamera vcam, Vector3 targetOffset, CancellationToken cancellationToken, float duration = 1.0f)
@@ -272,68 +260,6 @@ namespace unvs.ext
             catch (System.OperationCanceledException) { throw; }
         }
 
-
-        public static async UniTask SetFollowOffsetSmoothlyAsync(this CinemachineCamera vcam, Vector3 targetFollowOffset, float moveSpeed = 3f, float duration = -1f, CancellationToken cancellationToken = default, Action<Vector3> OnUpdating = null)
-        {
-            if (vcam == null) return;
-
-            try
-            {
-                // Lấy trực tiếp từ vcam đang gọi extension
-                var follow = vcam.GetComponent<CinemachineFollow>();
-                if (follow == null) return;
-
-                Vector3 startOffset = follow.FollowOffset;
-
-                // Kiểm tra khoảng cách bao gồm cả trục Z
-                if (Vector3.Distance(startOffset, targetFollowOffset) < 0.001f)
-                    return;
-
-                if (duration < 0f)
-                {
-                    float diff = Vector3.Distance(startOffset, targetFollowOffset);
-                    duration = Mathf.Clamp(diff / moveSpeed, 0.4f, 2f);
-                }
-
-                float elapsed = 0f;
-
-                while (elapsed < duration)
-                {
-                    if (cancellationToken.IsCancellationRequested) break;
-
-                    elapsed += Time.deltaTime;
-                    float t = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / duration));
-
-                    Vector3 currentOffset = Vector3.Lerp(startOffset, targetFollowOffset, t);
-
-                    // GÁN TRỰC TIẾP
-                    follow.FollowOffset = currentOffset;
-
-                    // Dùng Update thay vì PreUpdate để đồng bộ với logic game
-                    await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
-
-                    OnUpdating?.Invoke(currentOffset);
-                }
-
-                follow.FollowOffset = targetFollowOffset;
-                OnUpdating?.Invoke(targetFollowOffset);
-            }
-            catch (System.OperationCanceledException) { throw; }
-        }
-
-        public static float OrthoSizeToPerspectiveDistance(this Camera cam, float orthoSize)
-        {
-            if (cam.orthographic) return 0f; // Hoặc xử lý theo logic riêng của bạn
-
-            // fieldOfView của Unity là Vertical FOV (góc mở theo chiều dọc)
-            float halfFovRad = cam.fieldOfView * 0.5f * Mathf.Deg2Rad;
-
-            // Tính toán khoảng cách dương
-            float distance = orthoSize / Mathf.Tan(halfFovRad);
-
-            // Nếu bạn muốn trả về giá trị để gán cho Camera Offset Z (thường là lùi ra sau)
-            return -distance;
-        }
 
     }
 }

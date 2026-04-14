@@ -23,7 +23,8 @@ using unvs.shares;
 namespace unvs.game2d.scenes{
     public class UnvsCinema : UnvsUIComponentInstance<UnvsCinema>
     {
-        
+        [SerializeField]
+        public Vector3 DefaultOffset=new Vector3(0,10,-100);
         public event Action<UnvsScene> BeforeUpdate;
         public event Action<UnvsScene> AfterUpdate;
         public Camera cam;
@@ -59,39 +60,11 @@ namespace unvs.game2d.scenes{
             } else
             {
                 camColl.size = cam.GetCameraWorldSize();
-                chaneCameSteByOffset(s, Imediately);
             }
                 
             //ChangeCameraStateAsync(s).Forget();
         }
-        private bool chaneCameSteByOffset(List<UnvsScene> s, bool Imediately)
-        {
-            UnvsScene nearset = null;
-            if (Imediately)
-            {
 
-                
-                vcam.GetComponent<CinemachineFollow>().FollowOffset = new Vector3(s[0].followOffset.x, s[0].followOffset.y, cam.OrthoSizeToPerspectiveDistance(s[0].OrthographicSize));
-
-                float height = s[0].OrthographicSize * 2f;
-                float width = height * cam.aspect; // cam.aspect = Screen.width / Screen.height
-                camColl.size = new Vector2((float)width, (float)height);
-                confiner.InvalidateBoundingShapeCache();
-                return false;
-            }
-            nearset = CalculateNearestScene(s);
-            ctsChangeOffset = ctsChangeOffset.Refresh();
-            //ctsChangeOrthoSize = ctsChangeOrthoSize.Refresh();
-            var newOffset= new Vector3(nearset.followOffset.x, nearset.followOffset.y, cam.OrthoSizeToPerspectiveDistance(nearset.OrthographicSize));
-            vcam.SetFollowOffsetSmoothlyAsync(newOffset, 3,DurationTimeSmoothChangeSate, ctsChangeOffset.Token).ContinueWith(() =>
-            {
-                camColl.size = cam.GetCameraWorldSize();
-                confiner.InvalidateBoundingShapeCache();
-                
-            }).Forget();
-
-            return true;
-        }
         private bool chaneCameSteByOrthoSize(List<UnvsScene> s, bool Imediately)
         {
             UnvsScene nearset = null;
@@ -173,49 +146,27 @@ namespace unvs.game2d.scenes{
 
             return closestScene;
         }
-        /// <summary>
-        /// Update chunk load scene tracker size
-        /// </summary>
+
         public void UpdateMainCameraBoxCollider2dSize()
         {
+            
 
 
-            if (cam.orthographic)
-            {
-                float orthoSize = vcam.Lens.OrthographicSize;
-                float aspect = vcam.Lens.Aspect;
+            float orthoSize = vcam.Lens.OrthographicSize;
+            float aspect = vcam.Lens.Aspect;
 
 
-                float height = orthoSize * 2f;
-                float width = height * aspect;
+            float height = orthoSize * 2f;
+            float width = height * aspect;
 
 
-                camColl.size = new Vector2(width, height);
+            camColl.size = new Vector2(width, height);
 
 
-                camColl.isTrigger = true;
+            camColl.isTrigger = true;
 
 
-                camColl.offset = Vector2.zero;
-            } else
-            {
-                // plane gameplay cố định tại Z = 0
-                float planeZ = 0f;
-
-                // khoảng cách từ camera tới plane
-                float distance = Mathf.Abs(cam.transform.position.z - planeZ);
-
-                // FOV -> viewport height tại plane
-                float fovRad = cam.fieldOfView * 0.5f * Mathf.Deg2Rad;
-
-                float height = 2f * distance * Mathf.Tan(fovRad);
-                float width = height * cam.aspect;
-
-                camColl.size = new Vector2(width, height);
-
-                camColl.isTrigger = true;
-                camColl.offset = Vector2.zero;
-            }
+            camColl.offset = Vector2.zero;
         }
         /// <summary>
         /// This method update cam worls bound. light,...

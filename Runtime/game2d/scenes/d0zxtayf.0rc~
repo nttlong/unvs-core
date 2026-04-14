@@ -74,7 +74,7 @@ namespace unvs.game2d.scenes
 
             UnvsCinema.Instance.UpdateMainCameraBoxCollider2dSize();
             UnvsApp.Instance.RaiseEnterScene(ret);
-
+            UnvsCinema.Instance.UpdateMainCameraBoxCollider2dSize();
             CenterScene();
             ret.TurnOnLeft().TurnOnRight();
             ret.gameObject.SetActive(true);

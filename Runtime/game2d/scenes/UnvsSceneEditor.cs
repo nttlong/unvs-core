@@ -32,6 +32,7 @@ namespace unvs.game2d.scenes
         public void Review()
         {
             ApplyRequireComponents();
+            if (cam != null) cam.orthographic = true;
             this.actor = this.GetComponentInChildren<UnvsActor>();
             if (this.actor != null)
             {
@@ -220,7 +221,12 @@ namespace unvs.game2d.scenes
             }
             if (!Application.isPlaying)
             {
+                if(cam.orthographic)
                 this.vcam.SetOrthoSizeImmediate(this.OrthographicSize);
+                else
+                {
+                    this.vcam.GetComponent<CinemachineFollow>().FollowOffset = this.followOffset;
+                }
             }
                 
 
