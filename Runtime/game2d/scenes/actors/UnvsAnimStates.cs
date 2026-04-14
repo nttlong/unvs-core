@@ -69,7 +69,15 @@ namespace unvs.game2d.scenes.actors
         }
         public void BaseMotion(string name,string overideState=null)
         {
+            if(overideState == null)
+            {
+                if (actor.physical.currentHoldingItem)
+                {
+                    overideState = $"{name}-hangging-item";
+            }
+            }
             this.animStates.PlayBaseLayer(name, overideState);
+           
         }
         public void Motion(string name)
         {

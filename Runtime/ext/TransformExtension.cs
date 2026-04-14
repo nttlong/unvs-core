@@ -322,6 +322,22 @@ namespace unvs.ext
                 await UniTask.Yield(PlayerLoopTiming.Update, token);
             }
         }
+
+        public static void AttachItemToSocket(this Transform socketHand, Transform handle)
+        {
+            // 1. Gán cha cho item vào socket ở tay
+            handle.SetParent(socketHand);
+
+            // 2. Đưa vị trí về (0,0,0) so với socket
+            handle.localPosition = Vector3.zero;
+
+            // 3. Đưa hướng xoay về (0,0,0) hoặc khớp với hướng của socket
+            handle.localRotation = Quaternion.identity;
+
+            // 4. (Tùy chọn) Reset scale nếu item bị biến dạng do xương của nhân vật
+            handle.localScale = Vector3.one;
+            handle.position = new Vector3(handle.position.x, handle.position.y, socketHand.position.z);
+        }
     }
     public static class UnvsActorPhysicalSolverRuntimeExt
     {

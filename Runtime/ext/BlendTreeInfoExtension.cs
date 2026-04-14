@@ -27,7 +27,11 @@ namespace unvs.ext
             item.animationController.SetFloat(item.paramName, item.value);
             if (overideState != null)
             {
-                var overideStateItem = blendTreeAnim.FirstOrDefault(p => p.layerIndex != item.layerIndex && p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase));
+                var overideStateItem = blendTreeAnim.FirstOrDefault(p => p.layerIndex != item.layerIndex && p.motionName.Equals(overideState, StringComparison.OrdinalIgnoreCase));
+                if (overideStateItem == null)
+                {
+                    Debug.LogError($"{overideState} was not found");
+                }
                 overideStateItem.animationController.SetLayerWeight(overideStateItem.layerIndex, 1f);
                 overideStateItem.animationController.PlayInFixedTime(overideStateItem.motionName, overideStateItem.layerIndex);
             }

@@ -6,6 +6,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.U2D.IK;
 using unvs.ext;
+using unvs.game2d.objects;
 using  unvs.shares;
 
 namespace unvs.game2d.scenes.actors
@@ -46,6 +47,7 @@ namespace unvs.game2d.scenes.actors
         private IKManager2D _ikManager;
         [SerializeField]
         public MovingInfo movingInfo;
+        internal UnvsPickableObject currentHoldingItem;
 
         private  IKManager2D ikManager
         {

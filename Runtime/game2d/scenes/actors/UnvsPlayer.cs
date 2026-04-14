@@ -19,13 +19,7 @@ namespace unvs.game2d.scenes.actors {
     public abstract class UnvsPlayer : UnvsBaseComponent
     {
         public InputAction Look;
-        public class MapAction
-        {
-            public event Action<CallbackContext> started;
-            public event Action<CallbackContext> canceled;
-            internal void InvokeStarted(CallbackContext ctx) => started?.Invoke(ctx);
-            internal void InvokeCanceled(CallbackContext ctx) => canceled?.Invoke(ctx);
-        }
+        
         Dictionary<string, Action<CallbackContext>> _started = null;
         Dictionary<string,Action<CallbackContext>> _canceled = null;
         private bool _disableEvent;

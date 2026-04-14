@@ -8,6 +8,7 @@ using unvs.ext;
 using unvs.game2d.objects;
 using unvs.game2d.scenes.actors;
 using unvs.interfaces;
+using unvs.shares;
 
 namespace unvs.actionsbasics
 {
@@ -36,7 +37,10 @@ namespace unvs.actionsbasics
             await actor.motions.animStates.PlayMotionAsync("stand-up");
             actor.player.ControlEnable();
             actor.motions.BaseMotion("idle");
-           
+            TransformExtension.AttachItemToSocket(actor.physical.socketHandBack, st.transform);
+            st.SetMeOnLayer(Constants.Layers.HOLD_ITEM);
+            actor.physical.currentHoldingItem = st;
+
 
         }
     }
