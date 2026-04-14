@@ -78,12 +78,15 @@ namespace unvs.game2d.scenes
         }
         public override void InitRuntime()
         {
-            cam.enabled = false;
-            cam.gameObject.SetActive(false);
+            if (cam != null)
+            {
+                cam.enabled = false;
+                cam.gameObject.SetActive(false);
+            }
             vcam.enabled = false;
             vcam.gameObject.SetActive(false);
-            Destroy(cam.gameObject);
-            Destroy(vcam.gameObject);
+            //Destroy(cam.gameObject);
+            //Destroy(vcam.gameObject);
            
             light2d.enabled = false;
             light2d.gameObject.SetActive(false);

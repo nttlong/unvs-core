@@ -51,6 +51,12 @@ namespace unvs.game2d.scenes
                 this.ground.SetMeOnLayer(Constants.Layers.GROUND_FLOOR);
                 this.ground.AddComponentIfNotExist<UnvsAudible>();
             }
+            this.TurnOnLeft();
+            this.TurnOnRight();
+            this.cam.enabled = true;
+                this.cam.gameObject.SetActive(true);
+            this.vcam.enabled = true;
+            this.vcam.gameObject.SetActive(true);
             //this.vcam.GetComponent<CinemachineConfiner2D>().BoundingShape2D = this.worldBound;
         }
         [UnvsButton("Apply require components")]
@@ -135,7 +141,7 @@ namespace unvs.game2d.scenes
             //this.edgesWorldBound = this.AddChildComponentIfNotExist<EdgeCollider2D>("edgesWorldBound");
             this.startPoint = this.support.AddChildComponentIfNotExist<Transform>("start-point");
             this.startPoint.transform.position = new Vector3(this.JoinInfo.Size.x / 2, 0, -10);
-            this.defaulCamWatcher.transform.position = this.JoinInfo.Size / 2;
+            this.defaulCamWatcher.transform.position =  this.JoinInfo.Size / 2;
             this.worldBound = this.support.AddChildComponentIfNotExist<PolygonCollider2D>("world-bound");
             this.worldBound.SetMeOnLayer(Constants.Layers.WORLD_BOUND);
             this.worldBound.isTrigger = true;
@@ -245,6 +251,14 @@ namespace unvs.game2d.scenes
             {
                 groundThickness.GizmosDraw(Color.black,3f);
             }
+            if(this.defaulCamWatcher != null)
+            {
+                //this.defaulCamWatcher.position = new Vector3(this.defaulCamWatcher.position.x, this.defaulCamWatcher.position.y, -cam.OrthoSizeToPerspectiveDistance(this.OrthographicSize));
+            }
+            //if (vcam != null && ! Application.isPlaying)
+            //{
+            //    var fo=vcam.GetComponent<CinemachineFollow>().FollowOffset= new Vector3(this.followOffset.x, this.followOffset.y, cam.OrthoSizeToPerspectiveDistance(this.OrthographicSize));
+            //}
         }
 
 
