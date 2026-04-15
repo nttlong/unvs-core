@@ -11,9 +11,9 @@ using unvs.ext;
 using unvs.shares.editor;
 using unvs.sys;
 
-using static UnityEngine.InputSystem.InputAction;
-#endif
 
+#endif
+using static UnityEngine.InputSystem.InputAction;
 namespace unvs.game2d.scenes.actors {
     
     public abstract class UnvsPlayer : UnvsBaseComponent

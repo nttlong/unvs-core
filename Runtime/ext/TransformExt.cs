@@ -1,14 +1,16 @@
 
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.U2D.Animation;
 using UnityEngine.U2D.IK;
 using unvs.interfaces;
-
+using DG.Tweening;
 namespace unvs.ext
 {
     
@@ -138,6 +140,18 @@ namespace unvs.ext
             var r = tr.GetRootBone();
             if (r == null) return null;
             return r.AddComponentIfNotExist<IKManager2D>();
+        }
+
+        public static void MoveUpByHeight(this Transform transform,float Height)
+        {
+            transform.position = new Vector3(transform.position.x, transform.position.y + Height, transform.position.z);
+        }
+        public static async UniTask MoveUpByHeightAsync(this Transform transform, float height, float duration, CancellationToken tk)
+        {
+            // Nhảy lên với hiệu ứng mượt mà (Ease.OutQuad: chậm dần khi lên đỉnh)
+            await transform.DOMoveY(transform.position.y + height, duration)
+                           .SetEase(Ease.OutQuad)
+                           .WithCancellation(tk);
         }
     }
 }

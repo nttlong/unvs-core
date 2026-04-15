@@ -73,6 +73,7 @@ namespace unvs.game2d.objects
         {
             if(coll==null)
             coll=this.GetComponent<BoxCollider2D>();
+            coll.isTrigger = true;
             var sp=this.GetComponent<SpriteRenderer>();
             if (sp != null)
             {

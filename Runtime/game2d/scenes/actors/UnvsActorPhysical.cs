@@ -1,5 +1,4 @@
 using Cysharp.Threading.Tasks;
-using PlasticGui.WorkspaceWindow.PendingChanges;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,7 +18,8 @@ namespace unvs.game2d.scenes.actors
         public Vector2 target;
         public float speed;
         public Vector2 direction2;
-       
+
+        public float JumpingHeight;
 
         public void MoveStep(Transform transform,Vector2 slopeDirection)
         {

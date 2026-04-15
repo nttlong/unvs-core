@@ -19,8 +19,9 @@ using unvs.game2d.objects;
 using unvs.game2d.scenes.actors;
 using unvs.interfaces;
 using unvs.shares;
-using unvs.shares.editor;
+
 #if UNITY_EDITOR
+using unvs.shares.editor;
 namespace unvs.game2d.scenes
 {
     

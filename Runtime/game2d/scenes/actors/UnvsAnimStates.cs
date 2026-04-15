@@ -69,7 +69,7 @@ namespace unvs.game2d.scenes.actors
         }
         public void BaseMotion(string name,string overideState=null)
         {
-            if(overideState == null)
+            if (string.IsNullOrEmpty( overideState))
             {
                 if (actor.physical.currentHoldingItem)
                 {

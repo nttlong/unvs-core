@@ -31,7 +31,7 @@ namespace unvs.game2d.scenes.actors
         [Header("Speed")]
         public float WalkSpeed = 8f;
         public float SprintSpeed = 16f;
-
+        public float JumpingHeight=4f;
         public UnvsActorPhysical physical;
 
         public UnvsPlayer player;
@@ -48,6 +48,7 @@ namespace unvs.game2d.scenes.actors
         public Animator animator;
         public UnvsAnimStates motions;
         private CancellationTokenSource _cls;
+       
 
         public virtual CancellationTokenSource RefreshToken()
         {

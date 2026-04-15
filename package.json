@@ -7,9 +7,20 @@
   "author": {
     "name": "nttlong"
   },
-"dependencies": {
-	"com.unity.cinemachine": "3.1.6",
-"com.unity.localization": "1.5.11",
-"com.unity.textmeshpro": "3.0.6"
+  "dependencies": {
+    "com.unity.cinemachine": "3.1.6",
+    "com.unity.localization": "1.5.11",
+    "com.unity.textmeshpro": "3.0.6",
+    "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask"
+  },
+  "scopedRegistries": [
+    {
+      "name": "package.openupm.com",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.cysharp.unitask",
+        "com.hryooba.dotween"
+      ]
+    }
+  ]
 }
-} 

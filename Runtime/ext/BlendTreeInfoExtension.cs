@@ -25,7 +25,7 @@ namespace unvs.ext
 
             item.animationController.SetLayerWeight(item.layerIndex, 1f);
             item.animationController.SetFloat(item.paramName, item.value);
-            if (overideState != null)
+            if  (!string.IsNullOrEmpty( overideState))
             {
                 var overideStateItem = blendTreeAnim.FirstOrDefault(p => p.layerIndex != item.layerIndex && p.motionName.Equals(overideState, StringComparison.OrdinalIgnoreCase));
                 if (overideStateItem == null)
