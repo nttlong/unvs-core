@@ -24,7 +24,7 @@ namespace unvs.game2d.scenes
             var polygonName = $"{name}-thickness";
             var scene=this.GetComponentInParent<UnvsScene>();
             scene.groundThickness = this.transform.parent.AddChildComponentIfNotExist<PolygonCollider2D>(polygonName);
-            scene.groundThickness.SetMeOnLayer(Constants.Layers.GROUND_FLOOR);
+            scene.groundThickness.SetMeOnLayer(Constants.Layers.WORLD_GROUND);
             if (polyType==PotyType.Parallel)
             scene.groundThickness.points = EdgeCollider2DExtension.MakeThicnessPoly(
                 this.GetComponent<EdgeCollider2D>(), 
@@ -32,10 +32,14 @@ namespace unvs.game2d.scenes
                 scene.wallRight.bounds.min.x);
             if (polyType == PotyType.FlatBottom)
             {
-                scene.groundThickness.points = EdgeCollider2DExtension.MakeThicnessPolyWithFlatBottom(
-               this.GetComponent<EdgeCollider2D>(),
-               ThiknessDown, scene.wallLeft.bounds.max.x,
-               scene.wallRight.bounds.min.x);
+                // scene.groundThickness.points = EdgeCollider2DExtension.MakeThicnessPolyWithFlatBottom(
+                //this.GetComponent<EdgeCollider2D>(),
+                //ThiknessDown, scene.wallLeft.bounds.max.x,
+                //scene.wallRight.bounds.min.x);
+                scene.groundThickness.points = EdgeCollider2DExtension.MakeThicnessPoly(
+              this.GetComponent<EdgeCollider2D>(),
+              ThiknessDown, scene.wallLeft.bounds.max.x,
+              scene.wallRight.bounds.min.x);
             }
         }
 

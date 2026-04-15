@@ -17,6 +17,8 @@ namespace unvs.shares
             public const string PLAYER_CAM_WATCHER = "PLAYER-CAM-WATCHER";
 
             public const string INTERACT_SCANER = "INTERACT-SCANER";
+
+            public const string SOCKET = "SOCKET";
         }
 
         public class CinemachineDefaut
@@ -53,6 +55,8 @@ namespace unvs.shares
             public const string INTERACT_SCANER = "INTERACT-SCANER";
 
             public const string GROUND_FLOOR = "GROUND-FLOOR";
+
+            public const string WORLD_GROUND = "WORLD-GROUND";
         }
         public class Scenes
         {

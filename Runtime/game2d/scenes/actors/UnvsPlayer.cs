@@ -22,6 +22,7 @@ namespace unvs.game2d.scenes.actors {
         
         Dictionary<string, Action<CallbackContext>> _started = null;
         Dictionary<string,Action<CallbackContext>> _canceled = null;
+        Dictionary<string, Action<CallbackContext>> _performed = null;
         private bool _disableEvent;
 
         public abstract MapAction OnMapConrrol(string name);
@@ -36,6 +37,7 @@ namespace unvs.game2d.scenes.actors {
                 InitRuntime();
                 _started =new Dictionary<string, Action<CallbackContext>>();
                 _canceled = new Dictionary<string, Action<CallbackContext>>();
+                _performed = new Dictionary<string, Action<CallbackContext>>();
                 foreach (var key in UnvsGlobalInput.Player.Keys)
                 {
                     var action = OnMapConrrol(key.ToLower());
@@ -43,20 +45,38 @@ namespace unvs.game2d.scenes.actors {
                     {
                         // kiem tra action co start thi goi
 
-                        Action<CallbackContext> start = ctx =>
+                        if (action.hasStarted)
                         {
-                            if(!_disableEvent)
-                            action.InvokeStarted(ctx);
-                        };
-                        UnvsGlobalInput.Player[key].started += start;
-                        _started.Add(key, start);
-                        Action<CallbackContext> canceled = ctx =>
+                            Action<CallbackContext> start = ctx =>
+                                           {
+                                               if (!_disableEvent)
+                                                   action.InvokeStarted(ctx);
+                                           };
+                            UnvsGlobalInput.Player[key].started += start;
+                            _started.Add(key, start); 
+                        }
+                        if (action.hasCanceled)
                         {
-                            if (!_disableEvent)
-                                action.InvokeCanceled(ctx);
-                        };
-                        UnvsGlobalInput.Player[key].canceled += canceled;
-                        _canceled.Add(key, canceled);
+                            Action<CallbackContext> canceled = ctx =>
+                                           {
+                                               if (!_disableEvent)
+                                                   action.InvokeCanceled(ctx);
+                                           };
+                            UnvsGlobalInput.Player[key].canceled += canceled;
+                            _canceled.Add(key, canceled); 
+                        }
+                        if (action.hasPerformed)
+                        {
+                            Action<CallbackContext> performed = ctx =>
+                                            {
+                                                if (!_disableEvent)
+                                                    action.InvokePerformedd(ctx);
+                                            };
+                            UnvsGlobalInput.Player[key].performed += performed;
+                            _performed.Add(key, performed); 
+                        }
+
+                        action.OwnerInputAction = UnvsGlobalInput.Player[key]; // set owner for other method call such as ReadValue ...
                     }
                     
                 }
@@ -86,6 +106,14 @@ namespace unvs.game2d.scenes.actors {
                         inputAction.canceled -= item.Value;
                 }
                 _canceled.Clear();
+            }
+            if(_performed != null)
+            {
+                foreach(var item in _performed)
+                {
+                    if (UnvsGlobalInput.Player.TryGetValue(item.Key, out var inputAction))
+                        inputAction.performed -= item.Value;
+                }
             }
         }
         public void ControlDisable()

@@ -57,6 +57,12 @@ namespace unvs.game2d.scenes
                 this.cam.gameObject.SetActive(true);
             this.vcam.enabled = true;
             this.vcam.gameObject.SetActive(true);
+            if(this.groundThickness!=null)
+            {
+                this.groundThickness = support.GetComponentInChildrenByName<PolygonCollider2D>("ground-thickness");
+                
+            }
+            if (this.groundThickness != null) this.groundThickness.SetMeOnLayer(Constants.Layers.WORLD_GROUND);
             //this.vcam.GetComponent<CinemachineConfiner2D>().BoundingShape2D = this.worldBound;
         }
         [UnvsButton("Apply require components")]
@@ -156,6 +162,7 @@ namespace unvs.game2d.scenes
             this.wallLeft = this.support.AddChildComponentIfNotExist<BoxCollider2D>("wall-left");
             this.wallRight = this.support.AddChildComponentIfNotExist<BoxCollider2D>("wall-right");
             this.ground = this.support.AddChildComponentIfNotExist<EdgeCollider2D>("ground");
+            ground.AddComponentIfNotExist<UnvsAudible>();
             var dx = this.defaulCamWatcher.transform.GetSegment().Center().x;
             this.ground.points = new Vector2[] { new Vector2(dx - this.JoinInfo.Size.x / 2 - 5, 0), new Vector2(dx + this.JoinInfo.Size.x / 2 + 5, 0) };
 
@@ -259,6 +266,10 @@ namespace unvs.game2d.scenes
             //{
             //    var fo=vcam.GetComponent<CinemachineFollow>().FollowOffset= new Vector3(this.followOffset.x, this.followOffset.y, cam.OrthoSizeToPerspectiveDistance(this.OrthographicSize));
             //}
+            if(this.groundThickness!= null)
+            {
+                this.groundThickness.GizmosDraw(Color.whiteSmoke, 3f);
+            }
         }
 
 

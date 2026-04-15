@@ -66,7 +66,7 @@ namespace unvs.game2d.scenes
         public Transform sceneTracker;
         public UnvsBackgound background;
         private Transform pickableItems;
-        internal PolygonCollider2D groundThickness;
+        public PolygonCollider2D groundThickness;
 
         public bool IsDestroying { get; private set; }
         

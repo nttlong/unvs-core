@@ -338,6 +338,13 @@ namespace unvs.ext
             handle.localScale = Vector3.one;
             handle.position = new Vector3(handle.position.x, handle.position.y, socketHand.position.z);
         }
+        public static void SetMeOnTag(this Transform tr, string tagName)
+        {
+            #if UNITY_EDITOR
+                        TagHelper.AddTag(tagName);
+#endif
+            tr.gameObject.tag = tagName;
+        }
     }
     public static class UnvsActorPhysicalSolverRuntimeExt
     {

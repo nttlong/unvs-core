@@ -28,6 +28,9 @@ namespace unvs.game2d.scenes.actors
     public partial class UnvsActor : UnvsBaseComponent
     {
         public CancellationTokenSource cts => _cls;
+        [Header("Speed")]
+        public float WalkSpeed = 8f;
+        public float SprintSpeed = 16f;
 
         public UnvsActorPhysical physical;
 
@@ -36,7 +39,7 @@ namespace unvs.game2d.scenes.actors
         private bool isMoving;
         private Vector2 target;
         private Vector2 direction;
-        public float WalkSpeed = 8f;
+        
         public Collider2D coll;
         public Rigidbody2D body;
         public Transform camWatcher;

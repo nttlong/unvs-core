@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using PlasticGui.WorkspaceWindow.PendingChanges;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,16 +19,19 @@ namespace unvs.game2d.scenes.actors
         public Vector2 target;
         public float speed;
         public Vector2 direction2;
+       
 
-        public void MoveStep(Transform transform)
+        public void MoveStep(Transform transform,Vector2 slopeDirection)
         {
             if (Application.isPlaying)
             {
                 if (isMoving)
                 {
-                    
-                    transform.MoveStep(this.target, speed, out var dir, direction2.x);
-                    
+                    if (slopeDirection == Vector2.zero)
+                        transform.MoveStep(this.target, speed, out var dir, direction2.x);
+                    else
+                        //transform.MoveStep(this.target, speed, out var dir, direction2.x);
+                        transform.position += (Vector3)slopeDirection * speed * Time.deltaTime;
                 }
             }
            
@@ -48,6 +52,7 @@ namespace unvs.game2d.scenes.actors
         [SerializeField]
         public MovingInfo movingInfo;
         internal UnvsPickableObject currentHoldingItem;
+        private Collider2D _coll;
 
         private  IKManager2D ikManager
         {
@@ -145,7 +150,11 @@ namespace unvs.game2d.scenes.actors
         }
         private void Update()
         {
-            this.movingInfo.MoveStep(this.transform);
+            if(_coll==null) _coll=GetComponent<Collider2D>();
+            if(_coll==null) _coll=GetComponent<Collider2D>();
+            var slopeDirection = _coll.CalculateSlopDirection(this.movingInfo.direction2.x);
+           
+            this.movingInfo.MoveStep(this.transform, slopeDirection);
             
         }
 
@@ -167,9 +176,11 @@ namespace unvs.game2d.scenes.actors
                 this.RaiseEditorError($"handBack and handFront must be set on {name}");
             }
             this.socketHandBack = this.handBack.transform.CreateIfNoExist<Transform>("soket-hand-back");
-            this.socketHandBack.localPosition = new Vector3(0.5f, 0.5f, 0);
+            //this.socketHandBack.localPosition = new Vector3(0.5f, 0.5f, 0);
             this.socketHandFront = this.handFront.transform.CreateIfNoExist<Transform>("soket-hand-front");
-            this.socketHandFront.localPosition = new Vector3(0.5f, 0.5f, 0);
+
+            this.socketHandBack.SetMeOnTag(Constants.Tags.SOCKET);
+            //this.socketHandFront.localPosition = new Vector3(0.5f, 0.5f, 0);
         }
     }
     #endif
