@@ -15,6 +15,7 @@ using unvs.shares.editor;
 
 #endif
 using unvs.sys;
+using Unvs.Core.Game2D.Scenes.Actors;
 namespace unvs.game2d.scenes.actors
 {
     [RequireComponent(typeof(IKBoneMap))]
@@ -25,6 +26,7 @@ namespace unvs.game2d.scenes.actors
     [RequireComponent (typeof(AudioSource))]
  
     [RequireComponent(typeof(UnvsActorPhysical))]
+    [RequireComponent(typeof(UnsvPlayerDoTweenAnim))]
     public partial class UnvsActor : UnvsBaseComponent
     {
         public CancellationTokenSource cts => _cls;
@@ -155,13 +157,13 @@ namespace unvs.game2d.scenes.actors
         [UnvsButton]
         public void Generate()
         {
-            if (this.CheckComponentIfNotExistCreate<CapsuleCollider2D>(out var _coll))
-            {
+            //if (this.CheckComponentIfNotExistCreate<CapsuleCollider2D>(out var _coll))
+            //{
 
-                _coll.size = new Vector2(8, 20);
-                _coll.offset = new Vector2(0, 10);
-                this.coll = _coll;
-            }
+            //    _coll.size = new Vector2(8, 20);
+            //    _coll.offset = new Vector2(0, 10);
+            //    this.coll = _coll;
+            //}
 
 
             body = this.AddComponentIfNotExist<Rigidbody2D>();

@@ -60,6 +60,11 @@ namespace unvs.ext
         }
         public static void SetMeOnLayer(this GameObject go, string layerName, bool applyAllChildren = false)
         {
+
+#if UNITY_EDITOR
+            LayerHelper.AddLayer(layerName); 
+#endif
+
             var index = LayerMask.NameToLayer(layerName);
             if (index == -1)
             {

@@ -19,6 +19,8 @@ namespace unvs.shares
             public const string INTERACT_SCANER = "INTERACT-SCANER";
 
             public const string SOCKET = "SOCKET";
+
+            public const string PLAYER_FOOTER = "PLAYER-FOOTER";
         }
 
         public class CinemachineDefaut
@@ -57,6 +59,8 @@ namespace unvs.shares
             public const string GROUND_FLOOR = "GROUND-FLOOR";
 
             public const string WORLD_GROUND = "WORLD-GROUND";
+
+            public const string PLAYER_FOOTER = "PLAYER-FOOTER";
         }
         public class Scenes
         {

@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
@@ -120,6 +121,46 @@ namespace unvs.shares.editor
                     {
                         ((MonoBehaviour)(object)item).transform.SetParent(tr, true);
                     }
+                }
+            }
+        }
+
+        public static void EditorOpenClip(GameObject target, string clipPath)
+        {
+            // 1. Load AnimationClip từ đường dẫn (Path phải bắt đầu bằng "Assets/...")
+            AnimationClip clip = AssetDatabase.LoadAssetAtPath<AnimationClip>(clipPath);
+
+            if (clip == null)
+            {
+                Debug.LogError($"Không tìm thấy AnimationClip tại đường dẫn: {clipPath}");
+                return;
+            }
+
+            // 2. Chọn Object chứa Animator trước
+            //Selection.activeGameObject = target;
+
+            // 3. Mở cửa sổ Animation
+            EditorApplication.ExecuteMenuItem("Window/Animation/Animation");
+
+            // 4. Dùng Reflection để gán Clip vào cửa sổ đang mở
+            Assembly editorAssembly = typeof(EditorWindow).Assembly;
+            Type animWindowType = editorAssembly.GetType("UnityEditor.AnimationWindow");
+
+            EditorWindow window = EditorWindow.GetWindow(animWindowType);
+
+            if (window != null)
+            {
+                // Lấy thuộc tính 'state'
+                var stateProperty = animWindowType.GetProperty("state", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                object state = stateProperty.GetValue(window);
+
+                if (state != null)
+                {
+                    // Gán clip vào 'activeAnimationClip'
+                    var clipProperty = state.GetType().GetProperty("activeAnimationClip", BindingFlags.Instance | BindingFlags.Public);
+                    clipProperty.SetValue(state, clip);
+
+                    window.Repaint();
                 }
             }
         }

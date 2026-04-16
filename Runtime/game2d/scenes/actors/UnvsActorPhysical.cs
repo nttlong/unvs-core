@@ -53,7 +53,8 @@ namespace unvs.game2d.scenes.actors
         public MovingInfo movingInfo;
         internal UnvsPickableObject currentHoldingItem;
         private Collider2D _coll;
-
+        [SerializeField]
+        public Transform[] Footers;
         private  IKManager2D ikManager
         {
             get
@@ -162,7 +163,18 @@ namespace unvs.game2d.scenes.actors
 #if UNITY_EDITOR
     public partial class UnvsActorPhysical : UnvsBaseComponent
     {
-        
+
+        [UnvsButton("Footer collider")]
+        public void EditorCreateFooterCollider ()
+        {
+            foreach(var footer in Footers)
+            {
+                var c = footer.AddComponentIfNotExist<CapsuleCollider2D>();
+                footer.SetMeOnTag(Constants.Tags.PLAYER_FOOTER);
+                footer.gameObject.SetMeOnLayer(Constants.Layers.PLAYER_FOOTER);
+
+            }
+        }
         [UnvsButton("Validate")]
         public void EditorVaildate()
         {

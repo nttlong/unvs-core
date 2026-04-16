@@ -13,18 +13,18 @@ namespace unvs.shares
         public string Name;
         public int Index;
     }
-    [Serializable]
-    public class BlendTreeInfo
-    {
-        public string motionName;
-        public float value;
-        public string layerName;
-        public Animator animationController;
-        public string paramName;
-        public int layerIndex;
-        public string blendName;
-        public int blendIndex;
-    }
+    //[Serializable]
+    //public class BlendTreeInfo
+    //{
+    //    public string motionName;
+    //    public float value;
+    //    public string layerName;
+    //    public Animator animationController;
+    //    public string paramName;
+    //    public int layerIndex;
+    //    public string blendName;
+    //    public int blendIndex;
+    //}
     [Serializable]
     public struct AudioInfo
     {

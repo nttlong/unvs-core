@@ -13,7 +13,7 @@ namespace unvs.ext
 {
     public static class BlendTreeInfoExtension
     {
-        public static void PlayBaseLayer(this BlendTreeInfo[] blendTreeAnim, string motionName, string overideState=null)
+        public static void PlayBaseLayer(this AnimStateInfo[] blendTreeAnim, string motionName, string overideState=null)
         {
             var item = blendTreeAnim.FirstOrDefault(p => p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase)
             && !string.IsNullOrEmpty(p.blendName));
@@ -36,7 +36,7 @@ namespace unvs.ext
                 overideStateItem.animationController.PlayInFixedTime(overideStateItem.motionName, overideStateItem.layerIndex);
             }
         }
-        public static void PlayBlendTree(this BlendTreeInfo[] blendTreeAnim,  string motionName)
+        public static void PlayBlendTree(this AnimStateInfo[] blendTreeAnim,  string motionName)
         {
             
             var item= blendTreeAnim.FirstOrDefault(p=>p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase)
@@ -51,7 +51,7 @@ namespace unvs.ext
             item.animationController.SetFloat( item.paramName, item.value);
         }
        
-        public static void PlayMotion(this BlendTreeInfo[] blendTreeAnim, string motionName,string overideState)
+        public static void PlayMotion(this AnimStateInfo[] blendTreeAnim, string motionName,string overideState)
         {
             var item = blendTreeAnim.FirstOrDefault(p => p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase));
             if (item == null)
@@ -86,7 +86,7 @@ namespace unvs.ext
 
            
         }
-        public static async UniTask PlayMotionAsync(this BlendTreeInfo[] blendTreeAnim, string motionName,string ovveriSate=null)
+        public static async UniTask PlayMotionAsync(this AnimStateInfo[] blendTreeAnim, string motionName,string ovveriSate=null)
         {
             if(ovveriSate == null)
             {
@@ -113,7 +113,7 @@ namespace unvs.ext
             
 
         }
-        public static async UniTask PlayMotionAsync(this BlendTreeInfo[] blendTreeAnim, string motionName,Action OnFinish,CancellationToken ct)
+        public static async UniTask PlayMotionAsync(this AnimStateInfo[] blendTreeAnim, string motionName,Action OnFinish,CancellationToken ct)
         {
             var item = blendTreeAnim.FirstOrDefault(p => p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase));
             if (item == null)
@@ -130,7 +130,7 @@ namespace unvs.ext
 
 
         }
-        public static void PlayCrossFadeMotion(this BlendTreeInfo[] blendTreeAnim, string motionName, float normalizedTimeOffset=0.25f)
+        public static void PlayCrossFadeMotion(this AnimStateInfo[] blendTreeAnim, string motionName, float normalizedTimeOffset=0.25f)
         {
             var item = blendTreeAnim.FirstOrDefault(p => p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase));
             if (item == null)
@@ -144,7 +144,7 @@ namespace unvs.ext
             item.animationController.SetLayerWeight(item.layerIndex, 1);
             item.animationController.CrossFadeInFixedTime(motionName, normalizedTimeOffset,item.layerIndex);
         }
-        public static async UniTask PlayCrossFadeMotionAsync(this BlendTreeInfo[] blendTreeAnim, string motionName, float normalizedTimeOffset = 0.25f)
+        public static async UniTask PlayCrossFadeMotionAsync(this AnimStateInfo[] blendTreeAnim, string motionName, float normalizedTimeOffset = 0.25f)
         {
             var item = blendTreeAnim.FirstOrDefault(p => p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase));
 
@@ -167,7 +167,7 @@ namespace unvs.ext
 
             Debug.Log($"[Architect Log] Motion {motionName} hoàn tất.");
         }
-        public static void PlayAddtiveMotion(this BlendTreeInfo[] blendTreeAnim, string motionName)
+        public static void PlayAddtiveMotion(this AnimStateInfo[] blendTreeAnim, string motionName)
         {
             var item = blendTreeAnim.FirstOrDefault(p =>p.layerIndex>0 && p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase));
             if (item == null)

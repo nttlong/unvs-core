@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.U2D.Animation;
@@ -21,10 +23,12 @@ namespace unvs.game2d.scenes.actors
         private Vector3 oririnalScale;
         [SerializeField]
         public MotionAudio[] motionAudio;
+        public Transform motionObject;
         [SerializeField]
-        public BlendTreeInfo[] animStates;
+        public AnimStateInfo[] animStates;
         private Collider2D coll;
         private float _direction;
+       
 
         public float direction
         {
@@ -54,6 +58,10 @@ namespace unvs.game2d.scenes.actors
                 oririnalScale = this.transform.localScale.CloneToNew();
                 actor.motions = this;
                 coll = this.GetComponent<Collider2D>();
+                if(this.motionObject!=null)
+                {
+                    motionObject.gameObject.SetActive(false);
+                }
             }
         }
         public void DirectionTo(Vector3 direction)
@@ -123,9 +131,41 @@ namespace unvs.game2d.scenes.actors
                 }
             }
             this.motionAudio = lsAudio.Cast<MotionAudio>().ToArray();
+            this.motionObject = this.GetComponentInChildrenByName<Transform>("motions-object");
+        }
+        private Animator editorAnimController;
+        internal void EditotPlay(AnimStateInfo animStateInfo)
+        {
+            foreach (var mot in this.animStates)
+            {
+                animStateInfo.animationController.SetLayerWeight(mot.layerIndex, 0);
+            }
+            if (!string.IsNullOrEmpty(animStateInfo.blendName))
+            {
+                animStateInfo.animationController.SetLayerWeight(animStateInfo.layerIndex, 1f);
+                animStateInfo.animationController.SetFloat(animStateInfo.paramName, animStateInfo.value);
+            }
+            else
+            {
+                animStateInfo.animationController.SetLayerWeight(animStateInfo.layerIndex, 1f);
+                animStateInfo.animationController.PlayInFixedTime(animStateInfo.motionName, animStateInfo.layerIndex, 0f);
+                editorAnimController = animStateInfo.animationController;
+            }
+            EditorApplication.update -= EditorUpdate;
+            EditorApplication.update += EditorUpdate;
+        }
+        void EditorUpdate()
+        {
+            if (editorAnimController == null) return;
+
+
+            editorAnimController.Update(Time.deltaTime);
+
+           
+            EditorApplication.QueuePlayerLoopUpdate();
+            SceneView.RepaintAll();
         }
 
-       
 
 
 #endif

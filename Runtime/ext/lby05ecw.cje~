@@ -1,14 +1,10 @@
 ﻿using Cysharp.Threading.Tasks;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Unity.VisualScripting;
-using Unity.VisualScripting.YamlDotNet.Core.Tokens;
-using UnityEditor;
-
 
 #if UNITY_EDITOR
 using UnityEditor.Animations;
@@ -90,46 +86,48 @@ namespace unvs.ext
 
         }
 #if UNITY_EDITOR
-        //public static List<AnimStateInfo> EditorExtractBaseLayer(this Animator anim, Transform motionObjs)
-        //{
-        //    var ret = new List<AnimStateInfo>();
-        //    var controller = anim.runtimeAnimatorController as AnimatorController;
+        public static List<AnimStateInfo> EditorExtractBaseLayer(this Animator anim)
+        {
+            var ret = new List<AnimStateInfo>();
+            var controller = anim.runtimeAnimatorController as AnimatorController;
             
-        //    for(var i=0;i< controller.layers.Length; i++)
-        //    {
-        //        var layer = controller.layers[i];
-        //        for (var j = 0; j < layer.stateMachine.states.Length; j++)
-        //        {
-        //            var stateInMachine = layer.stateMachine.states[j];
-        //            var state = stateInMachine.state;
-        //            if (state.motion is BlendTree blendTree)
-        //            {
-        //                extractBlendTree(motionObjs,anim, ret, i,j, layer, blendTree);
+            for(var i=0;i< controller.layers.Length; i++)
+            {
+                var layer = controller.layers[i];
+                for (var j = 0; j < layer.stateMachine.states.Length; j++)
+                {
+                    var stateInMachine = layer.stateMachine.states[j];
+                    var state = stateInMachine.state;
+                    if (state.motion is BlendTree blendTree)
+                    {
+                        extractBlendTree(anim, ret, i,j, layer, blendTree);
 
-        //            }
+                    }
 
-        //        }
-        //    }
+                }
+            }
             
-        //    return ret;
-        //}
+            return ret;
+        }
 
-        private static void extractBlendTree(Transform motionObjs, Animator anim, List<AnimStateInfo> ret,int layerIndex, int blendIndex, AnimatorControllerLayer layer, BlendTree blendTree)
+        private static void extractBlendTree(Animator anim, List<AnimStateInfo> ret,int layerIndex, int blendIndex, AnimatorControllerLayer layer, BlendTree blendTree)
         {
             foreach (var child in blendTree.children)
             {
-                var obj = motionObjs.AddChildComponentIfNotExist<AnimStateInfo>($"{layer.name}-{blendTree.name}-{child.motion.name}");
-                obj.blendName = blendTree.name;
-                obj.blendIndex = blendIndex;
-                obj.motionName= child.motion.name;
-                obj.layerName= layer.name;
-                obj.layerIndex= layerIndex;
-                obj.paramName = blendTree.blendParameter;
-                obj.animationController = anim;
-                obj.value = child.threshold;
-                obj.clip = child.motion;
-                ret.Add(obj);
-                
+                ret.Add(new AnimStateInfo
+                {
+                    blendName = blendTree.name,
+                    blendIndex = blendIndex,
+                    motionName = child.motion.name,
+
+                    layerName = layer.name,
+                    animationController = anim,
+                    layerIndex = layerIndex,
+                    paramName = blendTree.blendParameter,
+                    value = child.threshold
+
+
+                });
             }
         }
 
@@ -138,12 +136,10 @@ namespace unvs.ext
             var motionObjs = anim.transform.GetComponentInChildrenByName<Transform>("motions-object");
            if(motionObjs!=null)
             {
-                for (int i = motionObjs.childCount - 1; i >= 0; i--)
+                var remItem = motionObjs.GetComponentInChildren<AnimStateInfo>(true);
+                while (remItem != null)
                 {
-                    GameObject child = motionObjs.GetChild(i).gameObject;
-
-                    // Cho phép Ctrl + Z trong Editor
-                    Undo.DestroyObjectImmediate(child);
+                    UnityEngine.Object.DestroyImmediate(remItem);
                 }
             }
              motionObjs = anim.transform.AddChildComponentIfNotExist<Transform>("motions-object");
@@ -165,21 +161,18 @@ namespace unvs.ext
                     var state = stateInMachine.state;
                     if (state.motion is BlendTree tree)
                     {
-                        
-                        extractBlendTree(motionObjs,anim, ret, i, j, layer, tree);
+                        extractBlendTree(anim, ret, i, j, layer, tree);
                         continue;
 
                     }
                     
                         if (state is AnimatorState animSt)
                     {
-                        
                         var motion = motionObjs.AddChildComponentIfNotExist<AnimStateInfo>($"{layer.name}-{animSt.name}");
-                        motion.motionName = animSt.name;
+                        motion.motionName = anim.name;
                         motion.layerName = layer.name;
                         motion.animationController = anim;
                         motion.layerIndex = i;
-                        motion.clip= state.motion;
                         ret.Add(motion);
                     }
                 }
