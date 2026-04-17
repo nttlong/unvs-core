@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +18,50 @@ namespace unvs.game2d.scenes.actors
     [RequireComponent(typeof(AudioSource))]
     public class UnvsAnimStates : UnvsBaseComponent
     {
-       
-       
+
+        [Header("overide anim controller")]
+        public AnimatorOverrideController[] ovrideAnimators;
+        private RuntimeAnimatorController _defaultAnimController;
+        private Animator _animator;
+
+        public void SwitchAnimController(string name = "")
+        {
+            // Cache the animator component to avoid repeated GetComponent calls
+            if (_animator == null)
+            {
+                _animator = GetComponentInChildren<Animator>();
+            }
+
+            if (_animator == null) return;
+
+            // Store the initial controller as default if not already set
+            if (_defaultAnimController == null)
+            {
+                _defaultAnimController = _animator.runtimeAnimatorController;
+            }
+
+            if (string.IsNullOrEmpty(name))
+            {
+                // Revert to the original controller
+                _animator.runtimeAnimatorController = _defaultAnimController;
+            }
+            else
+            {
+                // Find matching controller in the override list (case-insensitive)
+                var newController = ovrideAnimators.FirstOrDefault(p =>
+                    p.name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+                if (newController != null)
+                {
+                    _animator.runtimeAnimatorController = newController;
+                }
+                else
+                {
+                    Debug.LogError($"[AnimationSystem] Controller with name '{name}' not found.");
+                }
+            }
+        }
+        public string animControllerName;
         private UnvsActor actor;
         private Vector3 oririnalScale;
         [SerializeField]
@@ -28,7 +71,7 @@ namespace unvs.game2d.scenes.actors
         public AnimStateInfo[] animStates;
         private Collider2D coll;
         private float _direction;
-       
+        
 
         public float direction
         {
@@ -58,7 +101,7 @@ namespace unvs.game2d.scenes.actors
                 oririnalScale = this.transform.localScale.CloneToNew();
                 actor.motions = this;
                 coll = this.GetComponent<Collider2D>();
-                if(this.motionObject!=null)
+                if (this.motionObject != null)
                 {
                     motionObject.gameObject.SetActive(false);
                 }
@@ -75,21 +118,25 @@ namespace unvs.game2d.scenes.actors
             if (direction.x < 0)
                 this.direction = -1;
         }
-        public void BaseMotion(string name,string overideState=null)
+        public void BaseMotion(string name, string overideState = null)
         {
-            if (string.IsNullOrEmpty( overideState))
+            if (string.IsNullOrEmpty(overideState))
             {
                 if (actor.physical.currentHoldingItem)
                 {
                     overideState = $"{name}-hangging-item";
+                }
             }
-            }
-            this.animStates.PlayBaseLayer(name, overideState);
-           
+            this.animStates.PlayBaseLayer(name, overideState,this.ovrideAnimators.FirstOrDefault(p=>p.name.Equals(this.animControllerName,StringComparison.OrdinalIgnoreCase)));
+
         }
         public void Motion(string name)
         {
             this.animStates.PlayCrossFadeMotion(name);
+        }
+        public async UniTask MotionAsync(string name)
+        {
+            await this.animStates.PlayMotionAsync(name);
         }
         public void AddtiveMotion(string name)
         {
@@ -97,7 +144,7 @@ namespace unvs.game2d.scenes.actors
         }
         public void Disable()
         {
-           this.GetComponentInChildren<Animator>().enabled = false;
+            this.GetComponentInChildren<Animator>().enabled = false;
         }
         public void Enable()
         {
@@ -117,14 +164,14 @@ namespace unvs.game2d.scenes.actors
             var lsAudio = this.motionAudio.Cast<MotionAudio?>().ToList();
             foreach (var mot in this.animStates)
             {
-                var audio = lsAudio.FirstOrDefault(p => p?.name == mot.motionName && p?.LayerIndex==mot.layerIndex);
+                var audio = lsAudio.FirstOrDefault(p => p?.name == mot.motionName && p?.LayerIndex == mot.layerIndex);
                 if (audio == null)
                 {
                     lsAudio.Add(new MotionAudio
                     {
                         name = mot.motionName,
-                        LayerIndex= mot.layerIndex,
-                        LayerName= mot.layerName,
+                        LayerIndex = mot.layerIndex,
+                        LayerName = mot.layerName,
                         blendName = mot.blendName,
                         value = mot.value,
                     });
@@ -134,6 +181,8 @@ namespace unvs.game2d.scenes.actors
             this.motionObject = this.GetComponentInChildrenByName<Transform>("motions-object");
         }
         private Animator editorAnimController;
+       
+
         internal void EditotPlay(AnimStateInfo animStateInfo)
         {
             foreach (var mot in this.animStates)
@@ -161,10 +210,12 @@ namespace unvs.game2d.scenes.actors
 
             editorAnimController.Update(Time.deltaTime);
 
-           
+
             EditorApplication.QueuePlayerLoopUpdate();
             SceneView.RepaintAll();
         }
+
+        
 
 
 

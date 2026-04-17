@@ -12,6 +12,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 using unvs.ext;
+using unvs.game2d.objects;
 using unvs.game2d.scenes.actors;
 using unvs.interfaces;
 using unvs.interfaces.sys;
@@ -26,6 +27,7 @@ namespace unvs.game2d.scenes
     public class UnvsApp : UnvsComponent
     {
         public int ChunLenght = 3;
+        public int fps = 120;
         [Header("Sart Path")]
         public string startScenePath;
         public AssetReference startScene;
@@ -101,7 +103,7 @@ namespace unvs.game2d.scenes
         {
             MainMenu.btnStart.onClick.AddListener(() =>
             {
-                SceneLoader.LoadNewAsync(this.startScenePath, "").ContinueWith(s =>
+                SceneLoader.LoadNewAsync(this.startScenePath, "",false).ContinueWith(s =>
                 {
                     MainMenu.Hide();
                 }).Forget();
@@ -109,7 +111,7 @@ namespace unvs.game2d.scenes
 
             MainMenu.btnExit.onClick.AddListener(() =>
             {
-                SceneLoader.LoadNewAsync(this.startScenePath, "").ContinueWith(s =>
+                SceneLoader.LoadNewAsync(this.startScenePath, "", false).ContinueWith(s =>
                 {
                     MainMenu.Hide();
                 }).Forget();
@@ -138,8 +140,12 @@ namespace unvs.game2d.scenes
         public Dictionary<UnvsScene,string> Scenes { get; private set; }
         private UnvsScene _LastScene;
         private UnvsScene _LastExitScene;
-       
-
+        private CheckPintInfo restartCheckPoint;
+        public void RaiseResart(CheckPintInfo value)
+        {
+            this.restartCheckPoint = value;
+            UnvsSceneLoader.Instance.LoadNewAsync(this.restartCheckPoint.scenePath, restartCheckPoint.checkPointName, true).Forget();
+        }
         public void CleanUp()
         {
             this.Scenes = new Dictionary<UnvsScene, string>();
@@ -203,6 +209,7 @@ namespace unvs.game2d.scenes
         public override void InitRuntime()
         {
             Instance = this;
+            Application.targetFrameRate = this.fps;
             InitRuntimeAsync().ContinueWith(() =>
             {
                
@@ -288,7 +295,9 @@ namespace unvs.game2d.scenes
             this.ActorDialoguePath = r.PrefabPath;
         }
 
-       
+        
+
+
 
 
 

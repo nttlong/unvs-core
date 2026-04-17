@@ -725,10 +725,15 @@ namespace unvs.ext
         public static Vector2[] MakeThicnessPoly(this EdgeCollider2D ground,float thickness, float minX, float maxX)
         {
             var tmp = ground.transform.parent.AddChildComponentIfNotExist<EdgeCollider2D>($"TrimLeftAndRightToNew-{ground.name}-tmp");
+            tmp.transform.localPosition = ground.transform.localPosition;
+            tmp.transform.localRotation = ground.transform.localRotation;
+            tmp.transform.localScale = ground.transform.localScale;
+            tmp.transform.position = ground.transform.position;
             tmp.points = ground.points;
             tmp.ClipByFirstEdgeByX( minX );
             tmp.ClipLastEdgeByX( maxX );
             var ret = tmp.points.CreateThicknessDownPolygonFromLines(thickness);
+            
             UnityEngine.Object.DestroyImmediate(tmp.gameObject );
             return ret;
 
@@ -736,10 +741,29 @@ namespace unvs.ext
         public static Vector2[] MakeThicnessPolyWithFlatBottom(this EdgeCollider2D ground, float thickness, float minX, float maxX)
         {
             var tmp = ground.transform.parent.AddChildComponentIfNotExist<EdgeCollider2D>($"TrimLeftAndRightToNew-{ground.name}-tmp");
+            tmp.transform.localPosition = ground.transform.localPosition;
+            tmp.transform.localRotation = ground.transform.localRotation;
+            tmp.transform.localScale = ground.transform.localScale;
+            tmp.transform.position = ground.transform.position;
             tmp.points = ground.points;
             tmp.ClipByFirstEdgeByX(minX);
             tmp.ClipLastEdgeByX(maxX);
             var ret = tmp.points.CreateThicknessPolygonWithFlatBottomFromLines(thickness);
+            UnityEngine.Object.DestroyImmediate(tmp.gameObject);
+            return ret;
+
+        }
+        public static Vector2[] MakeThicnessPolyWithFlatBottomOneLine(this EdgeCollider2D ground, float thickness, float minX, float maxX)
+        {
+            var tmp = ground.transform.parent.AddChildComponentIfNotExist<EdgeCollider2D>($"TrimLeftAndRightToNew-{ground.name}-tmp");
+            tmp.transform.localPosition = ground.transform.localPosition;
+            tmp.transform.localRotation = ground.transform.localRotation;
+            tmp.transform.localScale = ground.transform.localScale;
+            tmp.transform.position = ground.transform.position;
+            tmp.points = ground.points;
+            tmp.ClipByFirstEdgeByX(minX);
+            tmp.ClipLastEdgeByX(maxX);
+            var ret = tmp.points.CreateThicknessPolygonWithOneLineFlatBottomFromLines(thickness);
             UnityEngine.Object.DestroyImmediate(tmp.gameObject);
             return ret;
 

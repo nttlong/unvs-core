@@ -166,5 +166,17 @@ namespace unvs.ext
             if(firstElement!=null) 
             EventSystem.current.SetSelectedGameObject(firstElement.gameObject);
         }
+        public static SpriteRenderer Off(this SpriteRenderer gameObject)
+        {
+            if(gameObject==null || gameObject.IsDestroyed() || gameObject.gameObject.IsDestroyed()) return null;
+            gameObject.enabled = false;
+            gameObject.gameObject.SetActive(false); return gameObject;
+        }
+        public static SpriteRenderer On(this SpriteRenderer gameObject)
+        {
+            if (gameObject == null || gameObject.IsDestroyed() || gameObject.gameObject.IsDestroyed()) return null;
+            gameObject.enabled = true;
+            gameObject.gameObject.SetActive(true); return gameObject;
+        }
     }
 }

@@ -27,6 +27,7 @@ namespace unvs.game2d.scenes.actors
  
     [RequireComponent(typeof(UnvsActorPhysical))]
     [RequireComponent(typeof(UnsvPlayerDoTweenAnim))]
+   
     public partial class UnvsActor : UnvsBaseComponent
     {
         public CancellationTokenSource cts => _cls;
@@ -34,6 +35,7 @@ namespace unvs.game2d.scenes.actors
         public float WalkSpeed = 8f;
         public float SprintSpeed = 16f;
         public float JumpingHeight=4f;
+        public float CrawlSpeed=4f;
         public UnvsActorPhysical physical;
 
         public UnvsPlayer player;
@@ -50,7 +52,7 @@ namespace unvs.game2d.scenes.actors
         public Animator animator;
         public UnvsAnimStates motions;
         private CancellationTokenSource _cls;
-       
+        
 
         public virtual CancellationTokenSource RefreshToken()
         {
@@ -110,8 +112,13 @@ namespace unvs.game2d.scenes.actors
             {
                 player = GetComponent<UnvsPlayer>();
                 physical= GetComponent<UnvsActorPhysical>();
+               
             }
 
+        }
+        private void Start()
+        {
+            if (Application.isPlaying) motions.BaseMotion("idle");
         }
     }
 #if UNITY_EDITOR
@@ -122,7 +129,15 @@ namespace unvs.game2d.scenes.actors
         [UnvsButton]
         public void FixLayout()
         {
+            if (GetComponent<CapsuleCollider2D>() == null)
+                if (this.CheckComponentIfNotExistCreate<CapsuleCollider2D>(out var _coll))
+                {
 
+                    _coll.size = new Vector2(8, 20);
+                    _coll.offset = new Vector2(0, 10);
+                    this.coll = _coll;
+                    this.coll.isTrigger = true;
+                }
             this.camWatcher.position = new Vector3(this.coll.bounds.center.x, this.coll.bounds.max.y, -10);
             var coll = this.camWatcher.AddComponentIfNotExist<BoxCollider2D>();
             coll.isTrigger = true;
@@ -142,7 +157,7 @@ namespace unvs.game2d.scenes.actors
             {
                 speaker = GetComponent<UnvsActorSpeaker>();
             }
-           
+            
 
         }
         [UnvsButton("Anim controller")]
@@ -157,13 +172,14 @@ namespace unvs.game2d.scenes.actors
         [UnvsButton]
         public void Generate()
         {
-            //if (this.CheckComponentIfNotExistCreate<CapsuleCollider2D>(out var _coll))
-            //{
+            if (this.CheckComponentIfNotExistCreate<CapsuleCollider2D>(out var _coll))
+            {
 
-            //    _coll.size = new Vector2(8, 20);
-            //    _coll.offset = new Vector2(0, 10);
-            //    this.coll = _coll;
-            //}
+                _coll.size = new Vector2(8, 20);
+                _coll.offset = new Vector2(0, 10);
+                this.coll = _coll;
+                this.coll.isTrigger = true;
+            }
 
 
             body = this.AddComponentIfNotExist<Rigidbody2D>();
@@ -171,7 +187,11 @@ namespace unvs.game2d.scenes.actors
             this.camWatcher = this.AddChildComponentIfNotExist<Transform>("cam-wacther");
             this.camWatcher.position = new Vector3(this.coll.bounds.center.x, this.coll.bounds.max.y, -10);
         }
-        
+        private void OnValidate()
+        {
+            this.SetMeOnTag(Constants.Tags.ACTOR);
+
+        }
 
     }
 

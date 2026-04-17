@@ -47,4 +47,10 @@ namespace unvs.shares
             return target == null;
         }
     }
+    public struct CalculateSlopeDirectionResull
+    {
+        public Vector2 slopeDir;
+        public Collider2D hitCollider;
+        public bool IsHit;
+    }
 }

@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using unvs.game2d.scenes;
 using unvs.game2d.scenes.actors;
-using UnityEditor;
+
 namespace unvs.shares
 {
     //[Serializable]
@@ -14,7 +14,13 @@ namespace unvs.shares
         public string motionName;
         public float value;
         public string layerName;
-        public Animator animationController;
+        public Animator animationController
+        {
+            get
+            {
+                return this.GetComponentInParent<Animator>();
+            }
+        }
         public string paramName;
         public int layerIndex;
         public string blendName;

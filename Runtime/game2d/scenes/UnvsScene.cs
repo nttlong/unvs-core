@@ -26,8 +26,10 @@ namespace unvs.game2d.scenes
     {
 
         [Header("Sene game world info")]
+        public Transform checkPoints;
         public WorldJoinInfo JoinInfo = new WorldJoinInfo();
         [SerializeField] public float OrthographicSize = 20;
+        public Transform deadZones;
         [SerializeField]
         public Vector2 followOffset = new Vector3(0, 4);
         [Header("Links scene", order = -1)]
@@ -67,6 +69,7 @@ namespace unvs.game2d.scenes
         public UnvsBackgound background;
         private Transform pickableItems;
         public PolygonCollider2D groundThickness;
+     
 
         public bool IsDestroying { get; private set; }
         

@@ -49,7 +49,7 @@ namespace unvs.actionsbasics
             teleportObject.OpenSound.PlayBetterAudioClipAsync(OpenSound).Forget();
             if (teleportObject.IsNew)
             {
-                await UnvsSceneLoader.Instance.LoadNewAsync(teleportObject.TargetPath, teleportObject.SpawnName);
+                await UnvsSceneLoader.Instance.LoadNewAsync(teleportObject.TargetPath, teleportObject.SpawnName,false);
                 
 
             }

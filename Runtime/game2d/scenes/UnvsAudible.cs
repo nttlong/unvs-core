@@ -13,7 +13,8 @@ namespace unvs.game2d.scenes
         public enum PotyType
         {
             Parallel,
-            FlatBottom
+            FlatBottom,
+            FlatBottomOneLine
         }
         [Range(1f,100)]
         public float ThiknessDown=10;
@@ -25,6 +26,9 @@ namespace unvs.game2d.scenes
             var scene=this.GetComponentInParent<UnvsScene>();
             scene.groundThickness = this.transform.parent.AddChildComponentIfNotExist<PolygonCollider2D>(polygonName);
             scene.groundThickness.SetMeOnLayer(Constants.Layers.WORLD_GROUND);
+            scene.groundThickness.transform.localPosition = transform.localPosition;
+            scene.groundThickness.transform.localScale= transform.localScale;
+            scene.groundThickness.transform.position = transform.position;
             if (polyType==PotyType.Parallel)
             scene.groundThickness.points = EdgeCollider2DExtension.MakeThicnessPoly(
                 this.GetComponent<EdgeCollider2D>(), 
@@ -36,10 +40,24 @@ namespace unvs.game2d.scenes
                 //this.GetComponent<EdgeCollider2D>(),
                 //ThiknessDown, scene.wallLeft.bounds.max.x,
                 //scene.wallRight.bounds.min.x);
-                scene.groundThickness.points = EdgeCollider2DExtension.MakeThicnessPoly(
+                scene.groundThickness.points = EdgeCollider2DExtension.MakeThicnessPolyWithFlatBottom(
               this.GetComponent<EdgeCollider2D>(),
               ThiknessDown, scene.wallLeft.bounds.max.x,
               scene.wallRight.bounds.min.x);
+            }
+            if (polyType == PotyType.Parallel)
+            {
+                    scene.groundThickness.points = EdgeCollider2DExtension.MakeThicnessPoly(
+                        this.GetComponent<EdgeCollider2D>(),
+                        ThiknessDown, scene.wallLeft.bounds.max.x,
+                        scene.wallRight.bounds.min.x);
+            }
+            if (polyType == PotyType.FlatBottomOneLine)
+            {
+                scene.groundThickness.points = EdgeCollider2DExtension.MakeThicnessPolyWithFlatBottomOneLine(
+                this.GetComponent<EdgeCollider2D>(),
+                ThiknessDown, scene.wallLeft.bounds.max.x,
+                scene.wallRight.bounds.min.x);
             }
         }
 

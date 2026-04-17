@@ -84,8 +84,17 @@ namespace unvs.game2d.scenes.actors {
         }
 
 
+        public virtual void OnDestroy()
+        {
+            ClearAllEvents();
+        }
 
         public virtual void OnDisable()
+        {
+            ClearAllEvents();
+        }
+
+        private void ClearAllEvents()
         {
             // Sử dụng cơ chế an toàn hơn khi truy cập Global Input
             if (_started != null)
@@ -107,15 +116,16 @@ namespace unvs.game2d.scenes.actors {
                 }
                 _canceled.Clear();
             }
-            if(_performed != null)
+            if (_performed != null)
             {
-                foreach(var item in _performed)
+                foreach (var item in _performed)
                 {
                     if (UnvsGlobalInput.Player.TryGetValue(item.Key, out var inputAction))
                         inputAction.performed -= item.Value;
                 }
             }
         }
+
         public void ControlDisable()
         {
             _disableEvent = true;

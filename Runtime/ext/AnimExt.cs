@@ -6,7 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Unity.VisualScripting;
-using Unity.VisualScripting.YamlDotNet.Core.Tokens;
+
 using UnityEditor;
 
 
@@ -125,7 +125,7 @@ namespace unvs.ext
                 obj.layerName= layer.name;
                 obj.layerIndex= layerIndex;
                 obj.paramName = blendTree.blendParameter;
-                obj.animationController = anim;
+                //obj.animationController = anim;
                 obj.value = child.threshold;
                 obj.clip = child.motion;
                 ret.Add(obj);
@@ -177,7 +177,7 @@ namespace unvs.ext
                         var motion = motionObjs.AddChildComponentIfNotExist<AnimStateInfo>($"{layer.name}-{animSt.name}");
                         motion.motionName = animSt.name;
                         motion.layerName = layer.name;
-                        motion.animationController = anim;
+                       // motion.animationController = anim;
                         motion.layerIndex = i;
                         motion.clip= state.motion;
                         ret.Add(motion);

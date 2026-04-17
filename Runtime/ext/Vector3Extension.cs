@@ -19,8 +19,10 @@ namespace unvs.ext
 {
     public static class PhysilcaExt
     {
-        public static Vector2 CalculateSlopeDirection(this Vector2 pos, float direction, float groundCheckDistance = 20f, string layerName = Constants.Layers.WORLD_GROUND)
+        
+        public static void CalculateSlopeDirection(this Vector2 pos, ref CalculateSlopeDirectionResull Result, float direction, float groundCheckDistance = 20f, string layerName = Constants.Layers.WORLD_GROUND)
         {
+            
             // Sử dụng Physics2D thay vì Physics
             RaycastHit2D hit = Physics2D.Raycast(pos, Vector2.down, groundCheckDistance, LayerMask.GetMask(layerName));
 
@@ -34,19 +36,26 @@ namespace unvs.ext
                 // Nếu direction > 0 (đi phải), hướng sẽ là (normal.y, -normal.x)
                 // Nếu direction < 0 (đi trái), hướng sẽ là (-normal.y, normal.x)
                 Vector2 slopeDir = new Vector2(slopeNormal.y, -slopeNormal.x) * direction;
-
-                return slopeDir;
+                Result.slopeDir = slopeDir;
+                Result.hitCollider = hit.collider;
+                Result.IsHit = true;
+                
+            } else
+            {
+                Result.slopeDir = Vector2.zero;
+                Result.hitCollider = null;
+                Result.IsHit = false;
             }
 
-            return new Vector2(direction, 0);
+              
         }
-        public static Vector2 CalculateSlopDirection(this Collider2D coll, float direction, float groundCheckDistance = 20f, string LayerName = Constants.Layers.WORLD_GROUND)
+        public static void CalculateSlopDirection(this Collider2D coll, ref CalculateSlopeDirectionResull Result, float direction, float groundCheckDistance = 20f, string LayerName = Constants.Layers.WORLD_GROUND)
         {
             
             var pos=new Vector2(coll.bounds.center.x, coll.bounds.max.y);
             
-            var slopDirection = pos.CalculateSlopeDirection(direction, groundCheckDistance, LayerName);
-            return slopDirection;
+            pos.CalculateSlopeDirection(ref Result, direction, groundCheckDistance, LayerName);
+           
         }
     }
     public static class Vector3Extension

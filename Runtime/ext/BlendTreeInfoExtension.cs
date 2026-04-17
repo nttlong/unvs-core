@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
+using System.Data;
 using System.Linq;
 using System.Threading;
 using Unity.Burst;
@@ -13,8 +14,9 @@ namespace unvs.ext
 {
     public static class BlendTreeInfoExtension
     {
-        public static void PlayBaseLayer(this AnimStateInfo[] blendTreeAnim, string motionName, string overideState=null)
+        public static void PlayBaseLayer(this AnimStateInfo[] blendTreeAnim, string motionName, string overideState=null, AnimatorOverrideController animatorOverrideController=null)
         {
+            if (blendTreeAnim.Count(p => p != null) == 0) return;
             var item = blendTreeAnim.FirstOrDefault(p => p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase)
             && !string.IsNullOrEmpty(p.blendName));
             if (item == null)
@@ -22,7 +24,7 @@ namespace unvs.ext
                 throw new Exception($"Can not find {motionName}");
             }
             item.animationController.ResetAllOverideLayers();
-
+           
             item.animationController.SetLayerWeight(item.layerIndex, 1f);
             item.animationController.SetFloat(item.paramName, item.value);
             if  (!string.IsNullOrEmpty( overideState))
@@ -38,7 +40,7 @@ namespace unvs.ext
         }
         public static void PlayBlendTree(this AnimStateInfo[] blendTreeAnim,  string motionName)
         {
-            
+            if (blendTreeAnim.Count(p => p != null) == 0) return;
             var item= blendTreeAnim.FirstOrDefault(p=>p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase)
             && !string.IsNullOrEmpty( p.blendName));
             if (item == null)
@@ -53,6 +55,7 @@ namespace unvs.ext
        
         public static void PlayMotion(this AnimStateInfo[] blendTreeAnim, string motionName,string overideState)
         {
+            if (blendTreeAnim.Count(p => p != null) == 0) return;
             var item = blendTreeAnim.FirstOrDefault(p => p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase));
             if (item == null)
             {
@@ -88,7 +91,8 @@ namespace unvs.ext
         }
         public static async UniTask PlayMotionAsync(this AnimStateInfo[] blendTreeAnim, string motionName,string ovveriSate=null)
         {
-            if(ovveriSate == null)
+            if (blendTreeAnim.Count(p => p != null) == 0) return;
+            if (ovveriSate == null)
             {
                 var item = blendTreeAnim.FirstOrDefault(p => p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase));
                 item.animationController.ResetAllOverideLayers();
@@ -115,6 +119,7 @@ namespace unvs.ext
         }
         public static async UniTask PlayMotionAsync(this AnimStateInfo[] blendTreeAnim, string motionName,Action OnFinish,CancellationToken ct)
         {
+            if (blendTreeAnim.Count(p => p != null) == 0) return;
             var item = blendTreeAnim.FirstOrDefault(p => p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase));
             if (item == null)
             {
@@ -132,6 +137,7 @@ namespace unvs.ext
         }
         public static void PlayCrossFadeMotion(this AnimStateInfo[] blendTreeAnim, string motionName, float normalizedTimeOffset=0.25f)
         {
+            if (blendTreeAnim.Count(p => p != null) == 0) return;
             var item = blendTreeAnim.FirstOrDefault(p => p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase));
             if (item == null)
             {
@@ -146,6 +152,7 @@ namespace unvs.ext
         }
         public static async UniTask PlayCrossFadeMotionAsync(this AnimStateInfo[] blendTreeAnim, string motionName, float normalizedTimeOffset = 0.25f)
         {
+            if (blendTreeAnim.Count(p => p != null) == 0) return;
             var item = blendTreeAnim.FirstOrDefault(p => p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase));
 
             if (item == null) throw new Exception($"Can not find {motionName}");
@@ -169,6 +176,7 @@ namespace unvs.ext
         }
         public static void PlayAddtiveMotion(this AnimStateInfo[] blendTreeAnim, string motionName)
         {
+            if (blendTreeAnim.Count(p => p != null) == 0) return;
             var item = blendTreeAnim.FirstOrDefault(p =>p.layerIndex>0 && p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase));
             if (item == null)
             {

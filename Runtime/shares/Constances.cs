@@ -21,6 +21,8 @@ namespace unvs.shares
             public const string SOCKET = "SOCKET";
 
             public const string PLAYER_FOOTER = "PLAYER-FOOTER";
+
+            public const string ACTOR = "ACTOR";
         }
 
         public class CinemachineDefaut

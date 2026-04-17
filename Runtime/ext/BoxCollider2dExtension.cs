@@ -403,37 +403,7 @@ namespace unvs.ext
             coll.size = new Vector2(width, height);// sp.transform.localScale;
         }
 
-        public static Collider2D RayCastDownHit(this Collider2D coll, int layerMask)
-        {
-            RaycastHit2D[] hits = new RaycastHit2D[5];
-            int hitCount = coll.Raycast(
-                Vector2.down,           // hướng
-                hits,                   // mảng chứa kết quả
-                10f,                    // distance
-                layerMask             // LayerMask
-            );
-            if (hitCount > 0)
-            {
-                RaycastHit2D hit = hits[0];   // lấy cái gần nhất
-                return hit.collider;
-            }
-            return null;
-        }
-        public static T RayCastDownHit<T>(this Collider2D coll, int layerMask)
-        {
-            RaycastHit2D[] hits = new RaycastHit2D[5];
-            int hitCount = coll.Raycast(
-                Vector2.down,           // hướng
-                hits,                   // mảng chứa kết quả
-                10f,                    // distance
-                layerMask             // LayerMask
-            );
-            if (hitCount > 0)
-            {
-                RaycastHit2D hit = hits[0];   // lấy cái gần nhất
-                return hit.collider.GetComponent<T>();
-            }
-            return default(T);
-        }
+       
+        
     }
 }

@@ -27,8 +27,27 @@ namespace unvs.game2d.scenes
     
     public partial class UnvsScene : UnvsComponent
     {
-        
 
+        [UnvsButton("Create check point")]
+        public void EditorCheckPoint()
+        {
+            if (this.checkPoints == null)
+            {
+                this.checkPoints = this.AddChildComponentIfNotExist<Transform>("check-points");
+            }
+            var d=this.checkPoints.AddChildComponentIfNotExist<UnvsCheckPoint>($"check-point-{this.deadZones.childCount}");
+            d.transform.position = this.defaulCamWatcher.transform.position;
+        }
+        [UnvsButton("Create Dead Zone")]
+        public void EditorCreateDeadZone()
+        {
+            if (this.deadZones == null)
+            {
+                this.deadZones = this.AddChildComponentIfNotExist<Transform>("dead-zones");
+            }
+            var d= this.deadZones.AddChildComponentIfNotExist<UnvsDeadZone>($"dead-zone-{this.deadZones.childCount}");
+            d.transform.position=this.defaulCamWatcher.transform.position;
+        }
         [UnvsButton("Review")]
         public void Review()
         {
@@ -47,6 +66,7 @@ namespace unvs.game2d.scenes
                 this.vcam.Watch(defaulCamWatcher);
 
             }
+            if (this.ground == null) this.ground = this.support.AddChildComponentIfNotExist<EdgeCollider2D>("ground");
             if (this.ground != null)
             {
                 this.ground.SetMeOnLayer(Constants.Layers.GROUND_FLOOR);

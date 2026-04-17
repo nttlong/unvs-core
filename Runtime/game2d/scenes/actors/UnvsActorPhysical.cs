@@ -14,6 +14,7 @@ namespace unvs.game2d.scenes.actors
     [Serializable]
     public struct MovingInfo
     {
+       
         public bool isMoving;
         public Vector2 target;
         public float speed;
@@ -37,8 +38,10 @@ namespace unvs.game2d.scenes.actors
            
         }
     }
+    
     public partial class UnvsActorPhysical : UnvsBaseComponent
     {
+        public Transform bodyBone;
         public float ArmLen;
         public Transform ArmTop;
         public Transform ArmRoot;
@@ -55,6 +58,9 @@ namespace unvs.game2d.scenes.actors
         private Collider2D _coll;
         [SerializeField]
         public Transform[] Footers;
+        private CalculateSlopeDirectionResull _slopDirectionResult;
+        private UnvsActor _actor;
+
         private  IKManager2D ikManager
         {
             get
@@ -149,20 +155,30 @@ namespace unvs.game2d.scenes.actors
             if(dir > 1) return pos + new Vector2(-this.ArmLen, 0);
             return pos;
         }
-        private void Update()
+        private void Awake()
         {
-            if(_coll==null) _coll=GetComponent<Collider2D>();
-            if(_coll==null) _coll=GetComponent<Collider2D>();
-            var slopeDirection = _coll.CalculateSlopDirection(this.movingInfo.direction2.x);
-           
-            this.movingInfo.MoveStep(this.transform, slopeDirection);
+            if (Application.isPlaying)
+            {
+                _actor=GetComponent<UnvsActor>();
+            }
+        }
+        public virtual void FixedUpdate()
+        {
+            if (_coll == null) _coll = GetComponent<Collider2D>();
+            if (_coll == null) _coll = GetComponent<Collider2D>();
+            ref var r = ref this._slopDirectionResult;
+            _coll.CalculateSlopDirection(ref r, this.movingInfo.direction2.x);
+
+            this.movingInfo.MoveStep(this.transform, r.slopeDir);
             
         }
+        
 
     }
 #if UNITY_EDITOR
     public partial class UnvsActorPhysical : UnvsBaseComponent
     {
+        
 
         [UnvsButton("Footer collider")]
         public void EditorCreateFooterCollider ()
@@ -192,6 +208,10 @@ namespace unvs.game2d.scenes.actors
             this.socketHandFront = this.handFront.transform.CreateIfNoExist<Transform>("soket-hand-front");
 
             this.socketHandBack.SetMeOnTag(Constants.Tags.SOCKET);
+            if (this.bodyBone == null)
+            {
+                this.RaiseEditorError($"bodyBone set on {name}, {this.GetType()}");
+            }
             //this.socketHandFront.localPosition = new Vector3(0.5f, 0.5f, 0);
         }
     }

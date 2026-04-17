@@ -81,6 +81,50 @@ namespace unvs.ext
             // Lưu ý: Nếu bạn muốn Collider bao phủ toàn bộ các Object con bên trong 
             // mà không dùng Renderer, bạn phải tính toán dựa trên vị trí của các con.
         }
+
+        public static T RayCastDownHit<T>(this Collider2D coll, int layerMask)
+        {
+            RaycastHit2D[] hits = new RaycastHit2D[5];
+            int hitCount = coll.Raycast(
+                Vector2.down,           // hướng
+                hits,                   // mảng chứa kết quả
+                10f,                    // distance
+                layerMask             // LayerMask
+            );
+            if (hitCount > 0)
+            {
+                RaycastHit2D hit = hits[0];   // lấy cái gần nhất
+                return hit.collider.GetComponent<T>();
+            }
+            return default(T);
+        }
+        public static Collider2D RayCastDownHit(this Collider2D coll, int layerMask, float distance = 10f)
+        {
+            RaycastHit2D[] hits = new RaycastHit2D[5];
+            int hitCount = coll.Raycast(
+                Vector2.down,           // hướng
+                hits,                   // mảng chứa kết quả
+                10f,                    // distance
+                layerMask             // LayerMask
+            );
+            if (hitCount > 0)
+            {
+                RaycastHit2D hit = hits[0];   // lấy cái gần nhất
+                return hit.collider;
+            }
+            return null;
+        }
+        public static bool IsOnWorldGround(this Collider2D coll, float distance = 1f, string LayerName = Constants.Layers.WORLD_GROUND, params string[] extraLayers)
+        {
+            var mask = LayerMask.GetMask(LayerName);
+            if (extraLayers.Length > 0)
+            {
+                mask |= LayerMask.GetMask(extraLayers);
+            }
+            var ret = coll.RayCastDownHit(mask);
+            return ret != null;
+
+        }
 #if UNITY_EDITOR
         public static void GizmosDrawCamView(Vector3 Center, float orthographicSize, OffsetFollow cameraOffsetFolow, Color color, float thickness)
         {
@@ -116,6 +160,7 @@ namespace unvs.ext
                 Handles.DrawBezier(bottomLeft, topLeft, bottomLeft, topLeft, color, null, thickness);
             }
         }
+        
 #endif
     }
 

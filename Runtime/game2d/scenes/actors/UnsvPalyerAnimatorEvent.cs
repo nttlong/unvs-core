@@ -48,7 +48,7 @@ namespace unvs.game2d.scenes.actors
             RaycastHit2D[] hits = new RaycastHit2D[5];   // mảng kết quả (dùng 1-10 là đủ)
 
 
-           var audibleObject = BoxCollider2dExtension.RayCastDownHit< UnvsAudible>(_coll, _layerMask);
+           var audibleObject = _coll.RayCastDownHit< UnvsAudible>( _layerMask);
             if(audibleObject != null)
             {
                 AudioInfo audioInfo = audibleObject.audioInfo;
