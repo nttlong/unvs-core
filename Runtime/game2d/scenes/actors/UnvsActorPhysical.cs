@@ -1,11 +1,14 @@
+using Codice.CM.Triggers;
 using Cysharp.Threading.Tasks;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.U2D.IK;
 using unvs.ext;
+using unvs.ext.physical2d;
 using unvs.game2d.objects;
 using  unvs.shares;
 
@@ -49,6 +52,7 @@ namespace unvs.game2d.scenes.actors
         public Transform handFront;
         public Transform socketHandBack;
         public Transform socketHandFront;
+        public Transform headBone;
         private UnvsActorPhysicalSolverRuntime _socketHandBackController;
         private UnvsActorPhysicalSolverRuntime _socketHandFrontController;
         private IKManager2D _ikManager;
@@ -99,6 +103,9 @@ namespace unvs.game2d.scenes.actors
                return _socketHandFrontController;
             }
         }
+
+        public float NormalHeight { get; private set; }
+
         public async UniTask MoveSocketHandBackToAsync(Vector2 pos, float duration = 1f, CancellationToken token = default)
         {
             // 1. Lấy tham chiếu các thành phần
@@ -155,11 +162,33 @@ namespace unvs.game2d.scenes.actors
             if(dir > 1) return pos + new Vector2(-this.ArmLen, 0);
             return pos;
         }
+        public virtual float CalculateHeight()
+        {
+            if (this.headBone != null)
+            {
+                if (this.Footers != null && this.Footers.Length > 0)
+                {
+                    var headColl = this.headBone.GetComponent<Collider2D>();
+                    var footerColl = this.Footers.FirstOrDefault().GetComponent<Collider2D>();
+                    if (headColl != null && footerColl != null)
+                    {
+                        return headColl.bounds.max.y - footerColl.bounds.min.y;
+                    }
+                }
+            }
+            return 0;
+        }
+        public virtual void IninitStatus()
+        {
+            
+            this.NormalHeight = CalculateHeight();
+        }
         private void Awake()
         {
             if (Application.isPlaying)
             {
                 _actor=GetComponent<UnvsActor>();
+                IninitStatus();
             }
         }
         public virtual void FixedUpdate()
@@ -172,16 +201,29 @@ namespace unvs.game2d.scenes.actors
             this.movingInfo.MoveStep(this.transform, r.slopeDir);
             
         }
-        
 
+        public bool IsHitUpFloor()
+        {
+            if (this.headBone != null)
+            {
+                var coll=this.headBone.GetComponent<Collider2D>();
+                if (coll != null)
+                {
+                    var distance= this.NormalHeight- this.CalculateHeight();
+                   return Physical2TransformExt.RayCastUp(coll, distance, Constants.Layers.WORLD_GROUND)!=null;
+                }
+
+            }
+            return false;
+        }
     }
 #if UNITY_EDITOR
     public partial class UnvsActorPhysical : UnvsBaseComponent
     {
         
 
-        [UnvsButton("Footer collider")]
-        public void EditorCreateFooterCollider ()
+        [UnvsButton("Create Hit box collider")]
+        public void EditorCreateHitBoxCollider ()
         {
             foreach(var footer in Footers)
             {
@@ -189,6 +231,15 @@ namespace unvs.game2d.scenes.actors
                 footer.SetMeOnTag(Constants.Tags.PLAYER_FOOTER);
                 footer.gameObject.SetMeOnLayer(Constants.Layers.PLAYER_FOOTER);
 
+            }
+            if (this.headBone != null)
+            {
+                var c = headBone.AddComponentIfNotExist<CapsuleCollider2D>();
+                headBone.SetMeOnTag(Constants.Tags.PLAYER_HEADER);
+                headBone.gameObject.SetMeOnLayer(Constants.Layers.PLAYER_HEADER);
+            } else
+            {
+                Debug.LogWarning($"headBone in {this.GetType()}.{name} is null");
             }
         }
         [UnvsButton("Validate")]

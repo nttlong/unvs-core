@@ -1,0 +1,69 @@
+﻿using System;
+using UnityEngine;
+using unvs.shares;
+
+namespace unvs.ext.physical2d
+{
+    public static class Physical2TransformExt
+    {
+        public static T RayCastDownHit<T>(this Collider2D coll, int layerMask)
+        {
+            RaycastHit2D[] hits = new RaycastHit2D[5];
+            int hitCount = coll.Raycast(
+                Vector2.down,           // hướng
+                hits,                   // mảng chứa kết quả
+                10f,                    // distance
+                layerMask             // LayerMask
+            );
+            if (hitCount > 0)
+            {
+                RaycastHit2D hit = hits[0];   // lấy cái gần nhất
+                return hit.collider.GetComponent<T>();
+            }
+            return default(T);
+        }
+        public static Collider2D RayCastDownHit(this Collider2D coll, int layerMask, float distance = 10f)
+        {
+            RaycastHit2D[] hits = new RaycastHit2D[5];
+            int hitCount = coll.Raycast(
+                Vector2.down,           // hướng
+                hits,                   // mảng chứa kết quả
+                10f,                    // distance
+                layerMask             // LayerMask
+            );
+            if (hitCount > 0)
+            {
+                RaycastHit2D hit = hits[0];   // lấy cái gần nhất
+                return hit.collider;
+            }
+            return null;
+        }
+        public static bool IsOnWorldGround(this Collider2D coll, float distance = 1f, string LayerName = Constants.Layers.WORLD_GROUND, params string[] extraLayers)
+        {
+            var mask = LayerMask.GetMask(LayerName);
+            if (extraLayers.Length > 0)
+            {
+                mask |= LayerMask.GetMask(extraLayers);
+            }
+            var ret = coll.RayCastDownHit(mask);
+            return ret != null;
+
+        }
+        public static void RaycastUp(Collider2D coll,float distance=1f, string wORLD_GROUND)
+        {
+            RaycastHit2D[] hits = new RaycastHit2D[5];
+            int hitCount = coll.Raycast(
+                Vector2.down,           // hướng
+                hits,                   // mảng chứa kết quả
+                10f,                    // distance
+                layerMask             // LayerMask
+            );
+            if (hitCount > 0)
+            {
+                RaycastHit2D hit = hits[0];   // lấy cái gần nhất
+                return hit.collider;
+            }
+            return null;
+        }
+    }
+}

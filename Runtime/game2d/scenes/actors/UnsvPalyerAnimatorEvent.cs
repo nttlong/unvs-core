@@ -4,6 +4,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using unvs.ext;
+using unvs.ext.physical2d;
 using unvs.shares;
 using static Unity.Cinemachine.IInputAxisOwner.AxisDescriptor;
 

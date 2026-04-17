@@ -23,6 +23,8 @@ namespace unvs.shares
             public const string PLAYER_FOOTER = "PLAYER-FOOTER";
 
             public const string ACTOR = "ACTOR";
+
+            public const string PLAYER_HEADER = "PLAYER-HEADER";
         }
 
         public class CinemachineDefaut
@@ -63,6 +65,8 @@ namespace unvs.shares
             public const string WORLD_GROUND = "WORLD-GROUND";
 
             public const string PLAYER_FOOTER = "PLAYER-FOOTER";
+
+            public const string PLAYER_HEADER = "PLAYER-HEADER";
         }
         public class Scenes
         {
