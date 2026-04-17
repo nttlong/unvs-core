@@ -67,6 +67,8 @@ namespace unvs.shares
             public const string PLAYER_FOOTER = "PLAYER-FOOTER";
 
             public const string PLAYER_HEADER = "PLAYER-HEADER";
+
+            public static string WORLD_LIQUID = "WORLD-LIQUID";
         }
         public class Scenes
         {

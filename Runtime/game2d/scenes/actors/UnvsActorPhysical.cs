@@ -1,6 +1,6 @@
-using Codice.CM.Triggers;
 using Cysharp.Threading.Tasks;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,6 +44,8 @@ namespace unvs.game2d.scenes.actors
     
     public partial class UnvsActorPhysical : UnvsBaseComponent
     {
+        [SerializeField]
+        public Collider2D[] HitBoxesCollider;
         public Transform bodyBone;
         public float ArmLen;
         public Transform ArmTop;
@@ -202,7 +204,7 @@ namespace unvs.game2d.scenes.actors
             
         }
 
-        public bool IsHitUpFloor()
+        public virtual bool IsHitUpFloor(string LayerName = Constants.Layers.WORLD_GROUND)
         {
             if (this.headBone != null)
             {
@@ -210,37 +212,77 @@ namespace unvs.game2d.scenes.actors
                 if (coll != null)
                 {
                     var distance= this.NormalHeight- this.CalculateHeight();
-                   return Physical2TransformExt.RayCastUp(coll, distance, Constants.Layers.WORLD_GROUND)!=null;
+                   return Physical2TransformExt.RayCastUp(coll, distance, LayerName) !=null;
                 }
 
             }
             return false;
         }
+        public virtual bool IsHitDownFloor(string LayerName= Constants.Layers.WORLD_GROUND)
+        {
+            if (this.Footers != null && this.Footers.Length>0)
+            {
+                var coll = this.Footers[0].GetComponent<Collider2D>();
+                if (coll != null)
+                {
+                 
+                    return Physical2TransformExt.RayCastDown(coll, this.NormalHeight, LayerName) != null;
+                }
+
+            }
+            return false;
+        }
+        public virtual string GetHitLayerDown( string LayerName = Constants.Layers.WORLD_GROUND,params string[]extraLayers)
+        {
+            if (this.Footers != null && this.Footers.Length > 0)
+            {
+                var coll = this.Footers[0].GetComponent<Collider2D>();
+                if (coll != null)
+                {
+
+                    return coll.GetHitLayer(Vector2.down, this.NormalHeight, LayerName, extraLayers) ;
+                }
+
+            }
+            return string.Empty;
+        }
+        // Trong class UnvsActorPhysical
+        public Transform composeColl;
     }
 #if UNITY_EDITOR
     public partial class UnvsActorPhysical : UnvsBaseComponent
     {
-        
+       
 
         [UnvsButton("Create Hit box collider")]
         public void EditorCreateHitBoxCollider ()
         {
-            foreach(var footer in Footers)
+            composeColl = this.AddChildComponentIfNotExist<Transform>("Composite-collider");
+            var cc = composeColl.AddComponentIfNotExist<CompositeCollider2D>();
+            cc.geometryType = CompositeCollider2D.GeometryType.Polygons;
+            var lst=new List<Collider2D> ();
+            foreach (var footer in Footers)
             {
-                var c = footer.AddComponentIfNotExist<CapsuleCollider2D>();
+                var c = footer.AddComponentIfNotExist<PolygonCollider2D>();
                 footer.SetMeOnTag(Constants.Tags.PLAYER_FOOTER);
                 footer.gameObject.SetMeOnLayer(Constants.Layers.PLAYER_FOOTER);
-
+                
+                lst.Add(c);
+                c.compositeOperation=Collider2D.CompositeOperation.Merge;
             }
             if (this.headBone != null)
             {
-                var c = headBone.AddComponentIfNotExist<CapsuleCollider2D>();
+                var c = headBone.AddComponentIfNotExist<PolygonCollider2D>();
                 headBone.SetMeOnTag(Constants.Tags.PLAYER_HEADER);
                 headBone.gameObject.SetMeOnLayer(Constants.Layers.PLAYER_HEADER);
+                c.compositeOperation = Collider2D.CompositeOperation.Merge;
+                lst.Add(c);
+
             } else
             {
                 Debug.LogWarning($"headBone in {this.GetType()}.{name} is null");
             }
+            HitBoxesCollider= lst.ToArray();
         }
         [UnvsButton("Validate")]
         public void EditorVaildate()

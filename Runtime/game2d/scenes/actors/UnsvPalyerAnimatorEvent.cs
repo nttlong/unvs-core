@@ -35,6 +35,8 @@ namespace unvs.game2d.scenes.actors
         {
             if (Application.isPlaying)
             {
+                _polyColl = GetComponent<PolygonCollider2D>();
+                _spriteRenderer = GetComponent<SpriteRenderer>();
                 _sates = this.GetComponentInParent<UnvsAnimStates>();
                 _anim = GetComponent<Animator>();
                 _audoiSource = GetComponent<AudioSource>();
@@ -62,7 +64,10 @@ namespace unvs.game2d.scenes.actors
             
             playActorSound();
         }
+        private PolygonCollider2D _polyColl;
+        private SpriteRenderer _spriteRenderer;
 
+       
         private void playActorSound()
         {
             foreach (var item in _clips)
@@ -92,5 +97,6 @@ namespace unvs.game2d.scenes.actors
 
             }
         }
+       
     }
 }

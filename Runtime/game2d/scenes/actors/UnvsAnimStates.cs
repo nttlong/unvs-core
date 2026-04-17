@@ -26,6 +26,7 @@ namespace unvs.game2d.scenes.actors
 
         public void SwitchAnimController(string name = "")
         {
+            if(this.IsDestroyed()||this.gameObject.IsDestroyed()) return;
             // Cache the animator component to avoid repeated GetComponent calls
             if (_animator == null)
             {

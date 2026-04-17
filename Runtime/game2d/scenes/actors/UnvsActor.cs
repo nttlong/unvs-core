@@ -27,9 +27,11 @@ namespace unvs.game2d.scenes.actors
  
     [RequireComponent(typeof(UnvsActorPhysical))]
     [RequireComponent(typeof(UnsvPlayerDoTweenAnim))]
+    [RequireComponent(typeof(UnvsActorSwimmable))]
    
     public partial class UnvsActor : UnvsBaseComponent
     {
+        
         public CancellationTokenSource cts => _cls;
         [Header("Speed")]
         public float WalkSpeed = 8f;
@@ -124,6 +126,8 @@ namespace unvs.game2d.scenes.actors
 #if UNITY_EDITOR
     public partial class UnvsActor : UnvsBaseComponent
     {
+       
+
         
 
         [UnvsButton]

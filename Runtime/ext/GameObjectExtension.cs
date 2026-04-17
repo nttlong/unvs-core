@@ -158,8 +158,8 @@ namespace unvs.ext
         {
             if (EventSystem.current == null)
             {
-                Debug.LogError("Open scene then add SystemEvent");
-
+                Debug.LogWarning("Open scene then add SystemEvent");
+                return;
             }
             EventSystem.current.SetSelectedGameObject(null);
             var firstElement = gameObject.GetComponentInChildren<T>();

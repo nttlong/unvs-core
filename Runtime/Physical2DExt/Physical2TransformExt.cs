@@ -9,6 +9,24 @@ namespace unvs.ext.physical2d
 {
     public static class Physical2TransformExt
     {
+        public static string GetHitLayer(this Collider2D coll,Vector2 direction, float distance=1f, string LayerName = Constants.Layers.WORLD_GROUND, params string[] extraLayers)
+        {
+            var mask = LayerMask.GetMask(LayerName);
+            if (extraLayers.Length > 0)
+            {
+                mask |= LayerMask.GetMask(extraLayers);
+            }
+
+            // Sử dụng Center của bounds để Raycast xuống
+            RaycastHit2D hit = Physics2D.Raycast(coll.bounds.center, Vector2.down, distance, mask);
+
+            if (hit.collider != null)
+            {
+                return LayerMask.LayerToName( hit.collider.gameObject.layer);
+            }
+
+            return string.Empty; // Không chạm gì cả
+        }
         public static T RayCastDownHit<T>(this Collider2D coll, int layerMask, float distance = 10f)
         {
             RaycastHit2D[] hits = new RaycastHit2D[5];
@@ -73,7 +91,27 @@ namespace unvs.ext.physical2d
             }
             return null;
         }
-
+        public static Collider2D RayCastDown(Collider2D coll, float distance = 1f, string LayerName = Constants.Layers.WORLD_GROUND, params string[] extraLayers)
+        {
+            var mask = LayerMask.GetMask(LayerName);
+            if (extraLayers.Length > 0)
+            {
+                mask |= LayerMask.GetMask(extraLayers);
+            }
+            RaycastHit2D[] hits = new RaycastHit2D[5];
+            int hitCount = coll.Raycast(
+                Vector2.down,           // hướng
+                hits,                   // mảng chứa kết quả
+                distance,                    // distance
+                mask             // LayerMask
+            );
+            if (hitCount > 0)
+            {
+                RaycastHit2D hit = hits[0];   // lấy cái gần nhất
+                return hit.collider;
+            }
+            return null;
+        }
         public static async UniTask MoveUpByHeightAsync(this Transform transform, float height, float duration, CancellationToken tk)
 
         {

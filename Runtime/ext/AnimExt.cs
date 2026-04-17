@@ -239,6 +239,8 @@ namespace unvs.ext
             Action onStart = null,
             CancellationToken ct = default)
                 {
+            if(animator==null || animator.IsDestroyed() || animator.gameObject.IsDestroyed()) return;
+
             animator.ResetAllOverideLayers();
             animator.SetLayerWeight(layer, 1f);
 
@@ -249,6 +251,7 @@ namespace unvs.ext
 
             await UniTask.WaitUntil(() =>
             {
+                if (animator == null || animator.IsDestroyed() || animator.gameObject.IsDestroyed()) return true;
                 var info = animator.GetCurrentAnimatorStateInfo(layer);
                 return info.IsName(stateName) && info.normalizedTime >= 1f;
             }, cancellationToken: ct);
