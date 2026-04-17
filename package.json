@@ -11,8 +11,7 @@
     "com.unity.cinemachine": "3.1.6",
     "com.unity.localization": "1.5.11",
     "com.unity.textmeshpro": "3.0.6",
-    "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
-    "com.unity.scripting.python": "7.0.1"
+    "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask"
   },
   "scopedRegistries": [
     {
