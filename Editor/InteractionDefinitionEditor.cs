@@ -2,8 +2,12 @@
 
 
 
+using System;
+using System.Linq;
 using UnityEditor;
+using UnityEngine;
 using unvs.actions;
+using unvs.actor.skills;
 
 
 [CustomEditor(typeof(InteractionDefinition))]
@@ -25,7 +29,10 @@ public class InteractionDefinitionEditor : Editor
         EditorExtension.OnInspectorGUI(this,this.localdata);
         
     }
-    
-    
+
+
 }
+
+
+
 #endif

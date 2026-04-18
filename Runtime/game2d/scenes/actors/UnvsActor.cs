@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 using UnityEngine.U2D.Animation;
+using unvs.actor.skills;
 using unvs.ext;
 using unvs.shares;
 
@@ -33,6 +34,8 @@ namespace unvs.game2d.scenes.actors
     {
         
         public CancellationTokenSource cts => _cls;
+       
+        public UnvsActorSkills Skills;
         [Header("Speed")]
         public float WalkSpeed = 8f;
         public float SprintSpeed = 16f;
