@@ -19,6 +19,8 @@ namespace unvs.ext
 
     public static class TransformExtension
     {
+       
+
         public static void MoveContinuous(this Transform transform, Vector2 direction, float speed)
         {
             if (transform == null || direction == Vector2.zero) return;
@@ -187,6 +189,7 @@ namespace unvs.ext
         {
             public Vector2 Start;
             public Vector2 End;
+            public Quaternion rotation;
 
             public float Length
             {
@@ -195,24 +198,44 @@ namespace unvs.ext
                     return Vector2.Distance(Start, End);
                 }
             }
-            public Vector2[] CreateRect(float width = 1f, bool centered = true)
+            public Vector2[] CreateRect(Transform tr, float width = 1f)
             {
+
+                var rect = CreateRect(width);
+              
+                var t = new List<Vector2>();
+                foreach (var v in rect)
+                {
+                    var tt = (Vector2)(Quaternion.Inverse(tr.rotation) * (v - Start));
+                    t.Add(tt);
+                }
+                return t.ToArray();
+            }
+            public Vector2[] CreateRect(float width = 1f)
+            {
+                // 1. Tính hướng của đoạn thẳng (Đường màu đỏ)
                 Vector2 dir = (End - Start).normalized;
+
+                // 2. Tính vector vuông góc để tạo độ rộng (Width)
+                // Trong 2D, vuông góc của (x, y) là (-y, x)
                 Vector2 perp = new Vector2(-dir.y, dir.x);
 
+                // 3. Độ rộng chia đôi sang mỗi bên
                 float halfW = width * 0.5f;
                 Vector2 offset = perp * halfW;
 
-                Vector2 start = centered ? Start : Start - dir * (width * 0.5f); // nếu không centered thì dịch
-
+                // 4. Tính toán 4 đỉnh dựa trên Start và End (Đúng như hình vẽ)
+                // Điểm 1: Dưới Start
+                // Điểm 2: Dưới End
+                // Điểm 3: Trên End
+                // Điểm 4: Trên Start
                 return new Vector2[4]
                 {
-                    start - offset,
-                    End   - offset,
-                    End   + offset,
-                    start + offset
-                };
-
+                    Start - offset, // Điểm góc dưới bên trái (Start)
+                    End   - offset, // Điểm góc dưới bên phải (End)
+                    End   + offset, // Điểm góc trên bên phải (End)
+                    Start + offset  // Điểm góc trên bên trái (Start)
+                            };
             }
 
             public Vector2 Center()
@@ -220,11 +243,16 @@ namespace unvs.ext
                 return (this.End + this.Start) / 2;
             }
         }
+        public static Vector2[] Collider2dGeneratePoints(this Transform transform,float width=1f)
+        {
+            var seg = transform.GetSegment();
+            return seg.CreateRect(transform, width);
+        }
         public static Segment GetSegment(this Transform transform)
         {
             // Điểm Start luôn là vị trí của Transform (Khớp nối/Joint)
             Vector2 start = transform.position;
-
+            
             // Trong Unity 2D Animation, xương thường dài theo trục Up (Y) hoặc Right (X)
             // Để chính xác nhất với hình ảnh bạn gửi, ta sẽ dùng Vector hướng từ vị trí hiện tại
             // đến vị trí của con đầu tiên (nếu có), đó chính là chiều dài thực của xương.
@@ -240,9 +268,13 @@ namespace unvs.ext
                 // Nếu không có con (xương cuối cùng), ta mặc định theo hướng 'Right' 
                 // nhưng nhân với Scale để bù đắp
                 end = start + (Vector2)transform.right * transform.lossyScale.x;
+                
             }
 
-            return new Segment { Start = start, End = end };
+            var ret= new Segment { Start = start, End = end };
+            
+            ret.rotation = transform.rotation;
+            return ret;
         }
         public static Button AddButtonIfNotExist(this Transform parent, string name, string label)
         {

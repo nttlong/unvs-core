@@ -46,7 +46,7 @@ namespace unvs.game2d.scenes.actors
         private Vector2 target;
         private Vector2 direction;
         
-        public Collider2D coll;
+        public CompositeCollider2D coll;
         public Rigidbody2D body;
         public Transform camWatcher;
         public BoxCollider2D scanerBound;
@@ -112,6 +112,7 @@ namespace unvs.game2d.scenes.actors
         {
             if (Application.isPlaying)
             {
+                this.coll = GetComponentInChildren<CompositeCollider2D>();
                 player = GetComponent<UnvsPlayer>();
                 physical= GetComponent<UnvsActorPhysical>();
                
@@ -120,7 +121,11 @@ namespace unvs.game2d.scenes.actors
         }
         private void Start()
         {
-            if (Application.isPlaying) motions.BaseMotion("idle");
+            if (Application.isPlaying)
+            {
+                
+                motions.BaseMotion("idle");
+            }
         }
     }
 #if UNITY_EDITOR
@@ -133,15 +138,7 @@ namespace unvs.game2d.scenes.actors
         [UnvsButton]
         public void FixLayout()
         {
-            if (GetComponent<CapsuleCollider2D>() == null)
-                if (this.CheckComponentIfNotExistCreate<CapsuleCollider2D>(out var _coll))
-                {
-
-                    _coll.size = new Vector2(8, 20);
-                    _coll.offset = new Vector2(0, 10);
-                    this.coll = _coll;
-                    this.coll.isTrigger = true;
-                }
+            this.coll = GetComponentInChildren<CompositeCollider2D>();
             this.camWatcher.position = new Vector3(this.coll.bounds.center.x, this.coll.bounds.max.y, -10);
             var coll = this.camWatcher.AddComponentIfNotExist<BoxCollider2D>();
             coll.isTrigger = true;
@@ -176,14 +173,14 @@ namespace unvs.game2d.scenes.actors
         [UnvsButton]
         public void Generate()
         {
-            if (this.CheckComponentIfNotExistCreate<CapsuleCollider2D>(out var _coll))
-            {
+            //if (this.CheckComponentIfNotExistCreate<CapsuleCollider2D>(out var _coll))
+            //{
 
-                _coll.size = new Vector2(8, 20);
-                _coll.offset = new Vector2(0, 10);
-                this.coll = _coll;
-                this.coll.isTrigger = true;
-            }
+            //    _coll.size = new Vector2(8, 20);
+            //    _coll.offset = new Vector2(0, 10);
+            //    this.coll = _coll;
+            //    this.coll.isTrigger = true;
+            //}
 
 
             body = this.AddComponentIfNotExist<Rigidbody2D>();

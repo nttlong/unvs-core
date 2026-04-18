@@ -1,3 +1,4 @@
+using Codice.CM.Triggers;
 using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
@@ -248,6 +249,7 @@ namespace unvs.game2d.scenes.actors
         }
         // Trong class UnvsActorPhysical
         public Transform composeColl;
+        
     }
 #if UNITY_EDITOR
     public partial class UnvsActorPhysical : UnvsBaseComponent
@@ -257,8 +259,8 @@ namespace unvs.game2d.scenes.actors
         [UnvsButton("Create Hit box collider")]
         public void EditorCreateHitBoxCollider ()
         {
-            composeColl = this.AddChildComponentIfNotExist<Transform>("Composite-collider");
-            var cc = composeColl.AddComponentIfNotExist<CompositeCollider2D>();
+           
+            var cc = this.AddComponentIfNotExist<CompositeCollider2D>();
             cc.geometryType = CompositeCollider2D.GeometryType.Polygons;
             var lst=new List<Collider2D> ();
             foreach (var footer in Footers)
@@ -268,6 +270,8 @@ namespace unvs.game2d.scenes.actors
                 footer.gameObject.SetMeOnLayer(Constants.Layers.PLAYER_FOOTER);
                 
                 lst.Add(c);
+                
+                c.SetPath(0, footer.Collider2dGeneratePoints());
                 c.compositeOperation=Collider2D.CompositeOperation.Merge;
             }
             if (this.headBone != null)
@@ -276,6 +280,8 @@ namespace unvs.game2d.scenes.actors
                 headBone.SetMeOnTag(Constants.Tags.PLAYER_HEADER);
                 headBone.gameObject.SetMeOnLayer(Constants.Layers.PLAYER_HEADER);
                 c.compositeOperation = Collider2D.CompositeOperation.Merge;
+               
+                c.SetPath(0, headBone.Collider2dGeneratePoints());
                 lst.Add(c);
 
             } else
