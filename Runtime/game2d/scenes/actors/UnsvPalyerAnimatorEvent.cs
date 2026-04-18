@@ -21,10 +21,14 @@ namespace unvs.game2d.scenes.actors
         public string blendName;
         public float value;
     }
+    /// <summary>
+    /// This script make a sound when actor hit the ground
+    /// </summary>
     [RequireComponent(typeof(AudioSource))]
+    
     public class UnsvPalyerAnimatorEvent : MonoBehaviour
     {
-        UnvsAnimStates _sates;
+       
         private Animator _anim;
         private AudioSource _audoiSource;
         private List<MotionAudio> _clips;
@@ -37,10 +41,10 @@ namespace unvs.game2d.scenes.actors
             {
                 _polyColl = GetComponent<PolygonCollider2D>();
                 _spriteRenderer = GetComponent<SpriteRenderer>();
-                _sates = this.GetComponentInParent<UnvsAnimStates>();
+             
                 _anim = GetComponent<Animator>();
                 _audoiSource = GetComponent<AudioSource>();
-                _clips = _sates.motionAudio.Where(p => p.audio.Clip != null).ToList();
+             
                 _coll = this.GetComponentInParent<Collider2D>();
                 _layerMask = LayerMask.GetMask(Constants.Layers.TERRANT, Constants.Layers.GROUND_FLOOR);
             }
@@ -70,6 +74,7 @@ namespace unvs.game2d.scenes.actors
        
         private void playActorSound()
         {
+            if(_clips==null) return;
             foreach (var item in _clips)
             {
                 if (_anim.GetLayerWeight(item.LayerIndex) > 0)

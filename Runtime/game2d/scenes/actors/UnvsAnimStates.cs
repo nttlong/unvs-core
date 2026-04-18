@@ -26,7 +26,7 @@ namespace unvs.game2d.scenes.actors
 
         public void SwitchAnimController(string name = "")
         {
-            if(this.IsDestroyed()||this.gameObject.IsDestroyed()) return;
+            if (this.IsDestroyed() || this.gameObject.IsDestroyed()) return;
             // Cache the animator component to avoid repeated GetComponent calls
             if (_animator == null)
             {
@@ -72,7 +72,7 @@ namespace unvs.game2d.scenes.actors
         public AnimStateInfo[] animStates;
         private Collider2D coll;
         private float _direction;
-        
+
 
         public float direction
         {
@@ -128,7 +128,7 @@ namespace unvs.game2d.scenes.actors
                     overideState = $"{name}-hangging-item";
                 }
             }
-            this.animStates.PlayBaseLayer(name, overideState,this.ovrideAnimators.FirstOrDefault(p=>p.name.Equals(this.animControllerName,StringComparison.OrdinalIgnoreCase)));
+            this.animStates.PlayBaseLayer(name, overideState, this.ovrideAnimators.FirstOrDefault(p => p.name.Equals(this.animControllerName, StringComparison.OrdinalIgnoreCase)));
 
         }
         public void Motion(string name)
@@ -182,7 +182,7 @@ namespace unvs.game2d.scenes.actors
             this.motionObject = this.GetComponentInChildrenByName<Transform>("motions-object");
         }
         private Animator editorAnimController;
-       
+
 
         internal void EditotPlay(AnimStateInfo animStateInfo)
         {
@@ -216,7 +216,8 @@ namespace unvs.game2d.scenes.actors
             SceneView.RepaintAll();
         }
 
-        
+
+
 
 
 

@@ -15,33 +15,6 @@ using  unvs.shares;
 
 namespace unvs.game2d.scenes.actors
 {
-    [Serializable]
-    public struct MovingInfo
-    {
-       
-        public bool isMoving;
-        public Vector2 target;
-        public float speed;
-        public Vector2 direction2;
-
-        public float JumpingHeight;
-
-        public void MoveStep(Transform transform,Vector2 slopeDirection)
-        {
-            if (Application.isPlaying)
-            {
-                if (isMoving)
-                {
-                    if (slopeDirection == Vector2.zero)
-                        transform.MoveStep(this.target, speed, out var dir, direction2.x);
-                    else
-                        //transform.MoveStep(this.target, speed, out var dir, direction2.x);
-                        transform.position += (Vector3)slopeDirection * speed * Time.deltaTime;
-                }
-            }
-           
-        }
-    }
     
     public partial class UnvsActorPhysical : UnvsBaseComponent
     {
@@ -59,8 +32,8 @@ namespace unvs.game2d.scenes.actors
         private UnvsActorPhysicalSolverRuntime _socketHandBackController;
         private UnvsActorPhysicalSolverRuntime _socketHandFrontController;
         private IKManager2D _ikManager;
-        [SerializeField]
-        public MovingInfo movingInfo;
+        //[SerializeField]
+        //public MovingInfo movingInfo;
         internal UnvsPickableObject currentHoldingItem;
         private Collider2D _coll;
         [SerializeField]
@@ -194,61 +167,61 @@ namespace unvs.game2d.scenes.actors
                 IninitStatus();
             }
         }
-        public virtual void FixedUpdate()
-        {
-            if (_coll == null) _coll = GetComponent<Collider2D>();
-            if (_coll == null) _coll = GetComponent<Collider2D>();
-            ref var r = ref this._slopDirectionResult;
-            _coll.CalculateSlopDirection(ref r, this.movingInfo.direction2.x);
+        //public virtual void FixedUpdate()
+        //{
+        //    if (_coll == null) _coll = GetComponent<Collider2D>();
+          
+        //    ref var r = ref this._slopDirectionResult;
+        //    _coll.CalculateSlopDirection(ref r, this.movingInfo.direction2.x);
 
-            this.movingInfo.MoveStep(this.transform, r.slopeDir);
+        //    this.movingInfo.MoveStep(this.transform, r.slopeDir);
             
-        }
+        //}
 
-        public virtual bool IsHitUpFloor(string LayerName = Constants.Layers.WORLD_GROUND)
-        {
-            if (this.headBone != null)
-            {
-                var coll=this.headBone.GetComponent<Collider2D>();
-                if (coll != null)
-                {
-                    var distance= this.NormalHeight- this.CalculateHeight();
-                   return Physical2TransformExt.RayCastUp(coll, distance, LayerName) !=null;
-                }
+        //public virtual bool IsHitUpFloor(string LayerName = Constants.Layers.WORLD_GROUND)
+        //{
+        //    if (this.headBone != null)
+        //    {
+        //        var coll=this.headBone.GetComponent<Collider2D>();
+        //        if (coll != null)
+        //        {
+        //            var distance= this.NormalHeight- this.CalculateHeight();
+        //           return Physical2TransformExt.RayCastUp(coll, distance, LayerName) !=null;
+        //        }
 
-            }
-            return false;
-        }
-        public virtual bool IsHitDownFloor(string LayerName= Constants.Layers.WORLD_GROUND)
-        {
-            if (this.Footers != null && this.Footers.Length>0)
-            {
-                var coll = this.Footers[0].GetComponent<Collider2D>();
-                if (coll != null)
-                {
+        //    }
+        //    return false;
+        //}
+        //public virtual bool IsHitDownFloor(string LayerName= Constants.Layers.WORLD_GROUND)
+        //{
+        //    if (this.Footers != null && this.Footers.Length>0)
+        //    {
+        //        var coll = this.Footers[0].GetComponent<Collider2D>();
+        //        if (coll != null)
+        //        {
                  
-                    return Physical2TransformExt.RayCastDown(coll, this.NormalHeight, LayerName) != null;
-                }
+        //            return Physical2TransformExt.RayCastDown(coll, this.NormalHeight, LayerName) != null;
+        //        }
 
-            }
-            return false;
-        }
-        public virtual string GetHitLayerDown( string LayerName = Constants.Layers.WORLD_GROUND,params string[]extraLayers)
-        {
-            if (this.Footers != null && this.Footers.Length > 0)
-            {
-                var coll = this.Footers[0].GetComponent<Collider2D>();
-                if (coll != null)
-                {
+        //    }
+        //    return false;
+        //}
+        //public virtual string GetHitLayerDown( string LayerName = Constants.Layers.WORLD_GROUND,params string[]extraLayers)
+        //{
+        //    if (this.Footers != null && this.Footers.Length > 0)
+        //    {
+        //        var coll = this.Footers[0].GetComponent<Collider2D>();
+        //        if (coll != null)
+        //        {
 
-                    return coll.GetHitLayer(Vector2.down, this.NormalHeight, LayerName, extraLayers) ;
-                }
+        //            return coll.GetHitLayer(Vector2.down, this.NormalHeight, LayerName, extraLayers) ;
+        //        }
 
-            }
-            return string.Empty;
-        }
-        // Trong class UnvsActorPhysical
-        public Transform composeColl;
+        //    }
+        //    return string.Empty;
+        //}
+        //// Trong class UnvsActorPhysical
+        //public Transform composeColl;
         
     }
 #if UNITY_EDITOR

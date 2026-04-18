@@ -69,8 +69,7 @@ namespace unvs.game2d.scenes
         public UnvsBackgound background;
         private Transform pickableItems;
         public PolygonCollider2D groundThickness;
-     
-
+       
         public bool IsDestroying { get; private set; }
         
 
@@ -81,6 +80,7 @@ namespace unvs.game2d.scenes
         }
         public override void InitRuntime()
         {
+           
             if (cam != null)
             {
                 cam.enabled = false;

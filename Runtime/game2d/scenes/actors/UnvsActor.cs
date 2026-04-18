@@ -20,22 +20,26 @@ using Unvs.Core.Game2D.Scenes.Actors;
 namespace unvs.game2d.scenes.actors
 {
     [RequireComponent(typeof(IKBoneMap))]
-    [RequireComponent(typeof(UnvsAnimStates))]
-    [RequireComponent(typeof(UnvsActorSpeaker))]
+
+
     [RequireComponent(typeof(UniqueObject))]
-    [RequireComponent(typeof(UnvsPlayer))]
-    [RequireComponent (typeof(AudioSource))]
- 
+    
+    [RequireComponent(typeof(AudioSource))]
+
     [RequireComponent(typeof(UnvsActorPhysical))]
-    [RequireComponent(typeof(UnsvPlayerDoTweenAnim))]
-    [RequireComponent(typeof(UnvsActorSwimmable))]
-   
+
+
+
     public partial class UnvsActor : UnvsBaseComponent
     {
+        public UnvsActorSkills Skills;
+        public void SayText(string msg) => Skills.Get<unvs.actor.skills.ActorSpeaker>()?.SayText(msg);
+        public void SayOff() => UnvsActirDialogue.Instance.Hide();
         
         public CancellationTokenSource cts => _cls;
-       
-        public UnvsActorSkills Skills;
+
+        public ActionBaseSkill CurrentSkill { get; private set; }
+
         [Header("Speed")]
         public float WalkSpeed = 8f;
         public float SprintSpeed = 16f;
@@ -57,8 +61,36 @@ namespace unvs.game2d.scenes.actors
         public Animator animator;
         public UnvsAnimStates motions;
         private CancellationTokenSource _cls;
-        
+        private Vector3 oririnalScale=Vector3.negativeInfinity;
 
+        public void DirectionBy(float dir)
+        {
+            if (oririnalScale.Equals(Vector3.negativeInfinity))
+            {
+                oririnalScale = transform.localScale.CopyToNew();
+            }
+            if (dir > 0)
+            {
+                transform.localScale=oririnalScale.CopyToNew();
+
+            } else
+            {
+                transform.localScale = new Vector3(-oririnalScale.x, transform.localScale.y, transform.localScale.z);
+            }
+
+        }
+        public virtual void OnEnable()
+        {
+            if (Skills != null)
+            {
+
+                Skills = Instantiate(Skills);
+                Skills.Initialize(this); 
+                if(Skills)
+                this.CurrentSkill=Skills.Get<unvs.actor.skills.ActorDefaultSkill>();
+               
+            }
+        }
         public virtual CancellationTokenSource RefreshToken()
         {
             _cls = _cls.Refresh();
@@ -70,15 +102,8 @@ namespace unvs.game2d.scenes.actors
 
 
         }
-        public void SayText(string Content)
-        {
-            var pos = new Vector2(coll.bounds.center.x, coll.bounds.max.y + 2);
-            UnvsActirDialogue.Instance.Show(pos, Content);
-        }
-        public void SayOff()
-        {
-            UnvsActirDialogue.Instance.Hide();
-        }
+       
+        
         public async UniTask MovtoTargetAsync(Vector2 pos, CancellationToken tk=default )
         {
             if(tk== default)
@@ -126,8 +151,16 @@ namespace unvs.game2d.scenes.actors
         {
             if (Application.isPlaying)
             {
-                
-                motions.BaseMotion("idle");
+                //SayText("Hello");
+                //motions.BaseMotion("idle");
+                this.CurrentSkill.Status = SkillSpeddEnum.Idle;
+            }
+        }
+        private void FixedUpdate()
+        {
+            if (this.CurrentSkill != null)
+            {
+                this.CurrentSkill.OnPerform();
             }
         }
     }
