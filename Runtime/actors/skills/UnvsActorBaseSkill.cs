@@ -23,7 +23,16 @@ namespace unvs.actor.skills
         [HideInInspector] public MonoBehaviour Owner;
         public AbstractActionBaseSkill PreviousSkill;
         public bool IsLocked { get; set; }
-
+        public AbstractActorBaseSkill Disable()
+        {
+            IsLocked = false;
+            return this;
+        }
+        public AbstractActorBaseSkill Enable()
+        {
+            IsLocked = true;
+            return this;
+        }
         // Hàm này gọi sau khi gán Owner để Skill chuẩn bị (nếu cần)
         public virtual void OnBind() { }
         public abstract void OnPerform(Action OnCompleted = null);
