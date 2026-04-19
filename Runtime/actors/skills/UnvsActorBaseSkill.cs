@@ -2,8 +2,7 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using System;
-
-
+using System.Threading;
 using UnityEngine;
 using unvs.actions;
 using unvs.ext;
@@ -36,15 +35,15 @@ namespace unvs.actor.skills
             }
         }
         public virtual AbstractActorBaseSkill Resume() { IsLocked = false; return this; }
-        public virtual async UniTask<AbstractActorBaseSkill> StartAysnc()
+        public virtual async UniTask<bool> StartAysnc(CancellationToken tk = default)
         {
             await UniTask.Yield();
-            return this;
+            return true;
         }
-        public virtual async UniTask<AbstractActorBaseSkill> StopAsync()
+        public virtual async UniTask<bool> StopAsync(CancellationToken tk=default)
         {
             await UniTask.Yield();
-            return this;
+            return true;
         }
         public T Cast<T>() where T : AbstractActorBaseSkill
         {

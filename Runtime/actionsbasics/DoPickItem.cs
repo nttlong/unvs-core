@@ -31,7 +31,7 @@ namespace unvs.actionsbasics
 
             
 
-            await actor.motions.animStates.PlayMotionAsync("bend-down", "collect-item");
+            await actor.motions.animStates.PlayMotionAsync("bend-down",actor.cts.Token, "collect-item", null,null );
 
             actor.player.ControlDisable();
             await actor.motions.animStates.PlayMotionAsync("stand-up");

@@ -4,12 +4,84 @@ using System;
 using System.Threading;
 using UnityEngine;
 using unvs.shares;
+using static UnityEditor.PlayerSettings;
 
 namespace unvs.ext.physical2d
 {
+    public static class CompositeCollider2DExt
+    {
+        //public static bool GetHit(this CompositeCollider2D compositeColl, out RaycastHit2D hit, Vector2 direction, float distance = 10f, string Layer = Constants.Layers.WORLD_GROUND, params string[] extra)
+        //{
+        //    var filter = new ContactFilter2D();
+        //    filter.useLayerMask = true;
+        //    filter.layerMask = LayerMask.GetMask(Layer);
+        //    if (extra.Length > 0)
+        //    {
+        //        filter.layerMask |= LayerMask.GetMask(extra);
+        //    }
+        //    filter.useTriggers = false;
+
+        //    RaycastHit2D[] hits = new RaycastHit2D[1];
+        //    int count = compositeColl.Raycast(direction, filter, hits, distance);
+
+        //    if (count > 0)
+        //    {
+        //        hit = hits[0];
+        //        Bounds b = compositeColl.bounds;
+        //        Debug.DrawLine(b.center, hit.point, Color.red, 5f);
+        //        // Kiểm tra xem điểm va chạm có nằm "sau" mép ngoài cùng của Collider theo hướng bắn không
+        //        // Nếu điểm va chạm nằm lọt vào bên trong bounds, ta coi đó là lỗi vật lý và bỏ qua
+        //        if (direction == Vector2.up && hit.point.y <= b.max.y) return false;
+        //        if (direction == Vector2.down && hit.point.y >= b.min.y) return false;
+        //        if (direction == Vector2.right && hit.point.x <= b.max.x) return false;
+        //        if (direction == Vector2.left && hit.point.x >= b.min.x) return false;
+
+        //        // Vẽ để debug trực quan
+                
+        //        return true;
+        //    }
+
+        //    hit = new RaycastHit2D();
+        //    return false;
+        //}
+    }
     public static class Physical2TransformExt
     {
-        public static string GetHitLayer(this Collider2D coll,Vector2 direction, float distance=1f, string LayerName = Constants.Layers.WORLD_GROUND, params string[] extraLayers)
+        public static bool GetHit(this Collider2D compositeColl, out RaycastHit2D hit, Vector2 direction, float distance = 10f, string Layer = Constants.Layers.WORLD_GROUND, params string[] extra)
+        {
+            var filter = new ContactFilter2D();
+            filter.useLayerMask = true;
+            filter.layerMask = LayerMask.GetMask(Layer);
+            if (extra.Length > 0)
+            {
+                filter.layerMask |= LayerMask.GetMask(extra);
+            }
+            filter.useTriggers = false;
+
+            RaycastHit2D[] hits = new RaycastHit2D[1];
+            int count = compositeColl.Raycast(direction, filter, hits, distance);
+
+            if (count > 0)
+            {
+                hit = hits[0];
+                Bounds b = compositeColl.bounds;
+                Debug.DrawLine(b.center, hit.point, Color.red, 5f);
+                // Kiểm tra xem điểm va chạm có nằm "sau" mép ngoài cùng của Collider theo hướng bắn không
+                // Nếu điểm va chạm nằm lọt vào bên trong bounds, ta coi đó là lỗi vật lý và bỏ qua
+                if (direction == Vector2.up && hit.point.y <= b.max.y) return false;
+                if (direction == Vector2.down && hit.point.y >= b.min.y) return false;
+                if (direction == Vector2.right && hit.point.x <= b.max.x) return false;
+                if (direction == Vector2.left && hit.point.x >= b.min.x) return false;
+
+                // Vẽ để debug trực quan
+
+                return true;
+            }
+
+            hit = new RaycastHit2D();
+            return false;
+        }
+        public static string GetHitLayer(this Collider2D coll, Vector2 direction, float distance = 1f, string LayerName = Constants.Layers.WORLD_GROUND, params string[] extraLayers)
         {
             var mask = LayerMask.GetMask(LayerName);
             if (extraLayers.Length > 0)
@@ -22,7 +94,7 @@ namespace unvs.ext.physical2d
 
             if (hit.collider != null)
             {
-                return LayerMask.LayerToName( hit.collider.gameObject.layer);
+                return LayerMask.LayerToName(hit.collider.gameObject.layer);
             }
 
             return string.Empty; // Không chạm gì cả
@@ -70,7 +142,7 @@ namespace unvs.ext.physical2d
             return ret != null;
 
         }
-        public static Collider2D RayCastUp(Collider2D coll,float distance=1f,  string LayerName = Constants.Layers.WORLD_GROUND, params string[] extraLayers)
+        public static Collider2D RayCastUp(Collider2D coll, float distance = 1f, string LayerName = Constants.Layers.WORLD_GROUND, params string[] extraLayers)
         {
             var mask = LayerMask.GetMask(LayerName);
             if (extraLayers.Length > 0)

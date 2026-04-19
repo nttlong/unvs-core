@@ -89,52 +89,51 @@ namespace unvs.ext
 
            
         }
-        public static async UniTask PlayMotionAsync(this AnimStateInfo[] blendTreeAnim, string motionName,string ovveriSate=null)
+        public static async UniTask PlayMotionAsync(this AnimStateInfo[] blendTreeAnim, string motionName, CancellationToken ct = default,  string ovveriSate = null,Func<bool> OnPlay=null,Action OnFinish=null)
         {
+            ct.ThrowIfCancellationRequested();
             if (blendTreeAnim.Count(p => p != null) == 0) return;
             if (ovveriSate == null)
             {
                 var item = blendTreeAnim.FirstOrDefault(p => p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase));
                 item.animationController.ResetAllOverideLayers();
-                await item.animationController.PlayAnimationAsync(motionName, item.layerIndex, () =>
-                {
-
-                });
+                await item.animationController.PlayAnimationAsync(motionName, item.layerIndex, ct, OnPlay, OnFinish );
             } else
             {
                 
                 var item = blendTreeAnim.FirstOrDefault(p => p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase));
                 var ovveriSateItem = blendTreeAnim.FirstOrDefault(p => p.layerIndex != item.layerIndex && p.motionName.Equals(ovveriSate, StringComparison.OrdinalIgnoreCase));
                 
-                await item.animationController.PlayAnimationAsync(motionName, item.layerIndex, () =>
+                await item.animationController.PlayAnimationAsync(motionName, item.layerIndex, ct, OnPlay, () =>
                 {
 
 
                     ovveriSateItem.animationController.SetLayerWeight(ovveriSateItem.layerIndex, 1);
                     ovveriSateItem.animationController.PlayInFixedTime(ovveriSateItem.motionName, ovveriSateItem.layerIndex, 0f);
+                    OnFinish?.Invoke();
                 });
             }
             
 
         }
-        public static async UniTask PlayMotionAsync(this AnimStateInfo[] blendTreeAnim, string motionName,Action OnFinish,CancellationToken ct)
-        {
-            if (blendTreeAnim.Count(p => p != null) == 0) return;
-            var item = blendTreeAnim.FirstOrDefault(p => p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase));
-            if (item == null)
-            {
-                throw new Exception($"Can not find {motionName}");
-            }
-            if (item.animationController == null)
-            {
-                throw new NullReferenceException($"animationController is null, refer {motionName}");
-            }
-            item.animationController.ResetAllOverideLayers();
-            item.animationController.SetLayerWeight(item.layerIndex, 1);
-            await item.animationController.PlayAnimationAsync(motionName, item.layerIndex, OnFinish,ct);
+        //public static async UniTask PlayMotionAsync(this AnimStateInfo[] blendTreeAnim, string motionName,Func<bool> OnPlay=null,Action OnFinish=null,CancellationToken ct=default)
+        //{
+        //    if (blendTreeAnim.Count(p => p != null) == 0) return;
+        //    var item = blendTreeAnim.FirstOrDefault(p => p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase));
+        //    if (item == null)
+        //    {
+        //        throw new Exception($"Can not find {motionName}");
+        //    }
+        //    if (item.animationController == null)
+        //    {
+        //        throw new NullReferenceException($"animationController is null, refer {motionName}");
+        //    }
+        //    item.animationController.ResetAllOverideLayers();
+        //    item.animationController.SetLayerWeight(item.layerIndex, 1);
+        //    await item.animationController.PlayAnimationAsync(motionName, item.layerIndex, OnPlay, OnFinish,ct);
 
 
-        }
+        //}
         public static void PlayCrossFadeMotion(this AnimStateInfo[] blendTreeAnim, string motionName, float normalizedTimeOffset=0.25f)
         {
             if (blendTreeAnim.Count(p => p != null) == 0) return;

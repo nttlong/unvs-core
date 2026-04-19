@@ -207,37 +207,44 @@ namespace unvs.ext
                 Debug.Log($"{s.transform.name}");
             }
         }
-        public static async UniTask PlayAnimationAsync(
-                 this Animator animator,
-                 string stateName,
-                 int layer,
-                 Action onFinish,
-                 CancellationToken ct,
-                 float normalizedEnd = 1f)
-        {
-            animator.Play(stateName, layer, 0f);
+        //public static async UniTask PlayAnimationAsync(
+        //         this Animator animator,
+        //         string stateName,
+        //         int layer,
+        //         Func<bool> onPlay,
+        //         Action onFinish,
+        //         CancellationToken ct,
+        //         float normalizedEnd = 1f)
+        //{
+        //    animator.Play(stateName, layer, 0f);
 
-            await UniTask.Yield(PlayerLoopTiming.Update, ct);
+        //    await UniTask.Yield(PlayerLoopTiming.Update, ct);
 
-            await UniTask.WaitUntil(() =>
-            {
-                var info = animator.GetCurrentAnimatorStateInfo(layer);
+        //    await UniTask.WaitUntil(() =>
+        //    {
+        //        if (onPlay != null)
+        //        {
+        //            if (!onPlay()) return true;
+        //        }
+        //        var info = animator.GetCurrentAnimatorStateInfo(layer);
 
-                // đảm bảo đúng state
-                if (!info.IsName(stateName)) return false;
+        //        // đảm bảo đúng state
+        //        if (!info.IsName(stateName)) return false;
 
-                // normalizedTime >= 1 nghĩa là đã chạy hết 1 vòng
-                return info.normalizedTime >= normalizedEnd;
-            }, cancellationToken: ct);
+        //        // normalizedTime >= 1 nghĩa là đã chạy hết 1 vòng
+        //        return info.normalizedTime >= normalizedEnd;
+        //    }, cancellationToken: ct);
 
-            onFinish?.Invoke();
-        }
-        public static async UniTask PlayAnimationAsync(
+        //    onFinish?.Invoke();
+        //}
+        public static async UniTask PlayAnimationAsyncOld(
             this Animator animator,
             string stateName,
             int layer,
-            Action onStart = null,
-            CancellationToken ct = default)
+            CancellationToken ct = default,
+            Func<bool> onPlay = null,
+            Action onStart = null
+            )
                 {
             if(animator==null || animator.IsDestroyed() || animator.gameObject.IsDestroyed()) return;
 
@@ -251,10 +258,61 @@ namespace unvs.ext
 
             await UniTask.WaitUntil(() =>
             {
+                if (onPlay != null)
+                {
+                   if(!onPlay())
+                    {
+                        return  true; // muon stop anim ngay tai day
+                    }
+                }
                 if (animator == null || animator.IsDestroyed() || animator.gameObject.IsDestroyed()) return true;
                 var info = animator.GetCurrentAnimatorStateInfo(layer);
                 return info.IsName(stateName) && info.normalizedTime >= 1f;
             }, cancellationToken: ct);
+        }
+        public static async UniTask PlayAnimationAsync(
+    this Animator animator,
+    string stateName,
+    int layer,
+    CancellationToken ct = default,
+    Func<bool> onPlay = null,
+    Action onStart = null)
+        {
+            if (animator == null || animator.IsDestroyed()) return;
+
+            // 1. Setup Layer
+            animator.ResetAllOverideLayers(); // Giả định đây là extension của bạn
+            animator.SetLayerWeight(layer, 1f);
+
+            // 2. Start
+            animator.Play(stateName, layer, 0f);
+            animator.speed = 1f; // Đảm bảo speed là 1 khi bắt đầu
+            onStart?.Invoke();
+
+            // 3. Đợi 1 frame để Animator chuyển sang State mới
+            await UniTask.Yield(PlayerLoopTiming.Update, ct);
+
+            // 4. Chờ cho đến khi xong hoặc bị ngắt bởi onPlay
+            await UniTask.WaitUntil(() =>
+            {
+                if (animator == null || animator.IsDestroyed()) return true;
+
+                // Kiểm tra điều kiện dừng từ bên ngoài (onPlay)
+                if (onPlay != null && !onPlay())
+                {
+                    animator.speed = 0f; // Khựng anim lại ngay lập tức
+                    return true;
+                }
+
+                var info = animator.GetCurrentAnimatorStateInfo(layer);
+
+                // Kiểm tra xem đã đúng State chưa (tránh trường hợp đang transition)
+                bool isCorrectState = info.IsName(stateName);
+
+                // Nếu không Loop: kết thúc khi >= 1. Nếu có Loop: sẽ kết thúc ở cuối vòng lặp đầu tiên
+                return isCorrectState && info.normalizedTime >= 1f;
+
+            }, PlayerLoopTiming.Update, ct);
         }
     }
     public static class IKManagerExt

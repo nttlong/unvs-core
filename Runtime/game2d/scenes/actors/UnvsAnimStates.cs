@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEditor;
@@ -135,9 +136,9 @@ namespace unvs.game2d.scenes.actors
         {
             this.animStates.PlayCrossFadeMotion(name);
         }
-        public async UniTask MotionAsync(string name)
+        public async UniTask MotionAsync(string name ,CancellationToken tk = default, string overideState=null, Func<bool> OnPlay=null,Action OnFinish =null)
         {
-            await this.animStates.PlayMotionAsync(name);
+            await this.animStates.PlayMotionAsync(name, tk,null, OnPlay, OnFinish);
         }
         public void AddtiveMotion(string name)
         {
