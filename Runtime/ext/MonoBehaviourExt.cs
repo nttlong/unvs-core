@@ -7,6 +7,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.U2D.Animation;
+using unvs.game2d.scenes.actors;
 
 namespace unvs.ext
 {
@@ -86,6 +87,21 @@ namespace unvs.ext
             }
         }
         /// <summary>
+        /// Check MonoBehaviour is null or destroyed return false 
+        /// </summary>
+        /// <param name="mono"></param>
+        /// <returns></returns>
+        public static bool IsValidate(this MonoBehaviour mono)
+        {
+            if (mono == null || mono.IsDestroyed()|| mono.gameObject==null || mono.gameObject.IsDestroyed()) return false;              // destroyed hoặc chưa gán
+            ////if (!mono) return false;                     // Unity fake-null check
+            //if (mono.gameObject == null) return false;   // GameObject bị destroy
+            //if (!mono.gameObject) return false;
+            
+
+            return true;
+        }
+        /// <summary>
         /// Synchronizes the sorting order and layer of this object (and optionally its children) 
         /// relative to a root SpriteRenderer.
         /// </summary>
@@ -153,6 +169,8 @@ namespace unvs.ext
     }
 
        
+
+
 #endif
     }
 }

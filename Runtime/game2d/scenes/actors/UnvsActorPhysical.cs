@@ -1,4 +1,4 @@
-using Codice.CM.Triggers;
+
 using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
@@ -167,61 +167,7 @@ namespace unvs.game2d.scenes.actors
                 IninitStatus();
             }
         }
-        //public virtual void FixedUpdate()
-        //{
-        //    if (_coll == null) _coll = GetComponent<Collider2D>();
-          
-        //    ref var r = ref this._slopDirectionResult;
-        //    _coll.CalculateSlopDirection(ref r, this.movingInfo.direction2.x);
-
-        //    this.movingInfo.MoveStep(this.transform, r.slopeDir);
-            
-        //}
-
-        //public virtual bool IsHitUpFloor(string LayerName = Constants.Layers.WORLD_GROUND)
-        //{
-        //    if (this.headBone != null)
-        //    {
-        //        var coll=this.headBone.GetComponent<Collider2D>();
-        //        if (coll != null)
-        //        {
-        //            var distance= this.NormalHeight- this.CalculateHeight();
-        //           return Physical2TransformExt.RayCastUp(coll, distance, LayerName) !=null;
-        //        }
-
-        //    }
-        //    return false;
-        //}
-        //public virtual bool IsHitDownFloor(string LayerName= Constants.Layers.WORLD_GROUND)
-        //{
-        //    if (this.Footers != null && this.Footers.Length>0)
-        //    {
-        //        var coll = this.Footers[0].GetComponent<Collider2D>();
-        //        if (coll != null)
-        //        {
-                 
-        //            return Physical2TransformExt.RayCastDown(coll, this.NormalHeight, LayerName) != null;
-        //        }
-
-        //    }
-        //    return false;
-        //}
-        //public virtual string GetHitLayerDown( string LayerName = Constants.Layers.WORLD_GROUND,params string[]extraLayers)
-        //{
-        //    if (this.Footers != null && this.Footers.Length > 0)
-        //    {
-        //        var coll = this.Footers[0].GetComponent<Collider2D>();
-        //        if (coll != null)
-        //        {
-
-        //            return coll.GetHitLayer(Vector2.down, this.NormalHeight, LayerName, extraLayers) ;
-        //        }
-
-        //    }
-        //    return string.Empty;
-        //}
-        //// Trong class UnvsActorPhysical
-        //public Transform composeColl;
+       
         
     }
 #if UNITY_EDITOR

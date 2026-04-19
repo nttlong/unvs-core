@@ -38,12 +38,9 @@ namespace unvs.game2d.scenes.actors
         
         public CancellationTokenSource cts => _cls;
 
-        public ActionBaseSkill CurrentSkill { get; private set; }
+        public AbstractActionBaseSkill CurrentSkill { get;  set; } 
 
-        [Header("Speed")]
-        public float WalkSpeed = 8f;
-        public float SprintSpeed = 16f;
-        public float JumpingHeight=4f;
+        
         public float CrawlSpeed=4f;
         public UnvsActorPhysical physical;
 
@@ -104,26 +101,7 @@ namespace unvs.game2d.scenes.actors
         }
        
         
-        public async UniTask MovtoTargetAsync(Vector2 pos, CancellationToken tk=default )
-        {
-            if(tk== default)
-            {
-                tk = this.RefreshToken().Token;
-            }
-            
-
-            await TransformExtension.MoveToAsync(this.transform, this.WalkSpeed, pos,
-                   p => {
-                       this.motions.direction = p.Direction;
-                       this.motions.BaseMotion("walk");
-                   },
-                   p => {
-                       this.motions.direction = p.Direction;
-                       this.motions.BaseMotion("idle");
-
-                   },
-                   tk);
-        }
+        
 
         public T ScanObject<T>(params string[] layers)
         {
@@ -160,7 +138,8 @@ namespace unvs.game2d.scenes.actors
         {
             if (this.CurrentSkill != null)
             {
-                this.CurrentSkill.OnPerform();
+               
+                this.CurrentSkill.OnUpdate();
             }
         }
     }

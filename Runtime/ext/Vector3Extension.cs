@@ -317,6 +317,19 @@ namespace unvs.ext
         {
             return new Vector3(localScale.x, localScale.y, localScale.z);
         }
+
+        public static RaycastHit2D RayCast(this Vector2 pos,Vector2 direction, float distance=1f, string LayerName=Constants.Layers.WORLD_GROUND,params string[]extraLayers)
+        {
+            var layer = LayerMask.GetMask(LayerName);
+            if (extraLayers.Length > 0)
+            {
+                layer |= LayerMask.GetMask(extraLayers);
+            }
+            Debug.DrawRay(pos, Vector2.down * distance, Color.red, distance);
+            var hits = Physics2D.Raycast(pos, direction, distance, layer);
+            return hits;
+        }
+        
     }
     public static class Vector2dExtesion
     {

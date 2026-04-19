@@ -13,27 +13,27 @@ namespace unvs.actionsbasics
     {
         public override async UniTask ExecuteAsync(ActionBaseSender sender)
         {
-            var source = sender.Source;
-            var target = sender.Target;
+            //var source = sender.Source;
+            //var target = sender.Target;
            
-            await UniTask.Yield();
-            var iteractSource = source.GetComponent<UnvsInteractObject>();
-            if (iteractSource == null)
-            {
-                sender.Cancel();
-                return;
-            }
-            var actor = target.GetComponent<UnvsActor>();
-            if (actor != null)
-            {
-                actor.motions.BaseMotion("walk");
-                await actor.MovtoTargetAsync(iteractSource.GetPosition(),sender.Cts.Token); 
-            }
-            else
-            {
-                sender.Cancel(); // sender.Cts se bi huy bo trong ham nay
+            //await UniTask.Yield();
+            //var iteractSource = source.GetComponent<UnvsInteractObject>();
+            //if (iteractSource == null)
+            //{
+            //    sender.Cancel();
+            //    return;
+            //}
+            //var actor = target.GetComponent<UnvsActor>();
+            //if (actor != null)
+            //{
+            //    actor.motions.BaseMotion("walk");
+            //    await actor.MovtoTargetAsync(iteractSource.GetPosition(),sender.Cts.Token); 
+            //}
+            //else
+            //{
+            //    sender.Cancel(); // sender.Cts se bi huy bo trong ham nay
 
-            }
+            //}
 
 
 

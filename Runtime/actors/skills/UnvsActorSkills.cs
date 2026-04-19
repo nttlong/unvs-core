@@ -10,10 +10,10 @@ namespace unvs.actor.skills{
     public class UnvsActorSkills : ScriptableObject
     {
         [SerializeReference, SkillSelector]
-        public ActorBaseSkill[] skills;
+        public AbstractActorBaseSkill[] skills;
 
         // Cache để truy cập cực nhanh
-        private Dictionary<Type, ActorBaseSkill> _skillCache;
+        private Dictionary<Type, AbstractActorBaseSkill> _skillCache;
 
         public MonoBehaviour Owner { get; internal set; }
         public void Initialize(MonoBehaviour owner)
@@ -30,15 +30,16 @@ namespace unvs.actor.skills{
                 }
             }
         }
-        public T Get<T>() where T : ActorBaseSkill
+        public T Get<T>(AbstractActionBaseSkill previous=null) where T : AbstractActorBaseSkill
         {
-            _skillCache ??= new Dictionary<Type, ActorBaseSkill>();
+            _skillCache ??= new Dictionary<Type, AbstractActorBaseSkill>();
 
             var type = typeof(T);
             if (!_skillCache.ContainsKey(type))
             {
                 _skillCache[type] = skills.FirstOrDefault(p => p is T);
             }
+            (_skillCache[type] as AbstractActorBaseSkill).PreviousSkill=previous;
             return _skillCache[type] as T;
         }
     }

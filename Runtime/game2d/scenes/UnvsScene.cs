@@ -104,9 +104,21 @@ namespace unvs.game2d.scenes
             if(!string.IsNullOrEmpty(spawnName))
             {
                 var tr = this.GetComponentInChildrenByName<Transform>(spawnName);
+                var centrePoint = tr.GetSegment().Center();
+                var hit = centrePoint.RayCast(Vector2.down, Math.Abs(centrePoint.y - worldBound.bounds.max.y));
+                if(hit.collider!=null)
+                {
+                    return hit.point;
+                }
                 return this.ground.GetIntersetPoint(tr.GetSegment().Center().x);
             } else
             {
+                var centrePoint = this.startPoint.GetSegment().Center();
+                var hit = ((Vector2)this.startPoint.transform.position).RayCast(Vector2.down, 100f);
+                if (hit.collider != null)
+                {
+                    return hit.point;
+                }
                 return this.ground.GetIntersetPoint(this.startPoint.transform.GetSegment().Center().x);
             }
 

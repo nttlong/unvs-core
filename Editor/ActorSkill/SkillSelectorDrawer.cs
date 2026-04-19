@@ -18,7 +18,7 @@ namespace unvs.editor.actorskill
             }
 
             // 1. Lấy tất cả class con của ActorBaseSkill
-            var baseType = typeof(ActorBaseSkill);
+            var baseType = typeof(AbstractActorBaseSkill);
             var types = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
                 .Where(p => baseType.IsAssignableFrom(p) && !p.IsAbstract && p.IsClass)

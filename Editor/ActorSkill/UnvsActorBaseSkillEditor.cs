@@ -18,7 +18,7 @@ namespace unvs.editor.actorskill
             // Tìm tất cả các class kế thừa từ ActorBaseSkill
             _implementations = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
-                .Where(p => typeof(ActorBaseSkill).IsAssignableFrom(p) && !p.IsAbstract)
+                .Where(p => typeof(AbstractActorBaseSkill).IsAssignableFrom(p) && !p.IsAbstract)
                 .ToArray();
         }
 
@@ -39,7 +39,7 @@ namespace unvs.editor.actorskill
                 Type selectedType = _implementations[_selectedIndex];
 
                 // Tạo instance mới
-                ActorBaseSkill newSkill = (ActorBaseSkill)Activator.CreateInstance(selectedType);
+                AbstractActorBaseSkill newSkill = (AbstractActorBaseSkill)Activator.CreateInstance(selectedType);
                 newSkill.name = "New " + selectedType.Name;
 
                 // Thêm vào mảng

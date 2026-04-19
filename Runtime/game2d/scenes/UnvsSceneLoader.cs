@@ -69,8 +69,7 @@ namespace unvs.game2d.scenes
                 this.validateCurrentActor(ret);
             }
 
-            UnvsApp.Instance.currentActor.StandBy(ret.GetStartPosition(spawnName));
-            UnvsCinema.Instance.vcam.Watch(UnvsApp.Instance.currentActor.camWatcher);
+          
 
             UnvsCinema.Instance.UpdateMainCameraBoxCollider2dSize();
             UnvsApp.Instance.RaiseEnterScene(ret);
@@ -78,7 +77,8 @@ namespace unvs.game2d.scenes
             CenterScene();
             ret.TurnOnLeft().TurnOnRight();
             ret.gameObject.SetActive(true);
-
+            UnvsApp.Instance.currentActor.StandBy(ret.GetStartPosition(spawnName));
+            UnvsCinema.Instance.vcam.Watch(UnvsApp.Instance.currentActor.camWatcher);
             lastInteriorScene = ret;
             return ret;
         }
@@ -118,6 +118,12 @@ namespace unvs.game2d.scenes
             }
 
 
+            
+
+            UnvsCinema.Instance.UpdateMainCameraBoxCollider2dSize();
+            UnvsApp.Instance.RaiseEnterScene(ret, true);
+            CenterScene();
+            ret.gameObject.SetActive(true);
             if (actor != null)
             {
                 actor.StandBy(ret.GetStartPosition(spawnName));
@@ -125,12 +131,6 @@ namespace unvs.game2d.scenes
                 UnvsCinema.Instance.vcam.Watch(actor.camWatcher);
                 UnvsApp.Instance.currentActor = actor;
             }
-
-            UnvsCinema.Instance.UpdateMainCameraBoxCollider2dSize();
-            UnvsApp.Instance.RaiseEnterScene(ret, true);
-            CenterScene();
-            ret.gameObject.SetActive(true);
-
             return ret;
         }
         public async UniTask<UnvsScene> LoadChunkLeftAsync(UnvsScene fromScene, string path)
