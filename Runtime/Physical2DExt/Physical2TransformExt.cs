@@ -4,7 +4,6 @@ using System;
 using System.Threading;
 using UnityEngine;
 using unvs.shares;
-using static UnityEditor.PlayerSettings;
 
 namespace unvs.ext.physical2d
 {
