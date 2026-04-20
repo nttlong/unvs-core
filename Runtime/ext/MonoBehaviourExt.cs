@@ -86,6 +86,40 @@ namespace unvs.ext
                 }
             }
         }
+        public static void IncrementalSortingOrder(this MonoBehaviour obj, int order, string sortingLayerName, bool all = true)
+        {
+            var sr = obj.GetComponent<SpriteRenderer>();
+            if (sr != null)
+            {
+                sr.sortingOrder += order;
+                sr.sortingLayerName = sortingLayerName;
+            }
+            if (all)
+            {
+                foreach (var item in obj.GetComponentsInChildren<SpriteRenderer>(true))
+                {
+                    item.sortingOrder += order;
+                    item.sortingLayerName = sortingLayerName;
+                }
+            }
+        }
+        public static void DecrementalSortingOrder(this MonoBehaviour obj, int order, string sortingLayerName, bool all = true)
+        {
+            var sr = obj.GetComponent<SpriteRenderer>();
+            if (sr != null)
+            {
+                sr.sortingOrder = order- sr.sortingOrder;
+                sr.sortingLayerName = sortingLayerName;
+            }
+            if (all)
+            {
+                foreach (var item in obj.GetComponentsInChildren<SpriteRenderer>(true))
+                {
+                    item.sortingOrder = order - item.sortingOrder;
+                    item.sortingLayerName = sortingLayerName;
+                }
+            }
+        }
         /// <summary>
         /// Check MonoBehaviour is null or destroyed return false 
         /// </summary>

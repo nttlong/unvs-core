@@ -6,6 +6,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.U2D.Animation;
 using unvs.actor.skills;
 using unvs.ext;
@@ -78,9 +79,10 @@ namespace unvs.game2d.scenes.actors
             }
 
         }
+        private bool _isSkillsCloned = false;
         public virtual void OnEnable()
         {
-            if (Skills != null)
+            if (Skills != null && !_isSkillsCloned)
             {
 
                 Skills = Instantiate(Skills);
@@ -177,6 +179,19 @@ namespace unvs.game2d.scenes.actors
             }
             
 
+        }
+        [UnvsButton("ShadowCaster2D")]
+        public void EditorShadowCaster2DAll()
+        {
+            var compositeShadowCaster=this.AddComponentIfNotExist<CompositeShadowCaster2D>();
+            
+            foreach (var sp in this.GetComponentsInChildren<SpriteRenderer>(true))
+            {
+                var shadowGroup = sp.AddComponentIfNotExist<ShadowCaster2D>();
+                shadowGroup.selfShadows = true;
+                shadowGroup.castingOption = ShadowCaster2D.ShadowCastingOptions.CastAndSelfShadow;
+                
+            }
         }
         [UnvsButton("Anim controller")]
         public void GenerateAnimatorController()

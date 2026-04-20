@@ -37,9 +37,10 @@ namespace unvs.actionsbasics
             await actor.motions.animStates.PlayMotionAsync("stand-up");
             actor.player.ControlEnable();
             actor.motions.BaseMotion("idle");
-            TransformExtension.AttachItemToSocket(actor.physical.socketHandBack, st.transform);
-            st.SetMeOnLayer(Constants.Layers.HOLD_ITEM);
-            actor.physical.currentHoldingItem = st;
+            actor.physical.HoldItemInBackHand(st);
+            
+            
+           
 
 
         }

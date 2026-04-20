@@ -23,7 +23,25 @@ namespace unvs.game2d.scenes
         public Transform backupInterior;
         public Transform actorContainer;
         private UnvsScene lastInteriorScene;
+        private static bool _isShow=true;
 
+        public override bool DisablePlayerInput => false;
+
+        public override bool EnablePlayerInput => false;
+
+        public static void GameShow()
+        {
+            if (Instance == null) return;
+            if(_isShow) return;
+            Instance.gameObject.SetActive(true);
+            _isShow = true;
+        }
+        public static void GameHide()
+        {
+            if (Instance == null) return;
+            Instance.gameObject.SetActive(false);
+            _isShow = false;
+        }
         public override void InitEvents()
         {
             this.buffer.gameObject.SetActive(false);
@@ -60,7 +78,7 @@ namespace unvs.game2d.scenes
             }
             ret.transform.SetParent(this.interior.transform, true);
 
-            UnvsCinema.Instance.UpdateWorld(ret, true);
+            UnvsCinema.Instance.UpdateWorld(ret, true,UpdateWorldEmun.Interior);
             UnvsCinema.Instance.vcam.UpdateByUnvsScene(ret);
 
             UnvsActor actor = ret.GetActiveActor();
@@ -80,6 +98,7 @@ namespace unvs.game2d.scenes
             UnvsApp.Instance.currentActor.StandBy(ret.GetStartPosition(spawnName));
             UnvsCinema.Instance.vcam.Watch(UnvsApp.Instance.currentActor.camWatcher);
             lastInteriorScene = ret;
+           
             return ret;
         }
 
@@ -98,7 +117,7 @@ namespace unvs.game2d.scenes
             var ret = await Commons.LoadPrefabsAsync<UnvsScene>(path, this.buffer);
             ret.transform.SetParent(this.chunks.transform, true);
 
-            UnvsCinema.Instance.UpdateWorld(ret, true);
+            UnvsCinema.Instance.UpdateWorld(ret, true, UpdateWorldEmun.New);
             UnvsCinema.Instance.vcam.UpdateByUnvsScene(ret);
 
             UnvsActor actor = ret.GetActiveActor();
@@ -165,7 +184,7 @@ namespace unvs.game2d.scenes
             ret.JoinInfo.LeftPos -= offset;
             ret.JoinInfo.RightPos -= offset;
             ret.transform.SetAsFirstSibling();
-            UnvsCinema.Instance.UpdateWorld(ret, false);
+            UnvsCinema.Instance.UpdateWorld(ret, false,UpdateWorldEmun.Left);
             CenterScene();
             ret.gameObject.SetActive(true);
             fromScene.leftScene = ret;
@@ -232,7 +251,7 @@ namespace unvs.game2d.scenes
             ret.JoinInfo.LeftPos -= offset;
             ret.JoinInfo.RightPos -= offset;
             //  ret.transform.SetAsLastSibling();
-            UnvsCinema.Instance.UpdateWorld(ret, false);
+            UnvsCinema.Instance.UpdateWorld(ret, false,UpdateWorldEmun.Right);
             ret.gameObject.SetActive(true);
             fromScene.rightScene = ret;
             ret.leftScene = fromScene;

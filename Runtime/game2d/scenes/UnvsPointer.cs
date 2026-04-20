@@ -23,6 +23,14 @@ namespace unvs.game2d.scenes
         private Vector2 _virtualMousePos;
         private Sprite defautlSprite;
         [SerializeField] float gamepadSensitivity = 1000f;
+        /// <summary>
+        /// THis UI allow showing when game playing, so no need to hide or show player
+        /// </summary>
+        public override bool DisablePlayerInput => false;
+        /// <summary>
+        /// THis UI allow showing when game playing
+        /// </summary>
+        public override bool EnablePlayerInput => false;
 
         public event Action<Vector2, Image, GameObject> OnHoverInteractObject;
         public override void InitEvents()

@@ -21,7 +21,9 @@ namespace unvs.game2d.scenes
     {
         public static Dictionary<string, InputAction> Player;
         private static object playerValue;
+        private static object uiValue;
         public static Dictionary<string, InputAction> UI;
+        
         public static object inputIns;
 
         public static InputAction LookAction { get; private set; }
@@ -40,6 +42,42 @@ namespace unvs.game2d.scenes
             {
                 var typ = inputIns.GetType();
                 typ.GetMethod("Enable").Invoke(inputIns, null);
+            }
+
+        }
+        public static void PlayerEnable()
+        {
+            if (playerValue != null)
+            {
+                var typ = playerValue.GetType();
+                typ.GetMethod("Enable").Invoke(playerValue, null);
+            }
+
+        }
+        public static void PlayerDisable()
+        {
+            if (playerValue != null)
+            {
+                var typ = playerValue.GetType();
+                typ.GetMethod("Disable").Invoke(playerValue, null);
+            }
+
+        }
+        public static void UIEnable()
+        {
+            if (uiValue != null)
+            {
+                var typ = uiValue.GetType();
+                typ.GetMethod("Enable").Invoke(uiValue, null);
+            }
+
+        }
+        public static void UIDisable()
+        {
+            if (uiValue != null)
+            {
+                var typ = uiValue.GetType();
+                typ.GetMethod("Disable").Invoke(uiValue, null);
             }
 
         }
@@ -67,15 +105,15 @@ namespace unvs.game2d.scenes
         internal static void MapUIEvents()
         {
             var typ = inputIns.GetType();
-            var PlayerPro = typ.GetProperty("UI");
-            if (PlayerPro != null)
+            var UIProperty = typ.GetProperty("UI");
+            if (UIProperty != null)
             {
                 UI = new Dictionary<string, InputAction>();
-                playerValue = PlayerPro.GetValue(inputIns);
-                var pts = PlayerPro.PropertyType.GetProperties().Where(p => p.PropertyType == typeof(InputAction));
+                uiValue = UIProperty.GetValue(inputIns);
+                var pts = UIProperty.PropertyType.GetProperties().Where(p => p.PropertyType == typeof(InputAction));
                 foreach (var p in pts)
                 {
-                    var val = p.GetValue(playerValue) as InputAction;
+                    var val = p.GetValue(uiValue) as InputAction;
                     UI[p.Name] = val;
                    
 

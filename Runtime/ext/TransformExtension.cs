@@ -331,24 +331,26 @@ namespace unvs.ext
         public static async UniTask MoveToTargetAsync(
                 this Transform socketController,
                  Vector2 targetPos,
-                 CancellationToken token,
+                 Action<float> OnMoving = null,
+                 CancellationToken token=default,
                  float speed = 5f,
-                 float stopDistance = 0.01f)
+                 float stopDistance = 0.7f)
         {
             while (true)
             {
+                if(token.IsCancellationRequested) return;
                 token.ThrowIfCancellationRequested();
 
                 Vector2 current = socketController.position;
-                float dist = Vector2.Distance(current, targetPos);
-
+                float dist = Math.Abs(current.x - targetPos.x);// Vector2.Distance(current, targetPos);
+                OnMoving?.Invoke(dist);
                 if (dist <= stopDistance)
                 {
                     socketController.position = targetPos;
                     break;
                 }
 
-                Vector2 next = Vector2.MoveTowards(current, targetPos, speed * Time.deltaTime);
+                Vector2 next = Vector2.MoveTowards(current, new Vector2(targetPos.x, current.y), speed * Time.deltaTime);
                 socketController.position = next;
 
                 await UniTask.Yield(PlayerLoopTiming.Update, token);
@@ -380,10 +382,10 @@ namespace unvs.ext
     }
     public static class UnvsActorPhysicalSolverRuntimeExt
     {
-        public static async UniTask<UnvsActorPhysicalSolverRuntime> MoveToAsync(UnvsActorPhysicalSolverRuntime socketController, Vector2 pos, CancellationToken token)
+        public static async UniTask<UnvsActorPhysicalSolverRuntime> MoveToAsync(UnvsActorPhysicalSolverRuntime socketController, Vector2 pos,Action<float> OnMoving, CancellationToken token)
         {
             //socketController.Disable();
-            await socketController.target.MoveToTargetAsync(pos, token);
+            await socketController.target.MoveToTargetAsync(pos,OnMoving, token);
             return socketController;
         }
     }

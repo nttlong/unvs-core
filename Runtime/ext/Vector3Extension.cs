@@ -226,8 +226,8 @@ namespace unvs.ext
         }
         public static float CalculateDirection(this Vector3 v,Vector2 other)
         {
-            if (v.x > other.x) return 1;
-            if (v.x < other.x) return -1;
+            if (v.x > other.x) return -1;
+            if (v.x < other.x) return 1;
             return 0;
         }
         public static float GetDirectionTo(this Vector3 From, Vector2 To)
@@ -502,6 +502,13 @@ namespace unvs.ext
 
             return hitObjects;
         }
+        /// <summary>
+        /// Get Hit Collider by object from Screen Position
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="pos">Screen Position</param>
+        /// <param name="layers"></param>
+        /// <returns></returns>
         public static T GetHitCollider<T>(this Vector2 pos, params string[] layers)
         {
             if(Camera.main==null) return default(T);

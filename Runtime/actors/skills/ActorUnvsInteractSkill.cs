@@ -11,17 +11,21 @@ namespace unvs.actor.skills {
     {
         private UnvsActor _actor;
         private UnvsAnimStates _animState;
-
-        public async UniTask MovtoTargetAsync(Vector2 vector2, CancellationToken token)
+        private CompositeCollider2D _composite;
+        public float MovingSpeed;
+        public async UniTask MovtoTargetAsync(Vector2 vector2,Action<float> OnMoving, CancellationToken token)
         {
-            _animState.BaseMotion("walk");
-           await  _actor.transform.MoveToTargetAsync(vector2, token);
+           
+            
+            _animState.BaseMotion("Walk");
+            await  _actor.transform.MoveToTargetAsync(vector2, OnMoving, token, MovingSpeed);
         }
         public override void OnBind()
         {
             base.OnBind();
             _actor = Owner.GetComponent<UnvsActor>();
             _animState = _actor.GetComponent<UnvsAnimStates>();
+            _composite = _actor.GetComponent<CompositeCollider2D>();
         }
         public override void OnPerform(Action OnCompleted = null)
         {

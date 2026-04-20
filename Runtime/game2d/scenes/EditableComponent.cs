@@ -94,7 +94,20 @@ namespace unvs.game2d.scenes
         public bool IsShow;
         public abstract void InitEvents();
         public abstract void InitRunTime();
-
+        /// <summary>
+        /// Disable Player Input when this UI is showing
+        /// </summary>
+        public abstract bool DisablePlayerInput
+        {
+            get;
+        }
+        /// <summary>
+        /// Enale PlayerInput when this UI is hidding
+        /// </summary>
+        public abstract bool EnablePlayerInput
+        {
+            get;
+        }
         public virtual void Hide()
         {
             this.enabled = false;
@@ -106,7 +119,19 @@ namespace unvs.game2d.scenes
                 canvas.gameObject.SetActive(false);
             }
             IsShow = false;
+            if(UnvsGlobalInput.Player != null)
+            {
+                if (EnablePlayerInput)
+                {
+                    UnvsGlobalInput.PlayerEnable();
+                }
+
+            }
+            //UnvsSceneLoader.GameShow();
         }
+
+       
+
         public virtual void Show()
         {
             this.enabled = true;
@@ -125,6 +150,13 @@ namespace unvs.game2d.scenes
            
             this.ApplyNavigate<Button>();
             IsShow=true;
+            if (UnvsGlobalInput.Player != null)
+            {
+                if (DisablePlayerInput)
+                {
+                    UnvsGlobalInput.PlayerDisable();
+                }
+            }
         }
         public virtual void Activate()
         {

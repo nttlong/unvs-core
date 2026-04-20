@@ -19,6 +19,10 @@ namespace game2d.scenes {
         public Button btnOk;
         public Button btnCancel;
 
+        public override bool DisablePlayerInput => false;
+
+        public override bool EnablePlayerInput => false;
+        
         public override void InitEvents()
         {
             
@@ -52,6 +56,10 @@ namespace game2d.scenes {
             dialog.btnCancel = dialog.foolterPanel.transform.AddButtonIfNotExist("btnCandel", "Cancel");
             dialog.EditorSetDirty();
         }
+
+        
+
+
 #endif
     }
 }

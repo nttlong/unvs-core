@@ -2,14 +2,34 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 namespace unvs.ext
 {
+    public enum UpdateWorldEmun
+    {
+        Left,
+        Right,
+        Interior,
+        New
+    }
+    [Serializable]
+    public struct GlobalLightChunkInfo
+    {
+        public float intensity;
+        public Color color;
+        public Vector2 position;
+        public DateTime createdOn;
+       
+
+       
+    }
     public static class Light2DExtension
     {
+        
         public static void CopyFrom(this Light2D source, Light2D another)
         {
             if (source == null || another == null) return;
@@ -67,17 +87,17 @@ namespace unvs.ext
         /// <param name="camPos"></param>
         /// <param name="lights"></param>
         /// <returns></returns>
-        public static MixedLightData MixGlobalLightSources(Vector2 camPos, Light2D[] lights)
+        public static MixedLightData MixGlobalLightSources(Vector2 camPos, List< GlobalLightChunkInfo> lights)
         {
             float ambientIntensity = 0.05f; // Ambient tối thiểu của game Emotion
 
             // 1. Phân loại và lấy danh sách đèn:
             // Không check active vì đèn Global của Scene có thể dang bị tắt
-            List<Light2D> activeLights = new List<Light2D>();
-            foreach (var light in lights)
+            List<GlobalLightChunkInfo> activeLights = new List<GlobalLightChunkInfo>();
+            foreach (var light in lights.Cast<GlobalLightChunkInfo?>())
             {
-                if (light == null) continue;
-                activeLights.Add(light);
+                if (light==null) continue;
+                activeLights.Add(light.Value);
             }
 
             // Trường hợp không có nguồn sáng nào
@@ -85,7 +105,7 @@ namespace unvs.ext
             {
                 return new MixedLightData { Color = Color.white, Intensity = ambientIntensity };
             }
-
+            ambientIntensity = activeLights[0].intensity;
             // Trường hợp 1: Có đúng CHUẨN 1 nguồn sáng -> Trả về thẳng Data của nó (Không giảm trừ)
             if (activeLights.Count == 1)
             {
@@ -93,7 +113,7 @@ namespace unvs.ext
                 return new MixedLightData
                 {
                     Color = singleLight.color,
-                    Intensity = Mathf.Max(singleLight.intensity, ambientIntensity)
+                    Intensity = singleLight.intensity
                 };
             }
 
@@ -106,7 +126,7 @@ namespace unvs.ext
             for (int i = 0; i < activeLights.Count; i++)
             {
                 // Chỉ tính khoảng cách chiều X (ngang), bỏ qua Y (cao/thấp)
-                float distX = Mathf.Abs(camPos.x - activeLights[i].transform.position.x);
+                float distX = Mathf.Abs(camPos.x - activeLights[i].position.x);
                 
                 // Trọng số tỷ lệ nghịch với khoảng cách. Cộng thêm epsilon nhỏ (0.001) để tránh lỗi chia cho 0
                 // Bình phương độ dài (Pow 2) giúp việc lân la giữa 2 map có độ chuyển fade đẹp hơn

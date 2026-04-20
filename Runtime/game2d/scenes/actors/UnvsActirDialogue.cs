@@ -15,6 +15,12 @@ namespace unvs.game2d.scenes.actors
         public TextMeshProUGUI txt;
         [SerializeField]
         public Vector2 Size;
+        /// <summary>
+        /// THis UI is Actor dilog 
+        /// </summary>
+        public override bool DisablePlayerInput => false;
+
+        public override bool EnablePlayerInput => false;
 
         public override void InitRunTime()
         {

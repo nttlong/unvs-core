@@ -22,6 +22,10 @@ namespace unvs.game2d.scenes
         private InputAction actionPause;
         private bool isShow;
 
+        public override bool DisablePlayerInput => true;
+
+        public override bool EnablePlayerInput => true;
+
         public override void InitRunTime()
         {
            

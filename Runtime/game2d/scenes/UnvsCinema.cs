@@ -23,7 +23,12 @@ using unvs.shares;
 namespace unvs.game2d.scenes{
     public class UnvsCinema : UnvsUIComponentInstance<UnvsCinema>
     {
-        
+        [Header("Cinema light")]
+        public float DurationTimeSmoothChangeSate = 1.5f;
+        public int MaintainGlobalLightNumber = 5;
+        [SerializeField]
+        public GlobalLightChunkInfo[] worldLightMaintain;
+        private List<GlobalLightChunkInfo> _lights = new List<GlobalLightChunkInfo>();
         public event Action<UnvsScene> BeforeUpdate;
         public event Action<UnvsScene> AfterUpdate;
         public Camera cam;
@@ -34,7 +39,8 @@ namespace unvs.game2d.scenes{
         public BoxCollider2D camColl;
         
         Dictionary<UnvsScene,PolygonCollider2D> worldBoundDict=new Dictionary<UnvsScene, PolygonCollider2D>();
-        Dictionary<UnvsScene, Light2D> lightDict = new Dictionary<UnvsScene, Light2D>();
+        //Dictionary<UnvsScene, Light2D> lightDict = new Dictionary<UnvsScene, Light2D>();
+       
         public PolygonCollider2D worldBoundCollider2d;
         public Transform centerWatch;
         CancellationTokenSource ctsChangeOffset;
@@ -42,13 +48,16 @@ namespace unvs.game2d.scenes{
         public Transform sceneLoaderTracing;
         public BoxCollider2D centerCamTracing;
         public Light2D globalLight;
-        public float DurationTimeSmoothChangeSate = 1.5f;
-        private Light2D[] _lights=new Light2D[] { };
+       
+       
+       
+        
         [SerializeField] public AudioSource audioSource;
 
-
+        
         public void ChangeCameraState(List<UnvsScene> s,bool Imediately)
         {
+            
             if (cam.orthographic)
             {
                 bool flowControl = chaneCameSteByOrthoSize(s, Imediately);
@@ -222,12 +231,13 @@ namespace unvs.game2d.scenes{
         /// The next pharse is ambient
         /// </summary>
         /// <param name="ret"></param>
-        public void UpdateWorld(UnvsScene ret,bool reset)
+        public void UpdateWorld(UnvsScene ret,bool reset, UpdateWorldEmun UpdateType)
         {
             if (reset)
             {
                 this.worldBoundDict = new Dictionary<UnvsScene, PolygonCollider2D>();
-                this.lightDict.Clear();
+                this._lights.Clear();
+                //this.lightDict.Clear();
             }
             this.BeforeUpdate?.Invoke(ret);
             
@@ -237,23 +247,33 @@ namespace unvs.game2d.scenes{
                 ret.light2d.enabled = false;
                 ret.light2d.gameObject.SetActive(false);
                 ret.light2d.transform.position = ret.worldBound.bounds.center;
-                this.lightDict.Add(ret, ret.light2d);
+                if(_lights.Count> this.MaintainGlobalLightNumber)
+                {
+                    removeLight(UpdateType);
+                }
+                this._lights.Add(new GlobalLightChunkInfo
+                {
+                    color = ret.light2d.color,
+                    createdOn=DateTime.Now,
+                    intensity = ret.light2d.intensity,
+                    position= ret.light2d.transform.position,
+                });
             }
+            worldLightMaintain = this._lights.ToArray();
+            //Action<UnvsScene> OnSceneDestroyTmp = null;
+            //Action<UnvsScene> OnSceneDestroy = (s) =>
+            //{
+            //    this.worldBoundDict.Remove(s);
+            //    //UpdateWorldBoundAsync().Forget();
+            //    this.lightDict.Remove(s);
+            //    ret.OnDestroying -= OnSceneDestroyTmp;
+            //    //requestUpdate = true;
 
-            Action<UnvsScene> OnSceneDestroyTmp = null;
-            Action<UnvsScene> OnSceneDestroy = (s) =>
-            {
-                this.worldBoundDict.Remove(s);
-                //UpdateWorldBoundAsync().Forget();
-                this.lightDict.Remove(s);
-                ret.OnDestroying -= OnSceneDestroyTmp;
-                //requestUpdate = true;
+            //};
+            //OnSceneDestroyTmp = OnSceneDestroy;
+            //ret.OnDestroying += OnSceneDestroy;
 
-            };
-            OnSceneDestroyTmp = OnSceneDestroy;
-            ret.OnDestroying += OnSceneDestroy;
-           
-            _lights = this.lightDict.Select(p => p.Value).ToArray();
+            //_lights = this.lightDict.Select(p => p.Value).ToArray();
             updateWorldBound();
             this.AfterUpdate?.Invoke(ret);
             
@@ -261,7 +281,50 @@ namespace unvs.game2d.scenes{
                 
          
         }
-        
+
+        private void removeLight(UpdateWorldEmun UpdateType)
+        {
+            // Define the camera's horizontal center for distance calculation
+            float camCenterX = this.camColl.bounds.center.x;
+            int targetIndex = -1;
+
+            if (UpdateType == UpdateWorldEmun.Left)
+            {
+                // New world added to the left: Find and remove the light furthest to the RIGHT of the camera
+                float maxDistance = float.MinValue;
+                for (int i = 0; i < _lights.Count; i++)
+                {
+                    // Calculate relative distance. Positive values are to the right.
+                    float relativeX = _lights[i].position.x - camCenterX;
+                    if (relativeX > maxDistance)
+                    {
+                        maxDistance = relativeX;
+                        targetIndex = i;
+                    }
+                }
+            }
+            else if (UpdateType == UpdateWorldEmun.Right)
+            {
+                // New world added to the right: Find and remove the light furthest to the LEFT of the camera
+                float minDistance = float.MaxValue;
+                for (int i = 0; i < _lights.Count; i++)
+                {
+                    // Calculate relative distance. Negative values are further to the left.
+                    float relativeX = _lights[i].position.x - camCenterX;
+                    if (relativeX < minDistance)
+                    {
+                        minDistance = relativeX;
+                        targetIndex = i;
+                    }
+                }
+            }
+
+            // Remove the furthest element if the list is not empty
+            if (targetIndex != -1)
+            {
+                _lights.RemoveAt(targetIndex);
+            }
+        }
 
         bool hasUpdate;
         private void updateWorldBound()
@@ -277,7 +340,7 @@ namespace unvs.game2d.scenes{
         public void ClearWorlds()
         {
             this.worldBoundDict.Clear();
-            this.lightDict.Clear();
+            this._lights.Clear();
             
         }
         public override void InitEvents()
@@ -289,7 +352,10 @@ namespace unvs.game2d.scenes{
         
         float _lastPosition = 0;
         bool _wasMoving;
-       
+
+        public override bool DisablePlayerInput => false;
+
+        public override bool EnablePlayerInput => false;
 
         float getValue(float x)
         {

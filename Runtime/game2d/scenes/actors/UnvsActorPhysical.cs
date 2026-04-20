@@ -7,15 +7,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.U2D.Animation;
 using UnityEngine.U2D.IK;
 using unvs.ext;
 using unvs.ext.physical2d;
 using unvs.game2d.objects;
-using  unvs.shares;
+using unvs.shares;
 
 namespace unvs.game2d.scenes.actors
 {
-    
+
     public partial class UnvsActorPhysical : UnvsBaseComponent
     {
         [SerializeField]
@@ -41,13 +42,13 @@ namespace unvs.game2d.scenes.actors
         private CalculateSlopeDirectionResull _slopDirectionResult;
         private UnvsActor _actor;
 
-        private  IKManager2D ikManager
+        private IKManager2D ikManager
         {
             get
             {
                 if (_ikManager == null)
                 {
-                    _ikManager=this.GetComponentInChildren<IKManager2D>();
+                    _ikManager = this.GetComponentInChildren<IKManager2D>();
                 }
                 return _ikManager;
             }
@@ -59,11 +60,11 @@ namespace unvs.game2d.scenes.actors
             {
                 if (_socketHandBackController.IsEmpty())
                 {
-                    _socketHandBackController=new UnvsActorPhysicalSolverRuntime();
-                    _socketHandBackController.target= GetTargetByName(socketHandBack.parent.name);
+                    _socketHandBackController = new UnvsActorPhysicalSolverRuntime();
+                    _socketHandBackController.target = GetTargetByName(socketHandBack.parent.name);
                     //_socketHandBackController.solver = GetSolver2DByName(socketHandBack.parent.name);
                 }
-               return _socketHandBackController;
+                return _socketHandBackController;
             }
         }
         public UnvsActorPhysicalSolverRuntime socketHandFrontController
@@ -73,10 +74,10 @@ namespace unvs.game2d.scenes.actors
                 if (_socketHandFrontController.IsEmpty())
                 {
                     _socketHandFrontController = new UnvsActorPhysicalSolverRuntime();
-                    _socketHandFrontController.target= GetTargetByName(socketHandFront.parent.name);
+                    _socketHandFrontController.target = GetTargetByName(socketHandFront.parent.name);
                     //_socketHandFrontController.solver = GetSolver2DByName(socketHandFront.parent.name);
                 }
-               return _socketHandFrontController;
+                return _socketHandFrontController;
             }
         }
 
@@ -85,7 +86,7 @@ namespace unvs.game2d.scenes.actors
         public async UniTask MoveSocketHandBackToAsync(Vector2 pos, float duration = 1f, CancellationToken token = default)
         {
             // 1. Lấy tham chiếu các thành phần
-            var bone = this.socketHandBack.parent; 
+            var bone = this.socketHandBack.parent;
             var target = GetTargetByName(bone.name);
             var solver = GetSolver2DByName(bone.name);
 
@@ -121,10 +122,10 @@ namespace unvs.game2d.scenes.actors
         public Transform GetTargetByName(string name)
         {
             var ikCOntrol = this.GetComponentInChildrenByName<Transform>("IK-Control");
-            if (ikCOntrol!=null)
+            if (ikCOntrol != null)
             {
                 var target = ikCOntrol.GetComponentInChildrenByName<Transform>("targets");
-                if (target!=null)
+                if (target != null)
                 {
                     return target.GetComponentInChildrenByName<Transform>(name);
                 }
@@ -133,9 +134,9 @@ namespace unvs.game2d.scenes.actors
         }
         public Vector2 GetReachPoint(Vector2 pos)
         {
-            var dir=GetComponent<Collider2D>().bounds.center.GetDirectionTo(pos);
+            var dir = GetComponent<Collider2D>().bounds.center.GetDirectionTo(pos);
             if (dir < 0) return pos + new Vector2(this.ArmLen, 0);
-            if(dir > 1) return pos + new Vector2(-this.ArmLen, 0);
+            if (dir > 1) return pos + new Vector2(-this.ArmLen, 0);
             return pos;
         }
         public virtual float CalculateHeight()
@@ -156,42 +157,74 @@ namespace unvs.game2d.scenes.actors
         }
         public virtual void IninitStatus()
         {
-            
+
             this.NormalHeight = CalculateHeight();
         }
         private void Awake()
         {
             if (Application.isPlaying)
             {
-                _actor=GetComponent<UnvsActor>();
+                _actor = GetComponent<UnvsActor>();
                 IninitStatus();
             }
         }
-       
-        
+        public void HoldItemInBackHand(MonoBehaviour item)
+        {
+            socketHandBack.AttachItemToSocket(item.transform);
+            var bone = socketHandBack.parent;
+
+            var sprite=this.GetComponentsInChildren<SpriteSkin>().FirstOrDefault(p=>p.boneTransforms.Contains(bone));
+            if (sprite != null)
+            {
+                var spriteRender=sprite.GetComponent<SpriteRenderer>();
+                if (spriteRender != null)
+                {
+                    item.SetSortingOrder(spriteRender.sortingOrder+1, spriteRender.sortingLayerName);
+                }
+            }
+            item.SetMeOnLayer(Constants.Layers.HOLD_ITEM);
+            currentHoldingItem = item.GetComponent<UnvsPickableObject>();
+        }
+        public void HoldItemInFrontHand(MonoBehaviour item)
+        {
+            socketHandFront.AttachItemToSocket(item.transform);
+            var bone = socketHandBack.parent;
+
+            var sprite = this.GetComponentsInChildren<SpriteSkin>().FirstOrDefault(p => p.boneTransforms.Contains(bone));
+            if (sprite != null)
+            {
+                var spriteRender = sprite.GetComponent<SpriteRenderer>();
+                if (spriteRender != null)
+                {
+                    item.SetSortingOrder(spriteRender.sortingOrder-1, spriteRender.sortingLayerName);
+                }
+            }
+            item.SetMeOnLayer(Constants.Layers.HOLD_ITEM);
+            currentHoldingItem = item.GetComponent<UnvsPickableObject>();
+        }
     }
 #if UNITY_EDITOR
     public partial class UnvsActorPhysical : UnvsBaseComponent
     {
-       
+
 
         [UnvsButton("Create Hit box collider")]
-        public void EditorCreateHitBoxCollider ()
+        public void EditorCreateHitBoxCollider()
         {
-           
+
             var cc = this.AddComponentIfNotExist<CompositeCollider2D>();
             cc.geometryType = CompositeCollider2D.GeometryType.Polygons;
-            var lst=new List<Collider2D> ();
+            var lst = new List<Collider2D>();
             foreach (var footer in Footers)
             {
                 var c = footer.AddComponentIfNotExist<PolygonCollider2D>();
                 footer.SetMeOnTag(Constants.Tags.PLAYER_FOOTER);
                 footer.gameObject.SetMeOnLayer(Constants.Layers.PLAYER_FOOTER);
-                
+
                 lst.Add(c);
-                
+
                 c.SetPath(0, footer.Collider2dGeneratePoints());
-                c.compositeOperation=Collider2D.CompositeOperation.Merge;
+                c.compositeOperation = Collider2D.CompositeOperation.Merge;
             }
             if (this.headBone != null)
             {
@@ -199,25 +232,26 @@ namespace unvs.game2d.scenes.actors
                 headBone.SetMeOnTag(Constants.Tags.PLAYER_HEADER);
                 headBone.gameObject.SetMeOnLayer(Constants.Layers.PLAYER_HEADER);
                 c.compositeOperation = Collider2D.CompositeOperation.Merge;
-               
+
                 c.SetPath(0, headBone.Collider2dGeneratePoints());
                 lst.Add(c);
 
-            } else
+            }
+            else
             {
                 Debug.LogWarning($"headBone in {this.GetType()}.{name} is null");
             }
-            HitBoxesCollider= lst.ToArray();
+            HitBoxesCollider = lst.ToArray();
         }
         [UnvsButton("Validate")]
         public void EditorVaildate()
         {
-            if(ArmTop==null||ArmRoot==null)
+            if (ArmTop == null || ArmRoot == null)
             {
                 this.RaiseEditorError($"ArmTop and ArmRoot must be set on {name}");
             }
-            ArmLen=Vector2.Distance( ArmTop.GetSegment().End, ArmRoot.GetSegment().Start );
-            if(this.handBack==null || this.handFront == null)
+            ArmLen = Vector2.Distance(ArmTop.GetSegment().End, ArmRoot.GetSegment().Start);
+            if (this.handBack == null || this.handFront == null)
             {
                 this.RaiseEditorError($"handBack and handFront must be set on {name}");
             }
@@ -233,5 +267,5 @@ namespace unvs.game2d.scenes.actors
             //this.socketHandFront.localPosition = new Vector3(0.5f, 0.5f, 0);
         }
     }
-    #endif
+#endif
 }

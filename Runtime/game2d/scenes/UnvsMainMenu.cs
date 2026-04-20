@@ -16,6 +16,11 @@ namespace unvs.game2d.scenes
         public Button btnExit;
         public Action OnStart;
         public Action OnExit;
+
+        public override bool DisablePlayerInput => true;
+
+        public override bool EnablePlayerInput => true;
+
         public override void InitEvents()
         {
             btnStart.onClick.AddListener(() =>
@@ -27,7 +32,7 @@ namespace unvs.game2d.scenes
                 OnExit?.Invoke();
             });
         }
-
+        
         public override void InitRunTime()
         {
             
@@ -53,6 +58,8 @@ namespace unvs.game2d.scenes
 
 
         }
+
+        
 #endif
     }
 }

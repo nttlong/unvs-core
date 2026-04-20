@@ -33,7 +33,11 @@ namespace unvs.actionsbasics
                     sender.Cancel();
                     return;
                 }
-                await skill.MovtoTargetAsync(iteractSource.GetPosition(), sender.Cts.Token);
+                await skill.MovtoTargetAsync(iteractSource.GetPosition(), distance =>
+                {
+                   
+                }, sender.Cts.Token);
+                actor.GetComponent<UnvsAnimStates>().BaseMotion("Idle");
             }
             else
             {

@@ -10,6 +10,10 @@ namespace game2d.scenes {
         
         public Image panel;
 
+        public override bool DisablePlayerInput => false;
+
+        public override bool EnablePlayerInput => false;
+
         public override void InitEvents()
         {
             
@@ -26,6 +30,8 @@ namespace game2d.scenes {
             this.canvas = this.AddChildChildCanvasWithGraphicRaycasterIfNotExist("canvas");
             this.panel = this.canvas.transform.AddChildComponentIfNotExist<Image>("Panel");
         }
+
+        
 #endif
     }
 }
