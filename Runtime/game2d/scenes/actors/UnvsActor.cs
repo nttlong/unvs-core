@@ -32,6 +32,8 @@ namespace unvs.game2d.scenes.actors
 
     public partial class UnvsActor : UnvsBaseComponent
     {
+        [SerializeField]
+        public BaseSkillObject[] SkilObjects;
         public UnvsActorSkills Skills;
         public void SayText(string msg) => Skills.Get<unvs.actor.skills.ActorSpeaker>()?.SayText(msg);
         public void SayOff() => UnvsActirDialogue.Instance.Hide();

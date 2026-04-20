@@ -13,49 +13,61 @@ namespace unvs.editor.actorskill
         {
             if (property.propertyType != SerializedPropertyType.ManagedReference)
             {
-                EditorGUI.LabelField(position, label.text, "Chỉ dùng với [SerializeReference]");
+                EditorGUI.LabelField(position, label, new GUIContent("Chỉ dùng với [SerializeReference]"));
                 return;
             }
 
-            // 1. Lấy tất cả class con của ActorBaseSkill
-            var baseType = typeof(AbstractActorBaseSkill);
-            var types = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(s => s.GetTypes())
-                .Where(p => baseType.IsAssignableFrom(p) && !p.IsAbstract && p.IsClass)
-                .ToArray();
+            EditorGUI.BeginProperty(position, label, property);
 
-            // 2. Vẽ label cho phần tử mảng
+            // 1. Vẽ Label
             Rect labelRect = new Rect(position.x, position.y, EditorGUIUtility.labelWidth, EditorGUIUtility.singleLineHeight);
             EditorGUI.LabelField(labelRect, label);
 
-            // 3. Vẽ nút Dropdown (Nằm bên phải label)
+            // 2. Vẽ nút Dropdown (Nằm bên phải label)
             Rect buttonRect = new Rect(position.x + EditorGUIUtility.labelWidth, position.y, position.width - EditorGUIUtility.labelWidth, EditorGUIUtility.singleLineHeight);
 
-            string currentTypeName = property.managedReferenceFullTypename.Split(' ').Last();
-            if (string.IsNullOrEmpty(currentTypeName)) currentTypeName = "Null (Click to Select)";
+            string fullTypeName = property.managedReferenceFullTypename;
+            string currentTypeName = string.IsNullOrEmpty(fullTypeName) ? "Null (Click to Select)" : fullTypeName.Split(' ').Last().Split('.').Last();
 
             if (GUI.Button(buttonRect, currentTypeName, EditorStyles.popup))
             {
-                GenericMenu menu = new GenericMenu();
-                menu.AddItem(new GUIContent("None"), property.managedReferenceValue == null, () =>
-                {
-                    property.managedReferenceValue = null;
-                    property.serializedObject.ApplyModifiedProperties();
-                });
-
-                foreach (var type in types)
-                {
-                    menu.AddItem(new GUIContent(type.Name), currentTypeName == type.Name, () =>
-                    {
-                        property.managedReferenceValue = Activator.CreateInstance(type);
-                        property.serializedObject.ApplyModifiedProperties();
-                    });
-                }
-                menu.ShowAsContext();
+                ShowTypeMenu(property);
             }
 
-            // 4. Vẽ các thuộc tính bên trong (name, animator) bên dưới dropdown
-            EditorGUI.PropertyField(position, property, label, true);
+            // 3. Vẽ các thuộc tính con nếu có (Dùng PropertyField cho phần nội dung bên dưới)
+            // Lưu ý: Không vẽ label lần nữa để tránh chồng lấn
+            Rect propertyRect = new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight + 2, position.width, position.height - EditorGUIUtility.singleLineHeight - 2);
+            
+            // Nếu có value mới hiện các field con
+            if (property.managedReferenceValue != null)
+            {
+                EditorGUI.PropertyField(position, property, GUIContent.none, true);
+            }
+
+            EditorGUI.EndProperty();
+        }
+
+        private void ShowTypeMenu(SerializedProperty property)
+        {
+            var baseType = typeof(AbstractActorBaseSkill);
+            var types = unvs.editor.utils.TypeCacheHelper.GetDerivedTypes(baseType);
+
+            GenericMenu menu = new GenericMenu();
+            menu.AddItem(new GUIContent("None"), property.managedReferenceValue == null, () =>
+            {
+                property.managedReferenceValue = null;
+                property.serializedObject.ApplyModifiedProperties();
+            });
+
+            foreach (var type in types)
+            {
+                menu.AddItem(new GUIContent(type.Name), false, () =>
+                {
+                    property.managedReferenceValue = Activator.CreateInstance(type);
+                    property.serializedObject.ApplyModifiedProperties();
+                });
+            }
+            menu.ShowAsContext();
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)

@@ -15,11 +15,8 @@ namespace unvs.editor.actorskill
 
         private void OnEnable()
         {
-            // Tìm tất cả các class kế thừa từ ActorBaseSkill
-            _implementations = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(s => s.GetTypes())
-                .Where(p => typeof(AbstractActorBaseSkill).IsAssignableFrom(p) && !p.IsAbstract)
-                .ToArray();
+            // Tìm tất cả các class kế thừa từ ActorBaseSkill sử dụng cache
+            _implementations = unvs.editor.utils.TypeCacheHelper.GetDerivedTypes(typeof(AbstractActorBaseSkill));
         }
 
         public override void OnInspectorGUI()

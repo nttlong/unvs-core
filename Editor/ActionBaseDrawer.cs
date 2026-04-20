@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 
 using System;
 using System.Linq;
@@ -46,10 +46,7 @@ public class ActionBaseDrawer : PropertyDrawer
     {
         if (_derivedTypes == null)
         {
-            _derivedTypes = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(s => s.GetTypes())
-                .Where(p => typeof(ActionBase).IsAssignableFrom(p) && !p.IsAbstract && p.IsClass)
-                .ToArray();
+            _derivedTypes = unvs.editor.utils.TypeCacheHelper.GetDerivedTypes(typeof(ActionBase));
         }
 
         GenericMenu menu = new GenericMenu();

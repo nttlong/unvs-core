@@ -13,6 +13,12 @@ using unvs.shares;
 
 namespace unvs.actor.skills
 {
+    [Serializable]
+    public abstract class BaseSkillObject: Behaviour
+    {
+        
+    }
+
     public class SkillSelectorAttribute : PropertyAttribute { }
     [Serializable]
     public abstract class AbstractActorBaseSkill // Chuyển thành abstract
