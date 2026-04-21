@@ -118,7 +118,11 @@ namespace unvs.shares
       
         static Dictionary<string, Scene> sceneLoaded = new Dictionary<string, Scene>();
 
-
+        public class DefaultResources
+        {
+            public static string Box = "Packages/com.unvs.core/Runtime/Sprites/Square.png";
+            public static string Circle = "Packages/com.unvs.core/Runtime/Sprites/Square.png";
+        }
 
         public static async UniTask<Scene> LoadNewScene(string startScene)
         {

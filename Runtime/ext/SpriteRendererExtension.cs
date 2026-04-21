@@ -1,6 +1,8 @@
 ﻿using Cysharp.Threading.Tasks;
+
 using System;
 using System.Collections;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -10,6 +12,15 @@ namespace unvs.ext
 {
     public static class SpriteRendererExtension
     {
+        public static SpriteRenderer ApplyDefaultBox(this SpriteRenderer sp)
+        {
+            if (sp == null) return sp;
+            if(sp.sprite==null)
+            {
+                sp.sprite = Commons.LoadAsset<Sprite>(Commons.DefaultResources.Box);
+            }
+            return sp;
+        }
         internal static void ApplyTexture(this SpriteRenderer sprite, string path)
         {
             var t=Commons.LoadAsset<Texture2D>(path);
@@ -110,4 +121,67 @@ namespace unvs.ext
            
         }
     }
+#if UNITY_EDITOR
+    public static class SpriteRendererExtensionExitor
+    {
+        /// <summary>
+        /// Use if SpriteRenderer is in same level with BoxCollider2D
+        /// </summary>
+        /// <param name="sr"></param>
+        /// <param name="coll"></param>
+        /// <returns></returns>
+        public static SpriteRenderer EditorSyncSize(this SpriteRenderer sr,BoxCollider2D coll, Transform transform)
+        {
+            if (sr == null ||coll == null || transform == null)
+            {
+                var i = 0;
+                foreach(object obj  in new object[] {sr,coll, transform })
+                {
+                    if (obj == null)
+                    {
+                        Debug.LogError($"param {i} is null");
+                    }
+                    i++;
+                }
+            }
+                SpriteRendererExtension.FixCollider2DSize(sr, coll);
+            float width = sr.sprite.rect.width / sr.sprite.pixelsPerUnit;
+            float height = sr.sprite.rect.height / sr.sprite.pixelsPerUnit;
+            coll.size = new Vector2(width, height);// sp.transform.localScale;
+            coll.offset = Vector2.zero;
+            // coll.offset =new ( sp.transform.position.x/2,sp.transform.position.y);//= coll.offset;
+            coll.transform.rotation = transform.rotation;// = coll.transform.rotation;
+            return sr;
+        }
+        /// <summary>
+        /// Use if SpriteRenderer is in child level with BoxCollider2D
+        /// </summary>
+        /// <param name="sr"></param>
+        /// <param name="coll"></param>
+        /// <returns></returns>
+        public static SpriteRenderer EditorSyncSize(this SpriteRenderer sr, BoxCollider2D coll)
+        {
+            if (sr == null || coll == null)
+            {
+                var i = 0;
+                foreach (object obj in new object[] { sr, coll })
+                {
+                    if (obj == null)
+                    {
+                        Debug.LogError($"param {i} is null");
+                    }
+                    i++;
+                }
+            }
+            if (sr != null && coll != null)
+            {
+                sr.transform.localScale = coll.size;
+                sr.transform.localPosition = coll.offset;
+                // coll.offset =new ( sp.transform.position.x/2,sp.transform.position.y);//= coll.offset;
+                coll.transform.rotation = sr.transform.rotation;// = coll.transform.rotation;
+            }
+            return sr;
+        }
+    } 
+#endif
 }

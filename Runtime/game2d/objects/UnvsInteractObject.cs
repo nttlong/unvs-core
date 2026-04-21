@@ -102,31 +102,32 @@ namespace unvs.game2d.objects
         }
         public virtual void OnDrawGizmos()
         {
-            if(coll==null)
-            coll=this.GetComponent<BoxCollider2D>();
-            coll.isTrigger = true;
-            var sp=this.GetComponent<SpriteRenderer>();
+            var sp = GetComponent<SpriteRenderer>();
             if (sp != null)
             {
-                SpriteRendererExtension.FixCollider2DSize(sp, coll);
-                float width = sp.sprite.rect.width / sp.sprite.pixelsPerUnit;
-                float height = sp.sprite.rect.height / sp.sprite.pixelsPerUnit;
-                coll.size = new Vector2(width, height);// sp.transform.localScale;
-                coll.offset = Vector2.zero;
-                // coll.offset =new ( sp.transform.position.x/2,sp.transform.position.y);//= coll.offset;
-                coll.transform.rotation = transform.rotation;// = coll.transform.rotation;
-            } else
-            {
-                sp = this.GetComponentInChildren<SpriteRenderer>();
-                if (sp != null && coll != null)
+                if (sp.sprite == null)
                 {
-                    sp.transform.localScale = coll.size;
-                    sp.transform.localPosition = coll.offset;
-                    // coll.offset =new ( sp.transform.position.x/2,sp.transform.position.y);//= coll.offset;
-                    coll.transform.rotation = sp.transform.rotation;// = coll.transform.rotation;
+                    sp.ApplyDefaultBox();
                 }
             }
-            
+            if (coll == null)
+            {
+                coll = this.GetComponent<BoxCollider2D>();
+                coll.isTrigger = true;
+            }
+
+            if (sp != null)
+            {
+                sp.EditorSyncSize(coll, transform);
+
+            }
+            else
+            {
+                sp = this.GetComponentInChildren<SpriteRenderer>();
+                sp?.EditorSyncSize(coll);
+
+            }
+
         }
     }
 #endif
