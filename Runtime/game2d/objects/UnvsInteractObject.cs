@@ -9,6 +9,7 @@ using Cysharp.Threading.Tasks;
 using System.Threading;
 using unvs.actions;
 using UnityEngine.Rendering;
+using unvs.unvsobjects;
 namespace unvs.game2d.objects
 {
 
@@ -21,9 +22,23 @@ namespace unvs.game2d.objects
         public BoxCollider2D coll;
         public Texture2D mousePoint;
         public InteractionDefinition Data;
-        
+        public UnvsObjectAttributesData ObjectDefinition;
+        /// <summary>
+        /// This event is called only once when the object is interacted for the first time.
+        /// </summary>
+        public Func<ActionBaseSender,UniTask> OnFirstTimeInteract;
+        /// <summary>
+        /// This event is called when the object is interacted for the last time.
+        /// </summary>
+        public Func<ActionBaseSender,UniTask> OnCompletedAsync;
+        /// <summary>
+        /// This event is called every time the object is interacted.
+        /// </summary>
+        public Func<ActionBaseSender,UniTask> OnStartInteract;
+        public string LayerName = Constants.Layers.INTERACT_OBJECT;
         public override void InitRuntime()
         {
+            
             if(this.mousePoint==null)
             this.mousePoint = UnvsInteractUI.Instance.defaultCursorIcon;
         }
@@ -36,13 +51,25 @@ namespace unvs.game2d.objects
         public async UniTask<ActionBaseSender> ExecuteAsync(MonoBehaviour target, CancellationTokenSource cts)
         {
             
-           
+          
             var sender = new ActionBaseSender()
             {
                 Target = target,
                 Source=this,
                 Cts= cts
             };
+            if (OnFirstTimeInteract != null)
+            {
+                await OnFirstTimeInteract(sender);
+                OnFirstTimeInteract = null;
+                if (sender.IsCancel) return sender;
+            }
+
+            if (OnStartInteract != null)
+            {
+                await OnStartInteract(sender);
+                if (sender.IsCancel) return sender;
+            }
             if (Data == null)
             {
                 sender.Cancel();
@@ -56,6 +83,10 @@ namespace unvs.game2d.objects
                 await item.ExecuteAsync(sender);
                 if (sender.IsCancel ) return sender;
             }
+            if (OnCompletedAsync != null)
+            {
+                await OnCompletedAsync(sender);
+            }
             return sender;
         }
 
@@ -67,7 +98,7 @@ namespace unvs.game2d.objects
 
         public virtual void OnValidate()
         {
-            this.SetMeOnLayer(Constants.Layers.INTERACT_OBJECT);
+            this.SetMeOnLayer(LayerName);
         }
         public virtual void OnDrawGizmos()
         {

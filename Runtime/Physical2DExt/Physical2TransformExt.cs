@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using System;
+using System.Linq;
 using System.Threading;
 using UnityEngine;
 using unvs.shares;
@@ -46,8 +47,11 @@ namespace unvs.ext.physical2d
     }
     public static class Physical2TransformExt
     {
-        public static bool GetHit(this Collider2D compositeColl, out RaycastHit2D hit, Vector2 direction, float distance = 10f, string Layer = Constants.Layers.WORLD_GROUND, params string[] extra)
+        public static bool GetHit(this Collider2D compositeColl, out RaycastHit2D hit, Vector2 direction, float distance = float.PositiveInfinity, string Layer = Constants.Layers.WORLD_GROUND, params string[] extra)
         {
+            bool oldSetting = Physics2D.queriesStartInColliders;
+            // Force physics engine to ignore the starting collider
+            //Physics2D.queriesStartInColliders = false;
             var filter = new ContactFilter2D();
             filter.useLayerMask = true;
             filter.layerMask = LayerMask.GetMask(Layer);
@@ -56,13 +60,25 @@ namespace unvs.ext.physical2d
                 filter.layerMask |= LayerMask.GetMask(extra);
             }
             filter.useTriggers = false;
-
-            RaycastHit2D[] hits = new RaycastHit2D[1];
+            hit = default;
+            RaycastHit2D[] hits = new RaycastHit2D[3];
             int count = compositeColl.Raycast(direction, filter, hits, distance);
-
+            //Physics2D.queriesStartInColliders = oldSetting;
             if (count > 0)
             {
-                hit = hits[0];
+                for (int i = 0; i < count; i++)
+                {
+                    // Explicitly ignore itself
+                    if (hits[i].collider != null && hits[i].collider != compositeColl)
+                    {
+                        hit = hits[i];
+                        if(compositeColl is BoxCollider2D)
+                        {
+                            return true;
+                        }
+                        break;
+                    }
+                }
                 Bounds b = compositeColl.bounds;
                 Debug.DrawLine(b.center, hit.point, Color.red, 5f);
                 // Kiểm tra xem điểm va chạm có nằm "sau" mép ngoài cùng của Collider theo hướng bắn không
@@ -77,7 +93,7 @@ namespace unvs.ext.physical2d
                 return true;
             }
 
-            hit = new RaycastHit2D();
+            
             return false;
         }
         public static string GetHitLayer(this Collider2D coll, Vector2 direction, float distance = 1f, string LayerName = Constants.Layers.WORLD_GROUND, params string[] extraLayers)

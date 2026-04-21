@@ -101,6 +101,7 @@ namespace unvs.ext
             float height = sp.sprite.rect.height / sp.sprite.pixelsPerUnit;
             coll.size = new Vector2(width, height);// sp.transform.localScale;
         }
+        
         public static void FixCollider2DSize(this Sprite sp, BoxCollider2D coll)
         {
             float width = sp.rect.width / sp.pixelsPerUnit;

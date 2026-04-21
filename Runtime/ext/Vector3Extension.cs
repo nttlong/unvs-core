@@ -792,5 +792,57 @@ namespace unvs.ext
             Vector2 dir = (p2 - p1).normalized;
             return new Vector2(-dir.y, dir.x); // Pháp tuyến hướng lên/ra ngoài
         }
+        public static bool GetHit(this Vector2 pos, out RaycastHit2D hit, Vector2 direction, float distance = 10f, string Layer = Constants.Layers.WORLD_GROUND, params string[] extra)
+        {
+           
+            
+            var layerMaskNumber = LayerMask.GetMask(Layer);
+            if (extra.Length > 0)
+            {
+                layerMaskNumber |= LayerMask.GetMask(extra);
+            }
+
+
+            hit = Physics2D.Raycast(pos, direction, distance, layerMaskNumber);
+
+           return hit.collider!=null;
+           
+        }
+        public static Vector2 GetCenterPoint(this BoxCollider2D box, PositionEnum pos, float eps=0.001f)
+        {
+            switch (pos)
+            {
+                case PositionEnum.Center:
+                    // Absolute center of the bounding box
+                    return box.bounds.center;
+
+                case PositionEnum.Top:
+                    // Midpoint of the top edge
+                    return new Vector2(box.bounds.center.x, box.bounds.max.y);
+
+                case PositionEnum.Bottom:
+                    // Midpoint of the bottom edge
+                    return new Vector2(box.bounds.center.x, box.bounds.min.y);
+
+                case PositionEnum.Left:
+                    // Midpoint of the left edge
+                    return new Vector2(box.bounds.min.x, box.bounds.center.y);
+
+                case PositionEnum.Right:
+                    // Midpoint of the right edge
+                    return new Vector2(box.bounds.max.x, box.bounds.center.y);
+
+                default:
+                    return box.bounds.center;
+            }
+        }
+    }
+    public enum PositionEnum
+    {
+        Center,
+        Bottom,
+        Left,
+        Right,
+        Top,
     }
 }
