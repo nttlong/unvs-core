@@ -48,7 +48,7 @@ namespace unvs.game2d.objects
             return coll.bounds.center;
         }
 
-        public async UniTask<ActionBaseSender> ExecuteAsync(MonoBehaviour target, CancellationTokenSource cts)
+        public virtual async UniTask<ActionBaseSender> ExecuteAsync(MonoBehaviour target, CancellationTokenSource cts)
         {
             
           
