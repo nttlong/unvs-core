@@ -212,8 +212,7 @@ namespace unvs.actor.skills
             }
             ref var r = ref this._slopDirectionResult;
 
-            coll.CalculateSlopDirection(ref r, Direction.x,20f);
-            var forceDown = 0f;
+            coll.CalculateSlopDirection(ref r, Direction.x,0.1f);
             if (r.IsHit)
             {
                 if (r.hitCollider.tag == Constants.Tags.RIGID_BOX)
@@ -222,22 +221,22 @@ namespace unvs.actor.skills
                     if (rb != null)
                     {
                         float vY = rb.Velocity.y;
-                        actor.SayText($"speed-down={rb.Velocity.y}");
+
                         // Nếu thang máy đang đi xuống
                         if (vY < 0)
                         {
                             // Ép hướng di chuyển của nhân vật đi xuống nhanh hơn thang máy một chút
                             // Điều này giúp GroundCheck luôn IsHit = true mà không cần dùng SetParent
-                            forceDown = vY - 2f;
+                            r.slopeDir.y = vY - 2f;
                         }
                     }
 
 
                 }
-                    
+                    actor.SayText(r.hitCollider.tag);
                
             } 
-            this.MoveStep(Owner.transform, r.slopeDir, forceDown);
+            this.MoveStep(Owner.transform, r.slopeDir);
         }
 
         public virtual bool IsOnRigBox()
@@ -253,13 +252,13 @@ namespace unvs.actor.skills
             return false;
         }
 
-        public void MoveStep(Transform transform, Vector2 slopeDirection, float forceDown)
+        public void MoveStep(Transform transform, Vector2 slopeDirection)
         {
 
             if (Application.isPlaying)
             {
-                var step = Direction * base.CurrentSpeed + new Vector2(0, forceDown);
-                //if (CurrentSpeed > 0)
+
+                if (CurrentSpeed > 0)
                 {
 
                     //if (slopeDirection == Vector2.zero)
@@ -267,9 +266,8 @@ namespace unvs.actor.skills
                     //    transform.position += (Vector3)Direction * base.CurrentSpeed * Time.deltaTime;
                     //else
                         //transform.MoveStep(this.target, speed, out var dir, direction2.x);
-                        transform.position += (Vector3)step * Time.deltaTime;
+                        transform.position += ((Vector3)Direction)  * base.CurrentSpeed * Time.deltaTime;
                 }
-                //transform.position += (Vector3)step * Time.deltaTime;
             }
 
         }

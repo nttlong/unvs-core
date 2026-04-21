@@ -29,14 +29,13 @@ namespace unvs.game2d.objects
         public Action OnBeginTransition;
         public Action OnInTransition;
         public Action OnCompleteTransition;
-        private bool _ToggleHeight;
-        public float DutaionTime;
+        private object _ToggleHeight;
 
         public virtual UnvsRigidObject ExecTransition(float distance, TrasitionEnum transition,float duration)
         {
             var rb = GetComponent<Rigidbody2D>();
             Vector2 targetPosition = rb.position;
-            
+
             // 1. Tính toán tọa độ đích dựa trên Enum
             switch (transition)
             {
@@ -50,7 +49,7 @@ namespace unvs.game2d.objects
             // Sử dụng DOMove của Rigidbody thay vì Transform để Unity xử lý vật lý mượt hơn
             rb.DOMove(targetPosition, duration) // 1f là thời gian di chuyển, bạn có thể biến nó thành tham số
               .SetEase(Ease.InOutQuad)     // Khởi đầu và kết thúc mượt mà (rất hợp với game Horror)
-              .SetUpdate(UpdateType.Normal) // QUAN TRỌNG: Buộc Tween chạy trong FixedUpdate để đồng bộ với vật lý
+              .SetUpdate(UpdateType.Fixed) // QUAN TRỌNG: Buộc Tween chạy trong FixedUpdate để đồng bộ với vật lý
               .OnUpdate(() => {
                   Velocity = ((Vector2)transform.position - lastPosition) / Time.fixedDeltaTime;
                   lastPosition = transform.position;
@@ -62,28 +61,25 @@ namespace unvs.game2d.objects
 
             return this;
         }
-
         
+        //public virtual void FixedUpdate()
+        //{
+        //    // Tính vận tốc = (Vị trí mới - Vị trí cũ) / thời gian
+        //    Velocity = ((Vector2)transform.position - lastPosition) / Time.fixedDeltaTime;
+        //    lastPosition = transform.position;
+        //}
         public virtual void InitRuntime()
         {
             coll = this.GetComponent<BoxCollider2D>();
         }
 
-        public void ToggleHeight()
+        public void _ToggleHeight()
         {
-            _ToggleHeight = !_ToggleHeight;
-            float height = _ToggleHeight?-coll.bounds.size.y: coll.bounds.size.y;
-            transform.parent.DOMoveY(height, DutaionTime)
+            _ToggleHeight = !ToggleHeight;
+            float height = coll.bounds.size.y;
+            source.transform.parent.DOMoveY(height, DutaionTime)
                 .SetRelative()
-                .SetEase(Ease.OutQuad).SetUpdate(UpdateType.Fixed) // QUAN TRỌNG: Buộc Tween chạy trong FixedUpdate để đồng bộ với vật lý
-              .OnUpdate(() => {
-                  Velocity = ((Vector2)transform.position - lastPosition) / Time.fixedDeltaTime;
-                  lastPosition = transform.position;
-                  OnInTransition?.Invoke();
-              }).OnComplete(() =>
-              {
-                  OnCompleteTransition?.Invoke();
-              }); ;
+                .SetEase(Ease.OutQuad);
         }
     }
 #if UNITY_EDITOR

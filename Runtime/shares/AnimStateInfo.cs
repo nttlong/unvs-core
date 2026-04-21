@@ -6,6 +6,10 @@ using unvs.game2d.scenes.actors;
 
 namespace unvs.shares
 {
+    public enum TrasitionEnum
+    {
+        Up, Down, Left, Right
+    }
     //[Serializable]
     public partial class AnimStateInfo:unvs.game2d.scenes.UnvsBaseComponent
     {

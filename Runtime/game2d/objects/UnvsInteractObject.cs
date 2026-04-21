@@ -35,7 +35,7 @@ namespace unvs.game2d.objects
         /// This event is called every time the object is interacted.
         /// </summary>
         public Func<ActionBaseSender,UniTask> OnStartInteract;
-        public string LayerName = Constants.Layers.INTERACT_OBJECT;
+        
         public override void InitRuntime()
         {
             
@@ -98,7 +98,7 @@ namespace unvs.game2d.objects
 
         public virtual void OnValidate()
         {
-            this.SetMeOnLayer(LayerName);
+            this.SetMeOnLayer(Constants.Layers.INTERACT_OBJECT);
         }
         public virtual void OnDrawGizmos()
         {

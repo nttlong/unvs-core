@@ -1,21 +1,32 @@
+using game2d.objects;
 using UnityEngine;
+using unvs.ext;
 using unvs.game2d.transitions;
+using unvs.shares;
 
 namespace unvs.game2d.objects
 {
     [RequireComponent(typeof(BoxCollider2D))]
-    public class UnvsRigidBox : UnvsRigidObject
+    [RequireComponent(typeof(UnvsTransitionable))]
+    public partial class UnvsRigidBox : UnvsRigidObject
     {
-        public UnvsTransitionDefinitions Transition;
-        public float Height;
-        public float duration;
-
-        public bool IsOn;
+        
+       
 
         public override void InitRuntime()
         {
             coll=GetComponent<BoxCollider2D>();
-            Height = coll.bounds.size.y;
+           
         }
     }
+#if UNITY_EDITOR
+    public partial class UnvsRigidBox : UnvsRigidObject
+    {
+        public override void OnDrawGizmos()
+        {
+            this.SetMeOnTag(Constants.Tags.RIGID_BOX);
+            base.OnDrawGizmos();
+        }
+    }
+#endif
 }

@@ -80,6 +80,8 @@ namespace unvs.game2d.scenes.actors
 
         }
         private bool _isSkillsCloned = false;
+       
+
         public virtual void OnEnable()
         {
             if (Skills != null && !_isSkillsCloned)

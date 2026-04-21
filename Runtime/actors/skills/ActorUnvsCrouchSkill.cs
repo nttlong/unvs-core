@@ -39,7 +39,7 @@ namespace unvs.actor.skills {
             ref var r = ref this._slopDirectionResult;
             coll.CalculateSlopDirection(ref r, Direction.x);
 
-            this.MoveStep(Owner.transform, r.slopeDir);
+            this.MoveStep(Owner.transform, r.slopeDir,0);
         }
 
         public override async UniTask<bool> StartAysnc(CancellationToken tk = default)

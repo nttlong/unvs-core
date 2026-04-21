@@ -9,9 +9,11 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
+using unvs.ext.physical2d;
 using unvs.game2d.scenes;
 using unvs.game2d.scenes.actors;
 using unvs.shares;
+using static UnityEngine.LowLevelPhysics2D.PhysicsLayers;
 
 
 
@@ -49,12 +51,29 @@ namespace unvs.ext
 
               
         }
-        public static void CalculateSlopDirection(this Collider2D coll, ref CalculateSlopeDirectionResull Result, float direction, float groundCheckDistance = 20f, string LayerName = Constants.Layers.WORLD_GROUND)
+        public static void CalculateSlopDirection(this Collider2D coll, ref CalculateSlopeDirectionResull Result, float direction, float groundCheckDistance = 0.3f, string LayerName = Constants.Layers.WORLD_GROUND)
         {
             
             var pos=new Vector2(coll.bounds.center.x, coll.bounds.max.y);
+            if (coll.GetHit(out var hit, Vector2.down, groundCheckDistance))
+            {
+                Vector2 slopeNormal = hit.normal;
+
+                // Tạo hướng di chuyển bám theo dốc
+                // Nếu direction > 0 (đi phải), hướng sẽ là (normal.y, -normal.x)
+                // Nếu direction < 0 (đi trái), hướng sẽ là (-normal.y, normal.x)
+                Vector2 slopeDir = new Vector2(slopeNormal.y, -slopeNormal.x) * direction;
+                Result.slopeDir = slopeDir;
+                Result.hitCollider = hit.collider;
+                Result.IsHit = true;
+            }
+            else
+            {
+                Result.slopeDir = Vector2.zero;
+                Result.hitCollider = null;
+                Result.IsHit = false;
+            }
             
-            pos.CalculateSlopeDirection(ref Result, direction, groundCheckDistance, LayerName);
            
         }
     }

@@ -1,4 +1,6 @@
 using Cysharp.Threading.Tasks;
+using game2d.objects;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using unvs.actions;
@@ -70,13 +72,23 @@ namespace unvs.actionsbasics
         public override async UniTask ExecuteAsync(ActionBaseSender Sender)
         {
             await UniTask.Yield();
-            var rigBox = Sender.GetSourceComponent<UnvsRigidBox>();
-            if(rigBox==null)
+            var tras = Sender.GetSourceComponent<UnvsTransitionable>();
+            if (tras == null)
+            {
+                var pro=Sender.Source.GetType().GetFields().FirstOrDefault(p=>p.FieldType== typeof(UnvsTransitionable));
+                if(pro == null)
+                {
+                    Sender.Cancel();
+                    return;
+                }
+                tras=pro.GetValue(Sender.Source) as UnvsTransitionable;
+            }
+            if(tras == null)
             {
                 Sender.Cancel();
                 return;
             }
-            UnvsTransitionDefinitionsExt.PlayTransition(rigBox.Transition, rigBox);
+            UnvsTransitionDefinitionsExt.PlayTransition(tras.Transition, tras);
             
         }
     }

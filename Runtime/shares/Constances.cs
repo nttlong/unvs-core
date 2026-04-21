@@ -25,6 +25,10 @@ namespace unvs.shares
             public const string ACTOR = "ACTOR";
 
             public const string PLAYER_HEADER = "PLAYER-HEADER";
+
+            public const string STAIR = "STAIR";
+
+            public const string RIGID_BOX = "RIGID-BOX";
         }
 
         public class CinemachineDefaut

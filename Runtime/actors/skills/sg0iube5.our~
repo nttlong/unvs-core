@@ -7,7 +7,6 @@ using UnityEngine;
 using unvs.actions;
 using unvs.ext;
 using unvs.ext.physical2d;
-using unvs.game2d.objects;
 using unvs.game2d.scenes;
 using unvs.game2d.scenes.actors;
 using unvs.shares;
@@ -16,9 +15,9 @@ using unvs.shares;
 namespace unvs.actor.skills
 {
     [Serializable]
-    public abstract class BaseSkillObject : Behaviour
+    public abstract class BaseSkillObject: Behaviour
     {
-
+        
     }
 
     public class SkillSelectorAttribute : PropertyAttribute { }
@@ -57,7 +56,7 @@ namespace unvs.actor.skills
             await UniTask.Yield();
             return true;
         }
-        public virtual async UniTask<bool> StopAsync(CancellationToken tk = default)
+        public virtual async UniTask<bool> StopAsync(CancellationToken tk=default)
         {
             await UniTask.Yield();
             return true;
@@ -147,7 +146,7 @@ namespace unvs.actor.skills
     }
     public class ActorDefaultSkill : AbstractActionBaseSkill
     {
-
+        
         public float MoveSpeed;
         public float SprintSpeed;
         protected Collider2D coll;
@@ -190,12 +189,12 @@ namespace unvs.actor.skills
 
         public override void OnPerform(Action OnCompleted = null)
         {
-
+            
             if (coll == null) return;
-
+            
             if (_lastSpeed != CurrentSpeed)
             {
-
+                
                 if (CurrentSpeed <= 0)
                 {
                     motions.BaseMotion("Idle");
@@ -211,38 +210,19 @@ namespace unvs.actor.skills
                 _lastSpeed = CurrentSpeed;
             }
             ref var r = ref this._slopDirectionResult;
-
-            coll.CalculateSlopDirection(ref r, Direction.x,20f);
-            var forceDown = 0f;
-            if (r.IsHit)
+            
+            coll.CalculateSlopDirection(ref r, Direction.x);
+            if (IsOnRigBox())// is on elavator
             {
-                if (r.hitCollider.tag == Constants.Tags.RIGID_BOX)
-                {
-                    var rb = r.hitCollider.GetComponent<UnvsRigidObject>();
-                    if (rb != null)
-                    {
-                        float vY = rb.Velocity.y;
-                        actor.SayText($"speed-down={rb.Velocity.y}");
-                        // Nếu thang máy đang đi xuống
-                        if (vY < 0)
-                        {
-                            // Ép hướng di chuyển của nhân vật đi xuống nhanh hơn thang máy một chút
-                            // Điều này giúp GroundCheck luôn IsHit = true mà không cần dùng SetParent
-                            forceDown = vY - 2f;
-                        }
-                    }
-
-
-                }
-                    
-               
-            } 
-            this.MoveStep(Owner.transform, r.slopeDir, forceDown);
+                
+                r.slopeDir.y = -10f;
+            }
+            this.MoveStep(Owner.transform, r.slopeDir);
         }
 
         public virtual bool IsOnRigBox()
         {
-            if (coll.GetHit(out var hit, Vector2.down, 0.05f))
+            if(coll.GetHit(out var hit, Vector2.down, 5f))
             {
                 actor.SayText(hit.collider.tag);
                 if (hit.collider.tag == Constants.Tags.RIGID_BOX)
@@ -253,23 +233,22 @@ namespace unvs.actor.skills
             return false;
         }
 
-        public void MoveStep(Transform transform, Vector2 slopeDirection, float forceDown)
+        public void MoveStep(Transform transform, Vector2 slopeDirection)
         {
 
             if (Application.isPlaying)
             {
-                var step = Direction * base.CurrentSpeed + new Vector2(0, forceDown);
-                //if (CurrentSpeed > 0)
+
+                if (CurrentSpeed > 0)
                 {
 
-                    //if (slopeDirection == Vector2.zero)
-                    //    //  transform.MoveStep(new Vector2(Direction.x*1000,0), base.CurrentSpeed, out var dir, Direction.x);
-                    //    transform.position += (Vector3)Direction * base.CurrentSpeed * Time.deltaTime;
-                    //else
+                    if (slopeDirection == Vector2.zero)
+                        //  transform.MoveStep(new Vector2(Direction.x*1000,0), base.CurrentSpeed, out var dir, Direction.x);
+                        transform.position += (Vector3)Direction * base.CurrentSpeed * Time.deltaTime;
+                    else
                         //transform.MoveStep(this.target, speed, out var dir, direction2.x);
-                        transform.position += (Vector3)step * Time.deltaTime;
+                        transform.position += (Vector3)slopeDirection * base.CurrentSpeed * Time.deltaTime;
                 }
-                //transform.position += (Vector3)step * Time.deltaTime;
             }
 
         }
@@ -282,7 +261,7 @@ namespace unvs.actor.skills
         public override void InitSkill()
         {
             motions = Owner.GetComponent<UnvsAnimStates>();
-            coll = Owner.GetComponent<CompositeCollider2D>();
+            coll = Owner.GetComponent<Collider2D>();
             actor = Owner.GetComponent<UnvsActor>();
         }
 
