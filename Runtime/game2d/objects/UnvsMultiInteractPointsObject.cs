@@ -1,7 +1,8 @@
-#if UNITY_EDITOR
+
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Triggers;
 using System;
+#if UNITY_EDITOR
 using UnityEditor; 
 #endif
 using UnityEngine;

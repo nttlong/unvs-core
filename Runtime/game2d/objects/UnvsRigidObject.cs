@@ -16,6 +16,7 @@ namespace unvs.game2d.objects
    
     public partial class UnvsRigidObject:UnvsBaseComponent
     {
+        public BoxCollider2D coll;
         public virtual void Awake()
         {
             if (Application.isPlaying)
@@ -89,7 +90,7 @@ namespace unvs.game2d.objects
 #if UNITY_EDITOR
     public partial class UnvsRigidObject : UnvsBaseComponent
     {
-        public BoxCollider2D coll;
+        
 
         public virtual void OnValidate()
         {

@@ -3,7 +3,9 @@ using UnityEngine;
 using unvs.ext;
 using unvs.game2d.scenes;
 using unvs.shares;
-using unvs.shares.editor;
+#if UNITY_EDITOR
+using unvs.shares.editor; 
+#endif
 
 namespace game2d.objects
 {
