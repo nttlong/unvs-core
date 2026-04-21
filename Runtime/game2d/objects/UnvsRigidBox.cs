@@ -1,10 +1,12 @@
 using UnityEngine;
+using unvs.game2d.transitions;
 
 namespace unvs.game2d.objects
 {
     [RequireComponent(typeof(BoxCollider2D))]
     public class UnvsRigidBox : UnvsRigidObject
     {
+        public UnvsTransitionDefinitions Transition;
         public float Height;
         public float duration;
 

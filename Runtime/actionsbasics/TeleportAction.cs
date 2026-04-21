@@ -65,5 +65,20 @@ namespace unvs.actionsbasics
 
 
     }
+    public class TransitionAction : ActionBase
+    {
+        public override async UniTask ExecuteAsync(ActionBaseSender Sender)
+        {
+            await UniTask.Yield();
+            var rigBox = Sender.GetSourceComponent<UnvsRigidBox>();
+            if(rigBox==null)
+            {
+                Sender.Cancel();
+                return;
+            }
+            UnvsTransitionDefinitionsExt.PlayTransition(rigBox.Transition, rigBox);
+            
+        }
+    }
 }
 

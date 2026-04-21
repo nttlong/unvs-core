@@ -16,7 +16,10 @@ namespace unvs.game2d.objects
         public override UniTask<ActionBaseSender> ExecuteAsync(MonoBehaviour target, CancellationTokenSource cts)
         {
             if (this.Data == null) this.Data = new InteractionDefinition();
-            if (this.Data.actions == null) this.Data.actions = new ActionBase[] { new MoveTo() };
+            if (this.Data.actions == null) this.Data.actions = new ActionBase[] { 
+                new MoveTo(),
+                new TransitionAction()
+            };
             
             return base.ExecuteAsync(target, cts);
         }

@@ -12,6 +12,7 @@ using UnityEngine.U2D.IK;
 using unvs.interfaces;
 using DG.Tweening;
 using unvs.shares;
+using unvs.game2d.transitions;
 namespace unvs.ext
 {
     
@@ -144,5 +145,18 @@ namespace unvs.ext
         }
 
         
+    }
+    public static class UnvsTransitionDefinitionsExt
+    {
+        public static void PlayTransition(this UnvsTransitionDefinitions transition, MonoBehaviour source)
+        {
+            if(transition == null) return;
+            if(transition.actions == null) return;
+            foreach (var action in transition.actions)
+            {
+                if (action == null) continue;
+                action.Execute(source);
+            }
+        }
     }
 }
