@@ -90,29 +90,29 @@ namespace unvs.ext
 
         }
 #if UNITY_EDITOR
-        //public static List<AnimStateInfo> EditorExtractBaseLayer(this Animator anim, Transform motionObjs)
-        //{
-        //    var ret = new List<AnimStateInfo>();
-        //    var controller = anim.runtimeAnimatorController as AnimatorController;
-            
-        //    for(var i=0;i< controller.layers.Length; i++)
-        //    {
-        //        var layer = controller.layers[i];
-        //        for (var j = 0; j < layer.stateMachine.states.Length; j++)
-        //        {
-        //            var stateInMachine = layer.stateMachine.states[j];
-        //            var state = stateInMachine.state;
-        //            if (state.motion is BlendTree blendTree)
-        //            {
-        //                extractBlendTree(motionObjs,anim, ret, i,j, layer, blendTree);
+        public static List<AnimStateInfo> EditorExtractBaseLayer(this Animator anim, Transform motionObjs)
+        {
+            var ret = new List<AnimStateInfo>();
+            var controller = anim.runtimeAnimatorController as AnimatorController;
 
-        //            }
+            for (var i = 0; i < controller.layers.Length; i++)
+            {
+                var layer = controller.layers[i];
+                for (var j = 0; j < layer.stateMachine.states.Length; j++)
+                {
+                    var stateInMachine = layer.stateMachine.states[j];
+                    var state = stateInMachine.state;
+                    if (state.motion is BlendTree blendTree)
+                    {
+                        extractBlendTree( anim, ret, i, j, layer, blendTree);
 
-        //        }
-        //    }
-            
-        //    return ret;
-        //}
+                    }
+
+                }
+            }
+
+            return ret;
+        }
 
         private static void extractBlendTree(Animator anim, List<AnimStateInfo> ret,int layerIndex, int blendIndex, AnimatorControllerLayer layer, BlendTree blendTree)
         {

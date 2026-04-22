@@ -8,6 +8,7 @@
     "name": "nttlong"
   },
   "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.2.1",
     "com.unity.cinemachine": "3.1.6",
     "com.unity.localization": "1.5.11",
     "com.unity.textmeshpro": "3.0.6",

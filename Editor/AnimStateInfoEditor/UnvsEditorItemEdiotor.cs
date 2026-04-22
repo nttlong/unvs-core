@@ -5,11 +5,17 @@ using UnityEngine;
 using unvs.game2d.scenes;
 using unvs.shares;
 
-[CustomPropertyDrawer(typeof(UnvsEditorItem),true)]
+[CustomPropertyDrawer(typeof(UnvsEditableObject),true)]
 public class AnimStateInfoDrawer : PropertyDrawer
 {
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
+        GUIStyle buttonStyle = new GUIStyle(GUI.skin.button)
+        {
+            fixedHeight = 30,
+            fixedWidth = 180,
+            fontStyle = FontStyle.Bold
+        };
         EditorGUI.BeginProperty(position, label, property);
 
         // 1. Vẽ tiêu đề Foldout
@@ -48,9 +54,11 @@ public class AnimStateInfoDrawer : PropertyDrawer
                 {
                     var attr = method.GetCustomAttribute<UnvsButtonAttribute>();
                     string displayName = string.IsNullOrEmpty(attr.ButtonName) ? method.Name : attr.ButtonName;
-
+                    ////float btnWidth = 180;
+                    ////float btnHeight = 30;
+                    //float centerX = position.x + (position.width - btnWidth) / 2f;
                     Rect btnRect = new Rect(position.x + 20, currentY, position.width - 20, 25);
-                    if (GUI.Button(btnRect, displayName))
+                    if (GUI.Button(btnRect, displayName, buttonStyle))
                     {
                         method.Invoke(targetObj, null);
                     }
@@ -67,6 +75,7 @@ public class AnimStateInfoDrawer : PropertyDrawer
     // Quan trọng: Tính toán tổng chiều cao để các item không đè lên nhau
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
     {
+        
         float height = EditorGUIUtility.singleLineHeight;
         if (property.isExpanded)
         {

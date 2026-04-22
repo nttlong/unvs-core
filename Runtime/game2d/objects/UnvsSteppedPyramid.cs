@@ -1,10 +1,14 @@
-﻿using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
 using UnityEngine;
+
 using unvs.ext;
 using unvs.game2d.scenes;
 using unvs.shares;
 #if UNITY_EDITOR
-using unvs.shares.editor; 
+using unvs.shares.editor;
+using unvs.core.editorlibs;
+using System.Linq;
 #endif
 
 namespace game2d.objects
@@ -35,8 +39,8 @@ namespace game2d.objects
         [UnvsButton("Create from left")]
         public void EditorCreateShape()
         {
-             
-            var spr = GetComponent<SpriteRenderer>();
+            
+                var spr = GetComponent<SpriteRenderer>();
             if (spr == null) return;
 
            
@@ -83,8 +87,19 @@ namespace game2d.objects
             polyColl.SetPath(0, points.ToArray());
         }
         [UnvsButton("Export to Png file")]
-        public void EditorExportPng()
+        public async UniTask EditorExportPng()
         {
+            var check = await unvs.core.editorlibs.UnvsPythonCall.HealthCheck();
+            if (check)
+            {
+                unvs.core.editorlibs.Dialogs.Show("OK");
+            }
+            else
+            {
+                unvs.core.editorlibs.Dialogs.Show("Fail");
+                return;
+            }
+           
             var scene = this.GetComponentInParent<UnvsScene>();
             if (scene == null || scene.selRef == null) return;
 
@@ -99,7 +114,8 @@ namespace game2d.objects
 
             var poly = GetComponent<PolygonCollider2D>();
             if (poly == null) return;
-
+            
+            
             Vector2[] points = poly.points;
 
             // 1. Tính toán Bounds của các điểm để xác định size ảnh
@@ -150,6 +166,7 @@ namespace game2d.objects
             // 5. Lưu ra file
             byte[] bytes = tex.EncodeToPNG();
             var fullPath = System.IO.Path.Combine(subFolder, $"{gameObject.name}.png");
+            var fullPathPsd = System.IO.Path.Combine(subFolder, $"{gameObject.name}.psd");
             System.IO.Path.GetFullPath(fullPath);
             System.IO.File.WriteAllBytes(fullPath, bytes);
 
@@ -158,6 +175,15 @@ namespace game2d.objects
             // Giải phóng bộ nhớ
             Object.DestroyImmediate(tex);
             UnityEditor.AssetDatabase.Refresh();
+            await unvs.core.editorlibs.UnvsPythonCall.Call("UnvsPsd", "CreatePsdFile", new
+            {
+                FilePath= unvs.core.editorlibs.UnvsPythonCall.ToAbsolutePath( fullPathPsd),
+                PngFile= unvs.core.editorlibs.UnvsPythonCall.ToAbsolutePath(fullPath),
+                Points= points.Select(p=>new
+                {
+                    x=p.x, y=p.y,
+                })
+            });
         }
     }
 #endif

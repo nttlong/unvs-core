@@ -6,8 +6,13 @@ using unvs.game2d.scenes.actors;
 
 namespace unvs.shares
 {
+    [System.Serializable]
+    public class PolygonData
+    {
+        public Vector2[] points;
+    }
     [Serializable]
-    public abstract class UnvsEditorItem
+    public abstract class UnvsEditableObject
     {
 
     }
@@ -16,7 +21,7 @@ namespace unvs.shares
         Up, Down, Left, Right
     }
     [Serializable]
-    public partial class AnimStateInfo : UnvsEditorItem
+    public partial class AnimStateInfo : UnvsEditableObject
     {
       
       
@@ -38,7 +43,7 @@ namespace unvs.shares
         }
     }
 #if UNITY_EDITOR
-    public partial class AnimStateInfo : UnvsEditorItem// : unvs.game2d.scenes.UnvsBaseComponent
+    public partial class AnimStateInfo : UnvsEditableObject// : unvs.game2d.scenes.UnvsBaseComponent
     {
         //[UnvsButton("Play")]
         //public void PlayInEditor()

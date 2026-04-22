@@ -3,9 +3,15 @@
 /[Oo]bj/
 /[Bb]uild/
 /[Bb]uilds/
+/[Bb]uilds/
 /[Logs]/
 /[MemoryCaptures]/
 *.csproj
 *.unitypackage
 *.sln
 .DS_Store
+
+# Python
+**/venv/
+**/__pycache__/
+*.pyc
