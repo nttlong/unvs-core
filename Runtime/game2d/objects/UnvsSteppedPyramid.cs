@@ -13,7 +13,7 @@ namespace game2d.objects
     [RequireComponent(typeof(SpriteRenderer))]
     public partial class UnvsSteppedPyramid : UnvsBaseComponent
     {
-        [Header("Visual shapr")]
+        [Header("Visual shape")]
         public float stepHeight;
         public float stepWidth;
         

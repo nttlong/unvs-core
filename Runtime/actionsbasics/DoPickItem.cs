@@ -19,7 +19,7 @@ namespace unvs.actionsbasics
         public override async UniTask ExecuteAsync(ActionBaseSender Sender)
         {
             await UniTask.Yield();
-            var  actor = Sender.GetTargetComponent<UnvsActor>();
+            var actor = Sender.GetTargetComponent<UnvsActor>();
             if (actor == null)
             {
                 Sender.Cancel();
@@ -29,18 +29,18 @@ namespace unvs.actionsbasics
             var item = actor.motions.animStates[0];
             var animator = item.animationController;
 
-            
 
-            await actor.motions.animStates.PlayMotionAsync("bend-down",actor.cts.Token, "collect-item", null,null );
+
+            await actor.motions.animStates.PlayMotionAsync("bend-down", actor.cts.Token, "collect-item", null, null);
 
             actor.player.ControlDisable();
             await actor.motions.animStates.PlayMotionAsync("stand-up");
             actor.player.ControlEnable();
             actor.motions.BaseMotion("idle");
             actor.physical.HoldItemInBackHand(st);
-            
-            
-           
+
+
+
 
 
         }

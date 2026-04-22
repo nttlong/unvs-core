@@ -114,17 +114,18 @@ namespace unvs.ext
         //    return ret;
         //}
 
-        private static void extractBlendTree(Transform motionObjs, Animator anim, List<AnimStateInfo> ret,int layerIndex, int blendIndex, AnimatorControllerLayer layer, BlendTree blendTree)
+        private static void extractBlendTree(Animator anim, List<AnimStateInfo> ret,int layerIndex, int blendIndex, AnimatorControllerLayer layer, BlendTree blendTree)
         {
             foreach (var child in blendTree.children)
             {
-                var obj = motionObjs.AddChildComponentIfNotExist<AnimStateInfo>($"{layer.name}-{blendTree.name}-{child.motion.name}");
+                var obj = new AnimStateInfo($"{layer.name}-{blendTree.name}-{child.motion.name}", anim); //motionObjs.AddChildComponentIfNotExist<AnimStateInfo>($"{layer.name}-{blendTree.name}-{child.motion.name}");
                 obj.blendName = blendTree.name;
                 obj.blendIndex = blendIndex;
                 obj.motionName= child.motion.name;
                 obj.layerName= layer.name;
                 obj.layerIndex= layerIndex;
                 obj.paramName = blendTree.blendParameter;
+                //obj.name = $"{layer.name}-{blendTree.name}-{child.motion.name}";
                 //obj.animationController = anim;
                 obj.value = child.threshold;
                 obj.clip = child.motion;
@@ -135,18 +136,18 @@ namespace unvs.ext
 
         public static List<AnimStateInfo> EditorExtractAllMotions(this Animator anim)
         {
-            var motionObjs = anim.transform.GetComponentInChildrenByName<Transform>("motions-object");
-           if(motionObjs!=null)
-            {
-                for (int i = motionObjs.childCount - 1; i >= 0; i--)
-                {
-                    GameObject child = motionObjs.GetChild(i).gameObject;
+           // var motionObjs = anim.transform.GetComponentInChildrenByName<Transform>("motions-object");
+           //if(motionObjs!=null)
+           // {
+           //     for (int i = motionObjs.childCount - 1; i >= 0; i--)
+           //     {
+           //         GameObject child = motionObjs.GetChild(i).gameObject;
 
-                    // Cho phép Ctrl + Z trong Editor
-                    Undo.DestroyObjectImmediate(child);
-                }
-            }
-             motionObjs = anim.transform.AddChildComponentIfNotExist<Transform>("motions-object");
+           //         // Cho phép Ctrl + Z trong Editor
+           //         Undo.DestroyObjectImmediate(child);
+           //     }
+           // }
+             //motionObjs = anim.transform.AddChildComponentIfNotExist<Transform>("motions-object");
             AnimatorController controller = null;
             var ret = new List<AnimStateInfo>();
             if (anim.runtimeAnimatorController is AnimatorOverrideController oController)
@@ -166,18 +167,19 @@ namespace unvs.ext
                     if (state.motion is BlendTree tree)
                     {
                         
-                        extractBlendTree(motionObjs,anim, ret, i, j, layer, tree);
+                        extractBlendTree(anim, ret, i, j, layer, tree);
                         continue;
 
                     }
                     
                         if (state is AnimatorState animSt)
                     {
-                        
-                        var motion = motionObjs.AddChildComponentIfNotExist<AnimStateInfo>($"{layer.name}-{animSt.name}");
+
+                        var motion = new AnimStateInfo($"{layer.name}-{animSt.name}", anim);//  motionObjs.AddChildComponentIfNotExist<AnimStateInfo>($"{layer.name}-{animSt.name}");
+                        //motion.name = $"{layer.name}-{animSt.name}";
                         motion.motionName = animSt.name;
                         motion.layerName = layer.name;
-                       // motion.animationController = anim;
+                        //motion.animationController = anim;
                         motion.layerIndex = i;
                         motion.clip= state.motion;
                         ret.Add(motion);
