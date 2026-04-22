@@ -5,3 +5,4 @@ Pillow
 numpy
 six
 packbits
+psd-tools==1.15.0.post1

@@ -182,7 +182,7 @@ namespace game2d.objects
                 Points= points.Select(p=>new
                 {
                     x=p.x, y=p.y,
-                })
+                }).ToList(),
             });
         }
     }

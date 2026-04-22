@@ -8,13 +8,17 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 
-# Xác định đường dẫn tới thư mục custom-api
+# Xác định đường dẫn tới các thư mục
 current_dir = os.path.dirname(os.path.abspath(__file__))
-custom_api_path = os.path.abspath(os.path.join(current_dir, "..", "custom-api"))
+root_path = os.path.abspath(os.path.join(current_dir, ".."))
+custom_api_path = os.path.join(root_path, "custom-api")
+libs_path = os.path.join(root_path, "libs")
 
 # Thêm vào sys.path nếu chưa có
 if custom_api_path not in sys.path:
     sys.path.append(custom_api_path)
+if root_path not in sys.path:
+    sys.path.append(root_path)
 
 app = FastAPI(
     title="UNVS Core API Server",
@@ -29,7 +33,9 @@ print(f" - Executing File: {__file__}")
 print(f" - Current Dir: {current_dir}")
 print(f" - Custom API Path: {custom_api_path}")
 print(f" - Custom API exists: {os.path.exists(custom_api_path)}")
-print(f" - Sys Path updated: {custom_api_path in sys.path}")
+print(f" - Root Path: {root_path}")
+print(f" - Root exists: {os.path.exists(root_path)}")
+print(f" - Sys Path updated: {custom_api_path in sys.path and root_path in sys.path}")
 print("="*50 + "\n")
 
 # Cấu trúc dữ liệu yêu cầu
@@ -108,8 +114,9 @@ def call(request: CallRequest):
         print(f"Module: {module} | Function: {func}")
         print(error_trace)
         print("!" * 67 + "\n")
-        
-        raise HTTPException(status_code=500, detail=f"Lỗi thực thi Python:\n{error_trace}")
+        raise
+        #raise HTTPException(status_code=500, detail=f"Lỗi thực thi Python:\n{error_trace}")
+
 
 if __name__ == "__main__":
     import uvicorn

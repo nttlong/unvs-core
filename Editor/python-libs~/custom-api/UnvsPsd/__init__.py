@@ -2,8 +2,9 @@ import os
 from PIL import Image
 from psd_tools import PSDImage
 from psd_tools.api.layers import PixelLayer
+from libs import create_psd_from_png
 
-def CreatePsdFile(data: dict) -> str:
+def CreatePsdFileOld(data: dict) -> str:
     psfFilePath = data['FilePath']
     pngFilePath = data['PngFile']
     
@@ -40,3 +41,10 @@ def CreatePsdFile(data: dict) -> str:
     psd.save(psfFilePath)
 
     return f"CreatePsdFile OK: {psfFilePath}"
+def CreatePsdFile(data: dict) -> str:
+    psfFilePath = data['FilePath']
+    pngFilePath = data['PngFile']
+    
+    if not os.path.exists(pngFilePath):
+        return f"Error: Không tìm thấy file PNG tại {pngFilePath}"
+    return create_psd_from_png(pngFilePath, psfFilePath)

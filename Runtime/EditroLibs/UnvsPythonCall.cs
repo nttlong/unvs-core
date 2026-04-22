@@ -1,9 +1,15 @@
 
+using Codice.CM.SEIDInfo;
 using Cysharp.Threading.Tasks;
+using System;
 using System.IO;
 using UnityEditor;
+using UnityEditor.AddressableAssets;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
+using unvs.game2d.scenes;
+using unvs.shares.editor;
 
 #if UNITY_EDITOR
 namespace unvs.core.editorlibs
@@ -127,6 +133,58 @@ namespace unvs.core.editorlibs
                 Dialogs.Show($"[Exception Occurred]\nMessage: {e.Message}\nURL: {url}");
             }
 
+            return null;
+        }
+    }
+    public class SceneInfoResut
+    {
+        public string FolderPath { get; internal set; }
+        public string AssetPath { get; internal set; }
+        public string Name { get; internal set; }
+    }
+    public class EditorTools
+    {
+        public static string EditorGetAddressPath(AssetReference myRef)
+        {
+
+            var settings = AddressableAssetSettingsDefaultObject.Settings;
+            var entry = settings.FindAssetEntry(myRef.AssetGUID);
+            if (entry != null)
+            {
+                return entry.address;
+            }
+            return string.Empty;
+        }
+        public static string ToAbsolutePath(string relativePath)
+        {
+            if (string.IsNullOrEmpty(relativePath)) return null;
+
+            // Path.GetFullPath khi chạy trong Unity Editor sẽ tự động lấy 
+            // thư mục chứa project làm gốc.
+            string absolutePath = Path.GetFullPath(relativePath);
+
+            // Chuẩn hóa dấu gạch chéo sang "/" để tránh lỗi khi gửi sang Python/JSON
+            return absolutePath.Replace("\\", "/");
+        }
+        public static SceneInfoResut GetFolderOfGameObjectByScene(GameObject obj)
+        {
+            var scene = obj.GetComponentInParent<UnvsScene>();
+            if (scene != null)
+            {
+                if(scene.selRef==null)
+                {
+                    Dialogs.Show($"{scene}.selRef is null or not set");
+                    return null;
+                }
+                var pathToAsset = UnvsEditorUtils.EditorGetAddressPath(scene.selRef);
+                var folder = System.IO.Path.GetDirectoryName(pathToAsset);
+                return new SceneInfoResut
+                {
+                    FolderPath= ToAbsolutePath(folder),
+                    AssetPath= ToAbsolutePath(pathToAsset),
+                    Name=scene.name
+                };
+            }
             return null;
         }
     }

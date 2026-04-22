@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using unvs.ext;
 using unvs.shares;
-
+using unvs.shares.editor;
 namespace unvs.game2d.scenes
 {
     public class UnvsAudible : UnvsBaseComponent
@@ -60,8 +63,36 @@ namespace unvs.game2d.scenes
                 scene.wallRight.bounds.min.x);
             }
         }
+        [UnvsButton("Geometry outline")]
+        public async UniTask EditorGeometryOutline()
+        {
+            EditorCreateThicknessGround();
+            var scene = this.GetComponentInParent<UnvsScene>();
+            var poly= scene.groundThickness.GetComponent<PolygonCollider2D>();
+            var info= unvs.core.editorlibs.EditorTools.GetFolderOfGameObjectByScene(poly.gameObject);
+            //if (info == null)
+            //{
+            //    return;
+            //}
+           
 
-        
+            
+            var subFolder = System.IO.Path.Combine(info.FolderPath, $"{info.Name}-sprites");
+            var fullPath = System.IO.Path.Combine(subFolder, $"{gameObject.name}.png");
+            var fullPathPsd = System.IO.Path.Combine(subFolder, $"{gameObject.name}.psd");
+            await unvs.core.editorlibs.UnvsPythonCall.Call("UnvsGeometry", "CreateGuidelinePng", new
+            {
+                width= poly.bounds.size.x,
+                height= poly.bounds.size.y,
+                points= poly.points.Select(p=>new
+                {
+                    x= p.x,y= p.y,
+                }).ToArray(),
+                output_path= fullPath,
+                output_path_psd= fullPathPsd,
+            });
+        }
+
 #endif
         #endregion
     }
