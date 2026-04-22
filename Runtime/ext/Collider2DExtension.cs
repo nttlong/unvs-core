@@ -4,7 +4,7 @@ using UnityEditor;
 using System;
 
 using UnityEngine;
-using unvs.interfaces;
+
 using unvs.shares;
 using System.Linq;
 namespace unvs.ext
@@ -84,40 +84,40 @@ namespace unvs.ext
 
        
 #if UNITY_EDITOR
-        public static void GizmosDrawCamView(Vector3 Center, float orthographicSize, OffsetFollow cameraOffsetFolow, Color color, float thickness)
-        {
-            // 1. Tính toán kích thước Camera trong World Space
-            Vector2 camSize = Commons.GetCameraWorldSizeEditorMode(orthographicSize);
-            Debug.Log($"GizmosDrawCamView={camSize}");
-            // 2. Tính toán vị trí tâm (Center) dựa trên Follow Offset
-            // Lưu ý: Offset này thường dựa trên vị trí của nhân vật/object
-            Vector3 offset = cameraOffsetFolow.CalculateOffset(orthographicSize);
-            Vector3 center = Center + offset;
+        //public static void GizmosDrawCamView(Vector3 Center, float orthographicSize, OffsetFollow cameraOffsetFolow, Color color, float thickness)
+        //{
+        //    // 1. Tính toán kích thước Camera trong World Space
+        //    Vector2 camSize = Commons.GetCameraWorldSizeEditorMode(orthographicSize);
+        //    Debug.Log($"GizmosDrawCamView={camSize}");
+        //    // 2. Tính toán vị trí tâm (Center) dựa trên Follow Offset
+        //    // Lưu ý: Offset này thường dựa trên vị trí của nhân vật/object
+        //    Vector3 offset = cameraOffsetFolow.CalculateOffset(orthographicSize);
+        //    Vector3 center = Center + offset;
 
-            // 3. Thiết lập màu sắc
-            Gizmos.color = color;
-            Handles.color = color;
+        //    // 3. Thiết lập màu sắc
+        //    Gizmos.color = color;
+        //    Handles.color = color;
 
-            // 4. Vẽ hình chữ nhật
-            // Nếu thickness <= 1, dùng DrawWireCube cho nhẹ
-            if (thickness <= 1f)
-            {
-                Gizmos.DrawWireCube(center, new Vector3(camSize.x, camSize.y, 0.1f));
-            }
-            else
-            {
-                // Vẽ 4 cạnh bằng Handles để có độ dày (Chỉ hoạt động trong Editor)
-                Vector3 topLeft = center + new Vector3(-camSize.x / 2, camSize.y / 2, 0);
-                Vector3 topRight = center + new Vector3(camSize.x / 2, camSize.y / 2, 0);
-                Vector3 bottomLeft = center + new Vector3(-camSize.x / 2, -camSize.y / 2, 0);
-                Vector3 bottomRight = center + new Vector3(camSize.x / 2, -camSize.y / 2, 0);
+        //    // 4. Vẽ hình chữ nhật
+        //    // Nếu thickness <= 1, dùng DrawWireCube cho nhẹ
+        //    if (thickness <= 1f)
+        //    {
+        //        Gizmos.DrawWireCube(center, new Vector3(camSize.x, camSize.y, 0.1f));
+        //    }
+        //    else
+        //    {
+        //        // Vẽ 4 cạnh bằng Handles để có độ dày (Chỉ hoạt động trong Editor)
+        //        Vector3 topLeft = center + new Vector3(-camSize.x / 2, camSize.y / 2, 0);
+        //        Vector3 topRight = center + new Vector3(camSize.x / 2, camSize.y / 2, 0);
+        //        Vector3 bottomLeft = center + new Vector3(-camSize.x / 2, -camSize.y / 2, 0);
+        //        Vector3 bottomRight = center + new Vector3(camSize.x / 2, -camSize.y / 2, 0);
 
-                Handles.DrawBezier(topLeft, topRight, topLeft, topRight, color, null, thickness);
-                Handles.DrawBezier(topRight, bottomRight, topRight, bottomRight, color, null, thickness);
-                Handles.DrawBezier(bottomRight, bottomLeft, bottomRight, bottomLeft, color, null, thickness);
-                Handles.DrawBezier(bottomLeft, topLeft, bottomLeft, topLeft, color, null, thickness);
-            }
-        }
+        //        Handles.DrawBezier(topLeft, topRight, topLeft, topRight, color, null, thickness);
+        //        Handles.DrawBezier(topRight, bottomRight, topRight, bottomRight, color, null, thickness);
+        //        Handles.DrawBezier(bottomRight, bottomLeft, bottomRight, bottomLeft, color, null, thickness);
+        //        Handles.DrawBezier(bottomLeft, topLeft, bottomLeft, topLeft, color, null, thickness);
+        //    }
+        //}
         
 #endif
     }

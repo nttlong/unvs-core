@@ -8,8 +8,8 @@ using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Localization.SmartFormat.Utilities;
 using unvs.game2d.scenes;
-using unvs.gameword;
-using unvs.interfaces;
+
+
 using unvs.shares;
 
 namespace unvs.ext
@@ -22,10 +22,7 @@ namespace unvs.ext
     }
     public static class VCamExtension
     {
-        public static void Watch(this CinemachineCamera vcam, ICamWacher camWatcher)
-        {
-            vcam.Watch((camWatcher as MonoBehaviour).transform);
-        }
+        
         public static void Watch(this CinemachineCamera vcam, Transform camWatcher)
         {
             if (vcam == null)

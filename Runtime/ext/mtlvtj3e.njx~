@@ -12,7 +12,7 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.Events;
 using UnityEngine.U2D.Animation;
 using UnityEngine.UI;
-using unvs.interfaces;
+
 using unvs.shares;
 namespace unvs.ext
 {

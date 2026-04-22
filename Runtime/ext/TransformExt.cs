@@ -9,7 +9,7 @@ using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.U2D.Animation;
 using UnityEngine.U2D.IK;
-using unvs.interfaces;
+
 using DG.Tweening;
 using unvs.shares;
 using unvs.game2d.transitions;

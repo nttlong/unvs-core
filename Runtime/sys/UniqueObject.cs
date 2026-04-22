@@ -1,12 +1,12 @@
 
 using UnityEngine;
-using unvs.interfaces;
+
 namespace unvs.sys
 {
     
-    public class UniqueObject : MonoBehaviour, IUniqueObject
+    public class UniqueObject : MonoBehaviour
     {
-        IUniqueObject instance;
+        UniqueObject instance;
 
         public bool IsValidate { get; set; }
 

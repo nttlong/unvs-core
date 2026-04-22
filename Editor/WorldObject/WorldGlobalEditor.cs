@@ -3,8 +3,8 @@
 //using UnityEditor;
 //using UnityEditor.SceneManagement;
 //using UnityEngine;
-//using unvs.gameword;
-//using unvs.interfaces;
+//
+//
 //using unvs.players;
 //using unvs.shares;
 //[CustomEditor(typeof(WorldObject), true)]

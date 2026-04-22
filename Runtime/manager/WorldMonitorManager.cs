@@ -7,7 +7,7 @@
 //using UnityEngine;
 //using UnityEngine.Rendering.Universal;
 //using unvs.ext;
-//using unvs.interfaces;
+//
 //using unvs.manager;
 //using unvs.shares;
 //namespace unvs.gameword.manager

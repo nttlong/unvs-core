@@ -7,8 +7,8 @@ using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using unvs.game2d.scenes;
-using unvs.gameword;
-using unvs.interfaces;
+
+
 using unvs.shares;
 
 public class WorldObjectEditor

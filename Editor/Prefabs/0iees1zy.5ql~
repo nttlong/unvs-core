@@ -8,9 +8,8 @@ using UnityEditor.AddressableAssets.Settings;
 
 using UnityEditor.AddressableAssets;
 using System;
-using unvs.interfaces;
+
 using unvs.shares;
-using unvs.gameword;
 
 public class WorldObjectEditor
 {

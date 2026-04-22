@@ -9,7 +9,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using unvs.ext;
 using unvs.game2d.scenes.actors;
-using unvs.interfaces;
+
 using unvs.shares;
 
 namespace unvs.game2d.scenes

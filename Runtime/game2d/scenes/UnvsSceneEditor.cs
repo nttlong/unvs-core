@@ -17,7 +17,7 @@ using UnityEngine.Rendering.Universal;
 using unvs.ext;
 using unvs.game2d.objects;
 using unvs.game2d.scenes.actors;
-using unvs.interfaces;
+
 using unvs.shares;
 
 #if UNITY_EDITOR

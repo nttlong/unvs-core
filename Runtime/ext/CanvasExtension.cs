@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
-using unvs.gameword;
+
 using unvs.shares;
 
 namespace unvs.ext

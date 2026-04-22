@@ -16,7 +16,7 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.Rendering.Universal;
 using unvs.ext;
 using unvs.game2d.scenes.actors;
-using unvs.interfaces;
+
 using unvs.shares;
 
 namespace unvs.game2d.scenes

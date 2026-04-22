@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.VirtualTexturing;
 using UnityEngine.XR;
-using unvs.interfaces;
+
 using static UnityEngine.Audio.GeneratorInstance;
 
 namespace unvs.ext

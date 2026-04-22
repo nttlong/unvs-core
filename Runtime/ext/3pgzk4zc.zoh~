@@ -8,8 +8,8 @@ using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Localization.SmartFormat.Utilities;
 using unvs.game2d.scenes;
-using unvs.gameword;
-using unvs.interfaces;
+
+
 using unvs.shares;
 
 namespace unvs.ext
