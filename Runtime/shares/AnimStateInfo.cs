@@ -6,12 +6,17 @@ using unvs.game2d.scenes.actors;
 
 namespace unvs.shares
 {
+    [Serializable]
+    public abstract class UnvsEditorItem
+    {
+
+    }
     public enum TrasitionEnum
     {
         Up, Down, Left, Right
     }
     [Serializable]
-    public partial class AnimStateInfo //:unvs.game2d.scenes.UnvsBaseComponent
+    public partial class AnimStateInfo : UnvsEditorItem
     {
       
       
@@ -33,21 +38,25 @@ namespace unvs.shares
         }
     }
 #if UNITY_EDITOR
-    //public partial class AnimStateInfo // : unvs.game2d.scenes.UnvsBaseComponent
-    //{
-    //    [UnvsButton("Play")]
-    //    public void PlayInEditor()
-    //    {
-    //        GetComponentInParent<UnvsAnimStates>().EditotPlay(this);
-            
-    //    }
-    //    [UnvsButton("Review")]
-    //    public void PlayOutEditor()
-    //    {
-    //        unvs.shares.editor.UnvsEditorUtils.EditorOpenClip(GetComponentInParent<Animator>().gameObject, AssetDatabase.GetAssetPath(this.clip));
-    //        //EditorApplication.ExecuteMenuItem("Window/Animation/Animation");
-    //    }
-        
-    //}
+    public partial class AnimStateInfo : UnvsEditorItem// : unvs.game2d.scenes.UnvsBaseComponent
+    {
+        //[UnvsButton("Play")]
+        //public void PlayInEditor()
+        //{
+        //    //this.PlayInEditor();
+        //    this.animationController.GetComponentInParent<UnvsAnimStates>().EditotPlay(this);
+        //    //new UnvsAnimStates().EditotPlay(this);
+        //   // GetComponentInParent<UnvsAnimStates>().EditotPlay(this);
+
+        //}
+        [UnvsButton("Review")]
+        public void PlayOutEditor()
+        {
+            Debug.Log($"Review {AssetDatabase.GetAssetPath(this.clip)}");
+            unvs.shares.editor.UnvsEditorUtils.EditorOpenClipV2(this.animationController.gameObject, AssetDatabase.GetAssetPath(this.clip));
+            EditorApplication.ExecuteMenuItem("Window/Animation/Animation");
+        }
+
+    }
 #endif
 }

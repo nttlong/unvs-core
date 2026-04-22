@@ -136,18 +136,7 @@ namespace unvs.ext
 
         public static List<AnimStateInfo> EditorExtractAllMotions(this Animator anim)
         {
-           // var motionObjs = anim.transform.GetComponentInChildrenByName<Transform>("motions-object");
-           //if(motionObjs!=null)
-           // {
-           //     for (int i = motionObjs.childCount - 1; i >= 0; i--)
-           //     {
-           //         GameObject child = motionObjs.GetChild(i).gameObject;
-
-           //         // Cho phép Ctrl + Z trong Editor
-           //         Undo.DestroyObjectImmediate(child);
-           //     }
-           // }
-             //motionObjs = anim.transform.AddChildComponentIfNotExist<Transform>("motions-object");
+           
             AnimatorController controller = null;
             var ret = new List<AnimStateInfo>();
             if (anim.runtimeAnimatorController is AnimatorOverrideController oController)

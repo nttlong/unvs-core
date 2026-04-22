@@ -124,7 +124,59 @@ namespace unvs.shares.editor
                 }
             }
         }
+        public static void EditorOpenClipV2(GameObject target, string clipPath)
+        {
+            AnimationClip clip = AssetDatabase.LoadAssetAtPath<AnimationClip>(clipPath);
 
+            if (clip == null)
+            {
+                Debug.LogError($"Không tìm thấy AnimationClip tại đường dẫn: {clipPath}");
+                return;
+            }
+
+            // 1. QUAN TRỌNG: Phải chọn Object này trong Hierarchy trước
+            Selection.activeGameObject = target;
+
+            // 2. Mở/Lấy cửa sổ Animation
+            EditorApplication.ExecuteMenuItem("Window/Animation/Animation");
+
+            Assembly editorAssembly = typeof(EditorWindow).Assembly;
+            Type animWindowType = editorAssembly.GetType("UnityEditor.AnimationWindow");
+            EditorWindow window = EditorWindow.GetWindow(animWindowType);
+
+            if (window != null)
+            {
+                // 3. Lấy AnimationWindowState
+                var stateProperty = animWindowType.GetProperty("state", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                object state = stateProperty.GetValue(window);
+
+                if (state != null)
+                {
+                    // 4. Đảm bảo State đã nhận diện Target (Keyable Object)
+                    // Đôi khi cần gọi Refresh hoặc gán trực tiếp Selection
+                    var selectionProperty = state.GetType().GetProperty("activeKeyableObject", BindingFlags.Instance | BindingFlags.Public);
+                    if (selectionProperty != null)
+                    {
+                        // Lấy Component Animator hoặc Animation từ target
+                        Component animationPlayer = target.GetComponent<Animator>();
+                        if (animationPlayer == null) animationPlayer = target.GetComponent<Animation>();
+
+                        selectionProperty.SetValue(state, animationPlayer);
+                    }
+
+                    // 5. Gán Clip
+                    var clipProperty = state.GetType().GetProperty("activeAnimationClip", BindingFlags.Instance | BindingFlags.Public);
+                    clipProperty.SetValue(state, clip);
+
+                    // 6. Force Window cập nhật lại giao diện
+                    window.Repaint();
+                }
+                else
+                {
+                    Debug.LogError($"Không thể lấy state của Animation Window. Hãy thử mở cửa sổ này thủ công một lần.");
+                }
+            }
+        }
         public static void EditorOpenClip(GameObject target, string clipPath)
         {
             // 1. Load AnimationClip từ đường dẫn (Path phải bắt đầu bằng "Assets/...")
@@ -161,6 +213,9 @@ namespace unvs.shares.editor
                     clipProperty.SetValue(state, clip);
 
                     window.Repaint();
+                }else
+                {
+                    Debug.LogError($"Can not get state of {clipPath}");
                 }
             }
         }
