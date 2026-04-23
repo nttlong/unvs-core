@@ -1,5 +1,5 @@
 
-using Codice.CM.SEIDInfo;
+#if UNITY_EDITOR
 using Cysharp.Threading.Tasks;
 using System;
 using System.IO;
@@ -8,10 +8,11 @@ using UnityEditor.AddressableAssets;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
+using unvs.editor.components;
 using unvs.game2d.scenes;
 using unvs.shares.editor;
 
-#if UNITY_EDITOR
+
 namespace unvs.core.editorlibs
 {
     public class Dialogs
@@ -70,13 +71,16 @@ namespace unvs.core.editorlibs
                     if (webRequest.result == UnityWebRequest.Result.Success)
                     {
                         string result = webRequest.downloadHandler.text.Trim('"'); // Xóa dấu ngoặc kép nếu FastAPI trả về dạng JSON string
-                        return result == "OK";
+                       
+                        Dialogs.Show($" API server can be connected");
+                        return true;
                     }
                 }
             }
             catch (System.Exception e)
             {
-                Debug.LogWarning($"[UnvsPythonCall] HealthCheck failed: {e.Message}");
+                Dialogs.Show($"[UnvsPythonCall] HealthCheck failed: {e.Message}");
+               
             }
 
             return false;
@@ -136,12 +140,7 @@ namespace unvs.core.editorlibs
             return null;
         }
     }
-    public class SceneInfoResut
-    {
-        public string FolderPath { get; internal set; }
-        public string AssetPath { get; internal set; }
-        public string Name { get; internal set; }
-    }
+    
     public class EditorTools
     {
         public static string EditorGetAddressPath(AssetReference myRef)
@@ -174,7 +173,7 @@ namespace unvs.core.editorlibs
                 if(scene.selRef==null)
                 {
                     Dialogs.Show($"{scene}.selRef is null or not set");
-                    return null;
+                    return default;
                 }
                 var pathToAsset = UnvsEditorUtils.EditorGetAddressPath(scene.selRef);
                 var folder = System.IO.Path.GetDirectoryName(pathToAsset);
@@ -185,8 +184,25 @@ namespace unvs.core.editorlibs
                     Name=scene.name
                 };
             }
-            return null;
+            return default;
+        }
+        public static SceneInfoResut GetFolderOfGameObjectByScene(UnvsScene scene)
+        {
+
+            if (scene.selRef == null)
+            {
+                Dialogs.Show($"{scene}.selRef is null or not set");
+                return default;
+            }
+            var pathToAsset = UnvsEditorUtils.EditorGetAddressPath(scene.selRef);
+            var folder = System.IO.Path.GetDirectoryName(pathToAsset);
+            return new SceneInfoResut
+            {
+                FolderPath = ToAbsolutePath(folder),
+                AssetPath = ToAbsolutePath(pathToAsset),
+                Name = scene.name
+            };
         }
     }
 }
-#endif
+#endif

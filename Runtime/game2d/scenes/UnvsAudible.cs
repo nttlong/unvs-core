@@ -3,9 +3,12 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using unvs.editor.components;
 using unvs.ext;
 using unvs.shares;
-using unvs.shares.editor;
+#if UNITY_EDITOR
+using unvs.shares.editor; 
+#endif
 namespace unvs.game2d.scenes
 {
     public class UnvsAudible : UnvsBaseComponent
@@ -62,6 +65,7 @@ namespace unvs.game2d.scenes
                 ThiknessDown, scene.wallLeft.bounds.max.x,
                 scene.wallRight.bounds.min.x);
             }
+            scene.groundThickness.AddComponentIfNotExist<UnvsGeometryChunks>();
         }
         [UnvsButton("Geometry outline")]
         public async UniTask EditorGeometryOutline()

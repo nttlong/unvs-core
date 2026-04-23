@@ -12,7 +12,7 @@ def CreateGuidelinePng(data: dict):
     #chuyen tu unity polycollider2d khi dan o che do edit 1 scene duoi dang 1 prefab, do bin tap vien chay tu unity
     output_path = data['output_path']
     output_path_psd = data.get('output_path_psd')
-    padding = data.get('padding', 0)# <-- kho co can phai canh le
+    padding = data.get('padding', 50)# <-- kho co can phai canh le
 
     if not raw_points:
         return "Error: No points provided"
@@ -28,10 +28,10 @@ def CreateGuidelinePng(data: dict):
     width = int(max_x - min_x) + padding * 2
     height = int(max_y - min_y) + padding * 2
 
-    # Giới hạn an toàn (16k pixels)
-    MAX_ALLOWED = 16384
-    if width > MAX_ALLOWED or height > MAX_ALLOWED:
-        return f"Error: Image too large ({width}x{height}). Max is {MAX_ALLOWED}px. Check PPU or world bounds."
+    # # Giới hạn an toàn (16k pixels)
+    # MAX_ALLOWED = 16384
+    # if width > MAX_ALLOWED or height > MAX_ALLOWED:
+    #     return f"Error: Image too large ({width}x{height}). Max is {MAX_ALLOWED}px. Check PPU or world bounds."
 
     # 3. Offset tọa độ để khớp với khung ảnh đã crop
     pts_arr[:, 0] -= (min_x - padding)
