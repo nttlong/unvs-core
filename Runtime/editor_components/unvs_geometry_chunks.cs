@@ -1,4 +1,12 @@
-﻿#if UNITY_EDITOR
+/*
+This component just use in editor mode, It will use
+purpose: if any mono behavior use this component
+a button with create psd file which include
+1. create an a psd file (which pixel format is 8bit rgba)  by image file that input from script in runtime
+2. psd file will generate by call python api server
+3. create tiled/chunked psd from polygon collider geometry
+*/
+#if UNITY_EDITOR
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,6 +34,10 @@ namespace unvs.editor.components     {
         public SceneInfoResut Folder;
         public string folderPath;
         public SpriteRenderer[] Sprites;
+
+        [Header("Create PSD From Image")]
+        public string imagePath;
+        public string psdPath;
         //private void OnValidate()
         //{
         //    coll = this.GetComponent<PolygonCollider2D>();
@@ -44,6 +56,24 @@ namespace unvs.editor.components     {
             
             Folder = unvs.core.editorlibs.EditorTools.GetFolderOfGameObjectByScene(gameObject);
         }
+        [UnvsButton("Create PSD From Image")]
+        public async UniTask CreatePsdFromImage()
+        {
+            if (!await unvs.core.editorlibs.UnvsPythonCall.HealthCheck())
+            {
+                return;
+            }
+
+            var data = new
+            {
+                FilePath = psdPath,
+                PngFile = imagePath
+            };
+
+            var result = await unvs.core.editorlibs.UnvsPythonCall.Call("UnvsPsd", "CreatePsdFile", data);
+            Debug.Log(result);
+        }
+
         [UnvsButton("Create psd file")]
         public async UniTask CreatePSDFile()
         {

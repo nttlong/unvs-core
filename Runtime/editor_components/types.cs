@@ -12,9 +12,9 @@ namespace unvs.editor.components
     [Serializable]
     public struct SceneInfoResut
     {
-        public string FolderPath { get; internal set; }
-        public string AssetPath { get; internal set; }
-        public string Name { get; internal set; }
+        public string FolderPath;
+        public string AssetPath;
+        public string Name;
     }
 } 
 #endif

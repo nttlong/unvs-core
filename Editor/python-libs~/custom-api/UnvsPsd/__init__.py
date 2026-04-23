@@ -187,7 +187,7 @@ def CreatePsdBigSizeOneFile(data: dict) -> str:
     folder_path = data.get('folder_path')
     file_name = data.get('file_name', "geometry_chunks.psd")
     # Ép split_width cố định 128 hoặc theo data
-    split_width = int(128) 
+    split_width = int(64) 
     screen_width = int(data.get('screen_width', 2048))
     screen_height = int(data.get('screen_height', 2048))
     points = data.get('points', [])
@@ -263,3 +263,75 @@ def CreatePsdBigSizeOneFile(data: dict) -> str:
     print(f"Saved PSD at {master_psd_path}")
 
     return f"Success: Created PSD with fixed-size layers (offset 0) at {master_psd_path}"
+
+import os
+import struct
+from PIL import Image
+
+def create_single_psd(data: dict) -> str:
+    psd_file_path = data.get('psd_file')
+    points = data.get('points', [])
+    
+    if not points or len(points) < 2:
+        return "Error: Need at least 2 points to draw lines"
+
+    # 1. Tìm giới hạn (Bounding Box) để tính size
+    min_x = min(p['x'] for p in points)
+    max_x = max(p['x'] for p in points)
+    min_y = min(p['y'] for p in points)
+    max_y = max(p['y'] for p in points)
+
+    padding = data.get('padding', 50)
+    canvas_width = int(max_x - min_x) + (padding * 2)
+    canvas_height = int(max_y - min_y) + (padding * 2)
+
+    # 2. Tạo ảnh bằng PIL và vẽ line
+    img = Image.new('RGBA', (canvas_width, canvas_height), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    # Convert tọa độ (giữ nguyên tỷ lệ, chỉ dời gốc tọa độ và thêm lề)
+    pts_to_draw = [
+        (float(p['x'] - min_x + padding), float(p['y'] - min_y + padding)) 
+        for p in points
+    ]
+    if len(pts_to_draw) > 1:
+        pts_to_draw.append(pts_to_draw[0])
+    # Vẽ đường line màu đỏ
+    draw.line(pts_to_draw, fill=(255, 0, 0, 255), width=2, joint="round")
+
+    # 3. Khởi tạo PSD và dọn dẹp layer (Dựa theo logic hàm CreatePsdBigSize của bạn)
+    psd = PSDImage.new(mode='RGBA', size=(canvas_width, canvas_height))
+    
+    # Cách xóa layer an toàn nhất cho phiên bản của bạn
+    if hasattr(psd, 'layers'):
+        psd.layers.clear()
+    elif hasattr(psd, 'pop'):
+        while len(psd) > 0:
+            psd.pop()
+
+    # 4. Tạo layer từ PIL
+    try:
+        new_layer = PixelLayer.from_pil(img, psd)
+    except AttributeError:
+        new_layer = PixelLayer.frompil(img, psd)
+
+    new_layer.name = "Lines_Layer"
+    new_layer.left = 0
+    new_layer.top = 0
+
+    # 5. Thêm layer vào PSD
+    # Kiểm tra xem psd có method append hay không (thường là psd.append hoặc psd.layers.append)
+    if hasattr(psd, 'append'):
+        psd.append(new_layer)
+    else:
+        psd.layers.append(new_layer)
+
+    # 6. Lưu file
+    output_dir = os.path.dirname(psd_file_path)
+    if output_dir and not os.path.exists(output_dir):
+        os.makedirs(output_dir, exist_ok=True)
+        
+    psd.save(psd_file_path)
+
+    return f"Success: Created PSD at {psd_file_path}"
+        

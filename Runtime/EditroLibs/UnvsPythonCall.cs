@@ -18,7 +18,7 @@ using UnityEngine.Rendering;
 namespace unvs.core.editorlibs
 {
 
-    
+
 
     public static class GlobalRenderArchitect
     {
@@ -112,7 +112,7 @@ namespace unvs.core.editorlibs
                     if (webRequest.result == UnityWebRequest.Result.Success)
                     {
                         string result = webRequest.downloadHandler.text.Trim('"'); // Xóa dấu ngoặc kép nếu FastAPI trả về dạng JSON string
-                       
+
                         Dialogs.Show($" API server can be connected");
                         return true;
                     }
@@ -121,7 +121,7 @@ namespace unvs.core.editorlibs
             catch (System.Exception e)
             {
                 Dialogs.Show($"[UnvsPythonCall] HealthCheck failed: {e.Message}");
-               
+
             }
 
             return false;
@@ -155,7 +155,7 @@ namespace unvs.core.editorlibs
                         string jsonResponse = webRequest.downloadHandler.text;
                         // Sử dụng Newtonsoft để deserialize linh hoạt hơn
                         PythonResponse response = Newtonsoft.Json.JsonConvert.DeserializeObject<PythonResponse>(jsonResponse);
-                        
+
                         if (response != null && response.status == "success")
                         {
                             return response.result?.ToString();
@@ -181,7 +181,7 @@ namespace unvs.core.editorlibs
             return null;
         }
     }
-    
+
     public class EditorTools
     {
         public static string EditorGetAddressPath(AssetReference myRef)
@@ -211,19 +211,22 @@ namespace unvs.core.editorlibs
             var scene = obj.GetComponentInParent<UnvsScene>();
             if (scene != null)
             {
-                if(scene.selRef==null)
+                if (scene.selRef == null)
                 {
                     Dialogs.Show($"{scene}.selRef is null or not set");
                     return default;
                 }
                 var pathToAsset = UnvsEditorUtils.EditorGetAddressPath(scene.selRef);
                 var folder = System.IO.Path.GetDirectoryName(pathToAsset);
-                return new SceneInfoResut
+                var ret = new SceneInfoResut
                 {
-                    FolderPath= ToAbsolutePath(folder),
-                    AssetPath= ToAbsolutePath(pathToAsset),
-                    Name=scene.name
+                    FolderPath = System.IO.Path.Join(ToAbsolutePath(folder), scene.name),
+                    AssetPath = ToAbsolutePath(pathToAsset),
+                    Name = scene.name
                 };
+                if (!System.IO.Directory.Exists(ret.FolderPath))
+                    System.IO.Directory.CreateDirectory(ret.FolderPath);
+                return ret;
             }
             return default;
         }
