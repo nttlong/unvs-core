@@ -208,22 +208,32 @@ namespace unvs.game2d.scenes{
                 camColl.offset = Vector2.zero;
             } else
             {
-                // plane gameplay cố định tại Z = 0
                 float planeZ = 0f;
-
-                // khoảng cách từ camera tới plane
                 float distance = Mathf.Abs(cam.transform.position.z - planeZ);
+                // Nếu vẫn bằng 0 (do cả 2 chưa init), hãy bỏ qua frame này hoặc dùng giá trị mặc định
+                if (distance < 0.1f)
+                {
+                    // Có thể đây là frame đầu tiên khi load, hãy đợi hoặc tạm dừng tính toán
+                    return;
+                }
+                // Truy cập trực tiếp vào Lens của Virtual Camera để đảm bảo đồng bộ
+                float currentFOV = vcam.Lens.FieldOfView;
+                float aspect = vcam.Lens.Aspect;
 
-                // FOV -> viewport height tại plane
-                float fovRad = cam.fieldOfView * 0.5f * Mathf.Deg2Rad;
+                // Tính toán bằng Radians
+                float halfFovRad = currentFOV * 0.5f * Mathf.Deg2Rad;
+                float tanAlpha = Mathf.Tan(halfFovRad);
 
-                float height = 2f * distance * Mathf.Tan(fovRad);
-                float width = height * cam.aspect;
+                float height = 2f * distance * tanAlpha;
+                float width = height * aspect;
+
+                // Log này sẽ cho bạn biết chính xác biến số nào đang "hủy diệt" kích thước của bạn
+                if (width < 1 || height < 1)
+                {
+                    Debug.LogError($"[Fix] Dist: {distance}, FOV: {currentFOV}, Tan: {tanAlpha}, Aspect: {aspect}");
+                }
 
                 camColl.size = new Vector2(width, height);
-
-                camColl.isTrigger = true;
-                camColl.offset = Vector2.zero;
             }
         }
         /// <summary>
@@ -366,9 +376,21 @@ namespace unvs.game2d.scenes{
             base.InitRunTime();
             _lastPosition = getValue(cam.transform.position.x);
             audioSource=this.GetComponentInChildren<AudioSource>(true);
+            //cam.transparencySortMode = TransparencySortMode.Orthographic;
+
+            //// Thiết lập trục ưu tiên là trục Z (0, 0, 1)
+            //cam.transparencySortAxis = new Vector3(0, 0, 1);
+
+            Debug.Log("Camera Transparency Sort Mode set to Orthographic Axis");
 
         }
-       
+        //void OnPreRender() // Trước khi render bất cứ thứ gì
+        //{
+            
+        //    // Ép cách tính Z luôn nhất quán, bất kể bạn thêm Layer nào sau này
+        //    cam.transparencySortMode = TransparencySortMode.Orthographic;
+        //    cam.transparencySortAxis = new Vector3(0, 0, 1);
+        //}
 
         private void LateUpdate()
         {

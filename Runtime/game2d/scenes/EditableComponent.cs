@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 using unvs.ext;
 using unvs.shares;
@@ -68,15 +69,17 @@ namespace unvs.game2d.scenes
         private void OnDisable()
         {
             onDisable.Invoke();
+
         }
     }
     public abstract class UnvsList
     {
 
     }
+   
     public abstract class UnvsBaseComponent : MonoBehaviour
     {
-
+        
 
 #if UNITY_EDITOR
         public Action<string> OnEditorError;

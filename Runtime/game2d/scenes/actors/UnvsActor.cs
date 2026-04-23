@@ -1,8 +1,10 @@
 ﻿using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Triggers;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
@@ -152,10 +154,32 @@ namespace unvs.game2d.scenes.actors
 #if UNITY_EDITOR
     public partial class UnvsActor : UnvsBaseComponent
     {
-       
 
-        
 
+
+        [UnvsButton]
+        public void FixMarterial()
+        {
+            foreach (var skin in this.GetComponentsInChildren<SpriteSkin>(true))
+{
+                var renderer = skin.GetComponent<SpriteRenderer>();
+                if (renderer != null)
+                {
+                    // Nhân vật Rigged cần dùng Material có Z-Write On và Alpha Clipping
+                    foreach (var mat in renderer.sharedMaterials)
+                    {
+                        mat.SetInt("_ZWrite", 1);
+                        mat.EnableKeyword("_ALPHATEST_ON");
+                        mat.renderQueue = 2450; // AlphaTest
+
+                        // CỰC KỲ QUAN TRỌNG: 
+                        // Ép Z-Test về LessEqual để chân không bị "đục lỗ" bởi chính nó
+                        mat.SetInt("_ZTest", (int)UnityEngine.Rendering.CompareFunction.LessEqual);
+                    }
+                }
+            }
+           
+        }
         [UnvsButton]
         public void FixLayout()
         {

@@ -19,7 +19,7 @@ namespace unvs.actor.skills {
         {
             await UniTask.Yield();
             // Debug actor show interact point
-            _actor.SayText($"{pos}");
+         
             // adjust direction of actor following pos
             Direction = new Vector2( _composite.bounds.center.CalculateDirection(pos),0);
             //check does positon hit Interactable Object

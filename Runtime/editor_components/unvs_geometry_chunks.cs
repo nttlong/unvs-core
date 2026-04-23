@@ -20,25 +20,25 @@ namespace unvs.editor.components     {
         public int ScreeHeight;
         public int numOfCols;
         public int numOfRows;
-        public EditorVector2[] Points;
+        //public EditorVector2[] Points;
         public UnvsScene scene;
         [SerializeField]
         public SceneInfoResut Folder;
         public string folderPath;
-
-        private void OnValidate()
-        {
-            coll = this.GetComponent<PolygonCollider2D>();
-            ScreenWidth =(int)( coll.bounds.size.x );
-            ScreeHeight=(int)( coll.bounds.size.y );
-            numOfCols = ScreenWidth / 2048;
-            numOfRows = ScreeHeight / 2048;
-            Points= coll.points.Select(p=>new EditorVector2
-            {
-                x=(int) p.x, y=(int) p.y,
-            }).ToArray();
+        public SpriteRenderer[] Sprites;
+        //private void OnValidate()
+        //{
+        //    coll = this.GetComponent<PolygonCollider2D>();
+        //    ScreenWidth =(int)( coll.bounds.size.x );
+        //    ScreeHeight=(int)( coll.bounds.size.y );
+        //    numOfCols = ScreenWidth / 2048;
+        //    numOfRows = ScreeHeight / 2048;
+        //    Points= coll.points.Select(p=>new EditorVector2
+        //    {
+        //        x=(int) p.x, y=(int) p.y,
+        //    }).ToArray();
             
-        }
+        //}
         private void OnDrawGizmos()
         {
             
@@ -86,7 +86,7 @@ namespace unvs.editor.components     {
                 folder_path = subFolderPath,
                 file_name = $"{name}-sprite-{numOfRows}X{numOfCols}.psd"
             };
-            await unvs.core.editorlibs.UnvsPythonCall.Call("UnvsPsd", "CreatePsdBigSise", data);
+            await unvs.core.editorlibs.UnvsPythonCall.Call("UnvsPsd", "CreatePsdBigSizeOneFile", data);
         }
     }
 

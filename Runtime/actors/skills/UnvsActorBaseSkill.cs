@@ -222,7 +222,7 @@ namespace unvs.actor.skills
                     if (rb != null)
                     {
                         float vY = rb.Velocity.y;
-                        actor.SayText($"speed-down={rb.Velocity.y}");
+                        
                         // Nếu thang máy đang đi xuống
                         if (vY < 0)
                         {

@@ -1,0 +1,95 @@
+def CreatePsdBigSiseOneFile(data: dict) -> str:
+    folder_path = data.get('folder_path')
+    file_name = data.get('file_name', "geometry_chunks.psd")
+    split_width = int(data.get('split_width', 2048))
+    screen_width = int(data.get('screen_width', 2048))
+    screen_height = int(data.get('screen_height', 2048))
+    points = data.get('points', [])
+
+    if not points:
+        return "Error: No points provided"
+
+    # 1. Coordinate Normalization
+    min_x = min(p['x'] for p in points)
+    min_y = min(p['y'] for p in points)
+
+    # 2. Create full image and draw lines
+    full_img = Image.new('RGBA', (screen_width, screen_height), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(full_img)
+    
+    pts = []
+    for p in points:
+        local_x = p['x'] - min_x
+        local_y = p['y'] - min_y
+        pts.append((float(local_x), float(screen_height - local_y)))
+    
+    if len(pts) > 1:
+        draw.line(pts, fill=(255, 0, 0, 255), width=1, joint="round")
+
+    # 3. Process into chunks (in-memory)
+    chunks_to_assemble = []
+    if screen_width > split_width:
+        index = 0
+        for x in range(0, screen_width, split_width):
+            right = min(x + split_width, screen_width)
+            chunk = full_img.crop((x, 0, right, screen_height))
+            
+            bbox = chunk.getbbox()
+            if not bbox:
+                continue
+                
+            cropped_chunk = chunk.crop((bbox[0], 0, bbox[2], screen_height))
+            
+            padded_chunk = Image.new('RGBA', (split_width, screen_height), (0, 0, 0, 0))
+            padded_chunk.paste(cropped_chunk, (0, 0))
+            
+            chunks_to_assemble.append({
+                'img': padded_chunk, 
+                'name': f"chunk_{index}",
+                'left': 0,
+                'top': 0
+            })
+            index += 1
+    else:
+        bbox = full_img.getbbox()
+        if bbox:
+            cropped_full = full_img.crop((bbox[0], 0, bbox[2], screen_height))
+            padded_full = Image.new('RGBA', (split_width, screen_height), (0, 0, 0, 0))
+            padded_full.paste(cropped_full, (0, 0))
+            
+            chunks_to_assemble.append({
+                'img': padded_full, 
+                'name': "chunk_0",
+                'left': 0,
+                'top': 0
+            })
+
+    # 4. Create final PSD
+    if chunks_to_assemble:
+        psd_master = PSDImage.new(mode='RGBA', size=(split_width, screen_height))
+        
+        if hasattr(psd_master, 'layers'):
+            psd_master.layers.clear()
+        elif hasattr(psd_master, 'pop'):
+            while len(psd_master) > 0:
+                psd_master.pop()
+
+        group = psd_master.create_group(name="out-line")
+        
+        for chunk in chunks_to_assemble:
+            try:
+                new_layer = PixelLayer.from_pil(chunk['img'], psd_master)
+            except AttributeError:
+                new_layer = PixelLayer.frompil(chunk['img'], psd_master)
+            
+            new_layer.name = chunk['name']
+            new_layer.left = chunk['left']
+            new_layer.top = chunk['top']
+            group.append(new_layer)
+
+        os.makedirs(folder_path, exist_ok=True)
+        master_psd_path = os.path.join(folder_path, file_name)
+        psd_master.save(master_psd_path)
+        return f"Success: Created one PSD file at {master_psd_path}"
+
+    return "Error: No content to save"

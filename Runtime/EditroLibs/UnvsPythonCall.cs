@@ -11,10 +11,51 @@ using UnityEngine.Networking;
 using unvs.editor.components;
 using unvs.game2d.scenes;
 using unvs.shares.editor;
-
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace unvs.core.editorlibs
 {
+
+    
+
+    public static class GlobalRenderArchitect
+    {
+        [MenuItem("Unvs/Globalize 3D Render Pipeline")]
+        static void Globalize()
+        {
+            // 1. Quét toàn bộ Material trong Project
+            string[] guids = AssetDatabase.FindAssets("t:Material");
+            foreach (string guid in guids)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                Material mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+
+                // 2. Ép mọi Material tuân thủ luật Z-Buffer thông minh
+                if (mat != null && mat.shader.name.Contains("Universal Render Pipeline"))
+                {
+                    // Cho phép ghi chiều sâu
+                    mat.SetInt("_ZWrite", 1);
+                    // Chỉ vẽ nếu gần Camera hơn hoặc bằng
+                    mat.SetInt("_ZTest", (int)CompareFunction.LessEqual);
+
+                    // MẤU CHỐT: Bật Alpha Clipping cho mọi thứ
+                    // Điều này giúp phần trong suốt không bao giờ "đục lỗ" vật thể phía sau
+                    if (mat.HasProperty("_AlphaClip"))
+                    {
+                        mat.SetFloat("_AlphaClip", 1);
+                        mat.SetFloat("_Cutoff", 0.01f); // Ngưỡng cực nhỏ để giữ chân nhân vật
+                        mat.EnableKeyword("_ALPHATEST_ON");
+                        mat.renderQueue = (int)RenderQueue.AlphaTest; // 2450
+                    }
+                }
+            }
+            AssetDatabase.SaveAssets();
+            Debug.Log("Hệ thống đã được tổng quát hóa sang chuẩn Depth-Buffer 3D.");
+        }
+    }
+
     public class Dialogs
     {
         public static void Show(string msg)

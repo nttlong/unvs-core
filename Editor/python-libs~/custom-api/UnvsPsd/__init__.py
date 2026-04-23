@@ -47,10 +47,10 @@ from PIL import Image, ImageDraw
 from psd_tools import PSDImage
 from psd_tools.api.layers import PixelLayer
 
-def CreatePsdBigSise(data: dict) -> str:
+def CreatePsdBigSize(data: dict) -> str:
     folder_path = data.get('folder_path')
     file_name = data.get('file_name', "geometry_chunks.psd")
-    split_width = int(data.get('split_width', 2048))
+    split_width = int(128) #int(data.get('split_width', 2048))
     screen_width = int(data.get('screen_width', 2048))
     screen_height = int(data.get('screen_height', 2048))
     points = data.get('points', [])
@@ -87,6 +87,7 @@ def CreatePsdBigSise(data: dict) -> str:
     full_img.save(full_img_path)
 
     # 4. Split into chunks and save as PNGs and individual PSDs
+    chunks_to_assemble = []
     if screen_width > split_width:
         index = 0
         for x in range(0, screen_width, split_width):
@@ -115,6 +116,13 @@ def CreatePsdBigSise(data: dict) -> str:
                 psd_file_path=os.path.join(folder_path, f"chunk_{index}.psd"),
                 layer_name=f"chunk_{index}"
             )
+            # Store with global offsets for master PSD reconstruction
+            chunks_to_assemble.append({
+                'img': padded_chunk, 
+                'name': f"chunk_{index}",
+                'left': 0,
+                'top': 0 # We kept full height, so vertical offset relative to canvas is 0 if we consider the ink is at the top
+            })
             index += 1
     else:
         bbox = full_img.getbbox()
@@ -135,9 +143,123 @@ def CreatePsdBigSise(data: dict) -> str:
                 psd_file_path=os.path.join(folder_path, "chunk_0.psd"),
                 layer_name="chunk_0"
             )
+            chunks_to_assemble.append({
+                'img': padded_full, 
+                'name': "chunk_0",
+                'left': bbox[0],
+                'top': 0
+            })
 
-
+    # 5. Create final master PSD with all chunks
+    if chunks_to_assemble:
+        # Use full screen dimensions for the master PSD to reconstruct the original image
+        psd_master = PSDImage.new(mode='RGBA', size=(screen_width, screen_height))
         
+        if hasattr(psd_master, 'layers'):
+            psd_master.layers.clear()
+        elif hasattr(psd_master, 'pop'):
+            while len(psd_master) > 0:
+                psd_master.pop()
 
-    print(f"Success: Created individual PSDs in {folder_path}")
-    return f"Success: Created individual PSDs in {folder_path}"
+        group = psd_master.create_group(name="out-line")
+        
+        for chunk in chunks_to_assemble:
+            try:
+                new_layer = PixelLayer.from_pil(chunk['img'], psd_master)
+            except AttributeError:
+                new_layer = PixelLayer.frompil(chunk['img'], psd_master)
+            
+            new_layer.name = chunk['name']
+            new_layer.left = chunk['left']
+            new_layer.top = chunk['top']
+            group.append(new_layer)
+
+        master_psd_path = os.path.join(folder_path, file_name)
+        psd_master.save(master_psd_path)
+
+    return f"Success: Created individual PSDs and master PSD in {folder_path}"
+import os
+from PIL import Image, ImageDraw
+from psd_tools import PSDImage
+from psd_tools.api.layers import PixelLayer
+
+def CreatePsdBigSizeOneFile(data: dict) -> str:
+    folder_path = data.get('folder_path')
+    file_name = data.get('file_name', "geometry_chunks.psd")
+    # Ép split_width cố định 128 hoặc theo data
+    split_width = int(128) 
+    screen_width = int(data.get('screen_width', 2048))
+    screen_height = int(data.get('screen_height', 2048))
+    points = data.get('points', [])
+
+    if not points:
+        return "Error: No points provided"
+
+    # 1. Coordinate Normalization
+    min_x = min(p['x'] for p in points)
+    min_y = min(p['y'] for p in points)
+
+    # 2. Create full image in memory
+    full_img = Image.new('RGBA', (screen_width, screen_height), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(full_img)
+    
+    pts = []
+    for p in points:
+        local_x = p['x'] - min_x
+        local_y = p['y'] - min_y
+        pts.append((float(local_x), float(screen_height - local_y)))
+    
+    if len(pts) > 1:
+        draw.line(pts, fill=(255, 0, 0, 255), width=1, joint="round")
+
+    # 3. Initialize Master PSD với kích thước layer tiêu chuẩn
+    # Lưu ý: Kích thước PSD master sẽ theo split_width để các layer không bị "lọt thỏm"
+    psd_master = PSDImage.new(mode='RGBA', size=(split_width, screen_height))
+    
+    if hasattr(psd_master, 'layers'):
+        psd_master.layers.clear()
+    elif hasattr(psd_master, 'pop'):
+        while len(psd_master) > 0: psd_master.pop()
+
+    group = psd_master.create_group(name="out-line")
+
+    # 4. Chia nhỏ và ép offset = 0
+    index = 0
+    for x in range(0, screen_width, split_width):
+        right = min(x + split_width, screen_width)
+        
+        # Cắt một vùng từ ảnh tổng
+        chunk_region = full_img.crop((x, 0, right, screen_height))
+        
+        # Kiểm tra nếu chunk rỗng (không có pixel) thì bỏ qua để nhẹ file
+        if not chunk_region.getbbox():
+            continue
+
+        # Tạo một layer mới luôn có kích thước cố định split_width
+        padded_layer_img = Image.new('RGBA', (split_width, screen_height), (0, 0, 0, 0))
+        
+        # Dán phần vừa cắt vào (luôn dán tại 0,0 của layer đó)
+        padded_layer_img.paste(chunk_region, (0, 0))
+        
+        # Chuyển sang PixelLayer
+        try:
+            new_layer = PixelLayer.from_pil(padded_layer_img, psd_master)
+        except AttributeError:
+            new_layer = PixelLayer.frompil(padded_layer_img, psd_master)
+        
+        new_layer.name = f"chunk_{index}"
+        # ÉP OFFSET LUÔN LÀ 0
+        new_layer.left = 0 
+        new_layer.top = 0
+        
+        group.append(new_layer)
+        index += 1
+        print(f"Added layer {index} at position ({new_layer.left}, {new_layer.top})")
+
+    # 5. Save final PSD
+    os.makedirs(folder_path, exist_ok=True)
+    master_psd_path = os.path.join(folder_path, file_name)
+    psd_master.save(master_psd_path)
+    print(f"Saved PSD at {master_psd_path}")
+
+    return f"Success: Created PSD with fixed-size layers (offset 0) at {master_psd_path}"
