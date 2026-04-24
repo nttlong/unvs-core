@@ -55,6 +55,12 @@ namespace unvs.animators_controllers
             this.ikControl = anim.AddChildComponentIfNotExist<Transform>("IK-Control");
             this.targets = this.ikControl.AddChildComponentIfNotExist<Transform>("targets");
             this.solvers = this.ikControl.AddChildComponentIfNotExist<Transform>("solvers");
+            //if (this.solversLimbs != null)
+            //{
+            //    this.solversLimbs.name = $"{this.solversLimbs.name}-delete";
+            //    UnityEngine.Object.Destroy(this.solversLimbs);
+            //}
+                
             this.solversLimbs = this.solvers.AddChildIfNotExist<Transform>("solversLims");
             this.solversChains = this.solvers.AddChildIfNotExist<Transform>("solversChains");
             fetchTarget(this.targets, this.rootBone);
@@ -64,10 +70,10 @@ namespace unvs.animators_controllers
 
         private void createSolver()
         {
-            foreach (Transform t in this.solversLimbs)
-            {
-                UnityEngine.Object.DestroyImmediate(t.gameObject);
-            }
+            //foreach (Transform t in this.solversLimbs)
+            //{
+            //    UnityEngine.Object.DestroyImmediate(t.gameObject);
+            //}
 
             foreach (var tr in Limbs)
             {
