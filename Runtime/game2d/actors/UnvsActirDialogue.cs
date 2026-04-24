@@ -5,8 +5,11 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using unvs.ext;
+using unvs.game2d.objects.components;
+using unvs.game2d.objects.editor;
+using unvs.game2d.scenes;
 
-namespace unvs.game2d.scenes.actors
+namespace unvs.game2d.actors
 {
     public class UnvsActirDialogue : UnvsUIComponentInstance<UnvsActirDialogue>
     {

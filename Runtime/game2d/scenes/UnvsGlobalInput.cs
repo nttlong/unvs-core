@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using unvs.game2d.objects.components;
 using static UnityEngine.InputSystem.DefaultInputActions;
 using static UnityEngine.InputSystem.InputAction;
 

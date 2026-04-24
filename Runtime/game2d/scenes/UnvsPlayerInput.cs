@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using unvs.game2d.objects.components;
+using unvs.game2d.objects.editor;
 using static UnityEngine.InputSystem.DefaultInputActions;
 
 namespace unvs.game2d.scenes

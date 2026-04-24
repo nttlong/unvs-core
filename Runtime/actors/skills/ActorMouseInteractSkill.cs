@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 using unvs.ext;
 using unvs.game2d.objects;
-using unvs.game2d.scenes.actors;
+using unvs.game2d.actors;
 using unvs.shares;
 
 namespace unvs.actor.skills {

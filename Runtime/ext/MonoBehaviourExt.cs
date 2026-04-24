@@ -7,7 +7,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.U2D.Animation;
-using unvs.game2d.scenes.actors;
+using unvs.game2d.actors;
 
 namespace unvs.ext
 {

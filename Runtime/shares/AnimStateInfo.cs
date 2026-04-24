@@ -2,7 +2,8 @@
 using UnityEditor;
 using UnityEngine;
 using unvs.game2d.scenes;
-using unvs.game2d.scenes.actors;
+using unvs.game2d.actors;
+using unvs.game2d.objects.editor;
 
 namespace unvs.shares
 {

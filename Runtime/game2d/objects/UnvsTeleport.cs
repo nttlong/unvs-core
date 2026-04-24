@@ -6,8 +6,10 @@ using UnityEngine.AddressableAssets;
 using unvs.actions;
 using unvs.ext;
 using unvs.game2d.scenes;
-using unvs.game2d.scenes.actors;
+using unvs.game2d.actors;
 using unvs.shares;
+using unvs.game2d.objects.editor;
+
 #if UNITY_EDITOR
 using unvs.shares.editor;
 #endif

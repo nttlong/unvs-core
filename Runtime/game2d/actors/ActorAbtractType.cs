@@ -1,4 +1,4 @@
-namespace unvs.game2d.scenes.actors {
+namespace unvs.game2d.actors {
     public enum ActorType {
         None,
         Player,

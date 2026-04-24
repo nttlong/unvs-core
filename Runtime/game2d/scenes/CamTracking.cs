@@ -3,6 +3,7 @@
 using Cysharp.Threading.Tasks;
 using System;
 using UnityEngine;
+using unvs.game2d.objects.components;
 using unvs.shares;
 
 

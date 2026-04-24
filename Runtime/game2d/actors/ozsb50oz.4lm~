@@ -14,7 +14,7 @@ using unvs.shares.editor;
 
 #endif
 using unvs.sys;
-namespace unvs.game2d.scenes.actors
+namespace unvs.game2d.actors
 {
     [RequireComponent(typeof(IKBoneMap))]
     [RequireComponent(typeof(AnimMap))]

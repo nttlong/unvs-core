@@ -2,7 +2,7 @@ using System;
 using UnityEngine.InputSystem;
 using static UnityEngine.InputSystem.InputAction;
 
-namespace unvs.game2d.scenes.actors
+namespace unvs.game2d.actors
 {
     public class MapAction
     {

@@ -5,7 +5,7 @@ using UnityEngine;
 using unvs.actor.skills;
 using unvs.ext;
 using unvs.ext.physical2d;
-using unvs.game2d.scenes.actors;
+using unvs.game2d.actors;
 
 namespace unvs.actor.skills {
     

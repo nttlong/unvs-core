@@ -1,9 +1,11 @@
 using UnityEngine;
 using UnityEngine.U2D.IK;
 using unvs.ext;
+using unvs.game2d.objects.components;
+using unvs.game2d.objects.editor;
 using unvs.game2d.scenes;
 
-namespace Unvs.Core.Game2D.Scenes.Actors
+namespace unvs.game2d.actors
 {
     public partial class UnsvPlayerDoTweenAnim:UnvsBaseComponent
     {

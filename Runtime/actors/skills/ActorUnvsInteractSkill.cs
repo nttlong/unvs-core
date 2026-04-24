@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using unvs.ext;
-using unvs.game2d.scenes.actors;
+using unvs.game2d.actors;
 
 namespace unvs.actor.skills {
     public class ActorUnvsInteractSkill : AbstractActorBaseSkill

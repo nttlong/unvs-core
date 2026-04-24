@@ -11,7 +11,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using unvs.ext.physical2d;
 using unvs.game2d.scenes;
-using unvs.game2d.scenes.actors;
+using unvs.game2d.actors;
 using unvs.shares;
 using static UnityEngine.LowLevelPhysics2D.PhysicsLayers;
 

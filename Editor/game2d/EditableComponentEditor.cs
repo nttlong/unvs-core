@@ -8,6 +8,8 @@ using UnityEditor;
 
 using game2d.ext;
 using System.Linq;
+using unvs.game2d.objects.components;
+using unvs.game2d.objects.editor;
 namespace editor.game2d
 {
    

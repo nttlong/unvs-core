@@ -3,6 +3,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using unvs.ext;
+using unvs.game2d.objects.components;
 using unvs.game2d.scenes;
 using unvs.game2d.transitions;
 using unvs.shares;

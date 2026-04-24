@@ -16,6 +16,8 @@ using unvs.game2d.scenes;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using System.IO;
+using unvs.game2d.objects.editor;
+using unvs.game2d.objects.components;
 namespace unvs.editor.components     {
 
     

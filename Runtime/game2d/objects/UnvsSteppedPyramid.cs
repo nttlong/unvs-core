@@ -5,6 +5,10 @@ using UnityEngine;
 using unvs.ext;
 using unvs.game2d.scenes;
 using unvs.shares;
+using unvs.game2d.objects.editor;
+using unvs.game2d.objects.components;
+
+
 #if UNITY_EDITOR
 using unvs.shares.editor;
 using unvs.core.editorlibs;

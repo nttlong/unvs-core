@@ -9,7 +9,7 @@ using unvs.ext;
 using unvs.ext.physical2d;
 using unvs.game2d.objects;
 using unvs.game2d.scenes;
-using unvs.game2d.scenes.actors;
+using unvs.game2d.actors;
 using unvs.shares;
 
 

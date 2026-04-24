@@ -12,9 +12,11 @@ using UnityEngine.U2D.Animation;
 using UnityEngine.U2D.IK;
 using UnityEngine.UI;
 using unvs.ext;
+using unvs.game2d.objects.components;
+using unvs.game2d.objects.editor;
 using unvs.shares;
 
-namespace unvs.game2d.scenes.actors
+namespace unvs.game2d.actors
 {
     [RequireComponent(typeof(AudioSource))]
     public class UnvsAnimStates : UnvsBaseComponent

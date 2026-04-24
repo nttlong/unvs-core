@@ -2,7 +2,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using unvs.actor.skills;
-using unvs.game2d.scenes.actors;
+using unvs.game2d.actors;
 
 namespace unvs.actors.controls {
     
@@ -53,7 +53,7 @@ namespace unvs.actors.controls {
         public override void InitRuntime()
         {
 
-            this.actor = this.GetComponent<unvs.game2d.scenes.actors.UnvsActor>();
+            this.actor = this.GetComponent<UnvsActor>();
 
         
             this.move = new MapAction();

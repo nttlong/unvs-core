@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
-using unvs.game2d.scenes.actors;
+using unvs.game2d.actors;
 
 namespace unvs.actor.skills{
     [CreateAssetMenu(fileName = "ActorSkill", menuName = "Systems/Actor Skill Data")]

@@ -11,7 +11,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 using unvs.ext;
-using unvs.game2d.scenes.actors;
+using unvs.game2d.actors;
 
 using unvs.interfaces.sys;
 using unvs.shares;

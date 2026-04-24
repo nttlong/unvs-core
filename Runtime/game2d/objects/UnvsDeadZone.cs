@@ -3,8 +3,10 @@ using System.Linq;
 using UnityEngine;
 using unvs.ext;
 using unvs.game2d.scenes;
-using unvs.game2d.scenes.actors;
+using unvs.game2d.actors;
 using unvs.shares;
+using unvs.game2d.objects.types;
+using unvs.game2d.objects.components;
 
 namespace unvs.game2d.objects
 {

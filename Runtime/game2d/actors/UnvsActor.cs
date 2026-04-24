@@ -12,6 +12,8 @@ using UnityEngine.Rendering.Universal;
 using UnityEngine.U2D.Animation;
 using unvs.actor.skills;
 using unvs.ext;
+using unvs.game2d.objects.components;
+using unvs.game2d.objects.editor;
 using unvs.shares;
 
 #if UNITY_EDITOR
@@ -19,14 +21,14 @@ using unvs.shares.editor;
 
 #endif
 using unvs.sys;
-using Unvs.Core.Game2D.Scenes.Actors;
-namespace unvs.game2d.scenes.actors
+
+namespace unvs.game2d.actors
 {
     [RequireComponent(typeof(IKBoneMap))]
 
 
     [RequireComponent(typeof(UniqueObject))]
-    
+
     [RequireComponent(typeof(AudioSource))]
 
     [RequireComponent(typeof(UnvsActorPhysical))]
@@ -40,13 +42,13 @@ namespace unvs.game2d.scenes.actors
         public UnvsActorSkills Skills;
         public void SayText(string msg) => Skills.Get<unvs.actor.skills.ActorSpeaker>()?.SayText(msg);
         public void SayOff() => UnvsActirDialogue.Instance.Hide();
-        
+
         public CancellationTokenSource cts => _cls;
 
-        public AbstractActionBaseSkill CurrentSkill { get;  set; } 
+        public AbstractActionBaseSkill CurrentSkill { get; set; }
 
-        
-        public float CrawlSpeed=4f;
+
+        public float CrawlSpeed = 4f;
         public UnvsActorPhysical physical;
 
         public UnvsPlayer player;
@@ -54,7 +56,7 @@ namespace unvs.game2d.scenes.actors
         private bool isMoving;
         private Vector2 target;
         private Vector2 direction;
-        
+
         public CompositeCollider2D coll;
         public Rigidbody2D body;
         public Transform camWatcher;
@@ -63,7 +65,7 @@ namespace unvs.game2d.scenes.actors
         public Animator animator;
         public UnvsAnimStates motions;
         private CancellationTokenSource _cls;
-        private Vector3 oririnalScale=Vector3.negativeInfinity;
+        private Vector3 oririnalScale = Vector3.negativeInfinity;
 
         public void DirectionBy(float dir)
         {
@@ -73,16 +75,17 @@ namespace unvs.game2d.scenes.actors
             }
             if (dir > 0)
             {
-                transform.localScale=oririnalScale.CopyToNew();
+                transform.localScale = oririnalScale.CopyToNew();
 
-            } else
+            }
+            else
             {
                 transform.localScale = new Vector3(-oririnalScale.x, transform.localScale.y, transform.localScale.z);
             }
 
         }
         private bool _isSkillsCloned = false;
-       
+
 
         public virtual void OnEnable()
         {
@@ -90,10 +93,10 @@ namespace unvs.game2d.scenes.actors
             {
 
                 Skills = Instantiate(Skills);
-                Skills.Initialize(this); 
-                if(Skills)
-                this.CurrentSkill=Skills.Get<unvs.actor.skills.ActorDefaultSkill>();
-               
+                Skills.Initialize(this);
+                if (Skills)
+                    this.CurrentSkill = Skills.Get<unvs.actor.skills.ActorDefaultSkill>();
+
             }
         }
         public virtual CancellationTokenSource RefreshToken()
@@ -107,9 +110,9 @@ namespace unvs.game2d.scenes.actors
 
 
         }
-       
-        
-        
+
+
+
 
         public T ScanObject<T>(params string[] layers)
         {
@@ -118,7 +121,7 @@ namespace unvs.game2d.scenes.actors
         }
         public T ScanObjectFromPont<T>(Vector2 pos, params string[] layers)
         {
-            if(this.IsDestroyed()||this.gameObject.IsDestroyed()) return default(T);
+            if (this.IsDestroyed() || this.gameObject.IsDestroyed()) return default(T);
             return Vector2dExtesion.ScanObject<T>(pos, this.scanerBound.size, layers);
             //return coll.ScanObject<T>(this.scanerBound.size.x, this.scanerBound.size.y, LayerMask.GetMask(layers));
         }
@@ -128,8 +131,8 @@ namespace unvs.game2d.scenes.actors
             {
                 this.coll = GetComponentInChildren<CompositeCollider2D>();
                 player = GetComponent<UnvsPlayer>();
-                physical= GetComponent<UnvsActorPhysical>();
-               
+                physical = GetComponent<UnvsActorPhysical>();
+
             }
 
         }
@@ -146,7 +149,7 @@ namespace unvs.game2d.scenes.actors
         {
             if (this.CurrentSkill != null)
             {
-               
+
                 this.CurrentSkill.OnUpdate();
             }
         }
@@ -161,7 +164,7 @@ namespace unvs.game2d.scenes.actors
         public void FixMarterial()
         {
             foreach (var skin in this.GetComponentsInChildren<SpriteSkin>(true))
-{
+            {
                 var renderer = skin.GetComponent<SpriteRenderer>();
                 if (renderer != null)
                 {
@@ -178,7 +181,7 @@ namespace unvs.game2d.scenes.actors
                     }
                 }
             }
-           
+
         }
         [UnvsButton]
         public void FixLayout()
@@ -194,7 +197,7 @@ namespace unvs.game2d.scenes.actors
             {
                 this.scanerBound = this.AddChildComponentIfNotExist<BoxCollider2D>("scaner-bound");
                 this.scanerBound.size = this.GetComponent<Collider2D>().bounds.size;
-                
+
             }
             this.scanerBound.SetMeOnLayer(Constants.Layers.INTERACT_SCANER);
             this.scanerBound.SetMeOnTag(Constants.Tags.INTERACT_SCANER);
@@ -203,20 +206,20 @@ namespace unvs.game2d.scenes.actors
             {
                 speaker = GetComponent<UnvsActorSpeaker>();
             }
-            
+
 
         }
         [UnvsButton("ShadowCaster2D")]
         public void EditorShadowCaster2DAll()
         {
-            var compositeShadowCaster=this.AddComponentIfNotExist<CompositeShadowCaster2D>();
-            
+            var compositeShadowCaster = this.AddComponentIfNotExist<CompositeShadowCaster2D>();
+
             foreach (var sp in this.GetComponentsInChildren<SpriteRenderer>(true))
             {
                 var shadowGroup = sp.AddComponentIfNotExist<ShadowCaster2D>();
                 shadowGroup.selfShadows = true;
                 shadowGroup.castingOption = ShadowCaster2D.ShadowCastingOptions.CastAndSelfShadow;
-                
+
             }
         }
         [UnvsButton("Anim controller")]

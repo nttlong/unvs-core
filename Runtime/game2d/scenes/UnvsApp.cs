@@ -13,10 +13,16 @@ using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 using unvs.ext;
 using unvs.game2d.objects;
-using unvs.game2d.scenes.actors;
+using unvs.game2d.actors;
 
 
 using unvs.shares;
+using unvs.game2d.objects.editor;
+using unvs.game2d.objects.components;
+using unvs.game2d.objects.types;
+
+
+
 #if UNITY_EDITOR
 using unvs.shares.editor; 
 #endif

@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.U2D.Animation;
 using unvs.ext;
+using unvs.game2d.objects.components;
 using unvs.shares;
 
 #if UNITY_EDITOR
@@ -15,7 +16,7 @@ using unvs.shares.editor;
 
 #endif
 using unvs.sys;
-namespace unvs.game2d.scenes.actors
+namespace unvs.game2d.actors
 {
     public class UnvsActorSpeaker : UnvsComponent
     {

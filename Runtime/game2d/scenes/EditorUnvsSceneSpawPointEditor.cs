@@ -1,5 +1,7 @@
 using System;
 using UnityEngine;
+using unvs.game2d.objects.components;
+using unvs.game2d.objects.editor;
 
 namespace unvs.game2d.scenes
 {

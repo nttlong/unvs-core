@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using unvs.ext;
+using unvs.game2d.objects.components;
+using unvs.game2d.objects.editor;
 using unvs.shares;
 
 namespace unvs.game2d.scenes

@@ -8,8 +8,9 @@ using Unity.Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
 using unvs.ext;
-using unvs.game2d.scenes.actors;
-
+using unvs.game2d.actors;
+using unvs.game2d.objects.components;
+using unvs.game2d.objects.editor;
 using unvs.shares;
 
 namespace unvs.game2d.scenes

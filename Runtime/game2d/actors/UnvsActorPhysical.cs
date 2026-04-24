@@ -12,9 +12,11 @@ using UnityEngine.U2D.IK;
 using unvs.ext;
 using unvs.ext.physical2d;
 using unvs.game2d.objects;
+using unvs.game2d.objects.components;
+using unvs.game2d.objects.editor;
 using unvs.shares;
 
-namespace unvs.game2d.scenes.actors
+namespace unvs.game2d.actors
 {
 
     public partial class UnvsActorPhysical : UnvsBaseComponent

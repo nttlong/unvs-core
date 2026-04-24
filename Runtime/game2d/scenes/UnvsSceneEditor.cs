@@ -19,9 +19,13 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using unvs.ext;
 using unvs.game2d.objects;
-using unvs.game2d.scenes.actors;
+using unvs.game2d.actors;
 
 using unvs.shares;
+using unvs.game2d.objects.components;
+using unvs.game2d.objects.editor;
+
+
 
 #if UNITY_EDITOR
 using unvs.shares.editor;
