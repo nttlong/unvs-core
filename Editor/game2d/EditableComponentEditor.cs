@@ -1,4 +1,4 @@
-﻿using game2d.scenes;
+using game2d.scenes;
 using System;
 using System.Reflection;
 
@@ -55,6 +55,7 @@ namespace editor.game2d
                     if (GUILayout.Button(displayName, buttonStyle))
                     {
                         // Thực thi method
+                        Undo.RecordObject(target, "Execute " + displayName);
                         method.Invoke(target, null);
                         target.EditorSetDirty();
                     }

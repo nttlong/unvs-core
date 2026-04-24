@@ -3,6 +3,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using unvs.animators_controllers;
 using unvs.ext;
 using unvs.game2d.actors;
 
@@ -10,7 +11,9 @@ namespace unvs.actor.skills {
     public class ActorUnvsInteractSkill : AbstractActorBaseSkill
     {
         private UnvsActor _actor;
-        private UnvsAnimStates _animState;
+        private motion_controllers _animState;
+
+        //private UnvsAnimStates _animState;
         private CompositeCollider2D _composite;
         public float MovingSpeed;
         public async UniTask MovtoTargetAsync(Vector2 vector2,Action<float> OnMoving, CancellationToken token)
@@ -24,7 +27,7 @@ namespace unvs.actor.skills {
         {
             base.OnBind();
             _actor = Owner.GetComponent<UnvsActor>();
-            _animState = _actor.GetComponent<UnvsAnimStates>();
+            _animState = _actor.motions;
             _composite = _actor.GetComponent<CompositeCollider2D>();
         }
         public override void OnPerform(Action OnCompleted = null)

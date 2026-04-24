@@ -1,0 +1,60 @@
+using unvs.game2d.objects.components;
+
+
+namespace unvs.game2d.actors
+{
+
+#if UNITY_EDITOR
+    using unvs.game2d.objects.editor;
+    using unvs.editor.utils;
+    using System;
+    using Unity.VisualScripting;
+    using UnityEngine;
+    using unvs.ext;
+    using System.Linq;
+    using Codice.CM.SEIDInfo;
+
+    public class UnvsDummyActor : UnvsBaseComponent
+    {
+        [SerializeField]
+        public DummyPartInfo[] partInfos;
+        public Transform dummyParts;
+        public string addressPath;
+
+        [UnvsButton("Create AI")]
+        public void CreateAI()
+        {
+            this.dummyParts = this.AddChildComponentIfNotExist<Transform>("dummy-part");
+            this.dummyParts.gameObject.tag = "EditorOnly";
+        }
+        [UnvsButton("Creare Psd file")]
+        public void EditorCreatePsdFile()
+        {
+            addressPath = unvs.editor.utils.UnvsEditorUtils.GetAddress(gameObject);
+            var dirPath=System.IO.Directory.GetParent( unvs.editor.utils.EditorTools.ToAbsolutePath(addressPath));
+            var sprList = this.dummyParts.GetComponentsInChildren<SpriteRenderer>(true).ToList();
+            var shapes = sprList.Select(p => new
+            {
+                p.name,
+                points= getPointOfSpriteRenderer(p),
+                index=sprList.IndexOf(p),
+                pivot=new
+                {
+                    x=p.transform.position.x*p.transform.localScale.x,
+                    y=p.transform.position.y * p.transform.localScale.y,
+                }
+            }).ToArray();
+        }
+
+        private object getPointOfSpriteRenderer(SpriteRenderer p)
+        {
+            var cener_x = p.transform.position.x * p.transform.localScale.x;
+            var cener_y = p.transform.position.y * p.transform.localScale.y;
+            var ret = new Vector2[]
+            {
+
+            };
+        }
+    }
+#endif
+}

@@ -1,0 +1,91 @@
+using System;
+using System.Linq;
+using UnityEditor;
+using UnityEngine;
+using unvs.ext;
+using unvs.game2d.actors;
+using unvs.game2d.objects.editor;
+using unvs.shares;
+
+namespace unvs.animators_controllers
+{
+    [Serializable]
+    public partial class motion_controllers : unvs.types.UnvsEditableProperty
+    {
+        public MonoBehaviour owner;
+        [SerializeField]
+        private AnimStateInfo[] animStates;
+        [SerializeField]
+        public MotionAudio[] motionAudio=new MotionAudio[] {};
+    }
+#if UNITY_EDITOR
+    public partial class motion_controllers : unvs.types.UnvsEditableProperty
+    {
+        [UnvsButton("Load Motions")]
+        public void LoadMotions()
+        {
+            owner.GetComponentInChildren<Animator>().AddComponentIfNotExist<UnsvPalyerAnimatorEvent>();
+            var animController = owner.GetComponentInChildren<Animator>();
+            if (animController == null)
+            {
+                unvs.editor.utils.Dialogs.Show($"{typeof(Animator)} was not found in {owner.name}");
+                return;
+            }
+            this.animStates = animController.EditorExtractAllMotions().ToArray();
+            var lsAudio = this.motionAudio.Cast<MotionAudio?>().ToList();
+            foreach (var mot in this.animStates)
+            {
+                var audio = lsAudio.FirstOrDefault(p => p?.name == mot.motionName && p?.LayerIndex == mot.layerIndex);
+                if (audio == null)
+                {
+                    lsAudio.Add(new MotionAudio
+                    {
+                        name = mot.motionName,
+                        LayerIndex = mot.layerIndex,
+                        LayerName = mot.layerName,
+                        blendName = mot.blendName,
+                        value = mot.value,
+                    });
+                }
+            }
+            this.motionAudio = lsAudio.Cast<MotionAudio>().ToArray();
+            
+        }
+        private Animator editorAnimController;
+        
+
+        internal void EditotPlay(AnimStateInfo animStateInfo)
+        {
+            foreach (var mot in this.animStates)
+            {
+                animStateInfo.animationController.SetLayerWeight(mot.layerIndex, 0);
+            }
+            if (!string.IsNullOrEmpty(animStateInfo.blendName))
+            {
+                animStateInfo.animationController.SetLayerWeight(animStateInfo.layerIndex, 1f);
+                animStateInfo.animationController.SetFloat(animStateInfo.paramName, animStateInfo.value);
+            }
+            else
+            {
+                animStateInfo.animationController.SetLayerWeight(animStateInfo.layerIndex, 1f);
+                animStateInfo.animationController.PlayInFixedTime(animStateInfo.motionName, animStateInfo.layerIndex, 0f);
+                editorAnimController = animStateInfo.animationController;
+            }
+            EditorApplication.update -= EditorUpdate;
+            EditorApplication.update += EditorUpdate;
+        }
+        void EditorUpdate()
+        {
+            if (editorAnimController == null) return;
+
+
+            editorAnimController.Update(Time.deltaTime);
+
+
+            EditorApplication.QueuePlayerLoopUpdate();
+            SceneView.RepaintAll();
+        }
+
+    }
+#endif
+}

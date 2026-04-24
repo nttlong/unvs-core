@@ -12,17 +12,13 @@ namespace unvs.shares
     {
         public Vector2[] points;
     }
-    [Serializable]
-    public abstract class UnvsEditableObject
-    {
-
-    }
+    
     public enum TrasitionEnum
     {
         Up, Down, Left, Right
     }
     [Serializable]
-    public partial class AnimStateInfo : UnvsEditableObject
+    public partial class AnimStateInfo : unvs.types.UnvsEditableProperty
     {
       
       
@@ -37,6 +33,10 @@ namespace unvs.shares
         public int blendIndex;
         public Motion clip;
         public string name;
+        public AnimStateInfo()
+        {
+
+        }
         public AnimStateInfo(string name, Animator animationControlle)
         {
             this.name= name;
@@ -44,7 +44,7 @@ namespace unvs.shares
         }
     }
 #if UNITY_EDITOR
-    public partial class AnimStateInfo : UnvsEditableObject// : unvs.game2d.scenes.UnvsBaseComponent
+    public partial class AnimStateInfo : unvs.types.UnvsEditableProperty// : unvs.game2d.scenes.UnvsBaseComponent
     {
         //[UnvsButton("Play")]
         //public void PlayInEditor()

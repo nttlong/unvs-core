@@ -8,6 +8,7 @@ using UnityEngine.Rendering;
 using UnityEngine.U2D.Animation;
 using unvs.controllers_input;
 using unvs.ext;
+using unvs.game2d.actors;
 using unvs.game2d.objects.components;
 using unvs.game2d.scenes;
 
@@ -19,7 +20,7 @@ using unvs.sys;
 
 #endif
 using static UnityEngine.InputSystem.InputAction;
-namespace unvs.game2d.actors {
+namespace unvs.actor.player {
     
     public abstract class UnvsPlayer : UnvsBaseComponent
     {

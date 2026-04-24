@@ -4,9 +4,10 @@ using UnityEditor;
 using UnityEngine;
 using unvs.game2d.objects.editor;
 using unvs.game2d.scenes;
-using unvs.shares;
 
-[CustomPropertyDrawer(typeof(UnvsEditableObject),true)]
+using unvs.types;
+
+[CustomPropertyDrawer(typeof(UnvsEditableProperty),true)]
 public class AnimStateInfoDrawer : PropertyDrawer
 {
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -61,7 +62,10 @@ public class AnimStateInfoDrawer : PropertyDrawer
                     Rect btnRect = new Rect(position.x + 20, currentY, position.width - 20, 25);
                     if (GUI.Button(btnRect, displayName, buttonStyle))
                     {
+                        Undo.RecordObject(property.serializedObject.targetObject, "Execute " + displayName);
                         method.Invoke(targetObj, null);
+                        property.serializedObject.Update();
+                        EditorUtility.SetDirty(property.serializedObject.targetObject);
                     }
                     currentY += 27;
                 }

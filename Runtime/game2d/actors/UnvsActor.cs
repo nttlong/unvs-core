@@ -10,7 +10,9 @@ using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.U2D.Animation;
+using unvs.actor.player;
 using unvs.actor.skills;
+using unvs.actor_physical;
 using unvs.ext;
 using unvs.game2d.objects.components;
 using unvs.game2d.objects.editor;
@@ -24,19 +26,28 @@ using unvs.sys;
 
 namespace unvs.game2d.actors
 {
-    [RequireComponent(typeof(IKBoneMap))]
+    //[RequireComponent(typeof(IKBoneMap))]
 
 
     [RequireComponent(typeof(UniqueObject))]
 
     [RequireComponent(typeof(AudioSource))]
 
-    [RequireComponent(typeof(UnvsActorPhysical))]
+    //[RequireComponent(typeof(UnvsActorPhysical))]
 
 
 
     public partial class UnvsActor : UnvsBaseComponent
     {
+        public bool IsActivePlayer = true;
+        [SerializeField]
+        controllers.ActorController controller;
+        [SerializeField]
+        public actor_physical2d physical;
+        [SerializeField]
+        public unvs.animators_controllers.ik_manager_controllers ik_manager;
+        [SerializeField]
+        public unvs.animators_controllers.motion_controllers motions;
         [SerializeField]
         public BaseSkillObject[] SkilObjects;
         public UnvsActorSkills Skills;
@@ -49,21 +60,16 @@ namespace unvs.game2d.actors
 
 
         public float CrawlSpeed = 4f;
-        public UnvsActorPhysical physical;
+        //public UnvsActorPhysical physical_actor;
 
         public UnvsPlayer player;
         public UnvsActorSpeaker speaker;
-        private bool isMoving;
-        private Vector2 target;
-        private Vector2 direction;
-
+     
         public CompositeCollider2D coll;
-        public Rigidbody2D body;
+        //public Rigidbody2D body;
         public Transform camWatcher;
         public BoxCollider2D scanerBound;
-        public GameObject animEle;
-        public Animator animator;
-        public UnvsAnimStates motions;
+      
         private CancellationTokenSource _cls;
         private Vector3 oririnalScale = Vector3.negativeInfinity;
 
@@ -85,7 +91,7 @@ namespace unvs.game2d.actors
 
         }
         private bool _isSkillsCloned = false;
-
+        
 
         public virtual void OnEnable()
         {
@@ -131,7 +137,7 @@ namespace unvs.game2d.actors
             {
                 this.coll = GetComponentInChildren<CompositeCollider2D>();
                 player = GetComponent<UnvsPlayer>();
-                physical = GetComponent<UnvsActorPhysical>();
+                //physical_actor = GetComponent<UnvsActorPhysical>();
 
             }
 
@@ -149,16 +155,17 @@ namespace unvs.game2d.actors
         {
             if (this.CurrentSkill != null)
             {
-
+                //body
                 this.CurrentSkill.OnUpdate();
             }
         }
     }
 #if UNITY_EDITOR
+    [RequireComponent(typeof(UnvsDummyActor))]
     public partial class UnvsActor : UnvsBaseComponent
     {
-
-
+        [SerializeField]
+        public accessories.components.accessories_editor accessories;
 
         [UnvsButton]
         public void FixMarterial()
@@ -209,50 +216,17 @@ namespace unvs.game2d.actors
 
 
         }
-        [UnvsButton("ShadowCaster2D")]
-        public void EditorShadowCaster2DAll()
-        {
-            var compositeShadowCaster = this.AddComponentIfNotExist<CompositeShadowCaster2D>();
-
-            foreach (var sp in this.GetComponentsInChildren<SpriteRenderer>(true))
-            {
-                var shadowGroup = sp.AddComponentIfNotExist<ShadowCaster2D>();
-                shadowGroup.selfShadows = true;
-                shadowGroup.castingOption = ShadowCaster2D.ShadowCastingOptions.CastAndSelfShadow;
-
-            }
-        }
-        [UnvsButton("Anim controller")]
-        public void GenerateAnimatorController()
-        {
-            this.animEle = this.GetComponentInChildren<SpriteSkin>(true).transform.parent.gameObject;
-            string folderPath = unvs.editor.utils.UnvsEditorUtils.EditorGetFolder(this.animEle);
-            var controller = unvs.editor.utils.UnvsEditorUtils.EditorCreateAnimatorController(folderPath, this.animEle.name);
-            this.animator = this.animEle.transform.AddComponentIfNotExist<Animator>();
-            this.animator.runtimeAnimatorController = controller;
-        }
-        [UnvsButton]
-        public void Generate()
-        {
-            //if (this.CheckComponentIfNotExistCreate<CapsuleCollider2D>(out var _coll))
-            //{
-
-            //    _coll.size = new Vector2(8, 20);
-            //    _coll.offset = new Vector2(0, 10);
-            //    this.coll = _coll;
-            //    this.coll.isTrigger = true;
-            //}
-
-
-            body = this.AddComponentIfNotExist<Rigidbody2D>();
-            body.freezeRotation = true;
-            this.camWatcher = this.AddChildComponentIfNotExist<Transform>("cam-wacther");
-            this.camWatcher.position = new Vector3(this.coll.bounds.center.x, this.coll.bounds.max.y, -10);
-        }
+        
+        
+        
         private void OnValidate()
         {
             this.SetMeOnTag(Constants.Tags.ACTOR);
-
+            ik_manager.owner = this as MonoBehaviour;
+            motions.owner= this as MonoBehaviour;
+            accessories.owner = this as MonoBehaviour;
+            physical.owner = this as MonoBehaviour;
+            controller.owner= this as MonoBehaviour;
         }
 
     }

@@ -1,0 +1,83 @@
+using unvs.game2d.objects.components;
+
+
+namespace unvs.game2d.actors
+{
+
+#if UNITY_EDITOR
+    using unvs.game2d.objects.editor;
+    using unvs.editor.utils;
+    using System;
+    using Unity.VisualScripting;
+    using UnityEngine;
+    using unvs.ext;
+    using System.Linq;
+    using Codice.CM.SEIDInfo;
+    using Cysharp.Threading.Tasks;
+
+    public class UnvsDummyActor : UnvsBaseComponent
+    {
+        [SerializeField]
+        public DummyPartInfo[] partInfos;
+        public Transform dummyParts;
+        public string addressPath;
+        public string addressDirPath;
+        public float Scale = 20f;
+        [UnvsButton("Create AI")]
+        public void CreateAI()
+        {
+            this.dummyParts = this.AddChildComponentIfNotExist<Transform>("dummy-part");
+            this.dummyParts.gameObject.tag = "EditorOnly";
+        }
+        [UnvsButton("Creare Psd file")]
+        public async UniTask EditorCreatePsdFile()
+        {
+            addressPath = unvs.editor.utils.UnvsEditorUtils.GetAddress(gameObject);
+            
+            var dirPath=System.IO.Path.GetDirectoryName( unvs.editor.utils.EditorTools.ToAbsolutePath(addressPath));
+            this.addressDirPath = dirPath;
+            var sprList = this.dummyParts.GetComponentsInChildren<SpriteRenderer>(true).ToList();
+            var shapes = sprList.Select(p => new
+            {
+                p.name, // layer name
+                points= getPointOfSpriteRenderer(p),
+                index=-sprList.IndexOf(p), // psd layer must be sort by this field
+                pivot=new
+                {
+                    // position already is world-space, do NOT multiply localScale
+                    x=p.transform.position.x* Scale,
+                    y=-p.transform.position.y * Scale,
+                }
+            }).ToArray();
+            if (!await unvs.editor.utils.UnvsPythonCall.HealthCheck()) return;
+            var filePath = System.IO.Path.Join(dirPath, $"{name}-sprites.psd");
+            await unvs.editor.utils.UnvsPythonCall.Call("UnvsPsd", "create_dumny_actor_psd", new
+            {
+                file_path= filePath,
+                shapes=shapes,
+            });
+            unvs.editor.utils.Dialogs.Show($"{filePath} has been created");
+        }
+
+        private object getPointOfSpriteRenderer(SpriteRenderer p)
+        {
+            // p.size is in local-space → must multiply localScale to get world-space size
+            var worldW = p.size.x * p.transform.localScale.x;
+            var worldH = p.size.y * p.transform.localScale.y;
+            // 4 corners in local-space relative to bottom-left (BL)
+            var ret = new Vector2[]
+            {
+                new Vector2(0,       0),
+                new Vector2(worldW,  0),
+                new Vector2(worldW,  worldH),
+                new Vector2(0,       worldH)
+            };
+            return ret.Select(pt => new
+            {
+                x = pt.x * Scale,
+                y = -pt.y * Scale,
+            }).ToArray();
+        }
+    }
+#endif
+}

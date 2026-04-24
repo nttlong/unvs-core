@@ -55,9 +55,9 @@ namespace unvs.actor.skills {
                 _trackDistanceUp = compositeColl.bounds.size.y;
             }
             if (!_actor.IsValidate()) return false;
-            _originalController = _actor.animator.runtimeAnimatorController;
+            _originalController = _actor.motions.animator.runtimeAnimatorController;
             await motions.MotionAsync("crouch-start", tk);
-            _actor.animator.runtimeAnimatorController = this.controller;
+            _actor.motions.animator.runtimeAnimatorController = this.controller;
             _hasStarted = true;
 
             //_trackDistanceUp = _trackDistanceUp - compositeColl.bounds.size.y;
@@ -94,7 +94,7 @@ namespace unvs.actor.skills {
 
             //var dx = 1f;
             await motions.MotionAsync("crouch-end", tk);
-            _actor.animator.runtimeAnimatorController = _originalController;
+            _actor.motions.animator.runtimeAnimatorController = _originalController;
             _hasStarted = false;
             return ret;
         }

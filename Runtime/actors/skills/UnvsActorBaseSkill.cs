@@ -11,6 +11,8 @@ using unvs.game2d.objects;
 using unvs.game2d.scenes;
 using unvs.game2d.actors;
 using unvs.shares;
+using UnityEngine.InputSystem.iOS.LowLevel;
+using unvs.animators_controllers;
 
 
 namespace unvs.actor.skills
@@ -98,7 +100,7 @@ namespace unvs.actor.skills
     }
     public abstract class AbstractActionBaseSkill : AbstractActorBaseSkill
     {
-        public UnvsAnimStates motions { get; set; }
+        //public UnvsAnimStates motions { get; set; }
         public float CurrentSpeed { get; set; }
 
         private Vector2 _lastDir;
@@ -121,6 +123,7 @@ namespace unvs.actor.skills
         public override void OnBind()
         {
             base.OnBind();
+           
             InitSkill();
         }
 
@@ -143,7 +146,7 @@ namespace unvs.actor.skills
         public abstract void OnChangeDirection(Vector2 value);
         public abstract void OnChangeStatus(SkillSpeddEnum value);
 
-
+        public motion_controllers motions;
     }
     public class ActorDefaultSkill : AbstractActionBaseSkill
     {
@@ -281,9 +284,10 @@ namespace unvs.actor.skills
 
         public override void InitSkill()
         {
-            motions = Owner.GetComponent<UnvsAnimStates>();
+            //motions = Owner.GetComponent<UnvsAnimStates>();
             coll = Owner.GetComponent<CompositeCollider2D>();
             actor = Owner.GetComponent<UnvsActor>();
+            base.motions = actor.motions;
         }
 
 

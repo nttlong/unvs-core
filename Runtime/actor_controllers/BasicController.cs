@@ -5,9 +5,10 @@ using unvs.actor.player;
 using unvs.actor.skills;
 using unvs.game2d.actors;
 
-namespace unvs.actors.controls {
+namespace unvs.controllers
+{
     
-    public class SampleControl : UnvsPlayer
+    public class BasicController : UnvsPlayer
     {
         private UnvsActor actor;
        
@@ -21,9 +22,7 @@ namespace unvs.actors.controls {
         private UnvsActor _actor;
         //private bool _isJumping;
         private MapAction crouch;
-        private bool _isCrouch;
-        private float _speedBeforeCrouch = -1f;
-        private int count;
+       
         private bool _isMove;
         private RuntimeAnimatorController lastAnim;
 
@@ -39,17 +38,9 @@ namespace unvs.actors.controls {
             return null;
         }
 
-
-
-
-
-       
-
-       
-
         public override void InitRuntime()
         {
-
+            
             this.actor = this.GetComponent<UnvsActor>();
 
         

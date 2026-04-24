@@ -103,7 +103,7 @@ namespace unvs.game2d.actors
             {
                 actor = GetComponent<UnvsActor>();
                 oririnalScale = this.transform.localScale.CloneToNew();
-                actor.motions = this;
+                //actor.motions_actor = this;
                 coll = this.GetComponent<Collider2D>();
                 if (this.motionObject != null)
                 {
@@ -138,9 +138,9 @@ namespace unvs.game2d.actors
         {
             this.animStates.PlayCrossFadeMotion(name);
         }
-        public async UniTask MotionAsync(string name ,CancellationToken tk = default, string overideState=null, Func<bool> OnPlay=null,Action OnFinish =null)
+        public async UniTask MotionAsync(string name, CancellationToken tk = default, string overideState = null, Func<bool> OnPlay = null, Action OnFinish = null)
         {
-            await this.animStates.PlayMotionAsync(name, tk,null, OnPlay, OnFinish);
+            await this.animStates.PlayMotionAsync(name, tk, null, OnPlay, OnFinish);
         }
         public void AddtiveMotion(string name)
         {

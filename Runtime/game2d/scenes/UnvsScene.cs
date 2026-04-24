@@ -130,7 +130,8 @@ namespace unvs.game2d.scenes
        
         public UnvsActor GetActiveActor()
         {
-            return this.GetComponentsInChildren<UnvsActor>(true).FirstOrDefault(p => p.GetComponent<UnvsPlayer>() != null);
+            //return this.GetComponentsInChildren<UnvsActor>(true).FirstOrDefault(p => p.GetComponent<UnvsPlayer>() != null);
+            return this.GetComponentsInChildren<UnvsActor>(true).FirstOrDefault(p => p.IsActivePlayer);
         }
         public UnvsScene TurnOnLeft()
         {

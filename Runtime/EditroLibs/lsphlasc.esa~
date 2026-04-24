@@ -68,9 +68,21 @@ namespace unvs.editor.utils
         }
         public static bool Confirm(string msg)
         {
-            bool ok = EditorUtility.DisplayDialog("Confirm", msg, "OK", "Cancel");
+            bool ok = EditorUtility.DisplayDialog(
+    "Xác nhận",
+    msg,
+    "OK",
+    "Cancel"
+);
 
-            return ok;
+            if (ok)
+            {
+                // user bấm OK
+            }
+            else
+            {
+                // user bấm Cancel
+            }
         }
     }
     [System.Serializable]

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Unity.Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
+using unvs.actor.player;
 using unvs.ext;
 using unvs.game2d.actors;
 using unvs.game2d.objects.components;

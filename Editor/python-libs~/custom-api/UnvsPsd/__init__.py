@@ -334,4 +334,141 @@ def create_single_psd(data: dict) -> str:
     psd.save(psd_file_path)
 
     return f"Success: Created PSD at {psd_file_path}"
-        
+
+def create_dumny_actor_psd(data: dict) -> str:
+    """
+    Tạo PSD file cho UnvsDummyActor.
+    
+    Data nhận từ C# (UnvsDummyActor.EditorCreatePsdFile):
+      - file_path  : str  – đường dẫn lưu file .psd
+      - shapes     : list – danh sách sprite renderer, mỗi phần tử gồm:
+            name   : str  – tên layer trong PSD
+            index  : int  – thứ tự sắp xếp layer (nhỏ = dưới cùng)
+            pivot  : {x, y} – vị trí tâm trong world-space
+            points : [{x,y}, {x,y}, {x,y}, {x,y}] – 4 góc bbox (local-space)
+                     [BL, BR, TR, TL] tương ứng (0,0),(w,0),(w,h),(0,h)
+
+    Cấu trúc PSD tạo ra:
+        PSD
+        └── Group: "dummy"
+                ├── Layer: <name_0>   (shape có index nhỏ nhất → dưới cùng)
+                ├── Layer: <name_1>
+                └── ...
+    """
+    print(data)
+
+    file_path = data.get('file_path')
+    shapes    = data.get('shapes', [])
+
+    if not file_path:
+        return "Error: 'file_path' is required"
+    if not shapes:
+        return "Error: 'shapes' is empty – nothing to draw"
+
+    # ------------------------------------------------------------------ #
+    # 1. Tính canvas chung để tất cả layer dùng chung hệ tọa độ
+    #    Canvas bao phủ toàn bộ pivot + bbox của mọi shape.
+    # ------------------------------------------------------------------ #
+    padding = 50
+
+    # Mỗi điểm thực = pivot + local_point
+    all_world_xs = []
+    all_world_ys = []
+    for shape in shapes:
+        px = shape['pivot']['x']
+        py = shape['pivot']['y']
+        for pt in shape['points']:
+            all_world_xs.append(px + pt['x'])
+            all_world_ys.append(py + pt['y'])
+
+    min_wx = min(all_world_xs)
+    max_wx = max(all_world_xs)
+    min_wy = min(all_world_ys)
+    max_wy = max(all_world_ys)
+
+    canvas_w = int(max_wx - min_wx) + padding * 2
+    canvas_h = int(max_wy - min_wy) + padding * 2
+
+    # ------------------------------------------------------------------ #
+    # 2. Tạo PSDImage với kích thước canvas chung
+    # ------------------------------------------------------------------ #
+    psd = PSDImage.new(mode='RGBA', size=(canvas_w, canvas_h))
+
+    # Xoá mọi layer mặc định (tương tự create_single_psd)
+    if hasattr(psd, 'layers'):
+        psd.layers.clear()
+    elif hasattr(psd, 'pop'):
+        while len(psd) > 0:
+            psd.pop()
+
+    # ------------------------------------------------------------------ #
+    # 3. Tạo Group tên "dummy" – toàn bộ layer nằm trong group này
+    # ------------------------------------------------------------------ #
+    group = psd.create_group(name="dummy")
+
+    # ------------------------------------------------------------------ #
+    # 4. Sắp xếp shapes theo index (tăng dần = layer dưới cùng trước)
+    # ------------------------------------------------------------------ #
+    sorted_shapes = sorted(shapes, key=lambda s: s['index'])
+
+    for shape in sorted_shapes:
+        layer_name = shape['name']
+        px = shape['pivot']['x']
+        py = shape['pivot']['y']
+
+        # Tọa độ 4 góc trong world-space
+        world_pts = [(px + pt['x'], py + pt['y']) for pt in shape['points']]
+
+        # Bounding box của riêng shape này
+        xs = [p[0] for p in world_pts]
+        ys = [p[1] for p in world_pts]
+        s_min_x, s_max_x = min(xs), max(xs)
+        s_min_y, s_max_y = min(ys), max(ys)
+
+        layer_w = max(int(s_max_x - s_min_x), 1)
+        layer_h = max(int(s_max_y - s_min_y), 1)
+
+        # Tạo ảnh RGBA riêng cho layer (kích thước bbox của shape)
+        layer_img = Image.new('RGBA', (layer_w, layer_h), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(layer_img)
+
+        # Chuyển world_pts → tọa độ cục bộ trong layer_img
+        local_pts = [
+            (float(p[0] - s_min_x), float(p[1] - s_min_y))
+            for p in world_pts
+        ]
+        # Đóng polygon
+        local_pts_closed = local_pts + [local_pts[0]]
+        draw.line(local_pts_closed, fill=(255, 0,0, 200), width=2, joint="curve")
+
+        # Đánh dấu pivot (chấm xanh lá) tương đối trong layer
+        pivot_local_x = float(px - s_min_x)
+        pivot_local_y = float(py - s_min_y)
+        r = 4
+        draw.ellipse(
+            [pivot_local_x - r, pivot_local_y - r,
+             pivot_local_x + r, pivot_local_y + r],
+            fill=(0, 255, 0, 255)
+        )
+
+        # Tạo PixelLayer từ ảnh PIL (tương tự create_single_psd)
+        try:
+            new_layer = PixelLayer.from_pil(layer_img, psd)
+        except AttributeError:
+            new_layer = PixelLayer.frompil(layer_img, psd)
+
+        new_layer.name  = layer_name
+        # Đặt offset layer trong canvas (top-left corner của bbox shape)
+        new_layer.left  = int(s_min_x - min_wx) + padding
+        new_layer.top   = int(s_min_y - min_wy) + padding
+
+        group.append(new_layer)
+
+    # ------------------------------------------------------------------ #
+    # 5. Lưu file PSD
+    # ------------------------------------------------------------------ #
+    output_dir = os.path.dirname(os.path.abspath(file_path))
+    os.makedirs(output_dir, exist_ok=True)
+    psd.save(file_path)
+
+    return f"Success: create_dumny_actor_psd → {file_path} ({len(sorted_shapes)} layers in group 'dummy')"

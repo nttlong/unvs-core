@@ -37,7 +37,7 @@ namespace unvs.actionsbasics
                 {
                    
                 }, sender.Cts.Token);
-                actor.GetComponent<UnvsAnimStates>().BaseMotion("Idle");
+                actor.motions.BaseMotion("Idle");
             }
             else
             {
