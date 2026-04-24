@@ -28,7 +28,7 @@ using unvs.game2d.objects.editor;
 
 
 #if UNITY_EDITOR
-using unvs.shares.editor;
+
 namespace unvs.game2d.scenes
 {
     
@@ -144,7 +144,7 @@ namespace unvs.game2d.scenes
             if (this.sceneTracker != null) this.sceneTracker.transform.SetParent(this.support.transform, true);
             if(this.background==null) this.background = this.AddChildComponentIfNotExist<UnvsBackgound>("background");
             if (this.pickableItems == null)  this.pickableItems = this.AddChildComponentIfNotExist<Transform>("pickable-items");
-            UnvsEditorUtils.CollecteAllTo<UnvsPickableObject>(this.pickableItems);
+            unvs.editor.utils.UnvsEditorUtils.CollecteAllTo<UnvsPickableObject>(this.pickableItems);
         }
 
         private void syncWorldBoundAndScencTracker()
@@ -226,9 +226,9 @@ namespace unvs.game2d.scenes
                  this.cinemachineFollow.FollowOffset= this.followOffset;
             }
             if (this.Links.LeftScene != null)
-                this.SceneLeft = unvs.shares.editor.UnvsEditorUtils.EditorGetAddressPath(this.Links.LeftScene);
+                this.SceneLeft = unvs.editor.utils.UnvsEditorUtils.EditorGetAddressPath(this.Links.LeftScene);
             if (this.Links.RightScene != null)
-                this.SceneRight = unvs.shares.editor.UnvsEditorUtils.EditorGetAddressPath(this.Links.RightScene);
+                this.SceneRight = unvs.editor.utils.UnvsEditorUtils.EditorGetAddressPath(this.Links.RightScene);
         }
         private void OnDrawGizmos()
         {

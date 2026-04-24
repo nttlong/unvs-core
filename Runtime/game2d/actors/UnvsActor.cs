@@ -17,7 +17,7 @@ using unvs.game2d.objects.editor;
 using unvs.shares;
 
 #if UNITY_EDITOR
-using unvs.shares.editor;
+
 
 #endif
 using unvs.sys;
@@ -226,8 +226,8 @@ namespace unvs.game2d.actors
         public void GenerateAnimatorController()
         {
             this.animEle = this.GetComponentInChildren<SpriteSkin>(true).transform.parent.gameObject;
-            string folderPath = UnvsEditorUtils.EditorGetFolder(this.animEle);
-            var controller = UnvsEditorUtils.EditorCreateAnimatorController(folderPath, this.animEle.name);
+            string folderPath = unvs.editor.utils.UnvsEditorUtils.EditorGetFolder(this.animEle);
+            var controller = unvs.editor.utils.UnvsEditorUtils.EditorCreateAnimatorController(folderPath, this.animEle.name);
             this.animator = this.animEle.transform.AddComponentIfNotExist<Animator>();
             this.animator.runtimeAnimatorController = controller;
         }

@@ -10,12 +10,12 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
 using unvs.editor.components;
 using unvs.game2d.scenes;
-using unvs.shares.editor;
+
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace unvs.core.editorlibs
+namespace unvs.editor.utils
 {
 
 
@@ -248,5 +248,6 @@ namespace unvs.core.editorlibs
             };
         }
     }
+    
 }
 #endif

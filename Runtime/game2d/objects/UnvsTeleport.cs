@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
+
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using unvs.actions;
@@ -8,10 +8,12 @@ using unvs.ext;
 using unvs.game2d.scenes;
 using unvs.game2d.actors;
 using unvs.shares;
-using unvs.game2d.objects.editor;
+
 
 #if UNITY_EDITOR
-using unvs.shares.editor;
+using unvs.game2d.objects.editor;
+using unvs.editor.utils;
+using UnityEditor;
 #endif
 
 namespace unvs.game2d.objects

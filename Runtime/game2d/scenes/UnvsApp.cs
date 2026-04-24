@@ -17,21 +17,38 @@ using unvs.game2d.actors;
 
 
 using unvs.shares;
-using unvs.game2d.objects.editor;
+
 using unvs.game2d.objects.components;
 using unvs.game2d.objects.types;
-
+using unvs.controllers_input;
 
 
 #if UNITY_EDITOR
-using unvs.shares.editor; 
+using UnityEditor;
+using unvs.editor.utils;
+using unvs.game2d.objects.editor;
+
 #endif
+
+
+
 
 namespace unvs.game2d.scenes
 {
     
     public class UnvsApp : UnvsComponent
     {
+        public GameObject controllerInput;
+        [Header("prefabs requirements")]
+        public AssetReference refPlayerInput;
+        public AssetReference refActorDialogue;
+        public AssetReference refInteractUI;
+        public AssetReference refSceneLoader;
+        public AssetReference refCinema;
+        public AssetReference refMainMenu;
+        public AssetReference refPauseMenu;
+        public AssetReference refFadeScreen;
+        public AssetReference refDialog;
         public int ChunLenght = 3;
         public int fps = 120;
         [Header("Sart Path")]
@@ -51,20 +68,26 @@ namespace unvs.game2d.scenes
         public UnvsDialog dialog;
         public UnvsInteractUI InteractUI;
         public UnvsActirDialogue ActorDialogue;
-       
 
 
+        
         public string ActorDialoguePath;
-
+       
         public string InteractUIPath;
-
+       
         public string playerInputPath;
         public string SceneLoaderPath;
+        
         public string cinemaPath;
+        
         public string mainMenuPath;
+        
         public string pauseMenuPath;
+       
         public string fadeScreenPath;
+        
         public string dialogPath;
+       
         public UnvsActor currentActor;
         public static UnvsApp Instance { get; private set; }
         public event Action<UnvsScene> OnEnterScene;
@@ -147,6 +170,8 @@ namespace unvs.game2d.scenes
         private UnvsScene _LastScene;
         private UnvsScene _LastExitScene;
         private CheckPintInfo restartCheckPoint;
+        
+
         public void RaiseResart(CheckPintInfo value)
         {
             this.restartCheckPoint = value;
@@ -232,6 +257,14 @@ namespace unvs.game2d.scenes
             }
         }
         [UnvsButton]
+        public async UniTask ValidateGameApp()
+        {
+           var ret= this.refPlayerInput.LoadAssetAsync<GameObject>();
+            this.controllerInput = await ret.ToUniTask();
+            var input= this.controllerInput.GetComponent< UnvsPlayerInputMap >();
+            unvs.editor.utils.Dialogs.Show(input.name);
+        }
+        [UnvsButton]
         public void GenerateUIEvents()
         {
             this.events = this.AddChildComponentIfNotExist<EventSystem>("EventSystem");
@@ -243,6 +276,7 @@ namespace unvs.game2d.scenes
             var r = this.EditorCreatePrefab<UnvsCinema>("cinema");
             this.cinema = r.value;
             this.cinemaPath = r.PrefabPath;
+            this.refCinema = unvs.editor.utils.UnvsEditorUtils.CreateAssetReference(r.PrefabPath);
         }
         [UnvsButton()]
         public void GenerateMainMenu()
@@ -250,6 +284,7 @@ namespace unvs.game2d.scenes
             var r = this.EditorCreatePrefab<UnvsMainMenu>("MainMenu");
             this.MainMenu = r.value;
             this.mainMenuPath = r.PrefabPath;
+            this.refMainMenu = unvs.editor.utils.UnvsEditorUtils.CreateAssetReference(r.PrefabPath);
         }
         [UnvsButton()]
         public void GeneratePauseMenu()
@@ -257,6 +292,7 @@ namespace unvs.game2d.scenes
             var r = this.EditorCreatePrefab<UnvsPauseMenu>("PauseMenu");
             this.PauseMenu = r.value;
             this.pauseMenuPath = r.PrefabPath;
+            this.refPauseMenu = unvs.editor.utils.UnvsEditorUtils.CreateAssetReference(r.PrefabPath);
         }
         [UnvsButton()]
         public void GenerateFadeScreen()
@@ -264,6 +300,7 @@ namespace unvs.game2d.scenes
             var r = this.EditorCreatePrefab<UnvsFadeScreen>("fadeScreen");
             this.fadeScreen = r.value;
             this.fadeScreenPath = r.PrefabPath;
+            this.refFadeScreen = unvs.editor.utils.UnvsEditorUtils.CreateAssetReference(r.PrefabPath);
         }
         [UnvsButton()]
         public void GenerateDialog()
@@ -271,6 +308,7 @@ namespace unvs.game2d.scenes
             var r = this.EditorCreatePrefab<UnvsDialog>("dialog");
             this.dialog = r.value;
             this.dialogPath = r.PrefabPath;
+            this.refDialog = unvs.editor.utils.UnvsEditorUtils.CreateAssetReference(r.PrefabPath);
         }
         [UnvsButton()]
         public void GenerateSceneLoader()
@@ -278,6 +316,7 @@ namespace unvs.game2d.scenes
             var r = this.EditorCreatePrefab<UnvsSceneLoader>("SceneLoader");
             this.SceneLoader = r.value;
             this.SceneLoaderPath = r.PrefabPath;
+            this.refSceneLoader = unvs.editor.utils.UnvsEditorUtils.CreateAssetReference(r.PrefabPath);
         }
         [UnvsButton()]
         public void GeneratePlayerInput()
@@ -285,6 +324,8 @@ namespace unvs.game2d.scenes
             var r = this.EditorCreatePrefab<UnvsPlayerInput>("playerInput");
             this.playerInput = r.value;
             this.playerInputPath = r.PrefabPath;
+           
+            this.refPlayerInput = unvs.editor.utils.UnvsEditorUtils.CreateAssetReference(r.PrefabPath);
         }
         [UnvsButton]
         public void GenerateInteracUI()
@@ -292,6 +333,8 @@ namespace unvs.game2d.scenes
             var r = this.EditorCreatePrefab<UnvsInteractUI>("InteractUI");
             this.InteractUI = r.value;
             this.InteractUIPath = r.PrefabPath;
+            this.refInteractUI = unvs.editor.utils.UnvsEditorUtils.CreateAssetReference(r.PrefabPath);
+
         }
         [UnvsButton]
         public void GenerateActorDialogue()
@@ -299,6 +342,7 @@ namespace unvs.game2d.scenes
             var r = this.EditorCreatePrefab<UnvsActirDialogue>("ActorDialogue");
             this.ActorDialogue = r.value;
             this.ActorDialoguePath = r.PrefabPath;
+            this.refActorDialogue = unvs.editor.utils.UnvsEditorUtils.CreateAssetReference(r.PrefabPath);
         }
 
         

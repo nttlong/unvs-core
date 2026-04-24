@@ -9,7 +9,7 @@ using unvs.game2d.objects.components;
 using unvs.game2d.objects.editor;
 using unvs.shares;
 #if UNITY_EDITOR
-using unvs.shares.editor; 
+
 #endif
 namespace unvs.game2d.scenes
 {
@@ -75,7 +75,7 @@ namespace unvs.game2d.scenes
             EditorCreateThicknessGround();
             var scene = this.GetComponentInParent<UnvsScene>();
             var poly= scene.groundThickness.GetComponent<PolygonCollider2D>();
-            var info= unvs.core.editorlibs.EditorTools.GetFolderOfGameObjectByScene(poly.gameObject);
+            var info= unvs.editor.utils.EditorTools.GetFolderOfGameObjectByScene(poly.gameObject);
             //if (info == null)
             //{
             //    return;
@@ -86,7 +86,7 @@ namespace unvs.game2d.scenes
             var subFolder = System.IO.Path.Combine(info.FolderPath, $"{info.Name}-sprites");
             var fullPath = System.IO.Path.Combine(subFolder, $"{gameObject.name}.png");
             var fullPathPsd = System.IO.Path.Combine(subFolder, $"{gameObject.name}.psd");
-            await unvs.core.editorlibs.UnvsPythonCall.Call("UnvsGeometry", "CreateGuidelinePng", new
+            await unvs.editor.utils.UnvsPythonCall.Call("UnvsGeometry", "CreateGuidelinePng", new
             {
                 width= poly.bounds.size.x,
                 height= poly.bounds.size.y,

@@ -10,8 +10,7 @@ using unvs.game2d.objects.components;
 
 
 #if UNITY_EDITOR
-using unvs.shares.editor;
-using unvs.core.editorlibs;
+
 using System.Linq;
 #endif
 
@@ -93,21 +92,21 @@ namespace game2d.objects
         [UnvsButton("Export to Png file")]
         public async UniTask EditorExportPng()
         {
-            var check = await unvs.core.editorlibs.UnvsPythonCall.HealthCheck();
+            var check = await unvs.editor.utils.UnvsPythonCall.HealthCheck();
             if (check)
             {
-                unvs.core.editorlibs.Dialogs.Show("OK");
+                unvs.editor.utils.Dialogs.Show("OK");
             }
             else
             {
-                unvs.core.editorlibs.Dialogs.Show("Fail");
+                unvs.editor.utils.Dialogs.Show("Fail");
                 return;
             }
            
             var scene = this.GetComponentInParent<UnvsScene>();
             if (scene == null || scene.selRef == null) return;
 
-            var pathToAsset = UnvsEditorUtils.EditorGetAddressPath(scene.selRef);
+            var pathToAsset = unvs.editor.utils.UnvsEditorUtils.EditorGetAddressPath(scene.selRef);
             if (string.IsNullOrEmpty(pathToAsset)) return;
 
             var folder = System.IO.Path.GetDirectoryName(pathToAsset);
@@ -179,10 +178,10 @@ namespace game2d.objects
             // Giải phóng bộ nhớ
             Object.DestroyImmediate(tex);
             UnityEditor.AssetDatabase.Refresh();
-            await unvs.core.editorlibs.UnvsPythonCall.Call("UnvsPsd", "CreatePsdFile", new
+            await unvs.editor.utils.UnvsPythonCall.Call("UnvsPsd", "CreatePsdFile", new
             {
-                FilePath= unvs.core.editorlibs.UnvsPythonCall.ToAbsolutePath( fullPathPsd),
-                PngFile= unvs.core.editorlibs.UnvsPythonCall.ToAbsolutePath(fullPath),
+                FilePath= unvs.editor.utils.UnvsPythonCall.ToAbsolutePath( fullPathPsd),
+                PngFile= unvs.editor.utils.UnvsPythonCall.ToAbsolutePath(fullPath),
                 Points= points.Select(p=>new
                 {
                     x=p.x, y=p.y,

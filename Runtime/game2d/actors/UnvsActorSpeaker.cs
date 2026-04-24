@@ -12,7 +12,7 @@ using unvs.game2d.objects.components;
 using unvs.shares;
 
 #if UNITY_EDITOR
-using unvs.shares.editor;
+
 
 #endif
 using unvs.sys;

@@ -33,10 +33,10 @@ namespace unvs.editor.components     {
             var spr=this.GetComponent<SpriteRenderer>();
             if(spr ==null)
             {
-                unvs.core.editorlibs.Dialogs.Show("Please,add SpriteRenderer");
+                unvs.editor.utils.Dialogs.Show("Please,add SpriteRenderer");
                 return;
             }
-            if (!await unvs.core.editorlibs.UnvsPythonCall.HealthCheck())
+            if (!await unvs.editor.utils.UnvsPythonCall.HealthCheck())
             {
                 return;
             }
@@ -60,13 +60,13 @@ namespace unvs.editor.components     {
 
             };
             
-            var result = await unvs.core.editorlibs.UnvsPythonCall.Call("UnvsPsd", "create_single_psd", data);
+            var result = await unvs.editor.utils.UnvsPythonCall.Call("UnvsPsd", "create_single_psd", data);
            
         }
         private void OnDrawGizmos()
         {
 
-            Folder = unvs.core.editorlibs.EditorTools.GetFolderOfGameObjectByScene(gameObject);
+            Folder = unvs.editor.utils.EditorTools.GetFolderOfGameObjectByScene(gameObject);
           
             psdPath = System.IO.Path.Join(Folder.FolderPath, $"{name}.psd");
         }

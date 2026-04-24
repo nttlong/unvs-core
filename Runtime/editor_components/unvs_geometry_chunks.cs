@@ -56,12 +56,12 @@ namespace unvs.editor.components     {
         private void OnDrawGizmos()
         {
             
-            Folder = unvs.core.editorlibs.EditorTools.GetFolderOfGameObjectByScene(gameObject);
+            Folder = utils.EditorTools.GetFolderOfGameObjectByScene(gameObject);
         }
         [UnvsButton("Create PSD From Image")]
         public async UniTask CreatePsdFromImage()
         {
-            if (!await unvs.core.editorlibs.UnvsPythonCall.HealthCheck())
+            if (!await utils.UnvsPythonCall.HealthCheck())
             {
                 return;
             }
@@ -72,18 +72,18 @@ namespace unvs.editor.components     {
                 PngFile = imagePath
             };
 
-            var result = await unvs.core.editorlibs.UnvsPythonCall.Call("UnvsPsd", "CreatePsdFile", data);
+            var result = await unvs.editor.utils.UnvsPythonCall.Call("UnvsPsd", "CreatePsdFile", data);
             Debug.Log(result);
         }
 
         [UnvsButton("Create psd file")]
         public async UniTask CreatePSDFile()
         {
-            if (!await unvs.core.editorlibs.UnvsPythonCall.HealthCheck())
+            if (!await unvs.editor.utils.UnvsPythonCall.HealthCheck())
             {
                 return;
             }
-            Folder = unvs.core.editorlibs.EditorTools.GetFolderOfGameObjectByScene(gameObject);
+            Folder = unvs.editor.utils.EditorTools.GetFolderOfGameObjectByScene(gameObject);
             folderPath = Folder.FolderPath;
             var subFolderPath=System.IO.Path.Combine(folderPath,$"{name}-sprite-{numOfRows}X{numOfCols}");
             if (!Directory.Exists(subFolderPath))
@@ -118,7 +118,7 @@ namespace unvs.editor.components     {
                 folder_path = subFolderPath,
                 file_name = $"{name}-sprite-{numOfRows}X{numOfCols}.psd"
             };
-            await unvs.core.editorlibs.UnvsPythonCall.Call("UnvsPsd", "CreatePsdBigSizeOneFile", data);
+            await unvs.editor.utils.UnvsPythonCall.Call("UnvsPsd", "CreatePsdBigSizeOneFile", data);
         }
     }
 

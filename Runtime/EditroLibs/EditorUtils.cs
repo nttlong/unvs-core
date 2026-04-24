@@ -11,7 +11,7 @@ using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-namespace unvs.shares.editor
+namespace unvs.editor.utils
 {
 
     public static class UnvsEditorUtils
@@ -218,6 +218,12 @@ namespace unvs.shares.editor
                     Debug.LogError($"Can not get state of {clipPath}");
                 }
             }
+        }
+
+        public static AssetReference CreateAssetReference(string prefabPath)
+        {
+            string guid = AssetDatabase.AssetPathToGUID(prefabPath);
+            return new AssetReference(guid);
         }
     }
 

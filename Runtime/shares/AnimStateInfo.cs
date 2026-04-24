@@ -59,7 +59,7 @@ namespace unvs.shares
         public void PlayOutEditor()
         {
             Debug.Log($"Review {AssetDatabase.GetAssetPath(this.clip)}");
-            unvs.shares.editor.UnvsEditorUtils.EditorOpenClipV2(this.animationController.gameObject, AssetDatabase.GetAssetPath(this.clip));
+            unvs.editor.utils.UnvsEditorUtils.EditorOpenClipV2(this.animationController.gameObject, AssetDatabase.GetAssetPath(this.clip));
             EditorApplication.ExecuteMenuItem("Window/Animation/Animation");
         }
 

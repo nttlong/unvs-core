@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using unvs.game2d.objects.components;
 using unvs.game2d.objects.editor;
+using unvs.game2d.scenes;
 using static UnityEngine.InputSystem.DefaultInputActions;
 
 namespace unvs.controllers_input
@@ -29,6 +30,12 @@ namespace unvs.controllers_input
             {
                 Instance = this;
                 UnvsGlobalInput.inputIns = OnNew();
+#if UNITY_EDITOR
+                if (UnvsGlobalInput.inputIns == null)
+                {
+                    unvs.editor.utils.Dialogs.Show($"Pleas, create class inherit from {typeof(UnvsPlayerInputMap)}, then add to {typeof(UnvsPlayerInput)}");
+                } 
+#endif
                 UnvsGlobalInput.MapPlayerEvents();
                 UnvsGlobalInput.MapUIEvents();
                 UnvsGlobalInput.Enable();
@@ -88,7 +95,11 @@ namespace unvs.controllers_input
                 InputMap=GetComponent<UnvsPlayerInputMap>(); 
                 if(InputMap == null)
                 {
-                    Debug.LogError($"Create new Monobehavior inherit {typeof(UnvsPlayerInputMap)} then add");
+#if UNITY_EDITOR
+                    var errMsg = $"Create new Monobehavior inherit {typeof(UnvsPlayerInputMap)} then add to {typeof(UnvsPlayerInput)}";
+                     unvs.editor.utils.Dialogs.Show(errMsg);
+                    Debug.LogError(errMsg);
+#endif
                 }
             }
         }

@@ -11,7 +11,7 @@ using unvs.game2d.objects.components;
 using static UnityEngine.InputSystem.DefaultInputActions;
 using static UnityEngine.InputSystem.InputAction;
 
-namespace unvs.game2d.scenes
+namespace unvs.controllers_input
 {
     public class UnvsEventAction
     {
