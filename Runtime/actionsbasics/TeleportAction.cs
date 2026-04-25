@@ -41,7 +41,7 @@ namespace unvs.actionsbasics
             }
             if (string.IsNullOrEmpty(teleportObject.TargetPath))
             {
-                actor.speaker.SayIThisDoesNotDoAnything();
+                actor.speaker?.SayIThisDoesNotDoAnything();
                 
                 Sender.Cancel();
                 return;

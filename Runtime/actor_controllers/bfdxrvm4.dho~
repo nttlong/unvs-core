@@ -1,0 +1,35 @@
+
+using UnityEngine.InputSystem;
+using unvs.actor.player;
+using unvs.actor.skills;
+using unvs.game2d.actors;
+using unvs.ext;
+using UnityEngine;
+namespace unvs.controllers
+{
+    public class BasicMouseController : BasicController{
+        protected MapAction interact => this.NewMapAction("interact", ctx =>
+        {
+
+        });
+
+        
+        public override void InitRuntime()
+        {
+            base.InitRuntime();
+            interact = NewMapAction("interact", action =>
+            {
+                action.started += Action_started;
+            });
+
+        }
+
+        private void Action_started(InputAction.CallbackContext obj)
+        {
+            var pos = obj.ReadValue<Vector2>().ToWorld();
+            this.actor.CurrentSkill.Direction = this.actor.coll.bounds.center.GetVector2DirectionTo(pos);
+        }
+
+        
+    }
+}

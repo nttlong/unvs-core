@@ -1,6 +1,8 @@
 ﻿using Cysharp.Threading.Tasks.Triggers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -30,7 +32,21 @@ namespace unvs.actor.player {
         Dictionary<string,Action<CallbackContext>> _canceled = null;
         Dictionary<string, Action<CallbackContext>> _performed = null;
         private bool _disableEvent;
+        protected MapAction NewMapAction(string name,Action<MapAction> InitEvents)
+        {
+            if (!UnvsGlobalInput.Player.Keys.Contains(name,StringComparer.OrdinalIgnoreCase))
+            {
+                Debug.LogError($"{name} was not found in {string.Join(',', UnvsGlobalInput.Player.Keys)}");
+                return null;
+            }
+            var key= UnvsGlobalInput.Player.Keys.FirstOrDefault(p=>p.Equals(name,StringComparison.OrdinalIgnoreCase));
+            var action = new MapAction();
+            InitEvents(action);
+            applyAction(key, action);
+            return action;
 
+
+        }
         public abstract MapAction OnMapConrrol(string name);
        
         public abstract void InitRuntime();
@@ -41,54 +57,71 @@ namespace unvs.actor.player {
                 
                 Look = UnvsGlobalInput.Player["Look"];
                 InitRuntime();
+                var properties = this.GetType().GetProperties(
+                    BindingFlags.Instance |     // Lấy các property của đối tượng (không phải static)
+                    BindingFlags.Public |       // Lấy cả Public
+                    BindingFlags.NonPublic      // QUAN TRỌNG: Lấy cả Protected và Private
+                ).Where(p=>p.PropertyType==typeof(MapAction));
+                foreach (var item in properties)
+                {
+                    item.GetValue(this);
+                }
                 _started =new Dictionary<string, Action<CallbackContext>>();
                 _canceled = new Dictionary<string, Action<CallbackContext>>();
                 _performed = new Dictionary<string, Action<CallbackContext>>();
+
                 foreach (var key in UnvsGlobalInput.Player.Keys)
                 {
                     var action = OnMapConrrol(key.ToLower());
-                    if(action != null)
-                    {
-                        // kiem tra action co start thi goi
+                    applyAction(key, action);
 
-                        if (action.hasStarted)
-                        {
-                            Action<CallbackContext> start = ctx =>
-                                           {
-                                               if (!_disableEvent)
-                                                   action.InvokeStarted(ctx);
-                                           };
-                            UnvsGlobalInput.Player[key].started += start;
-                            _started.Add(key, start); 
-                        }
-                        if (action.hasCanceled)
-                        {
-                            Action<CallbackContext> canceled = ctx =>
-                                           {
-                                               if (!_disableEvent)
-                                                   action.InvokeCanceled(ctx);
-                                           };
-                            UnvsGlobalInput.Player[key].canceled += canceled;
-                            _canceled.Add(key, canceled); 
-                        }
-                        if (action.hasPerformed)
-                        {
-                            Action<CallbackContext> performed = ctx =>
-                                            {
-                                                if (!_disableEvent)
-                                                    action.InvokePerformedd(ctx);
-                                            };
-                            UnvsGlobalInput.Player[key].performed += performed;
-                            _performed.Add(key, performed); 
-                        }
-
-                        action.OwnerInputAction = UnvsGlobalInput.Player[key]; // set owner for other method call such as ReadValue ...
-                    }
-                    
                 }
             }
         }
 
+        private void applyAction(string key, MapAction action)
+        {
+            if (action != null)
+            {
+                // kiem tra action co start thi goi
+
+                if (action.hasStarted)
+                {
+                    Action<CallbackContext> start = ctx =>
+                    {
+                        if (!_disableEvent)
+                            action.InvokeStarted(ctx);
+                    };
+                    UnvsGlobalInput.Player[key].started += start;
+                    if(_started==null) _started=new Dictionary<string, Action<CallbackContext>>();
+                    _started.Add(key, start);
+                }
+                if (action.hasCanceled)
+                {
+                    Action<CallbackContext> canceled = ctx =>
+                    {
+                        if (!_disableEvent)
+                            action.InvokeCanceled(ctx);
+                    };
+                    UnvsGlobalInput.Player[key].canceled += canceled;
+                    if(_canceled==null) _canceled= new Dictionary<string, Action<CallbackContext>>();
+                    _canceled.Add(key, canceled);
+                }
+                if (action.hasPerformed)
+                {
+                    Action<CallbackContext> performed = ctx =>
+                    {
+                        if (!_disableEvent)
+                            action.InvokePerformedd(ctx);
+                    };
+                    UnvsGlobalInput.Player[key].performed += performed;
+                    if(_performed==null) _performed = new Dictionary<string, Action<CallbackContext>>();
+                    _performed.Add(key, performed);
+                }
+
+                action._ownerInputAction = UnvsGlobalInput.Player[key]; // set owner for other method call such as ReadValue ...
+            }
+        }
 
         public virtual void OnDestroy()
         {

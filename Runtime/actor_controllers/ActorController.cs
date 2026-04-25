@@ -28,18 +28,18 @@ namespace unvs.controllers
             }
             owner.AddComponent<BasicController>();
         }
-        //[UnvsButton("Create mouse controller")]
-        //public void EditorCreateDefaltMousePlayerController()
-        //{
-        //    //BasicController
-        //    var control = owner.GetComponent<UnvsPlayer>();
-        //    if (control != null)
-        //    {
-        //        unvs.editor.utils.Dialogs.Show($"Please, remove {control.GetType()} before add {typeof(BasicController)}");
-        //        return;
-        //    }
-        //    owner.AddComponent<BasicController>();
-        //}
+        [UnvsButton("Create mouse controller")]
+        public void EditorCreateDefaltMousePlayerController()
+        {
+            //BasicController
+            var control = owner.GetComponent<UnvsPlayer>();
+            if (control != null)
+            {
+                unvs.editor.utils.Dialogs.Show($"Please, remove {control.GetType()} before add {typeof(BasicController)}");
+                return;
+            }
+            owner.AddComponent<BasicMouseController>();
+        }
     }
 #endif
 }

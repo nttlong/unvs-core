@@ -6,7 +6,7 @@ namespace unvs.actor.player
 {
     public class MapAction
     {
-        public InputAction OwnerInputAction;
+        internal InputAction _ownerInputAction;
 
         public event Action<CallbackContext> started;
         public event Action<CallbackContext> canceled;
@@ -14,6 +14,11 @@ namespace unvs.actor.player
         internal void InvokeStarted(CallbackContext ctx) => started?.Invoke(ctx);
         internal void InvokeCanceled(CallbackContext ctx) => canceled?.Invoke(ctx);
         internal void InvokePerformedd(CallbackContext ctx) => performed?.Invoke(ctx);
+
+        public T ReadValue<T>() where T : struct
+        {
+            return _ownerInputAction.ReadValue<T>();
+        }
 
         internal bool hasStarted => started != null;
         internal bool hasCanceled=>canceled!=null;

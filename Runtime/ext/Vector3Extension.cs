@@ -811,6 +811,13 @@ namespace unvs.ext
             Vector2 dir = (p2 - p1).normalized;
             return new Vector2(-dir.y, dir.x); // Pháp tuyến hướng lên/ra ngoài
         }
+        public static bool GetHit(this Vector3 pos, out RaycastHit2D hit, Vector2 direction, float distance = 10f, string Layer = Constants.Layers.WORLD_GROUND, params string[] extra)
+        {
+
+
+            return GetHit(pos, out hit, direction, distance, Layer, extra);
+
+        }
         public static bool GetHit(this Vector2 pos, out RaycastHit2D hit, Vector2 direction, float distance = 10f, string Layer = Constants.Layers.WORLD_GROUND, params string[] extra)
         {
            
