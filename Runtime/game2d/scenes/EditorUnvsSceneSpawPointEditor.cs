@@ -5,6 +5,7 @@ using unvs.game2d.objects.editor;
 
 namespace unvs.game2d.scenes
 {
+#if UNITY_EDITOR
     [Serializable]
     public struct SpawnPointInfo
     {
@@ -14,12 +15,13 @@ namespace unvs.game2d.scenes
     }
     public class EditorUnvsSceneSpawPointEditor : UnvsBaseComponent
     {
-       
+
         [SerializeField]
         [UnvsProperty(UnvsPropertyTypeEnum.List)]
         public SpawnPointInfo[] spawnPoints;
-//#if UNITY_EDITOR
 
-//#endif
+
+
     }
+#endif
 }

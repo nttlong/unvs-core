@@ -72,6 +72,7 @@ Material:
     - _Noise: -25
     - _WaterLevel: 0
     m_Colors:
+    - White: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
     - _Max: {r: 21.3805, g: 30, b: 0, a: 0}

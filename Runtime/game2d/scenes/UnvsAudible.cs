@@ -30,6 +30,7 @@ namespace unvs.game2d.scenes
         [UnvsButton("Create thickness ground")]
         public void EditorCreateThicknessGround()
         {
+            this.tag = "EditorOnly";
             var polygonName = $"{name}-thickness";
             var scene=this.GetComponentInParent<UnvsScene>();
             scene.groundThickness = this.transform.parent.AddChildComponentIfNotExist<PolygonCollider2D>(polygonName);

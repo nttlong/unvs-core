@@ -10,7 +10,7 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
 using unvs.editor.components;
 using unvs.game2d.scenes;
-
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -219,12 +219,12 @@ namespace unvs.editor.utils
             var scene = obj.GetComponentInParent<UnvsScene>();
             if (scene != null)
             {
-                if (scene.selRef == null)
-                {
-                    Dialogs.Show($"{scene}.selRef is null or not set");
-                    return default;
-                }
-                var pathToAsset = UnvsEditorUtils.EditorGetAddressPath(scene.selRef);
+                //if (scene.selRef == null)
+                //{
+                //    Dialogs.Show($"{scene}.selRef is null or not set");
+                //    return default;
+                //}
+                var pathToAsset = UnvsEditorUtils.GetAddress(scene.gameObject);
                 var folder = System.IO.Path.GetDirectoryName(pathToAsset);
                 var ret = new SceneInfoResut
                 {
@@ -233,7 +233,14 @@ namespace unvs.editor.utils
                     Name = scene.name
                 };
                 if (!System.IO.Directory.Exists(ret.FolderPath))
-                    System.IO.Directory.CreateDirectory(ret.FolderPath);
+                    try
+                    {
+                        System.IO.Directory.CreateDirectory(ret.FolderPath);
+                    }
+                    catch (Exception)
+                    {
+
+                    }
                 return ret;
             }
             return default;
@@ -310,6 +317,48 @@ namespace unvs.editor.utils
                 };
                 if (this.shapes == null) this.shapes = new List<ShapeData>();
                 this.shapes.Add(shape);
+            }
+
+            public void AddBox(Transform item)
+            {
+                var collider2d=item.GetComponent<Collider2D>();
+                if(collider2d is BoxCollider2D  box  && box != null){
+                    this.AddBox(box);
+                    return;
+                }
+                if (collider2d is PolygonCollider2D poly && poly != null)
+                {
+                    this.AddBox(poly);
+                    return;
+                }
+            }
+
+            public void AddBox(PolygonCollider2D poly)
+            {
+                var shape = new ShapeData
+                {
+
+                    index = 0,
+                    name = poly.name,
+                    pivot = new PointData
+                    {
+                        x = poly.bounds.size.x/ 2,
+                        y = poly.bounds.size.y / 2
+                    },
+                    points = poly.points.Select(p=> new PointData
+                    {
+                        x=(float)p.x,
+                        y=(float)p.y,
+                    }).ToArray()
+
+                };
+                if (this.shapes == null) this.shapes = new List<ShapeData>();
+                this.shapes.Add(shape);
+            }
+
+            public void AddBox(BoxCollider2D box)
+            {
+                this.AddBox(box.name, box.size.x, box.size.y);
             }
         }
 

@@ -234,7 +234,7 @@ namespace unvs.game2d.scenes
         }
         private void OnDrawGizmos()
         {
-            this.psdFileExport.Owner= this;
+            this.editorPortal.Owner= this;
             if (this.worldBound != null) this.worldBound.GizmosDraw(Color.green, 1);
             if (this.defaulCamWatcher != null) this.defaulCamWatcher.transform.GetSegment().Center().DrawCircle(1f, Color.red);
             if (this.startPoint != null) this.startPoint.GetSegment().Center().DrawCircle(1f, Color.green);

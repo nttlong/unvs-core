@@ -20,7 +20,7 @@ namespace unvs.game2d.objects
 {
     [RequireComponent(typeof(UnvsSpawnPoint))]
     [RequireComponent(typeof(SpriteRenderer))]
-    public class UnvsTeleport : UnvsInteractObject
+    public partial class UnvsTeleport : UnvsInteractObject
     {
         [Header("Teleport info",order =0)]
         public AssetReference Target;
@@ -29,8 +29,7 @@ namespace unvs.game2d.objects
         public UnvsScene TarggetScene;
         public bool IsNew;
         public string SpawnName;
-        [Header("Spawn List", order = 1)]
-        [SerializeField] public SpawnPointInfo[] SpawnList;
+        
         [Header("Feedback audio", order = 2)]
         [SerializeField]
         public AudioInfo OpenSound;
@@ -43,12 +42,19 @@ namespace unvs.game2d.objects
         {
 
         }
+
+    }
+
 #if UNITY_EDITOR
+    public partial class UnvsTeleport : UnvsInteractObject
+    {
+        [Header("Spawn List", order = 1)]
+        [SerializeField] public SpawnPointInfo[] SpawnList;
         public void OnValidate()
         {
-            
-        
-           
+
+
+
             if (Target != null)
             {
                 this.TargetPath = Target.EditorGetAddressPath();
@@ -96,7 +102,7 @@ namespace unvs.game2d.objects
                         this.otherSpawnPoints = tr;
 
 
-                        
+
                     }
                 }
 
@@ -111,8 +117,7 @@ namespace unvs.game2d.objects
                 this.TargetPath = Target.EditorGetAddressPath();
             }
         }
-        
-#endif
     }
+#endif
 
 }

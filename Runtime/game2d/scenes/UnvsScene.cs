@@ -21,10 +21,10 @@ using unvs.shares;
 
 namespace unvs.game2d.scenes
 {
-
+    
     public partial class UnvsScene : UnvsComponent
     {
-
+        
         [Header("Sene game world info")]
         public Transform checkPoints;
         public WorldJoinInfo JoinInfo = new WorldJoinInfo();
@@ -43,17 +43,17 @@ namespace unvs.game2d.scenes
         public string SceneRight;
         public EditorUnvsSceneSpawPointEditor SpawnPoints;
         [SerializeField]
-
+        
         public Transform support;
         public Camera cam;
         public CinemachineCamera vcam;
         public Transform defaulCamWatcher;
         public CinemachineConfiner2D confiner;
         public CinemachineFollow cinemachineFollow;
-
-
+     
+        
         public Transform startPoint;
-
+       
         public PolygonCollider2D worldBound;
         public BoxCollider2D triggerLeft;
         public BoxCollider2D triggerRight;
@@ -71,9 +71,9 @@ namespace unvs.game2d.scenes
         public UnvsBackgound background;
         private Transform pickableItems;
         public PolygonCollider2D groundThickness;
-
+       
         public bool IsDestroying { get; private set; }
-
+        
 
         public event Action<UnvsScene> OnDestroying;
         async UniTask initAsync()
@@ -82,7 +82,7 @@ namespace unvs.game2d.scenes
         }
         public override void InitRuntime()
         {
-
+           
             if (cam != null)
             {
                 cam.enabled = false;
@@ -92,43 +92,42 @@ namespace unvs.game2d.scenes
             vcam.gameObject.SetActive(false);
             //Destroy(cam.gameObject);
             //Destroy(vcam.gameObject);
-
+           
             light2d.enabled = false;
             light2d.gameObject.SetActive(false);
             //this.triggerLeft.isTrigger = true;
             //this.triggerRight.isTrigger = true;
             this.TrimGround();
-
-
+           
+           
         }
         public Vector2 GetStartPosition(string spawnName)
         {
-            if (!string.IsNullOrEmpty(spawnName))
+            if(!string.IsNullOrEmpty(spawnName))
             {
                 var tr = this.GetComponentInChildrenByName<Transform>(spawnName);
                 var centrePoint = tr.GetSegment().Center();
                 var hit = centrePoint.RayCast(Vector2.down, Math.Abs(centrePoint.y - worldBound.bounds.max.y));
-                if (hit.collider != null)
+                if(hit.collider!=null)
                 {
                     return hit.point;
                 }
                 return this.ground.GetIntersetPoint(tr.GetSegment().Center().x);
-            }
-            else
+            } else
             {
                 var centrePoint = this.startPoint.GetSegment().Center();
                 if (this.startPoint.transform.position.GetHit(out var hit, Vector2.down))
                 {
                     return hit.point;
                 }
-                
+               
                 return this.ground.GetIntersetPoint(this.startPoint.transform.GetSegment().Center().x);
             }
 
 
-
+               
         }
-
+       
         public UnvsActor GetActiveActor()
         {
             //return this.GetComponentsInChildren<UnvsActor>(true).FirstOrDefault(p => p.GetComponent<UnvsPlayer>() != null);
@@ -136,12 +135,12 @@ namespace unvs.game2d.scenes
         }
         public UnvsScene TurnOnLeft()
         {
-            this.wallLeft.enabled = true;
+            this.wallLeft.enabled=true;
             this.wallLeft.gameObject.SetActive(true);
-            this.triggerLeft.enabled = true;
+            this.triggerLeft.enabled=true;
             this.triggerLeft.gameObject.SetActive(true);
-            this.triggerLoadSceneLeft.enabled = true;
-            this.triggerLoadSceneLeft.gameObject.SetActive(true);
+            this.triggerLoadSceneLeft.enabled=true;
+            this.triggerLoadSceneLeft.gameObject.SetActive(true );
             return this;
         }
         public UnvsScene TurnOffLeft()
@@ -174,12 +173,12 @@ namespace unvs.game2d.scenes
             this.triggerLoadSceneRight.gameObject.SetActive(false);
             return this;
         }
-
+        
         public void TrimGround()
         {
-            if (ground == null || JoinInfo == null) return;
+            if (ground == null || JoinInfo == null ) return;
             if (_hastrimEdge) return;
-
+           
             ground.ClipByFirstEdgeByX(this.wallLeft.bounds.max.x);
             ground.ClipLastEdgeByX(this.wallRight.bounds.min.x);
 
@@ -187,11 +186,11 @@ namespace unvs.game2d.scenes
         }
         private void OnDestroy()
         {
-            this.IsDestroying = true;
+            this.IsDestroying=true;
             this.OnDestroying?.Invoke(this);
             UnvsApp.Instance.RaiseEventScenseDestroying(this);
         }
-
+        
 
     }
 }

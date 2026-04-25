@@ -59,7 +59,7 @@ Material:
     - _Freq: 7
     - _Speed: 0.7
     - _SurfaceDistance: 0.5
-    - _ZWrite: 0
+    - _ZWrite: 1
     m_Colors:
     - White: {r: 1, g: 1, b: 1, a: 1}
     - _Bottom: {r: 0.01788891, g: 0.01790792, b: 0.01886791, a: 1}

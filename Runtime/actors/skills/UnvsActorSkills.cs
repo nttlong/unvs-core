@@ -39,7 +39,10 @@ namespace unvs.actor.skills{
             {
                 _skillCache[type] = skills.FirstOrDefault(p => p is T);
             }
-            (_skillCache[type] as AbstractActorBaseSkill).PreviousSkill=previous;
+            if(_skillCache[type] is AbstractActorBaseSkill  skill && skill!= null){
+                skill.PreviousSkill = previous;
+            }
+           
             return _skillCache[type] as T;
         }
     }

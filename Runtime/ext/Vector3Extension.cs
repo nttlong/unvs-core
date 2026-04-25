@@ -815,7 +815,7 @@ namespace unvs.ext
         {
 
 
-            return GetHit(pos, out hit, direction, distance, Layer, extra);
+            return GetHit((Vector2)pos, out hit, direction, distance, Layer, extra);
 
         }
         public static bool GetHit(this Vector2 pos, out RaycastHit2D hit, Vector2 direction, float distance = 10f, string Layer = Constants.Layers.WORLD_GROUND, params string[] extra)

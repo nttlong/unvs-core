@@ -55,7 +55,7 @@ namespace unvs.editor.components     {
         //}
         private void OnDrawGizmos()
         {
-            
+          
             Folder = utils.EditorTools.GetFolderOfGameObjectByScene(gameObject);
         }
         [UnvsButton("Create PSD From Image")]

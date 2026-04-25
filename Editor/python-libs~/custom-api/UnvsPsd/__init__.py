@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 import numpy as np
 from PIL import Image, ImageDraw
 from psd_tools import PSDImage
@@ -390,21 +391,32 @@ def create_dumny_actor_psd(data: dict) -> str:
     canvas_h = int(max_wy - min_wy) + padding * 2
 
     # ------------------------------------------------------------------ #
-    # 2. Tạo PSDImage với kích thước canvas chung
+    # 2. Khởi tạo hoặc Load PSDImage
     # ------------------------------------------------------------------ #
-    psd = PSDImage.new(mode='RGBA', size=(canvas_w, canvas_h))
+    if os.path.exists(file_path):
+        try:
+            psd = PSDImage.open(file_path)
+            group_name = datetime.now().strftime("%Y-%m-%d-%H-%M")
+        except Exception:
+            psd = PSDImage.new(mode='RGBA', size=(canvas_w, canvas_h),color=(0,0,0,0))
+            if hasattr(psd, 'layers'): psd.layers.clear()
+            elif hasattr(psd, 'pop'): 
+                while len(psd) > 0: psd.pop()
+            group_name = "dummy"
+    else:
+        psd = PSDImage.new(mode='RGBA', size=(canvas_w, canvas_h),color=(0,0,0,0))
+        # Xoá mọi layer mặc định (tương tự create_single_psd)
+        if hasattr(psd, 'layers'):
+            psd.layers.clear()
+        elif hasattr(psd, 'pop'):
+            while len(psd) > 0:
+                psd.pop()
+        group_name = "dummy"
 
-    # Xoá mọi layer mặc định (tương tự create_single_psd)
-    if hasattr(psd, 'layers'):
-        psd.layers.clear()
-    elif hasattr(psd, 'pop'):
-        while len(psd) > 0:
-            psd.pop()
-
     # ------------------------------------------------------------------ #
-    # 3. Tạo Group tên "dummy" – toàn bộ layer nằm trong group này
+    # 3. Tạo Group mới – toàn bộ layer nằm trong group này
     # ------------------------------------------------------------------ #
-    group = psd.create_group(name="dummy")
+    group = psd.create_group(name=group_name)
 
     # ------------------------------------------------------------------ #
     # 4. Sắp xếp shapes theo index (tăng dần = layer dưới cùng trước)
@@ -471,4 +483,4 @@ def create_dumny_actor_psd(data: dict) -> str:
     os.makedirs(output_dir, exist_ok=True)
     psd.save(file_path)
 
-    return f"Success: create_dumny_actor_psd → {file_path} ({len(sorted_shapes)} layers in group 'dummy')"
+    return f"Success: create_dumny_actor_psd → {file_path} ({len(sorted_shapes)} layers in group '{group_name}')"
