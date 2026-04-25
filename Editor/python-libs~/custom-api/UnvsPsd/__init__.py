@@ -355,7 +355,7 @@ def create_dumny_actor_psd(data: dict) -> str:
                 ├── Layer: <name_1>
                 └── ...
     """
-    print(data)
+    
 
     file_path = data.get('file_path')
     shapes    = data.get('shapes', [])

@@ -50,6 +50,7 @@ namespace unvs.game2d.scenes
         }
         public async UniTask<UnvsScene> LoadInteriorAsync(string path, string spawnName, UnvsScene fromScene)
         {
+            await UnvsFadeScreen.Instance.FadeInAsync(UnvsApp.Instance.DefaultFadeTimeLoadScene);
             if (fromScene == null) return null;
             lastInteriorScene = fromScene;
             lastInteriorScene.transform.SetParent(this.backupInterior.transform, true);
@@ -81,7 +82,7 @@ namespace unvs.game2d.scenes
             ret.transform.SetParent(this.interior.transform, true);
 
             UnvsCinema.Instance.UpdateWorld(ret, true,UpdateWorldEmun.Interior);
-            UnvsCinema.Instance.vcam.UpdateByUnvsScene(ret);
+            UnvsCinema.Instance.vcam.UpdateByUnvsScene(ret,UnvsCinema.Instance.LimitDistance);
 
             UnvsActor actor = ret.GetActiveActor();
             if (actor != null)
@@ -97,10 +98,13 @@ namespace unvs.game2d.scenes
             CenterScene();
             ret.TurnOnLeft().TurnOnRight();
             ret.gameObject.SetActive(true);
+           // UnvsApp.Instance.currentActor.GetComponentInChildren<Animator>(true).gameObject.SetActive(false);
             UnvsApp.Instance.currentActor.StandBy(ret.GetStartPosition(spawnName));
+
             UnvsCinema.Instance.vcam.Watch(UnvsApp.Instance.currentActor.camWatcher);
+           // UnvsApp.Instance.currentActor.GetComponentInChildren<Animator>(true).gameObject.SetActive(true);
             lastInteriorScene = ret;
-           
+            await UnvsFadeScreen.Instance.FadeOutAsync(UnvsApp.Instance.DefaultFadeTimeLoadScene);
             return ret;
         }
 
@@ -120,7 +124,7 @@ namespace unvs.game2d.scenes
             ret.transform.SetParent(this.chunks.transform, true);
 
             UnvsCinema.Instance.UpdateWorld(ret, true, UpdateWorldEmun.New);
-            UnvsCinema.Instance.vcam.UpdateByUnvsScene(ret);
+            UnvsCinema.Instance.vcam.UpdateByUnvsScene(ret,UnvsCinema.Instance.LimitDistance);
 
             UnvsActor actor = ret.GetActiveActor();
 

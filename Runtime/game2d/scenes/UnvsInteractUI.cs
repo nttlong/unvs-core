@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks.Triggers;
+﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks.Triggers;
 using game2d.ext;
 using game2d.scenes;
 
@@ -18,7 +19,7 @@ using unvs.shares;
 namespace unvs.game2d.scenes
 {
 
-    public class UnvsInteractUI : UnvsUIComponentInstance<UnvsInteractUI>
+    public partial class UnvsInteractUI : UnvsUIComponentInstance<UnvsInteractUI>
     {
         public Texture2D defaultCursorIcon;
         public Image cursor;
@@ -143,17 +144,46 @@ namespace unvs.game2d.scenes
                 cursor.sprite = defautlSprite;
             }
         }
+
+        
+
+       
+
+
+    }
 #if UNITY_EDITOR
+    public partial class UnvsInteractUI : UnvsUIComponentInstance<UnvsInteractUI>
+    {
         [UnvsButton]
         public void Generate()
         {
             canvas = this.AddChildComponentIfNotExist<Canvas>("canvas");
-           
-
             
-        }
 
-       
-#endif
+
+        }
+        [UnvsButton("Create psd app file")]
+        public async UniTask EditorCreateIConPSDFile()
+        {
+            if (UnityEditor.Selection.activeGameObject != this.gameObject)
+            {
+                unvs.editor.utils.Dialogs.Show($"Please ,select {this.GetType()},instead of {UnityEditor.Selection.activeGameObject.GetType()}");
+                return;
+            }
+            var folder = unvs.editor.utils.UnvsEditorUtils.GetAbsFolderPathOfGameObject(UnityEditor.Selection.activeGameObject);
+            var file_path = System.IO.Path.Join(folder, "icons.psd");
+            if (!unvs.editor.utils.Dialogs.Confirm($"Do you want to create new psd file at \n{file_path}"))
+            {
+                return;
+            }
+            if (!await unvs.editor.utils.UnvsPythonCall.HealthCheck()) return;
+            var dataLayer = unvs.editor.utils.PsdFile.Createlayers(file_path);
+            dataLayer.AddBox("default-icon", 64, 64);
+           
+          
+            await unvs.editor.utils.UnvsPythonCall.Call("UnvsPsd", "create_dumny_actor_psd", dataLayer);
+
+        }
     }
+#endif
 }

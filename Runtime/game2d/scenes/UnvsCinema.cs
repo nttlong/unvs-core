@@ -24,6 +24,12 @@ using unvs.shares;
 namespace unvs.game2d.scenes{
     public class UnvsCinema : UnvsUIComponentInstance<UnvsCinema>
     {
+        /// <summary>
+        /// Limit z of cinema michonne, the distance of cam to plane of view is always bigger or equal by this value 
+        /// That mean z of follow offset o cinemachine is alway add negative of this value
+        /// </summary>
+        [Header("Camera")]
+        public float LimitDistance=0;
         [Header("Cinema light")]
         public float DurationTimeSmoothChangeSate = 1.5f;
         public int MaintainGlobalLightNumber = 5;
@@ -81,7 +87,7 @@ namespace unvs.game2d.scenes{
             {
 
                 
-                vcam.GetComponent<CinemachineFollow>().FollowOffset = new Vector3(s[0].followOffset.x, s[0].followOffset.y, cam.OrthoSizeToPerspectiveDistance(s[0].OrthographicSize));
+                vcam.GetComponent<CinemachineFollow>().FollowOffset = new Vector3(s[0].followOffset.x, s[0].followOffset.y, cam.OrthoSizeToPerspectiveDistance(s[0].OrthographicSize,this.LimitDistance));
 
                 float height = s[0].OrthographicSize * 2f;
                 float width = height * cam.aspect; // cam.aspect = Screen.width / Screen.height
@@ -92,7 +98,7 @@ namespace unvs.game2d.scenes{
             nearset = CalculateNearestScene(s);
             ctsChangeOffset = ctsChangeOffset.Refresh();
             //ctsChangeOrthoSize = ctsChangeOrthoSize.Refresh();
-            var newOffset= new Vector3(nearset.followOffset.x, nearset.followOffset.y, cam.OrthoSizeToPerspectiveDistance(nearset.OrthographicSize));
+            var newOffset= new Vector3(nearset.followOffset.x, nearset.followOffset.y, cam.OrthoSizeToPerspectiveDistance(nearset.OrthographicSize,this.LimitDistance));
             vcam.SetFollowOffsetSmoothlyAsync(newOffset, 3,DurationTimeSmoothChangeSate, ctsChangeOffset.Token).ContinueWith(() =>
             {
                 camColl.size = cam.GetCameraWorldSize();
@@ -271,20 +277,9 @@ namespace unvs.game2d.scenes{
                 });
             }
             worldLightMaintain = this._lights.ToArray();
-            //Action<UnvsScene> OnSceneDestroyTmp = null;
-            //Action<UnvsScene> OnSceneDestroy = (s) =>
-            //{
-            //    this.worldBoundDict.Remove(s);
-            //    //UpdateWorldBoundAsync().Forget();
-            //    this.lightDict.Remove(s);
-            //    ret.OnDestroying -= OnSceneDestroyTmp;
-            //    //requestUpdate = true;
+           
 
-            //};
-            //OnSceneDestroyTmp = OnSceneDestroy;
-            //ret.OnDestroying += OnSceneDestroy;
-
-            //_lights = this.lightDict.Select(p => p.Value).ToArray();
+         
             updateWorldBound();
             this.AfterUpdate?.Invoke(ret);
             
@@ -363,6 +358,7 @@ namespace unvs.game2d.scenes{
         
         float _lastPosition = 0;
         bool _wasMoving;
+        private float _lastLimitDistance;
 
         public override bool DisablePlayerInput => false;
 
@@ -382,7 +378,8 @@ namespace unvs.game2d.scenes{
             //// Thiết lập trục ưu tiên là trục Z (0, 0, 1)
             //cam.transparencySortAxis = new Vector3(0, 0, 1);
 
-            Debug.Log("Camera Transparency Sort Mode set to Orthographic Axis");
+           
+            _lastLimitDistance = LimitDistance;
 
         }
         //void OnPreRender() // Trước khi render bất cứ thứ gì
@@ -395,6 +392,18 @@ namespace unvs.game2d.scenes{
 
         private void LateUpdate()
         {
+            if (_lastLimitDistance != LimitDistance )
+            {
+                if (this.vcam != null && this.vcam.GetComponent<CinemachineFollow>() != null)
+                {
+                    var offset = this.vcam.GetComponent<CinemachineFollow>().FollowOffset;
+                    /*
+                     * exclude _lastLimitDistance out of offset.z and add new LimitDistance
+                     */
+                    this.vcam.GetComponent<CinemachineFollow>().FollowOffset = offset - new Vector3(0, 0,  -_lastLimitDistance + LimitDistance);
+                    _lastLimitDistance = LimitDistance;
+                }
+            }
             float newPos = getValue(cam.transform.position.x);
             // Tính toán độ lệch
             float delta = Mathf.Abs(newPos - _lastPosition);

@@ -95,7 +95,7 @@ namespace unvs.ext
         /// </summary>
         /// <param name="vcam"></param>
         /// <param name="scene"></param>
-        public static void UpdateByUnvsScene(this CinemachineCamera vcam, UnvsScene scene)
+        public static void UpdateByUnvsScene(this CinemachineCamera vcam, UnvsScene scene,float limitDistance)
         {
             var state = vcam.AddComponentIfNotExist<UnvsCamStaus>();
 
@@ -120,7 +120,7 @@ namespace unvs.ext
                 //{
                 //    z = scene.followOffset.z;
                 //}
-                var z = UnvsCinema.Instance.cam.OrthoSizeToPerspectiveDistance(scene.OrthographicSize);
+                var z = UnvsCinema.Instance.cam.OrthoSizeToPerspectiveDistance(scene.OrthographicSize,limitDistance);
                 vcam.GetComponent<CinemachineFollow>().FollowOffset = new Vector3(scene.followOffset.x, scene.followOffset.y, z);
             }
                
@@ -318,7 +318,7 @@ namespace unvs.ext
             catch (System.OperationCanceledException) { throw; }
         }
 
-        public static float OrthoSizeToPerspectiveDistance(this Camera cam, float orthoSize)
+        public static float OrthoSizeToPerspectiveDistance(this Camera cam, float orthoSize, float limitDistance)
         {
             if (cam.orthographic) return 0f; // Hoặc xử lý theo logic riêng của bạn
 
@@ -329,7 +329,7 @@ namespace unvs.ext
             float distance = orthoSize / Mathf.Tan(halfFovRad);
 
             // Nếu bạn muốn trả về giá trị để gán cho Camera Offset Z (thường là lùi ra sau)
-            return -distance;
+            return -distance-limitDistance;
         }
 
     }

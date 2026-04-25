@@ -21,6 +21,8 @@ using unvs.shares;
 using unvs.game2d.objects.components;
 using unvs.game2d.objects.types;
 using unvs.controllers_input;
+using UnityEngine.UIElements;
+
 
 
 #if UNITY_EDITOR
@@ -38,6 +40,7 @@ namespace unvs.game2d.scenes
     
     public class UnvsApp : UnvsComponent
     {
+        public float DefaultFadeTimeLoadScene=0;
         public GameObject controllerInput;
         [Header("prefabs requirements")]
         public AssetReference refPlayerInput;
@@ -71,22 +74,8 @@ namespace unvs.game2d.scenes
 
 
         
-        public string ActorDialoguePath;
        
-        public string InteractUIPath;
        
-        public string playerInputPath;
-        public string SceneLoaderPath;
-        
-        public string cinemaPath;
-        
-        public string mainMenuPath;
-        
-        public string pauseMenuPath;
-       
-        public string fadeScreenPath;
-        
-        public string dialogPath;
        
         public UnvsActor currentActor;
         public static UnvsApp Instance { get; private set; }
@@ -111,14 +100,15 @@ namespace unvs.game2d.scenes
 
             container = transform.CreateIfNoExist<Transform>("container");
             container.gameObject.SetActive(false);
-            SceneLoader = await Commons.LoadPrefabsAsync<UnvsSceneLoader>(SceneLoaderPath, container, true);
-            cinema = await Commons.LoadPrefabsAsync<UnvsCinema>(cinemaPath, container, true);
-            MainMenu = await Commons.LoadPrefabsAsync<UnvsMainMenu>(mainMenuPath, container, true);
-            PauseMenu = await Commons.LoadPrefabsAsync<UnvsPauseMenu>(pauseMenuPath, container, true);
-            dialog = await Commons.LoadPrefabsAsync<UnvsDialog>(dialogPath, container, true);
-            playerInput = await Commons.LoadPrefabsAsync<UnvsPlayerInput>(playerInputPath, container, true);
-            InteractUI = await Commons.LoadPrefabsAsync<UnvsInteractUI>(InteractUIPath, container, true);
-            ActorDialogue = await Commons.LoadPrefabsAsync<UnvsActirDialogue>(ActorDialoguePath, container, true);
+            SceneLoader = await refSceneLoader.LoadPrefabsAsync<UnvsSceneLoader>(container, true); 
+            cinema = await refCinema.LoadPrefabsAsync<UnvsCinema>(container, true);
+            MainMenu = await refMainMenu.LoadPrefabsAsync<UnvsMainMenu>(container, true);
+            PauseMenu = await Commons.LoadPrefabsAsync<UnvsPauseMenu>(refPauseMenu, container, true);
+            dialog = await Commons.LoadPrefabsAsync<UnvsDialog>(refDialog, container, true);
+            playerInput = await Commons.LoadPrefabsAsync<UnvsPlayerInput>(refPlayerInput, container, true);
+            InteractUI = await Commons.LoadPrefabsAsync<UnvsInteractUI>(refInteractUI, container, true);
+            ActorDialogue = await Commons.LoadPrefabsAsync<UnvsActirDialogue>(refActorDialogue, container, true);
+            fadeScreen = await Commons.LoadPrefabsAsync<UnvsFadeScreen>(refFadeScreen, container, true);
             MainMenu.Show();
             ActorDialogue.Hide();
             dialog.Hide();
@@ -256,6 +246,7 @@ namespace unvs.game2d.scenes
                 startScenePath = startScene.EditorGetAddressPath();
             }
         }
+       
         [UnvsButton]
         public async UniTask ValidateGameApp()
         {
@@ -275,7 +266,7 @@ namespace unvs.game2d.scenes
         {
             var r = this.EditorCreatePrefab<UnvsCinema>("cinema");
             this.cinema = r.value;
-            this.cinemaPath = r.PrefabPath;
+            
             this.refCinema = unvs.editor.utils.UnvsEditorUtils.CreateAssetReference(r.PrefabPath);
         }
         [UnvsButton()]
@@ -283,7 +274,7 @@ namespace unvs.game2d.scenes
         {
             var r = this.EditorCreatePrefab<UnvsMainMenu>("MainMenu");
             this.MainMenu = r.value;
-            this.mainMenuPath = r.PrefabPath;
+            
             this.refMainMenu = unvs.editor.utils.UnvsEditorUtils.CreateAssetReference(r.PrefabPath);
         }
         [UnvsButton()]
@@ -291,7 +282,7 @@ namespace unvs.game2d.scenes
         {
             var r = this.EditorCreatePrefab<UnvsPauseMenu>("PauseMenu");
             this.PauseMenu = r.value;
-            this.pauseMenuPath = r.PrefabPath;
+           
             this.refPauseMenu = unvs.editor.utils.UnvsEditorUtils.CreateAssetReference(r.PrefabPath);
         }
         [UnvsButton()]
@@ -299,7 +290,7 @@ namespace unvs.game2d.scenes
         {
             var r = this.EditorCreatePrefab<UnvsFadeScreen>("fadeScreen");
             this.fadeScreen = r.value;
-            this.fadeScreenPath = r.PrefabPath;
+            
             this.refFadeScreen = unvs.editor.utils.UnvsEditorUtils.CreateAssetReference(r.PrefabPath);
         }
         [UnvsButton()]
@@ -307,7 +298,7 @@ namespace unvs.game2d.scenes
         {
             var r = this.EditorCreatePrefab<UnvsDialog>("dialog");
             this.dialog = r.value;
-            this.dialogPath = r.PrefabPath;
+          
             this.refDialog = unvs.editor.utils.UnvsEditorUtils.CreateAssetReference(r.PrefabPath);
         }
         [UnvsButton()]
@@ -315,7 +306,7 @@ namespace unvs.game2d.scenes
         {
             var r = this.EditorCreatePrefab<UnvsSceneLoader>("SceneLoader");
             this.SceneLoader = r.value;
-            this.SceneLoaderPath = r.PrefabPath;
+            //this.SceneLoaderPath = r.PrefabPath;
             this.refSceneLoader = unvs.editor.utils.UnvsEditorUtils.CreateAssetReference(r.PrefabPath);
         }
         [UnvsButton()]
@@ -323,7 +314,7 @@ namespace unvs.game2d.scenes
         {
             var r = this.EditorCreatePrefab<UnvsPlayerInput>("playerInput");
             this.playerInput = r.value;
-            this.playerInputPath = r.PrefabPath;
+           
            
             this.refPlayerInput = unvs.editor.utils.UnvsEditorUtils.CreateAssetReference(r.PrefabPath);
         }
@@ -332,7 +323,7 @@ namespace unvs.game2d.scenes
         {
             var r = this.EditorCreatePrefab<UnvsInteractUI>("InteractUI");
             this.InteractUI = r.value;
-            this.InteractUIPath = r.PrefabPath;
+           
             this.refInteractUI = unvs.editor.utils.UnvsEditorUtils.CreateAssetReference(r.PrefabPath);
 
         }
@@ -341,13 +332,13 @@ namespace unvs.game2d.scenes
         {
             var r = this.EditorCreatePrefab<UnvsActirDialogue>("ActorDialogue");
             this.ActorDialogue = r.value;
-            this.ActorDialoguePath = r.PrefabPath;
+           
             this.refActorDialogue = unvs.editor.utils.UnvsEditorUtils.CreateAssetReference(r.PrefabPath);
         }
 
+
+
         
-
-
 
 
 

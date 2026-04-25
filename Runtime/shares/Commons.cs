@@ -263,6 +263,48 @@ namespace unvs.shares
             go.SetActive(active);
             return go.GetComponent<T>();    
         }
+        public static async UniTask<T> LoadPrefabsAsync<T>(this AssetReference assetRef, Transform parent = null, bool active = false)
+        {
+
+            GameObject go = await LoadPrefabsAsync(assetRef, parent);
+            go.SetActive(active);
+            return go.GetComponent<T>();
+        }
+        public static async UniTask<GameObject> LoadPrefabsAsync(this AssetReference assetRef, Transform parent = null)
+        {
+            // 1. Kiểm tra tính hợp lệ
+            if (assetRef == null || assetRef.RuntimeKeyIsValid() == false)
+            {
+                Debug.LogError("AssetReference không hợp lệ!");
+                return null;
+            }
+
+            // 2. Instantiate trực tiếp từ AssetReference
+            // Truyền 'parent' vào đây giúp Object nằm đúng chỗ ngay từ Frame đầu tiên
+            // 'instantiateInWorldSpace' mặc định là true, nhưng nếu có parent nó sẽ theo parent
+            var handle = assetRef.InstantiateAsync(parent);
+
+            // 3. Chờ đợi không block Main Thread
+            await handle.Task;
+
+            if (handle.Status == AsyncOperationStatus.Succeeded)
+            {
+                GameObject result = handle.Result;
+
+                // Đảm bảo Reset Transform nếu cần (tránh vật lý bị lệch do offset cũ)
+                // result.transform.localPosition = Vector3.zero;
+                // result.transform.localRotation = Quaternion.identity;
+
+                return result;
+            }
+            else
+            {
+                // Giải phóng handle nếu lỗi để tránh leak bộ nhớ
+                Addressables.Release(handle);
+                Debug.LogError($"Lỗi load AssetReference: {assetRef.RuntimeKey}");
+                return null;
+            }
+        }
         public static async UniTask<GameObject> LoadPrefabsAsync(string v, Transform parent = null)
         {
             

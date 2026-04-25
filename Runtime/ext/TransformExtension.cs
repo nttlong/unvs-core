@@ -356,7 +356,44 @@ namespace unvs.ext
                 await UniTask.Yield(PlayerLoopTiming.Update, token);
             }
         }
+        public static async UniTask MoveToTargetByXAsync(
+    this Transform socketController,
+    float targetX, // Chỉ truyền vào target X cho rõ ràng
+    Action<float> OnMoving = null,
+    CancellationToken token = default,
+    float speed = 5f,
+    float stopDistance = 0.7f)
+        {
+            while (true)
+            {
+                if (token.IsCancellationRequested) return;
+                token.ThrowIfCancellationRequested();
 
+                // 1. Lấy vị trí hiện tại ĐẦY ĐỦ (X, Y, Z) tại frame này
+                Vector3 currentPos = socketController.position;
+
+                // 2. Tính khoảng cách chỉ dựa trên trục X
+                float dist = Math.Abs(currentPos.x - targetX);
+                OnMoving?.Invoke(dist);
+
+                // 3. Kiểm tra điều kiện dừng
+                if (dist <= stopDistance)
+                {
+                    // Khi dừng, chỉ ép X về đích, giữ nguyên Y và Z của frame cuối
+                    socketController.position = new Vector3(targetX, currentPos.y, currentPos.z);
+                    break;
+                }
+
+                // 4. Tính toán X mới bằng Mathf.MoveTowards
+                float nextX = Mathf.MoveTowards(currentPos.x, targetX, speed * Time.deltaTime);
+
+                // 5. Gán lại: X là giá trị mới, Y và Z là giá trị vừa lấy ở trên
+                // Đảm bảo Y và Z luôn đi theo transform hiện tại
+                socketController.position = new Vector3(nextX, currentPos.y, currentPos.z);
+
+                await UniTask.Yield(PlayerLoopTiming.Update, token);
+            }
+        }
         public static void AttachItemToSocket(this Transform socketHand, Transform handle)
         {
             // 1. Gán cha cho item vào socket ở tay

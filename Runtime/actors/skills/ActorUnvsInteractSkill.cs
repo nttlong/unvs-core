@@ -21,7 +21,7 @@ namespace unvs.actor.skills {
            
             
             _animState.BaseMotion("Walk");
-            await  _actor.transform.MoveToTargetAsync(vector2, OnMoving, token, MovingSpeed);
+            await  _actor.transform.MoveToTargetByXAsync(vector2.x, OnMoving, token, MovingSpeed);
         }
         public override void OnBind()
         {

@@ -186,7 +186,7 @@ namespace unvs.ext
         /// </summary>
         public static async UniTask FadeInAsync(this UnityEngine.UI.Image panel, CanvasGroup canvasGroup, float fadingTime = 0.5f)
         {
-            if (canvasGroup) return;
+            if (!canvasGroup) return;
 
             panel.gameObject.SetActive(true);
             canvasGroup.blocksRaycasts = true; // Block UI interactions early

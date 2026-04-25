@@ -11,6 +11,7 @@ using unvs.actions;
 using UnityEngine.Rendering;
 using unvs.unvsobjects;
 using unvs.game2d.objects.components;
+using unvs.ext.physical2d;
 namespace unvs.game2d.objects
 {
 
@@ -44,8 +45,13 @@ namespace unvs.game2d.objects
             this.mousePoint = UnvsInteractUI.Instance.defaultCursorIcon;
         }
 
-        public virtual Vector2 GetPosition()
+        public virtual Vector2 GetPosition(string Layer = Constants.Layers.WORLD_GROUND, params string[] extra)
         {
+           
+            if(coll.GetHit(out var hit,Vector2.down,float.PositiveInfinity,Layer,extra))
+            {
+                return hit.point;
+            }
             return coll.bounds.center;
         }
 

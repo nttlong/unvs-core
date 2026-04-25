@@ -112,7 +112,7 @@ namespace unvs.game2d.actors
         }
         public void StandBy(Vector2 vector2)
         {
-            this.transform.position = vector2;// + new Vector2((coll.bounds.max.x-coll.bounds.min.x)/2,0);
+            this.transform.position = vector2;// - (Vector2)this.coll.bounds.center;  //new Vector2((coll.bounds.max.x-coll.bounds.min.x)/2, -this.coll.bounds.size.y);
 
 
         }
