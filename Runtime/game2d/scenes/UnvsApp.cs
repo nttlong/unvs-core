@@ -114,10 +114,10 @@ namespace unvs.game2d.scenes
             InteractUI = await Commons.LoadPrefabsAsync<UnvsInteractUI>(refInteractUI, container, true);
             ActorDialogue = await Commons.LoadPrefabsAsync<UnvsActorDialogue>(refActorDialogue, container, true);
             fadeScreen = await Commons.LoadPrefabsAsync<UnvsFadeScreen>(refFadeScreen, container, true);
-            MainMenu.Show();
-            ActorDialogue.Hide();
-            dialog.Hide();
-            PauseMenu.Hide();
+            //MainMenu.Show();
+            //ActorDialogue.Hide();
+            //dialog.Hide();
+            //PauseMenu.Hide();
 
             InitEvents();
             uiInputs.StartInputController();

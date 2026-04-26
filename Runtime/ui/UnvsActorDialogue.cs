@@ -32,8 +32,7 @@ namespace unvs.ui
         public override void InitRunTime()
         {
             base.InitRunTime();
-            //this.canvas.FullSize();
-            //this.canvas.enabled = false;
+           
         }
         public UnvsActorDialogue Show(Vector2 pos,string content)
         {

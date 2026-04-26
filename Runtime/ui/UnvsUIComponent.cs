@@ -101,8 +101,17 @@ namespace unvs.ui
                 if (canvas != null)
                 {
                     canvas.FullSize();
+                    if (IsShow)
+                    {
+                        this.Show();
+                    }else
+                    {
+                        this.Hide();
+                    }
+                    //canvas.enabled = IsShow;
 
                 }
+               
                 InitEvents();
             }
         }
