@@ -11,6 +11,9 @@ using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using unvs.game2d.objects.components;
+using unvs.types;
+using static System.Net.WebRequestMethods;
 namespace unvs.editor.utils
 {
 
@@ -50,7 +53,7 @@ namespace unvs.editor.utils
         }
         public static string GetAbsFolderPathOfGameObject(GameObject go)
         {
-            var folder= EditorGetFolder(go);
+            var folder = EditorGetFolder(go);
             return EditorTools.ToAbsolutePath(folder);
         }
         public static string EditorGetFolder(GameObject go)
@@ -110,13 +113,13 @@ namespace unvs.editor.utils
         public static void CollecteAllTo<T>(Transform tr)
         {
             var items = tr.parent.GetComponentsInChildren<T>();
-            foreach ( var item in items )
+            foreach (var item in items)
             {
                 if (typeof(T) == typeof(Transform))
                 {
-                   if(((Transform)(object)item).parent == tr.parent)
+                    if (((Transform)(object)item).parent == tr.parent)
                     {
-                        ((Transform)(object)item).SetParent(tr,true);
+                        ((Transform)(object)item).SetParent(tr, true);
                     }
                 }
                 if (typeof(T) == typeof(MonoBehaviour))
@@ -217,7 +220,8 @@ namespace unvs.editor.utils
                     clipProperty.SetValue(state, clip);
 
                     window.Repaint();
-                }else
+                }
+                else
                 {
                     Debug.LogError($"Can not get state of {clipPath}");
                 }
@@ -229,6 +233,76 @@ namespace unvs.editor.utils
             string guid = AssetDatabase.AssetPathToGUID(prefabPath);
             return new AssetReference(guid);
         }
+
+      
+        public static FieldInfo[] GetAllGenericFieldsOfType(Type typ, Type Ftyp)
+        {
+
+            return typ.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .Where(f =>
+                {
+                    Type t = f.FieldType;
+
+                    // 1. Kiểm tra trực tiếp xem có khớp với typ không (nếu typ không phải generic)
+                    if (typ.IsAssignableFrom(t)) return true;
+
+                    // 2. Leo ngược cây thừa kế để tìm Open Generic (UnvsProperty<>)
+                    while (t != null && t != typeof(object))
+                    {
+                        if (t.IsGenericType && t.GetGenericTypeDefinition() == Ftyp)
+                            return true;
+                        t = t.BaseType;
+                    }
+                    return false;
+                }).ToArray();
+
+        }
+        public static PropertyInfo[] GetAllGenericProperties(object instance, Type typ)
+        {
+            if (instance == null) return null;
+            return instance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .Where(f =>
+                {
+                    Type t = f.PropertyType;
+
+                    // 1. Kiểm tra trực tiếp xem có khớp với typ không (nếu typ không phải generic)
+                    if (typ.IsAssignableFrom(t)) return true;
+
+                    // 2. Leo ngược cây thừa kế để tìm Open Generic (UnvsProperty<>)
+                    while (t != null && t != typeof(object))
+                    {
+                        if (t.IsGenericType && t.GetGenericTypeDefinition() == typ)
+                            return true;
+                        t = t.BaseType;
+                    }
+                    return false;
+                }).ToArray();
+
+        }
+        public static PropertyInfo[] GetAllGenericPropertiesOfType(Type typ, Type Ftyp)
+        {
+
+            return typ.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .Where(f =>
+                {
+                    Type t = f.PropertyType;
+
+                    // 1. Kiểm tra trực tiếp xem có khớp với typ không (nếu typ không phải generic)
+                    if (typ.IsAssignableFrom(t)) return true;
+
+                    // 2. Leo ngược cây thừa kế để tìm Open Generic (UnvsProperty<>)
+                    while (t != null && t != typeof(object))
+                    {
+                        if (t.IsGenericType && t.GetGenericTypeDefinition() == Ftyp)
+                            return true;
+                        t = t.BaseType;
+                    }
+                    return false;
+                }).ToArray();
+
+        }
+
+        
     }
 
 

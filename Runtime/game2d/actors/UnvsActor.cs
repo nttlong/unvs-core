@@ -43,11 +43,11 @@ namespace unvs.game2d.actors
         [SerializeField]
         controllers.ActorController controller;
         [SerializeField]
-        public actor_physical2d physical;
+        public actor_physical2d<UnvsActor> physical;
         [SerializeField]
         public unvs.animators_controllers.ik_manager_controllers ik_manager;
         [SerializeField]
-        public unvs.animators_controllers.motion_controllers motions;
+        public unvs.animators_controllers.motion_controllers<UnvsActor> motions;
         [SerializeField]
         public BaseSkillObject[] SkilObjects;
         public UnvsActorSkills Skills;
@@ -167,29 +167,7 @@ namespace unvs.game2d.actors
         [SerializeField]
         public accessories.components.accessories_editor accessories;
 
-        [UnvsButton]
-        public void FixMarterial()
-        {
-            foreach (var skin in this.GetComponentsInChildren<SpriteSkin>(true))
-            {
-                var renderer = skin.GetComponent<SpriteRenderer>();
-                if (renderer != null)
-                {
-                    // Nhân vật Rigged cần dùng Material có Z-Write On và Alpha Clipping
-                    foreach (var mat in renderer.sharedMaterials)
-                    {
-                        mat.SetInt("_ZWrite", 1);
-                        mat.EnableKeyword("_ALPHATEST_ON");
-                        mat.renderQueue = 2450; // AlphaTest
-
-                        // CỰC KỲ QUAN TRỌNG: 
-                        // Ép Z-Test về LessEqual để chân không bị "đục lỗ" bởi chính nó
-                        mat.SetInt("_ZTest", (int)UnityEngine.Rendering.CompareFunction.LessEqual);
-                    }
-                }
-            }
-
-        }
+        
         [UnvsButton]
         public void FixLayout()
         {
@@ -216,18 +194,19 @@ namespace unvs.game2d.actors
 
 
         }
-        
-        
-        
-        private void OnValidate()
+
+
+        public override void OnValidate()
         {
+            base.OnValidate();
             this.SetMeOnTag(Constants.Tags.ACTOR);
             ik_manager.owner = this as MonoBehaviour;
-            motions.owner= this as MonoBehaviour;
+
             accessories.owner = this as MonoBehaviour;
-            physical.owner = this as MonoBehaviour;
-            controller.owner= this as MonoBehaviour;
+          
+            controller.owner = this as MonoBehaviour;
         }
+        
 
     }
 

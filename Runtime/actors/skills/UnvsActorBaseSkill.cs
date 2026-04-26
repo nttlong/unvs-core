@@ -11,7 +11,7 @@ using unvs.game2d.objects;
 using unvs.game2d.scenes;
 using unvs.game2d.actors;
 using unvs.shares;
-using UnityEngine.InputSystem.iOS.LowLevel;
+
 using unvs.animators_controllers;
 
 
@@ -146,7 +146,7 @@ namespace unvs.actor.skills
         public abstract void OnChangeDirection(Vector2 value);
         public abstract void OnChangeStatus(SkillSpeddEnum value);
 
-        public motion_controllers motions;
+        public motion_controllers<UnvsActor> motions;
     }
     public class ActorDefaultSkill : AbstractActionBaseSkill
     {

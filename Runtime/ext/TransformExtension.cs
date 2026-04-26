@@ -394,6 +394,27 @@ namespace unvs.ext
                 await UniTask.Yield(PlayerLoopTiming.Update, token);
             }
         }
+        public static T GetFirstComponent<T>(this GameObject tr, bool includeHidden = false) where T : Component
+        {
+            var ret = tr.GetComponent<T>();
+            if (ret != null) return ret;
+            ret = tr.GetComponentInChildren<T>(includeHidden);
+            return ret;
+        }
+        public static T GetFirstComponent<T>(this MonoBehaviour tr, bool includeHidden = false) where T : Component
+        {
+            var ret = tr.GetComponent<T>();
+            if (ret != null) return ret;
+            ret = tr.GetComponentInChildren<T>(includeHidden);
+            return ret;
+        }
+        public static T GetFirstComponent<T>(this Transform tr,bool includeHidden=false) where T : Component
+        {
+            var ret= tr.GetComponent<T>();
+            if (ret != null) return ret;
+            ret= tr.GetComponentInChildren<T>(includeHidden);
+            return ret;
+        }
         public static void AttachItemToSocket(this Transform socketHand, Transform handle)
         {
             // 1. Gán cha cho item vào socket ở tay

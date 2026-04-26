@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-using unvs.controllers_input;
+using unvs.controllers.inputs;
 using unvs.ext;
 using unvs.game2d.scenes;
 

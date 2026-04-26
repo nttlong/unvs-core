@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Unity.Cinemachine;
 using Unity.VisualScripting;
@@ -12,6 +13,7 @@ using UnityEngine.Localization;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using unvs.game2d.objects.components;
 using unvs.game2d.scenes;
 using unvs.ui;
 namespace unvs.shares
@@ -420,6 +422,37 @@ namespace unvs.shares
             targetUIProperty.SetValue(target, targetUIValue);
             
             
+        }
+
+        public static FieldInfo[] GetAllGenericFields(object instance, Type typ)
+        {
+            if (instance == null) return null;
+            //return instance.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            //    .Where(f => f.FieldType.IsGenericType && (f.FieldType.GetGenericTypeDefinition() == typ || f.FieldType.GetGenericTypeDefinition().BaseType==typ)).ToArray();
+            return instance.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy)
+                 .Where(f =>
+                 {
+                     Type t = f.FieldType;
+
+                     // 1. Kiểm tra trực tiếp xem có khớp với typ không (nếu typ không phải generic)
+                     if (typ.IsAssignableFrom(t)) return true;
+
+                     // 2. Leo ngược cây thừa kế để tìm Open Generic (UnvsProperty<>)
+                     while (t != null && t != typeof(object))
+                     {
+                         if (t.IsGenericType && t.GetGenericTypeDefinition() == typ)
+                             return true;
+                         t = t.BaseType;
+                     }
+                     return false;
+                 }).ToArray();
+
+        }
+
+        public static FieldInfo GetFlatternField(FieldInfo field, string fieldName)
+        {
+            return field.FieldType.GetField(fieldName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+
         }
     }
 }

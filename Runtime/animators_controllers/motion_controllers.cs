@@ -9,26 +9,48 @@ using UnityEngine;
 using UnityEngine.U2D.Animation;
 using unvs.ext;
 using unvs.game2d.actors;
+using unvs.game2d.objects.components;
 using unvs.game2d.objects.editor;
 using unvs.shares;
 
 namespace unvs.animators_controllers
 {
     [Serializable]
-    public partial class motion_controllers : unvs.types.UnvsEditableProperty
+    public partial class motion_controllers<T> : unvs.types.UnvsProperty<T> where T : UnvsBaseComponent
     {
         public Animator editorAnimController;
         public GameObject animEle;
         public Animator animator;
-        public MonoBehaviour owner;
+        //public MonoBehaviour owner;
         [SerializeField]
         public AnimStateInfo[] animStates;
         [SerializeField]
-        public MotionAudio[] motionAudio=new MotionAudio[] {};
+        public MotionAudio[] motionAudio = new MotionAudio[] { };
+        [SerializeField]
+        public AnimStateInfo currentBaseAnimState;
+        private Dictionary<string, AnimStateInfo> _dictBaseMotion;
+        private AnimStateInfo currentOrerideAnimState;
+        private Dictionary<string, AnimStateInfo> _dictOverideMotion;
+
         public void BaseMotion(string name, string overideState = null, AnimatorOverrideController animatorOverrideController = null)
         {
-           
-            this.animStates.PlayBaseLayer(name, overideState, animatorOverrideController);
+            if (_dictBaseMotion == null) _dictBaseMotion = new Dictionary<string, AnimStateInfo>();
+            if (_dictBaseMotion.ContainsKey(name.ToLower()))
+            {
+                currentBaseAnimState = _dictBaseMotion[name.ToLower()];
+
+
+            }
+            else
+            {
+                this.currentBaseAnimState = this.animStates.GetBaseStateByName(name);
+
+
+                //this.currentBaseAnimState = this.animStates.PlayBaseLayer(name, overideState, animatorOverrideController);
+                _dictBaseMotion.Add(name.ToLower(), currentBaseAnimState);
+
+            }
+            currentBaseAnimState.PlayAsBaseState();
 
         }
         public void Motion(string name)
@@ -39,23 +61,35 @@ namespace unvs.animators_controllers
         {
             await this.animStates.PlayMotionAsync(name, tk, null, OnPlay, OnFinish);
         }
-        public void AddtiveMotion(string name)
+        public void OverideMotion(string name)
         {
-            this.animStates.PlayAddtiveMotion(name);
+            if (_dictOverideMotion == null) _dictOverideMotion = new Dictionary<string, AnimStateInfo>();
+            if (_dictOverideMotion.ContainsKey(name.ToLower()))
+            {
+                this.currentOrerideAnimState = _dictOverideMotion[name.ToLower()];
+
+
+            }
+            else
+            {
+                this.currentOrerideAnimState = this.animStates.GetOverideStateByName(this.currentBaseAnimState, name);
+                _dictOverideMotion.Add(name.ToLower(), this.currentOrerideAnimState);
+            }
+            this.currentOrerideAnimState.PlayAsOverideState();
         }
-        
+
     }
 #if UNITY_EDITOR
-    public partial class motion_controllers : unvs.types.UnvsEditableProperty
+    public partial class motion_controllers<T> : unvs.types.UnvsProperty<T> where T : UnvsBaseComponent
     {
         [UnvsButton("Load Motions")]
         public void LoadMotions()
         {
-            owner.GetComponentInChildren<Animator>().AddComponentIfNotExist<UnsvPalyerAnimatorEvent>();
-            var animController = owner.GetComponentInChildren<Animator>();
+            this.Owner.GetComponentInChildren<Animator>().AddComponentIfNotExist<UnsvPalyerAnimatorEvent>();
+            var animController = Owner.GetComponentInChildren<Animator>();
             if (animController == null)
             {
-                unvs.editor.utils.Dialogs.Show($"{typeof(Animator)} was not found in {owner.name}");
+                unvs.editor.utils.Dialogs.Show($"{typeof(Animator)} was not found in {Owner.name}");
                 return;
             }
             this.animStates = animController.EditorExtractAllMotions().ToArray();
@@ -76,18 +110,28 @@ namespace unvs.animators_controllers
                 }
             }
             this.motionAudio = lsAudio.Cast<MotionAudio>().ToArray();
-            
+            GenerateAnimatorController();
         }
-       
+
 
         [UnvsButton("Create Anim controller")]
         public void GenerateAnimatorController()
         {
-            this.animEle = owner.GetComponentInChildren<SpriteSkin>(true).transform.parent.gameObject;
+            this.animEle = Owner.GetComponentInChildren<SpriteSkin>(true).transform.parent.gameObject;
             string folderPath = unvs.editor.utils.UnvsEditorUtils.EditorGetFolder(this.animEle);
-            var controller = unvs.editor.utils.UnvsEditorUtils.EditorCreateAnimatorController(folderPath, this.animEle.name);
-            this.animator = this.animEle.transform.AddComponentIfNotExist<Animator>();
-            this.animator.runtimeAnimatorController = controller;
+            if (this.animator == null) this.animator = this.Owner.GetComponentInChildren<Animator>();
+            if (this.animator!=null)
+            {
+                var msg = $"{this.animator.name} is already in {this.Owner.name}. Do you want to create new and overide it";
+                if (unvs.editor.utils.Dialogs.Confirm(msg))
+                {
+                    var controller = unvs.editor.utils.UnvsEditorUtils.EditorCreateAnimatorController(folderPath, this.animEle.name);
+                    this.animator = this.Owner.transform.AddComponentIfNotExist<Animator>();
+                    this.animator.runtimeAnimatorController = controller;
+                }
+            }
+           
+            
         }
 
         internal void EditotPlay(AnimStateInfo animStateInfo)

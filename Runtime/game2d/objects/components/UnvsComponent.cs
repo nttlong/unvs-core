@@ -7,6 +7,7 @@ namespace unvs.game2d.objects.components
 
         public virtual void Awake()
         {
+            //InitProperties();
             if (Application.isPlaying)
 
                 InitRuntime();

@@ -11,7 +11,7 @@ namespace unvs.actor.skills {
     public class ActorUnvsInteractSkill : AbstractActorBaseSkill
     {
         private UnvsActor _actor;
-        private motion_controllers _animState;
+        private motion_controllers<UnvsActor> _animState;
 
         //private UnvsAnimStates _animState;
         private CompositeCollider2D _composite;

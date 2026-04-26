@@ -25,9 +25,9 @@ namespace unvs.controllers.inputs
         private static object playerValue;
         private static object uiValue;
         public static Dictionary<string, InputAction> UI;
-
+        
         public static object inputIns;
-
+       
 
         public static InputAction LookAction { get; private set; }
 
@@ -101,7 +101,7 @@ namespace unvs.controllers.inputs
                         LookAction = val;
                     }
                     Player[p.Name] = val;
-
+                  
                 }
             }
         }
@@ -118,7 +118,7 @@ namespace unvs.controllers.inputs
                 {
                     var val = p.GetValue(uiValue) as InputAction;
                     UI[p.Name] = val;
-
+                   
 
                 }
             }
@@ -128,16 +128,16 @@ namespace unvs.controllers.inputs
         {
             throw new NotImplementedException();
         }
-
+        
         public static void RegisterPlayer<T>(T component, Func<string, UnvsEventAction> OnRegsietEvent) where T : UnvsComponentEvetns
         {
             var dict = new Dictionary<string, Action<CallbackContext>>();
             foreach (var key in Player.Keys)
             {
-                var action = OnRegsietEvent(key);
-                if (action != null)
+                var action= OnRegsietEvent(key);
+                if(action != null)
                 {
-
+                    
                     if (action.Started != null)
                     {
                         void start(CallbackContext ctx)
@@ -163,7 +163,7 @@ namespace unvs.controllers.inputs
                 foreach (var key in dict.Keys)
                 {
                     var items = key.Split('.');
-                    if (items[1] == "start")
+                    if (items[1]=="start")
                     {
                         Player[key].started -= dict[key];
                     }
@@ -174,8 +174,67 @@ namespace unvs.controllers.inputs
                 }
             };
         }
-        
-        
+        public static MapAction CreateMapAction(string name, Action<MapAction> InitEvents)
+        {
+            if (!UnvsGlobalInput.Player.Keys.Contains(name, StringComparer.OrdinalIgnoreCase))
+            {
+                Debug.LogError($"{name} was not found in {string.Join(',', UnvsGlobalInput.Player.Keys)}");
+                return null;
+            }
+            var key = UnvsGlobalInput.Player.Keys.FirstOrDefault(p => p.Equals(name, StringComparison.OrdinalIgnoreCase));
+            var action = new MapAction();
+            InitEvents(action);
+            applyAction(key, action);
+            return action;
+
+
+        }
+        private static Dictionary<string, Action<CallbackContext>> _started;
+        private static Dictionary<string, Action<CallbackContext>> _canceled;
+        private static Dictionary<string, Action<CallbackContext>> _performed;
+        private static void applyAction(string key, MapAction action)
+        {
+            if (action != null)
+            {
+                // kiem tra action co start thi goi
+
+                if (action.hasStarted)
+                {
+                    Action<CallbackContext> start = ctx =>
+                    {
+                        if (!_disableEvent)
+                            action.InvokeStarted(ctx);
+                    };
+                    UnvsGlobalInput.Player[key].started += start;
+                    if (_started == null) _started = new Dictionary<string, Action<CallbackContext>>();
+                    _started.Add(key, start);
+                }
+                if (action.hasCanceled)
+                {
+                    Action<CallbackContext> canceled = ctx =>
+                    {
+                        if (!_disableEvent)
+                            action.InvokeCanceled(ctx);
+                    };
+                    UnvsGlobalInput.Player[key].canceled += canceled;
+                    if (_canceled == null) _canceled = new Dictionary<string, Action<CallbackContext>>();
+                    _canceled.Add(key, canceled);
+                }
+                if (action.hasPerformed)
+                {
+                    Action<CallbackContext> performed = ctx =>
+                    {
+                        if (!_disableEvent)
+                            action.InvokePerformedd(ctx);
+                    };
+                    UnvsGlobalInput.Player[key].performed += performed;
+                    if (_performed == null) _performed = new Dictionary<string, Action<CallbackContext>>();
+                    _performed.Add(key, performed);
+                }
+
+                action._ownerInputAction = UnvsGlobalInput.Player[key]; // set owner for other method call such as ReadValue ...
+            }
+        }
     }
     public struct ActionSender
     {

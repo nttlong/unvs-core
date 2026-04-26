@@ -22,6 +22,7 @@ namespace unvs.accessories.components
                 var shadowGroup = sp.AddComponentIfNotExist<ShadowCaster2D>();
                 shadowGroup.selfShadows = true;
                 shadowGroup.castingOption = ShadowCaster2D.ShadowCastingOptions.CastAndSelfShadow;
+                shadowGroup.enabled=true;
 
             }
         }

@@ -38,10 +38,11 @@ namespace unvs.game2d.scenes
 
         public _UnvsSceneEditorObject Links;
         public AssetReference selRef;
+        public EditorUnvsSceneSpawPointEditor SpawnPoints;
 #endif
         public string SceneLeft;
         public string SceneRight;
-        public EditorUnvsSceneSpawPointEditor SpawnPoints;
+       
         [SerializeField]
         
         public Transform support;

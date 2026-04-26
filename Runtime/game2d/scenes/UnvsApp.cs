@@ -20,7 +20,7 @@ using unvs.shares;
 
 using unvs.game2d.objects.components;
 using unvs.game2d.objects.types;
-using unvs.controllers_input;
+using unvs.controllers.inputs;
 using UnityEngine.UIElements;
 
 
@@ -40,6 +40,7 @@ namespace unvs.game2d.scenes
     
     public class UnvsApp : UnvsComponent
     {
+        public UnvsUIInput<UnvsApp> uiInputs;
         public float DefaultFadeTimeLoadScene=0;
         public GameObject controllerInput;
         [Header("prefabs requirements")]
@@ -73,7 +74,7 @@ namespace unvs.game2d.scenes
         public UnvsActirDialogue ActorDialogue;
 
 
-        
+       
        
        
        
@@ -97,7 +98,7 @@ namespace unvs.game2d.scenes
        
         public virtual async UniTask InitRuntimeAsync()
         {
-
+            
             container = transform.CreateIfNoExist<Transform>("container");
             container.gameObject.SetActive(false);
             SceneLoader = await refSceneLoader.LoadPrefabsAsync<UnvsSceneLoader>(container, true); 
@@ -115,6 +116,7 @@ namespace unvs.game2d.scenes
             PauseMenu.Hide();
 
             InitEvents();
+            uiInputs.StartInputController();
 
         }
 
@@ -140,7 +142,14 @@ namespace unvs.game2d.scenes
             var back = UnvsGlobalInput.UI["Pause"];
             back.started += Back_started;
         }
-
+        private void OnDisable()
+        {
+            this.uiInputs.ControlDisable();
+        }
+        private void OnEnable()
+        {
+            this.uiInputs.ControlEnable();
+        }
         private void Back_started(InputAction.CallbackContext obj)
         {
             if (MainMenu.IsShow) return;

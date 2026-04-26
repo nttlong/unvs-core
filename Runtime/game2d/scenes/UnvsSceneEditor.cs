@@ -5,6 +5,7 @@
    
 */
 
+#if UNITY_EDITOR
 using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
@@ -24,12 +25,11 @@ using unvs.game2d.actors;
 using unvs.shares;
 using unvs.game2d.objects.components;
 using unvs.game2d.objects.editor;
+
+
+
+
 using unvs.editor.components;
-
-
-
-#if UNITY_EDITOR
-
 namespace unvs.game2d.scenes
 {
     

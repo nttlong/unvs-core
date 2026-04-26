@@ -14,9 +14,39 @@ namespace unvs.ext
 {
     public static class BlendTreeInfoExtension
     {
-        public static void PlayBaseLayer(this AnimStateInfo[] blendTreeAnim, string motionName, string overideState=null, AnimatorOverrideController animatorOverrideController=null)
+        public static AnimStateInfo GetBaseStateByName(this AnimStateInfo[] blendTreeAnim,string name)
         {
-            if (blendTreeAnim.Count(p => p != null) == 0) return;
+            return blendTreeAnim
+                    .Where(p => !string.IsNullOrEmpty(p.blendName))
+                    .OrderBy(p => p.layerIndex).ThenBy(p => p.blendIndex)
+                    .FirstOrDefault(p => p.motionName.Equals(name, StringComparison.OrdinalIgnoreCase));
+        }
+        public static AnimStateInfo GetOverideStateByName(this AnimStateInfo[] blendTreeAnim, AnimStateInfo baseState, string name)
+        {
+            return blendTreeAnim
+                    .Where(p => string.IsNullOrEmpty(p.blendName) && p.layerIndex != baseState.layerIndex)
+                    .FirstOrDefault(p => p.motionName.Equals(name, StringComparison.OrdinalIgnoreCase));
+        }
+        public static AnimStateInfo PlayAsOverideState(this AnimStateInfo item)
+        {
+            item.animationController.SetLayerWeight(item.layerIndex, 1);
+            item.animationController.Play(item.motionName, item.layerIndex, 0f);
+            return item;
+        }
+        public static AnimStateInfo PlayAsBaseState(this AnimStateInfo animState)
+        {
+            if(string.IsNullOrEmpty( animState.blendName))
+            {
+                Debug.LogError($"{animState.layerName}.{animState.name} in not blendetree ");
+            }
+            animState.animationController.ResetAllOverideLayers();
+            animState.animationController.SetLayerWeight(animState.layerIndex, 1f);
+            animState.animationController.SetFloat(animState.paramName, animState.value);
+            return animState;
+        }
+        public static AnimStateInfo PlayBaseLayer(this AnimStateInfo[] blendTreeAnim, string motionName, string overideState=null, AnimatorOverrideController animatorOverrideController=null)
+        {
+            if (blendTreeAnim.Count(p => p != null) == 0) return null;
             var item = blendTreeAnim.FirstOrDefault(p => p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase)
             && !string.IsNullOrEmpty(p.blendName));
             if (item == null)
@@ -38,6 +68,7 @@ namespace unvs.ext
                 overideStateItem.animationController.SetLayerWeight(overideStateItem.layerIndex, 1f);
                 overideStateItem.animationController.PlayInFixedTime(overideStateItem.motionName, overideStateItem.layerIndex);
             }
+            return item;
         }
         public static void PlayBlendTree(this AnimStateInfo[] blendTreeAnim,  string motionName)
         {
@@ -174,9 +205,9 @@ namespace unvs.ext
 
             Debug.Log($"[Architect Log] Motion {motionName} hoàn tất.");
         }
-        public static void PlayAddtiveMotion(this AnimStateInfo[] blendTreeAnim, string motionName)
+        public static AnimStateInfo PlayAddtiveMotion(this AnimStateInfo[] blendTreeAnim, string motionName)
         {
-            if (blendTreeAnim.Count(p => p != null) == 0) return;
+            if (blendTreeAnim.Count(p => p != null) == 0) return null;
             var item = blendTreeAnim.FirstOrDefault(p =>p.layerIndex>0 && p.motionName.Equals(motionName, StringComparison.OrdinalIgnoreCase));
             if (item == null)
             {
@@ -190,6 +221,7 @@ namespace unvs.ext
             if(item.layerIndex > 0)
             item.animationController.SetLayerWeight(item.layerIndex, 1);
             item.animationController.Play(item.motionName, item.layerIndex, 0f);
+            return item;
         }
     }
 }

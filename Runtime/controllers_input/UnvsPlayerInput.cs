@@ -10,7 +10,7 @@ using unvs.game2d.objects.editor;
 using unvs.game2d.scenes;
 using static UnityEngine.InputSystem.DefaultInputActions;
 
-namespace unvs.controllers_input
+namespace unvs.controllers.inputs
 {
     
     public abstract class UnvsPlayerInputMap : UnvsBaseComponent
