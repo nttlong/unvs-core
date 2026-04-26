@@ -7,8 +7,9 @@ using UnityEngine.InputSystem;
 using UnityEngine.U2D.Animation;
 using UnityEngine.U2D.IK;
 using UnityEngine.UI;
+using unvs.components;
 using unvs.ext;
-using unvs.game2d.objects.components;
+using unvs.components;
 using unvs.game2d.objects.editor;
 using unvs.game2d.scenes;
 

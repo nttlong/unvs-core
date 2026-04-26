@@ -6,7 +6,8 @@ using unvs.game2d.scenes;
 using unvs.game2d.actors;
 using unvs.shares;
 using unvs.game2d.objects.types;
-using unvs.game2d.objects.components;
+using unvs.components;
+using unvs.components;
 
 namespace unvs.game2d.objects
 {

@@ -1,6 +1,6 @@
 using System;
 
-namespace unvs.game2d.objects.components
+namespace unvs.components
 {
     public abstract class UnvsComponentEvetns: UnvsComponent
     {

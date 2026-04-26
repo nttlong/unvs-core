@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace unvs.game2d.objects.components
+namespace unvs.ui
 {
     public abstract class UnvsUIComponentInstance<T> : UnvsUIComponent where T : Component
     {

@@ -13,6 +13,7 @@ using unvs.game2d.actors;
 using unvs.shares;
 
 using unvs.animators_controllers;
+using unvs.ui;
 
 
 namespace unvs.actor.skills
@@ -90,7 +91,7 @@ namespace unvs.actor.skills
         {
             var coll = Owner.GetComponent<Collider2D>();
             var pos = new Vector2(coll.bounds.center.x, coll.bounds.max.y + 2);
-            UnvsActirDialogue.Instance.Show(pos, text);
+            UnvsActorDialogue.Instance.Show(pos, text);
         }
 
     }

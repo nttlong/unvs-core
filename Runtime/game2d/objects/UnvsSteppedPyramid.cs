@@ -6,7 +6,7 @@ using unvs.ext;
 using unvs.game2d.scenes;
 using unvs.shares;
 using unvs.game2d.objects.editor;
-using unvs.game2d.objects.components;
+using unvs.components;
 
 
 #if UNITY_EDITOR

@@ -10,8 +10,10 @@ using System.Threading;
 using unvs.actions;
 using UnityEngine.Rendering;
 using unvs.unvsobjects;
-using unvs.game2d.objects.components;
+using unvs.components;
 using unvs.ext.physical2d;
+using unvs.ui;
+using unvs.components;
 namespace unvs.game2d.objects
 {
 

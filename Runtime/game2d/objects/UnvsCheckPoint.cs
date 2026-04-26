@@ -1,6 +1,6 @@
 using UnityEngine;
 using unvs.ext;
-using unvs.game2d.objects.components;
+using unvs.components;
 using unvs.game2d.scenes;
 using unvs.shares;
 

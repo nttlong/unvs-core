@@ -1,4 +1,4 @@
-using unvs.game2d.objects.components;
+using unvs.components;
 
 
 namespace unvs.game2d.actors

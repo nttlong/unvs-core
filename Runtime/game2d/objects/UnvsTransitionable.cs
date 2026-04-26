@@ -1,5 +1,5 @@
 using UnityEngine;
-using unvs.game2d.objects.components;
+using unvs.components;
 using unvs.game2d.scenes;
 using unvs.game2d.transitions;
 

@@ -8,10 +8,11 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 using UnityEngine.U2D.Animation;
+using unvs.components;
 using unvs.controllers.inputs;
 using unvs.ext;
 using unvs.game2d.actors;
-using unvs.game2d.objects.components;
+using unvs.components;
 using unvs.game2d.scenes;
 
 

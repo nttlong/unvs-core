@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 using unvs.ext;
-using unvs.game2d.objects.components;
+using unvs.components;
 using unvs.game2d.objects.editor;
 using unvs.shares;
+using unvs.components;
+
 #if UNITY_EDITOR
 using unvs.editor.components;
 #endif

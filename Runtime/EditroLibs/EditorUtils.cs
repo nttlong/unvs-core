@@ -11,7 +11,7 @@ using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using unvs.game2d.objects.components;
+using unvs.components;
 using unvs.types;
 using static System.Net.WebRequestMethods;
 namespace unvs.editor.utils

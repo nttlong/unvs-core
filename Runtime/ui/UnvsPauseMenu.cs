@@ -6,10 +6,12 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using unvs.ext;
-using unvs.game2d.objects.components;
+using unvs.components;
 using unvs.game2d.objects.editor;
+using unvs.ui;
+using unvs.game2d.scenes;
 
-namespace unvs.game2d.scenes
+namespace unvs.ui
 {
     public class UnvsPauseMenu : UnvsUIComponentInstance<UnvsPauseMenu>
     {

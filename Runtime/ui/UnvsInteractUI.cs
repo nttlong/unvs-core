@@ -12,11 +12,12 @@ using UnityEngine.InputSystem;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 using unvs.ext;
-using unvs.game2d.objects.components;
+using unvs.components;
 using unvs.game2d.objects.editor;
+using unvs.game2d.scenes;
 using unvs.shares;
 
-namespace unvs.game2d.scenes
+namespace unvs.ui
 {
 
     public partial class UnvsInteractUI : UnvsUIComponentInstance<UnvsInteractUI>

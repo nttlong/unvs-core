@@ -13,10 +13,13 @@ using UnityEngine.U2D.Animation;
 using unvs.actor.player;
 using unvs.actor.skills;
 using unvs.actor_physical;
+using unvs.components;
 using unvs.ext;
-using unvs.game2d.objects.components;
+using unvs.components;
 using unvs.game2d.objects.editor;
 using unvs.shares;
+using unvs.ui;
+
 
 #if UNITY_EDITOR
 
@@ -26,14 +29,14 @@ using unvs.sys;
 
 namespace unvs.game2d.actors
 {
-    //[RequireComponent(typeof(IKBoneMap))]
+   
 
 
     [RequireComponent(typeof(UniqueObject))]
 
     [RequireComponent(typeof(AudioSource))]
-
-    //[RequireComponent(typeof(UnvsActorPhysical))]
+  
+  
 
 
 
@@ -49,10 +52,12 @@ namespace unvs.game2d.actors
         [SerializeField]
         public unvs.animators_controllers.motion_controllers<UnvsActor> motions;
         [SerializeField]
+        public unvs.data.properties.Inventory<UnvsActor> inventory;
+        [SerializeField]
         public BaseSkillObject[] SkilObjects;
         public UnvsActorSkills Skills;
         public void SayText(string msg) => Skills.Get<unvs.actor.skills.ActorSpeaker>()?.SayText(msg);
-        public void SayOff() => UnvsActirDialogue.Instance.Hide();
+        public void SayOff() => UnvsActorDialogue.Instance.Hide();
 
         public CancellationTokenSource cts => _cls;
 

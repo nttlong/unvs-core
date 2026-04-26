@@ -23,7 +23,7 @@ using unvs.game2d.objects;
 using unvs.game2d.actors;
 
 using unvs.shares;
-using unvs.game2d.objects.components;
+using unvs.components;
 using unvs.game2d.objects.editor;
 
 

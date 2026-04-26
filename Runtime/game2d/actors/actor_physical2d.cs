@@ -4,9 +4,10 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.U2D.Animation;
 using UnityEngine.UIElements;
+using unvs.components;
 using unvs.ext;
 using unvs.game2d.objects;
-using unvs.game2d.objects.components;
+using unvs.components;
 using unvs.game2d.objects.editor;
 
 namespace unvs.game2d.actors

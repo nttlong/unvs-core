@@ -5,7 +5,8 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using unvs.actor.player;
-using unvs.game2d.objects.components;
+using unvs.components;
+using unvs.components;
 using static UnityEngine.InputSystem.InputAction;
 
 namespace unvs.controllers.inputs {

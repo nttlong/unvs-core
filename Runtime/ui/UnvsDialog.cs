@@ -5,9 +5,10 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using unvs.ext;
-using unvs.game2d.objects.components;
+using unvs.components;
 using unvs.game2d.objects.editor;
 using unvs.game2d.scenes;
+using unvs.ui;
 
 namespace game2d.scenes {
     public class UnvsDialog : UnvsUIComponentInstance<UnvsDialog>

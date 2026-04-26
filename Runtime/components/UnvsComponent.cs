@@ -1,6 +1,7 @@
 using UnityEngine;
+using unvs.components;
 
-namespace unvs.game2d.objects.components
+namespace unvs.components
 {
     public abstract class UnvsComponent : UnvsBaseComponent
     {

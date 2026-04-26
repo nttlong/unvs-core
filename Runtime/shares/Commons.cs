@@ -13,7 +13,7 @@ using UnityEngine.Localization;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using unvs.game2d.objects.components;
+using unvs.components;
 using unvs.game2d.scenes;
 using unvs.ui;
 namespace unvs.shares

@@ -9,10 +9,11 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.U2D.Animation;
 using UnityEngine.U2D.IK;
+using unvs.components;
 using unvs.ext;
 using unvs.ext.physical2d;
 using unvs.game2d.objects;
-using unvs.game2d.objects.components;
+using unvs.components;
 using unvs.game2d.objects.editor;
 using unvs.shares;
 

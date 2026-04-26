@@ -15,7 +15,7 @@ using System.Text;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.WSA;
-using unvs.game2d.objects.components;
+using unvs.components;
 using unvs.game2d.objects.editor;
 using unvs.game2d.scenes;
 namespace unvs.editor.components     {

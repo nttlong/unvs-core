@@ -7,7 +7,7 @@ using UnityEngine;
 using unvs.shares;
 using unvs.types;
 
-namespace unvs.game2d.objects.components
+namespace unvs.components
 {
 
     public abstract class UnvsBaseComponent : MonoBehaviour
@@ -24,7 +24,7 @@ namespace unvs.game2d.objects.components
                 var component = this.GetComponent(field.FieldType.GenericTypeArguments[0]);
 
 
-                if (ownerField != null)
+                if (ownerField != null && component!=null)
                 {
                     ownerField.SetValue(propertyInstance, component);
 

@@ -10,9 +10,10 @@ using UnityEngine;
 using unvs.actor.player;
 using unvs.ext;
 using unvs.game2d.actors;
-using unvs.game2d.objects.components;
+using unvs.components;
 using unvs.game2d.objects.editor;
 using unvs.shares;
+using unvs.ui;
 
 namespace unvs.game2d.scenes
 {

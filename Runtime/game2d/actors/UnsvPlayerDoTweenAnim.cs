@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.U2D.IK;
+using unvs.components;
 using unvs.ext;
-using unvs.game2d.objects.components;
+using unvs.components;
 using unvs.game2d.objects.editor;
 using unvs.game2d.scenes;
 

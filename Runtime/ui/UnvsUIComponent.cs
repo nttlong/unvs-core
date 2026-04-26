@@ -1,10 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
+using unvs.components;
 using unvs.controllers.inputs;
 using unvs.ext;
+using unvs.components;
 using unvs.game2d.scenes;
 
-namespace unvs.game2d.objects.components
+namespace unvs.ui
 {
      public abstract class UnvsUIComponent : UnvsBaseComponent
     {

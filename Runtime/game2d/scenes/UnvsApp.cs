@@ -18,10 +18,12 @@ using unvs.game2d.actors;
 
 using unvs.shares;
 
-using unvs.game2d.objects.components;
+using unvs.components;
 using unvs.game2d.objects.types;
 using unvs.controllers.inputs;
 using UnityEngine.UIElements;
+using unvs.ui;
+
 
 
 
@@ -45,6 +47,8 @@ namespace unvs.game2d.scenes
         public GameObject controllerInput;
         [Header("prefabs requirements")]
         public AssetReference refPlayerInput;
+       
+        public AssetReference refUiInventory;
         public AssetReference refActorDialogue;
         public AssetReference refInteractUI;
         public AssetReference refSceneLoader;
@@ -59,7 +63,7 @@ namespace unvs.game2d.scenes
         public string startScenePath;
         public AssetReference startScene;
         [Header("Components")]
-        
+        public UnvsUiInventory UiInventory;
         public UnvsPlayerInput playerInput;
         public UnvsMainMenu MainMenu;
         public UnvsPauseMenu PauseMenu;
@@ -71,7 +75,7 @@ namespace unvs.game2d.scenes
         public UnvsSceneLoader SceneLoader;
         public UnvsDialog dialog;
         public UnvsInteractUI InteractUI;
-        public UnvsActirDialogue ActorDialogue;
+        public UnvsActorDialogue ActorDialogue;
 
 
        
@@ -108,7 +112,7 @@ namespace unvs.game2d.scenes
             dialog = await Commons.LoadPrefabsAsync<UnvsDialog>(refDialog, container, true);
             playerInput = await Commons.LoadPrefabsAsync<UnvsPlayerInput>(refPlayerInput, container, true);
             InteractUI = await Commons.LoadPrefabsAsync<UnvsInteractUI>(refInteractUI, container, true);
-            ActorDialogue = await Commons.LoadPrefabsAsync<UnvsActirDialogue>(refActorDialogue, container, true);
+            ActorDialogue = await Commons.LoadPrefabsAsync<UnvsActorDialogue>(refActorDialogue, container, true);
             fadeScreen = await Commons.LoadPrefabsAsync<UnvsFadeScreen>(refFadeScreen, container, true);
             MainMenu.Show();
             ActorDialogue.Hide();
@@ -339,15 +343,22 @@ namespace unvs.game2d.scenes
         [UnvsButton]
         public void GenerateActorDialogue()
         {
-            var r = this.EditorCreatePrefab<UnvsActirDialogue>("ActorDialogue");
+            var r = this.EditorCreatePrefab<UnvsActorDialogue>("ActorDialogue");
             this.ActorDialogue = r.value;
            
             this.refActorDialogue = unvs.editor.utils.UnvsEditorUtils.CreateAssetReference(r.PrefabPath);
         }
+        [UnvsButton("Generate Inventory")]
+        public void GenerateInventoryUI()
+        {
+            var r = this.EditorCreatePrefab<UnvsUiInventory>("UnvsUiInventory");
+            this.UiInventory = r.value;
+
+            this.refUiInventory = unvs.editor.utils.UnvsEditorUtils.CreateAssetReference(r.PrefabPath);
+        }
 
 
 
-        
 
 
 

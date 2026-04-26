@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.U2D.Animation;
+using unvs.components;
 using unvs.ext;
 using unvs.game2d.actors;
-using unvs.game2d.objects.components;
+using unvs.components;
 using unvs.game2d.objects.editor;
 using unvs.shares;
 
