@@ -16,16 +16,18 @@ using unvs.components;
 using unvs.game2d.objects.editor;
 using unvs.game2d.scenes;
 using unvs.shares;
+using unvs.game2d.objects;
 
 namespace unvs.ui
 {
 
     public partial class UnvsInteractUI : UnvsUIComponentInstance<UnvsInteractUI>
     {
-        public Texture2D defaultCursorIcon;
+        //public Texture2D defaultCursorIcon;
         public Image cursor;
         private Vector2 _virtualMousePos;
-        private Sprite defautlSprite;
+        [SerializeField]
+        public types.IconInfo DefaultIcon;
         [SerializeField] float gamepadSensitivity = 1000f;
         /// <summary>
         /// THis UI allow showing when game playing, so no need to hide or show player
@@ -55,23 +57,25 @@ namespace unvs.ui
             canvas.SetMeOnLayer(Constants.Layers.UI);
             canvas.sortingOrder = 1024;
             cursor = canvas.transform.AddChildComponentIfNotExist<Image>("cursor");
-            if (defaultCursorIcon != null)
-            {
-                // Create a new Sprite from the texture
-                // Rect defines the area (full texture), Pivot (0.5, 0.5) centers it
+            //if (defaultCursorIcon != null)
+            //{
+            //    // Create a new Sprite from the texture
+            //    // Rect defines the area (full texture), Pivot (0.5, 0.5) centers it
 
-                defautlSprite = Sprite.Create(
-                     defaultCursorIcon,
-                     new Rect(0, 0, defaultCursorIcon.width, defaultCursorIcon.height),
-                     new Vector2(0.5f, 0.5f)
-                 );
-                cursor.sprite = defautlSprite;
-                // 4. Set the UI size based on the texture dimensions
-                cursor.rectTransform.sizeDelta = new Vector2(defaultCursorIcon.width, defaultCursorIcon.height);
-            }
+            //    defautlSprite = Sprite.Create(
+            //         defaultCursorIcon,
+            //         new Rect(0, 0, 32, 32),
+            //         new Vector2(0.5f, 0.5f)
+            //     );
+            //    cursor.sprite = defautlSprite;
 
+            //    // 4. Set the UI size based on the texture dimensions
+            //    cursor.rectTransform.sizeDelta = new Vector2(defaultCursorIcon.width, defaultCursorIcon.height);
+            //}
+            cursor.sprite = DefaultIcon.srpite;
             // 5. Reset position to center of screen initially
-            cursor.rectTransform.anchoredPosition = Vector2.zero;
+            cursor.rectTransform.anchoredPosition = DefaultIcon.Pivot;
+            cursor.rectTransform.sizeDelta = DefaultIcon.size;
             // Hide the system cursor
             Cursor.visible = false;
         }
@@ -131,18 +135,25 @@ namespace unvs.ui
 
             if (!safeRect.Contains(pos))
             {
-                cursor.sprite = defautlSprite;
+                cursor.sprite = this.DefaultIcon.srpite;
                 return;
             }
-            var interactObject = pos.GetHitCollider<Transform>(Constants.Layers.INTERACT_OBJECT);
+            var interactObject = pos.GetHitCollider<UnvsInteractObject>(Constants.Layers.INTERACT_OBJECT);
 
             if (interactObject != null)
             {
-                OnHoverInteractObject?.Invoke(pos, this.cursor, interactObject.gameObject);
+                if (interactObject.icon.srpite != null)
+                {
+                    cursor.sprite = interactObject.icon.srpite;
+                    if(interactObject.icon.size!=Vector2.zero)
+                    cursor.rectTransform.sizeDelta = interactObject.icon.size;
+                    cursor.rectTransform.anchoredPosition = interactObject.icon.Pivot;
+                    UpdateCursorPosition();
+                }
             }
             else
             {
-                cursor.sprite = defautlSprite;
+                cursor.sprite = this.DefaultIcon.srpite; 
             }
         }
 

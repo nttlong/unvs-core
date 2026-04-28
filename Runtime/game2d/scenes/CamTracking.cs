@@ -33,16 +33,16 @@ namespace  unvs.game2d.scenes
             if (collision.gameObject.tag != Constants.Tags.TRIGGER_LOAD_SCENE) return;
             var scene = this.GetComponentInParent<UnvsScene>();
             if(scene == null) return;
-            if(this.direction==LoadeSceneEnum.Left && !string.IsNullOrEmpty(scene.SceneLeft))
+            if(this.direction==LoadeSceneEnum.Left && scene.Links.LeftScene!=null && scene.Links.LeftScene.AssetGUID!="")
             {
                 this.Off();
-                UnvsSceneLoader.Instance.LoadChunkLeftAsync(scene,scene.SceneLeft).Forget();
+                UnvsSceneLoader.Instance.LoadChunkLeftAsync(scene, scene.Links.LeftScene).Forget();
                
             }
-            if (this.direction == LoadeSceneEnum.Right && !string.IsNullOrEmpty(scene.SceneRight))
+            if (this.direction == LoadeSceneEnum.Right && scene.Links.RightScene != null && scene.Links.RightScene.AssetGUID != "")
             {
                 this.Off();
-                UnvsSceneLoader.Instance.LoadChunkRightAsync(scene, scene.SceneRight).Forget();
+                UnvsSceneLoader.Instance.LoadChunkRightAsync(scene, scene.Links.RightScene).Forget();
             }
         }
 

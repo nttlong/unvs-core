@@ -221,19 +221,24 @@ namespace unvs.game2d.scenes
 
         private void OnValidate()
         {
-            if(this.vcam!=null)
+            this.selRef = unvs.editor.utils.UnvsEditorUtils.EditorGetAssetReference(gameObject);
+            if (this.vcam!=null)
             this.vcam.SetOrthoSizeImmediate(this.OrthographicSize);
             if (this.cinemachineFollow != null)
             {
                  this.cinemachineFollow.FollowOffset= this.followOffset;
             }
-            if (this.Links.LeftScene != null)
-                this.SceneLeft = unvs.editor.utils.UnvsEditorUtils.EditorGetAddressPath(this.Links.LeftScene);
-            if (this.Links.RightScene != null)
-                this.SceneRight = unvs.editor.utils.UnvsEditorUtils.EditorGetAddressPath(this.Links.RightScene);
+            //if (this.Links.LeftScene != null)
+            //    this.SceneLeft = unvs.editor.utils.UnvsEditorUtils.EditorGetAddressPath(this.Links.LeftScene);
+            //if (this.Links.RightScene != null)
+            //    this.SceneRight = unvs.editor.utils.UnvsEditorUtils.EditorGetAddressPath(this.Links.RightScene);
         }
+       
         private void OnDrawGizmos()
         {
+           
+
+            this.selRef = unvs.editor.utils.UnvsEditorUtils.EditorGetAssetReference(gameObject);
             this.psdFileExport.Owner= this;
             if (this.worldBound != null) this.worldBound.GizmosDraw(Color.green, 1);
             if (this.defaulCamWatcher != null) this.defaulCamWatcher.transform.GetSegment().Center().DrawCircle(1f, Color.red);

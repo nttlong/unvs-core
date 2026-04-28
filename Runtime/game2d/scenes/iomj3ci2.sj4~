@@ -42,7 +42,6 @@ namespace unvs.game2d.scenes
     
     public class UnvsApp : UnvsComponent
     {
-        public bool useAssetReferenceAssetGUIDForName = true;
         public UnvsUIInput<UnvsApp> uiInputs;
         public float DefaultFadeTimeLoadScene=0;
         public GameObject controllerInput;
@@ -129,7 +128,7 @@ namespace unvs.game2d.scenes
         {
             MainMenu.btnStart.onClick.AddListener(() =>
             {
-                SceneLoader.LoadNewAsync(this.startScene, "",false).ContinueWith(s =>
+                SceneLoader.LoadNewAsync(this.startScenePath, "",false).ContinueWith(s =>
                 {
                     MainMenu.Hide();
                 }).Forget();
@@ -137,7 +136,7 @@ namespace unvs.game2d.scenes
 
             MainMenu.btnExit.onClick.AddListener(() =>
             {
-                SceneLoader.LoadNewAsync(this.startScene, "", false).ContinueWith(s =>
+                SceneLoader.LoadNewAsync(this.startScenePath, "", false).ContinueWith(s =>
                 {
                     MainMenu.Hide();
                 }).Forget();
@@ -179,7 +178,7 @@ namespace unvs.game2d.scenes
         public void RaiseResart(CheckPintInfo value)
         {
             this.restartCheckPoint = value;
-            UnvsSceneLoader.Instance.LoadNewAsync(this.restartCheckPoint.scene, restartCheckPoint.checkPointName, true).Forget();
+            UnvsSceneLoader.Instance.LoadNewAsync(this.restartCheckPoint.scenePath, restartCheckPoint.checkPointName, true).Forget();
         }
         public void CleanUp()
         {

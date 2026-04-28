@@ -54,7 +54,7 @@ namespace unvs.game2d.objects
         {
 
 
-
+            this.SetMeOnLayer(Constants.Layers.INTERACT_OBJECT);
             if (Target != null)
             {
                 this.TargetPath = Target.EditorGetAddressPath();

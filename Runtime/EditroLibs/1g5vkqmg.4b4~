@@ -2,14 +2,12 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using UnityEditor;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.Animations;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -78,51 +76,6 @@ namespace unvs.editor.utils
             // 3. Chuẩn hóa dấu gạch chéo theo chuẩn Unity (/) thay vì chuẩn Windows (\)
             return folderPath.Replace('\\', '/');
         }
-        public static AssetReference EditorGetAssetReference(GameObject go)
-        {
-            return CreateAssetReference(EditorGetAddressFromInspector(go));
-        }
-        public static string EditorGetAddressFromInspector(GameObject go)
-        {
-            if (go == null) return "Null";
-
-            string guid = string.Empty;
-
-            // 1. Kiểm tra nếu đang ở trong Prefab Mode (Cửa sổ chỉnh sửa Prefab riêng biệt)
-            var prefabStage = PrefabStageUtility.GetPrefabStage(go);
-            if (prefabStage != null)
-            {
-                // Trong Prefab Mode, đường dẫn nằm ở prefabAssetPath
-                guid = AssetDatabase.AssetPathToGUID(prefabStage.assetPath);
-            }
-            else
-            {
-                // 2. Nếu ở Scene bình thường, tìm file gốc trên đĩa
-                UnityEngine.Object source = PrefabUtility.GetCorrespondingObjectFromSource(go);
-                if (source != null)
-                {
-                    string path = AssetDatabase.GetAssetPath(source);
-                    guid = AssetDatabase.AssetPathToGUID(path);
-                }
-                else
-                {
-                    // 3. Trường hợp cuối: Thử lấy path trực tiếp (nếu go chính là Asset đang được chọn)
-                    string path = AssetDatabase.GetAssetPath(go);
-                    guid = AssetDatabase.AssetPathToGUID(path);
-                }
-            }
-
-            if (string.IsNullOrEmpty(guid))
-                return "Not an Asset (Hierarchy Only)";
-
-            // 4. Truy vấn Address từ GUID
-            var settings = AddressableAssetSettingsDefaultObject.Settings;
-            if (settings == null) return "Settings Missing";
-
-            var entry = settings.FindAssetEntry(guid);
-            return entry != null ? entry.address : "Not Addressable";
-        }
-       
         public static string GetAddress(GameObject go)
         {
             // 1. Tìm GUID của Asset từ GameObject
@@ -280,24 +233,20 @@ namespace unvs.editor.utils
             string guid = AssetDatabase.AssetPathToGUID(prefabPath);
             return new AssetReference(guid);
         }
-        public static AssetReference GetReference(MonoBehaviour target)
+        public static AssetReference GetReferenceFromComponent(MonoBehaviour target)
         {
-            if (target == null) return null;
+            // Giả sử component của bạn tên là ItemDataHolder và có biến public AssetReference myRef;
+            // Bạn có thể cast trực tiếp nếu biết kiểu:
+            // var component = target as YourSpecificClass;
+            // return component.myRef;
 
-            // Lấy tất cả các field (biến) của class, bao gồm cả biến private
-            // Chúng ta tìm các field mà kiểu dữ liệu của nó là AssetReference hoặc kế thừa từ AssetReference
-            FieldInfo field = target.GetType()
-                .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                .FirstOrDefault(f => typeof(AssetReference).IsAssignableFrom(f.FieldType));
+            // Hoặc dùng SerializedObject để lấy một cách tổng quát (Generic)
+            SerializedObject so = new SerializedObject(target);
+            SerializedProperty sp = so.FindProperty("m_AssetRefereneVariable"); // Tên biến khai báo trong code
 
-            if (field != null)
-            {
-                // Trả về giá trị thực tế của biến đó từ đối tượng target
-                return field.GetValue(target) as AssetReference;
-            }
-
-            Debug.LogWarning($"Class {target.GetType().Name} không chứa bất kỳ biến AssetReference nào.");
-            return null;
+            // Lưu ý: AssetReference thực tế là một object phức tạp, 
+            // lấy trực tiếp qua SerializedProperty thường dùng để chỉnh sửa UI hơn là lấy object.
+            return (target as dynamic).yourAssetReferenceVariableName;
         }
 
         public static FieldInfo[] GetAllGenericFieldsOfType(Type typ, Type Ftyp)

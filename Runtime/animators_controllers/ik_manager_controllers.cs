@@ -3,13 +3,14 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.U2D.Animation;
 using UnityEngine.U2D.IK;
+using unvs.components;
 using unvs.ext;
 using unvs.game2d.objects.editor;
 
 namespace unvs.animators_controllers
 {
     [Serializable]
-    public partial class ik_manager_controllers : unvs.types.UnvsEditableProperty
+    public partial class ik_manager_controllers<T> : unvs.types.UnvsProperty<T> where T : UnvsBaseComponent
     {
         [Header("IK Setup")]
         [SerializeField]
@@ -25,29 +26,34 @@ namespace unvs.animators_controllers
         public Transform solversChains;
         public IKManager2D ikManager;
 
-        public MonoBehaviour owner;
+       
 
     }
 #if UNITY_EDITOR
-    public partial class ik_manager_controllers:unvs.types.UnvsEditableProperty
+    public partial class ik_manager_controllers<T>: unvs.types.UnvsProperty<T> where T : UnvsBaseComponent
     {
 
         [UnvsButton("Create IK Manager")]
         public void CreateIKManager()
         {
-            this.rootBone = findRootBone();
-            var animator = owner.GetComponentInChildren<Animator>();
+            if (this.rootBone == null)
+            {
+                unvs.editor.utils.Dialogs.Show($"Please, set root bone for  {Owner.name} at {typeof(ik_manager_controllers<T>)}");
+                return;
+            }
+            
+            var animator = Owner.GetComponentInChildren<Animator>();
             if (animator == null)
             {
                 
-                unvs.editor.utils.Dialogs.Show($"{typeof(Animator)} was not found in {owner.name}");
+                unvs.editor.utils.Dialogs.Show($"{typeof(Animator)} was not found in {Owner.name}");
                 return;
             }
             var anim = animator.transform;
            
             if (Chain == null && Chain.Length == 0 && Limbs == null && Limbs.Length == 0)
             {
-                unvs.editor.utils.Dialogs.Show($"Chains or Limbs in the {owner.name}," +
+                unvs.editor.utils.Dialogs.Show($"Chains or Limbs in the {Owner.name}," +
                     $" section must be assigned. To create an IK Manager, " +
                     $"you must select at least one Transform in the Chains list or the Limbs list.");
                 return;
@@ -111,11 +117,11 @@ namespace unvs.animators_controllers
             }
         }
 
-        private Transform findRootBone()
-        {
-            var spriteSkins = owner.GetComponentsInChildren<SpriteSkin>(true);
-            return spriteSkins.SelectMany(p => p.boneTransforms).GetRoot();
-        }
+        //private Transform findRootBone()
+        //{
+        //    var spriteSkins = owner.GetComponentsInChildren<SpriteSkin>(true);
+        //    return spriteSkins.SelectMany(p => p.boneTransforms).GetRoot();
+        //}
 
     }
 #endif

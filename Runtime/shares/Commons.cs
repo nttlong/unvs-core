@@ -265,11 +265,43 @@ namespace unvs.shares
             go.SetActive(active);
             return go.GetComponent<T>();    
         }
+        public static string GetObjectName(this AssetReference assetRef)
+        {
+#if UNITY_EDITOR
+            if (UnvsApp.Instance != null && UnvsApp.Instance.useAssetReferenceAssetGUIDForName)
+            {
+                return assetRef.AssetGUID;
+            }
+            else
+            {
+                return unvs.editor.utils.UnvsEditorUtils.EditorGetAddressPath(assetRef);
+            }
+
+#else
+                 return assetRef.AssetGUID;
+#endif
+        }
         public static async UniTask<T> LoadPrefabsAsync<T>(this AssetReference assetRef, Transform parent = null, bool active = false)
         {
-
+            if (assetRef.AssetGUID == "")
+            {
+                return default(T);
+            }
             GameObject go = await LoadPrefabsAsync(assetRef, parent);
             go.SetActive(active);
+#if UNITY_EDITOR
+            if(UnvsApp.Instance!=null && UnvsApp.Instance.useAssetReferenceAssetGUIDForName)
+            {
+                go.name = go.name = assetRef.AssetGUID;
+            } else
+            {
+                go.name = unvs.editor.utils.UnvsEditorUtils.EditorGetAddressPath(assetRef);
+            }
+                
+#else
+                go.name = assetRef.AssetGUID;
+#endif
+
             return go.GetComponent<T>();
         }
         public static async UniTask<GameObject> LoadPrefabsAsync(this AssetReference assetRef, Transform parent = null)

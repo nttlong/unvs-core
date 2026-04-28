@@ -16,4 +16,13 @@ namespace unvs.types
        
         public T Owner;
     }
+    [Serializable]
+    public struct IconInfo
+    {
+        [SerializeField]
+        public Sprite srpite;
+        [SerializeField]
+        public Vector2 size;
+        [SerializeField] public Vector2 Pivot;
+    }
 }

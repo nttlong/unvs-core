@@ -32,17 +32,20 @@ namespace unvs.game2d.scenes
         public Transform deadZones;
         [SerializeField]
         public Vector2 followOffset = new Vector3(0, 4);
-#if UNITY_EDITOR
         [Header("Links scene", order = -1)]
+#if UNITY_EDITOR
+
         [SerializeField]
 
-        public _UnvsSceneEditorObject Links;
-        public AssetReference selRef;
+       
+       
         public EditorUnvsSceneSpawPointEditor SpawnPoints;
 #endif
-        public string SceneLeft;
-        public string SceneRight;
-       
+        public AssetReference selRef;
+        public _UnvsSceneEditorObject Links;
+        //public string SceneLeft;
+        //public string SceneRight;
+
         [SerializeField]
         
         public Transform support;

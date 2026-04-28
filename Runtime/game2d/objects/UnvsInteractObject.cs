@@ -24,7 +24,8 @@ namespace unvs.game2d.objects
     {
         [Header("Interact info")]
         public BoxCollider2D coll;
-        public Texture2D mousePoint;
+        [SerializeField]
+        public unvs.types.IconInfo icon;
         public InteractionDefinition Data;
         public UnvsObjectAttributesData ObjectDefinition;
         /// <summary>
@@ -43,8 +44,8 @@ namespace unvs.game2d.objects
         public override void InitRuntime()
         {
             
-            if(this.mousePoint==null)
-            this.mousePoint = UnvsInteractUI.Instance.defaultCursorIcon;
+            //if(this.mousePoint==null)
+            //this.mousePoint = UnvsInteractUI.Instance.defaultCursorIcon;
         }
 
         public virtual Vector2 GetPosition(string Layer = Constants.Layers.WORLD_GROUND, params string[] extra)

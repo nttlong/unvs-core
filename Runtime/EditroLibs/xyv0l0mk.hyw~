@@ -2,14 +2,12 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using UnityEditor;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.Animations;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -78,51 +76,6 @@ namespace unvs.editor.utils
             // 3. Chuẩn hóa dấu gạch chéo theo chuẩn Unity (/) thay vì chuẩn Windows (\)
             return folderPath.Replace('\\', '/');
         }
-        public static AssetReference EditorGetAssetReference(GameObject go)
-        {
-            return CreateAssetReference(EditorGetAddressFromInspector(go));
-        }
-        public static string EditorGetAddressFromInspector(GameObject go)
-        {
-            if (go == null) return "Null";
-
-            string guid = string.Empty;
-
-            // 1. Kiểm tra nếu đang ở trong Prefab Mode (Cửa sổ chỉnh sửa Prefab riêng biệt)
-            var prefabStage = PrefabStageUtility.GetPrefabStage(go);
-            if (prefabStage != null)
-            {
-                // Trong Prefab Mode, đường dẫn nằm ở prefabAssetPath
-                guid = AssetDatabase.AssetPathToGUID(prefabStage.assetPath);
-            }
-            else
-            {
-                // 2. Nếu ở Scene bình thường, tìm file gốc trên đĩa
-                UnityEngine.Object source = PrefabUtility.GetCorrespondingObjectFromSource(go);
-                if (source != null)
-                {
-                    string path = AssetDatabase.GetAssetPath(source);
-                    guid = AssetDatabase.AssetPathToGUID(path);
-                }
-                else
-                {
-                    // 3. Trường hợp cuối: Thử lấy path trực tiếp (nếu go chính là Asset đang được chọn)
-                    string path = AssetDatabase.GetAssetPath(go);
-                    guid = AssetDatabase.AssetPathToGUID(path);
-                }
-            }
-
-            if (string.IsNullOrEmpty(guid))
-                return "Not an Asset (Hierarchy Only)";
-
-            // 4. Truy vấn Address từ GUID
-            var settings = AddressableAssetSettingsDefaultObject.Settings;
-            if (settings == null) return "Settings Missing";
-
-            var entry = settings.FindAssetEntry(guid);
-            return entry != null ? entry.address : "Not Addressable";
-        }
-       
         public static string GetAddress(GameObject go)
         {
             // 1. Tìm GUID của Asset từ GameObject

@@ -87,13 +87,13 @@ namespace unvs.animators_controllers
         public void LoadMotions()
         {
             this.Owner.GetComponentInChildren<Animator>().AddComponentIfNotExist<UnsvPalyerAnimatorEvent>();
-            var animController = Owner.GetComponentInChildren<Animator>();
-            if (animController == null)
-            {
-                unvs.editor.utils.Dialogs.Show($"{typeof(Animator)} was not found in {Owner.name}");
-                return;
-            }
-            this.animStates = animController.EditorExtractAllMotions().ToArray();
+            //var animController = Owner.GetComponentInChildren<Animator>();
+            //if (animController == null)
+            //{
+            //    unvs.editor.utils.Dialogs.Show($"{typeof(Animator)} was not found in {Owner.name}");
+            //    return;
+            //}
+            this.animStates = this.Owner.GetComponentInChildren<Animator>().EditorExtractAllMotions().ToArray();
             var lsAudio = new List<MotionAudio?>();
             foreach (var mot in this.animStates)
             {
@@ -111,7 +111,7 @@ namespace unvs.animators_controllers
                 }
             }
             this.motionAudio = lsAudio.Cast<MotionAudio>().ToArray();
-            GenerateAnimatorController();
+           // GenerateAnimatorController();
         }
 
 

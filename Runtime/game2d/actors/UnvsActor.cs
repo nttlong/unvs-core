@@ -48,7 +48,7 @@ namespace unvs.game2d.actors
         [SerializeField]
         public actor_physical2d<UnvsActor> physical;
         [SerializeField]
-        public unvs.animators_controllers.ik_manager_controllers ik_manager;
+        public unvs.animators_controllers.ik_manager_controllers<UnvsActor> ik_manager;
         [SerializeField]
         public unvs.animators_controllers.motion_controllers<UnvsActor> motions;
         [SerializeField]
@@ -205,7 +205,7 @@ namespace unvs.game2d.actors
         {
             base.OnValidate();
             this.SetMeOnTag(Constants.Tags.ACTOR);
-            ik_manager.owner = this as MonoBehaviour;
+          
 
             accessories.owner = this as MonoBehaviour;
           

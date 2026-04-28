@@ -51,14 +51,14 @@ namespace unvs.actionsbasics
             teleportObject.OpenSound.PlayBetterAudioClipAsync(OpenSound).Forget();
             if (teleportObject.IsNew)
             {
-                await UnvsSceneLoader.Instance.LoadNewAsync(teleportObject.TargetPath, teleportObject.SpawnName,false);
+                await UnvsSceneLoader.Instance.LoadNewAsync(teleportObject.Target, teleportObject.SpawnName,false);
                 
 
             }
             else
             {
                 var fromScene = Sender.Source.GetComponentInParent<UnvsScene>();
-                await UnvsSceneLoader.Instance.LoadInteriorAsync(teleportObject.TargetPath, teleportObject.SpawnName, fromScene);
+                await UnvsSceneLoader.Instance.LoadInteriorAsync(teleportObject.Target, teleportObject.SpawnName, fromScene);
             }
             await teleportObject.CloseSound.PlayBetterAudioClipAsync(CloseSound);
         }

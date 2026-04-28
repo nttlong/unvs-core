@@ -36,19 +36,7 @@ namespace game2d.ext
 
             GameObject prefabAsset = PrefabUtility.SaveAsPrefabAsset(go, prefabPath);
             Object.DestroyImmediate(go);
-            // 1. Determine the path of the AppScene script/asset to place the prefab in the same folder
-            //if (string.IsNullOrEmpty(folderPath))
-            //    folderPath = EditorGetAssetFolder(obj);
-            //string prefabPath = Path.Combine(folderPath, $"{name}.prefab");
-
-            //// 2. Create a new GameObject with the required component
-            //GameObject go = new GameObject(name, typeof(RectTransform), typeof(T));
-
-            //// 3. Save as a prefab and cleanup the temporary object
-            //GameObject prefabAsset = PrefabUtility.SaveAsPrefabAsset(go, prefabPath);
-            //Object.DestroyImmediate(go);
-
-            // 4. Assign the reference to the AppScene instance
+           
             var ret = prefabAsset.GetComponent<T>();
 
             // 5. Mark the object as dirty so the reference is saved in the scene/asset

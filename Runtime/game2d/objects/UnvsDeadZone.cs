@@ -56,7 +56,7 @@ namespace unvs.game2d.objects
             return new CheckPintInfo
             {
                 checkPointName = nearest.name,
-                scenePath = scene.name
+                scene = scene.selRef
             };
         }
     }
