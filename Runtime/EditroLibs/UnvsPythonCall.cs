@@ -11,8 +11,7 @@ using UnityEngine.Networking;
 using unvs.editor.components;
 using unvs.game2d.scenes;
 using System.Linq;
-using UnityEditor;
-using UnityEngine;
+
 using UnityEngine.Rendering;
 using System.Collections.Generic;
 
@@ -212,7 +211,7 @@ namespace unvs.editor.utils
             string absolutePath = Path.GetFullPath(relativePath);
 
             // Chuẩn hóa dấu gạch chéo sang "/" để tránh lỗi khi gửi sang Python/JSON
-            return absolutePath.Replace("\\", "/");
+            return absolutePath.Replace("/", System.IO.Path.PathSeparator.ToString());
         }
         public static SceneInfoResut GetFolderOfGameObjectByScene(GameObject obj)
         {

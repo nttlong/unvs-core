@@ -21,6 +21,8 @@ using unvs.shares;
 using unvs.ui;
 
 
+
+
 #if UNITY_EDITOR
 
 
@@ -43,16 +45,18 @@ namespace unvs.game2d.actors
     public partial class UnvsActor : UnvsBaseComponent
     {
         public bool IsActivePlayer = true;
-        [SerializeField]
-        controllers.ActorController controller;
+       
         [SerializeField]
         public actor_physical2d<UnvsActor> physical;
         [SerializeField]
         public unvs.animators_controllers.ik_manager_controllers<UnvsActor> ik_manager;
+
         [SerializeField]
         public unvs.animators_controllers.motion_controllers<UnvsActor> motions;
+
         [SerializeField]
-        public unvs.data.properties.Inventory<UnvsActor> inventory;
+        public unvs.data.properties.Inventory<UnvsActor> inventory; 
+
         [SerializeField]
         public BaseSkillObject[] SkilObjects;
         public UnvsActorSkills Skills;
@@ -142,7 +146,7 @@ namespace unvs.game2d.actors
             {
                 this.coll = GetComponentInChildren<CompositeCollider2D>();
                 player = GetComponent<UnvsPlayer>();
-                //physical_actor = GetComponent<UnvsActorPhysical>();
+               
 
             }
 
@@ -151,8 +155,7 @@ namespace unvs.game2d.actors
         {
             if (Application.isPlaying)
             {
-                //SayText("Hello");
-                //motions.BaseMotion("idle");
+                
                 this.CurrentSkill.Status = SkillSpeddEnum.Idle;
             }
         }
@@ -170,7 +173,9 @@ namespace unvs.game2d.actors
     public partial class UnvsActor : UnvsBaseComponent
     {
         [SerializeField]
-        public accessories.components.accessories_editor accessories;
+        public controllers.ActorController<UnvsActor> controller;
+        [SerializeField]
+        public accessories.components.accessories_editor<UnvsActor> accessories;
 
         
         [UnvsButton]
@@ -205,11 +210,11 @@ namespace unvs.game2d.actors
         {
             base.OnValidate();
             this.SetMeOnTag(Constants.Tags.ACTOR);
-          
 
-            accessories.owner = this as MonoBehaviour;
-          
-            controller.owner = this as MonoBehaviour;
+
+            //accessories.owner = this as MonoBehaviour;
+
+           
         }
         
 

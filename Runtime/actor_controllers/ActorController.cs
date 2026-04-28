@@ -2,43 +2,46 @@ using System;
 using Unity.VisualScripting;
 using UnityEngine;
 using unvs.actor.player;
+using unvs.components;
 using unvs.game2d.actors;
 using unvs.game2d.objects.editor;
 
 namespace unvs.controllers
 {
-    [Serializable]
-    public partial class ActorController : unvs.types.UnvsEditableProperty
-    {
-        public MonoBehaviour owner;
-        public UnvsPlayer Player;
-    }
+    ////unvs.types.UnvsProperty<T> where T : UnvsBaseComponent
+    //[Serializable]
+    //public partial class ActorController<T> : unvs.types.UnvsProperty<T> where T : UnvsBaseComponent
+    //{
+
+    //    //public UnvsPlayer Player;
+    //}
 #if UNITY_EDITOR
-    public partial class ActorController : unvs.types.UnvsEditableProperty
+    [Serializable]
+    public partial class ActorController<T> : unvs.types.UnvsProperty<T> where T : UnvsBaseComponent
     {
         [UnvsButton("Create default controller")]
         public void EditorCreateDefaltPlayerController()
         {
             //BasicController
-            var control = owner.GetComponent<UnvsPlayer>();
+            var control = Owner.GetComponent<UnvsPlayer>();
             if (control!=null)
             {
                 unvs.editor.utils.Dialogs.Show($"Please, remove {control.GetType()} before add {typeof(BasicController)}");
                 return;
             }
-            owner.AddComponent<BasicController>();
+            Owner.AddComponent<BasicController>();
         }
         [UnvsButton("Create mouse controller")]
         public void EditorCreateDefaltMousePlayerController()
         {
             //BasicController
-            var control = owner.GetComponent<UnvsPlayer>();
+            var control = Owner.GetComponent<UnvsPlayer>();
             if (control != null)
             {
                 unvs.editor.utils.Dialogs.Show($"Please, remove {control.GetType()} before add {typeof(BasicController)}");
                 return;
             }
-            owner.AddComponent<BasicMouseController>();
+            Owner.AddComponent<BasicMouseController>();
         }
     }
 #endif

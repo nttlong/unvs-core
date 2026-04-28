@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,20 +8,22 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.U2D.Animation;
 using unvs.components;
+
 using unvs.ext;
 using unvs.game2d.actors;
-using unvs.components;
 using unvs.game2d.objects.editor;
 using unvs.shares;
+using unvs.types;
 
 namespace unvs.animators_controllers
 {
+    
     [Serializable]
     public partial class motion_controllers<T> : unvs.types.UnvsProperty<T> where T : UnvsBaseComponent
     {
         public Animator editorAnimController;
-        public GameObject animEle;
-        public Animator animator;
+        //public GameObject animEle;
+        //public Animator animator;
         //public MonoBehaviour owner;
         [SerializeField]
         public AnimStateInfo[] animStates;
@@ -29,6 +31,7 @@ namespace unvs.animators_controllers
         public MotionAudio[] motionAudio = new MotionAudio[] { };
         [SerializeField]
         public AnimStateInfo currentBaseAnimState;
+        public Animator animator;
         private Dictionary<string, AnimStateInfo> _dictBaseMotion;
         private AnimStateInfo currentOrerideAnimState;
         private Dictionary<string, AnimStateInfo> _dictOverideMotion;
@@ -79,20 +82,20 @@ namespace unvs.animators_controllers
             this.currentOrerideAnimState.PlayAsOverideState();
         }
 
+        
     }
 #if UNITY_EDITOR
     public partial class motion_controllers<T> : unvs.types.UnvsProperty<T> where T : UnvsBaseComponent
     {
+#if UNITY_EDITOR
+        [SerializeField]
+        public unvs.animators_controllers.texturesEditor[] textures;
+#endif
         [UnvsButton("Load Motions")]
         public void LoadMotions()
         {
             this.Owner.GetComponentInChildren<Animator>().AddComponentIfNotExist<UnsvPalyerAnimatorEvent>();
-            //var animController = Owner.GetComponentInChildren<Animator>();
-            //if (animController == null)
-            //{
-            //    unvs.editor.utils.Dialogs.Show($"{typeof(Animator)} was not found in {Owner.name}");
-            //    return;
-            //}
+           
             this.animStates = this.Owner.GetComponentInChildren<Animator>().EditorExtractAllMotions().ToArray();
             var lsAudio = new List<MotionAudio?>();
             foreach (var mot in this.animStates)
@@ -115,23 +118,47 @@ namespace unvs.animators_controllers
         }
 
 
-        [UnvsButton("Create Anim controller")]
+        [UnvsButton("Extract all sprite skin")]
         public void GenerateAnimatorController()
         {
-            this.animEle = Owner.GetComponentInChildren<SpriteSkin>(true).transform.parent.gameObject;
-            string folderPath = unvs.editor.utils.UnvsEditorUtils.EditorGetFolder(this.animEle);
-            if (this.animator == null) this.animator = this.Owner.GetComponentInChildren<Animator>();
-            if (this.animator!=null)
+            Debug.Log($"GenerateAnimatorControlle.Ownerr={Owner}");
+            var spriteRenders = Owner.GetComponentsInChildren<SpriteRenderer>(true)
+                .Where(p => p.sprite != null)
+                .GroupBy(p => p.sprite.texture)
+                .Select(p => p.First()).ToArray();
+            if (spriteRenders.Length==0)
             {
-                var msg = $"{this.animator.name} is already in {this.Owner.name}. Do you want to create new and overide it";
-                if (unvs.editor.utils.Dialogs.Confirm(msg))
-                {
-                    var controller = unvs.editor.utils.UnvsEditorUtils.EditorCreateAnimatorController(folderPath, this.animEle.name);
-                    this.animator = this.Owner.transform.AddComponentIfNotExist<Animator>();
-                    this.animator.runtimeAnimatorController = controller;
-                }
+                var msg = $"{Owner.name}.SpriteRenderer was not found";
+                unvs.editor.utils.Dialogs.Show(msg);
+                return;
             }
+            textures = spriteRenders.Select(p => new texturesEditor
+            {
+                name = p.sprite.texture.name,
+                texttue=p.sprite.texture,
+                transform=p.transform.parent,
+                owner=Owner as MonoBehaviour,
+                folderPath= unvs.editor.utils.UnvsEditorUtils.EditorGetTueFolder((Owner as MonoBehaviour).gameObject),
+               
+            }).ToArray();
            
+           
+            //var sprite = Owner.GetComponentInChildren<SpriteSkin>(true);
+            //if(sprite == null)
+            //{
+            //    //var msg = $"{Owner.name}.sprite is null. Please create skining sprite editor";
+            //    //unvs.editor.utils.Dialogs.Show(msg);
+            //    unvs.editor.utils.UnvsEditorUtils.OpenSpriteEditor(textures.FirstOrDefault().texttue);
+
+            //    return;
+            //}
+            
+            //if (Owner == null || Owner.GetComponentInChildren<SpriteSkin>(true)==null)
+            //{
+            //    return;
+            //}
+            
+            
             
         }
 
@@ -157,6 +184,7 @@ namespace unvs.animators_controllers
         }
         void EditorUpdate()
         {
+           
             if (editorAnimController == null) return;
 
 
@@ -167,6 +195,57 @@ namespace unvs.animators_controllers
             SceneView.RepaintAll();
         }
 
+    }
+    [Serializable]
+    public partial class texturesEditor : UnvsEditableProperty
+    {
+        public string name;
+        public Texture2D texttue;
+        public Transform transform;
+        public Animator animator;
+        public MonoBehaviour owner;
+        public string folderPath;
+        
+
+      
+
+        [UnvsButton("Set As Default")]
+        public void EditorSetAsDefault()
+        {
+            if (this.animator == null)
+            {
+                unvs.editor.utils.Dialogs.Show($"Can ot use this ad default! (Animator=null)");
+                return;
+            }
+
+        }
+        [UnvsButton("Edit srpite")]
+        public void EditSprite()
+        {
+            unvs.editor.utils.UnvsEditorUtils.OpenSpriteEditor(texttue);
+        }
+        [UnvsButton("Create Anim")]
+        public void EditCreateAnim()
+        {
+            
+
+            
+            if (this.animator == null) this.animator = this.transform.gameObject.GetComponent<Animator>();
+            if (this.animator != null)
+            {
+                var msg = $"{this.animator.name} is already in {this.animator.transform.parent.name}. Do you want to create new and overide it";
+                if (!unvs.editor.utils.Dialogs.Confirm(msg))
+                {
+                    return;
+
+                }
+            }
+            
+            var controller = unvs.editor.utils.UnvsEditorUtils.EditorCreateAnimatorController(folderPath, this.transform.name);
+
+            this.animator = this.transform.AddComponentIfNotExist<Animator>();
+            this.animator.runtimeAnimatorController = controller;
+        }
     }
 #endif
 }

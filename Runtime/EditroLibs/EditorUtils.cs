@@ -58,12 +58,79 @@ namespace unvs.editor.utils
             var folder = EditorGetFolder(go);
             return EditorTools.ToAbsolutePath(folder);
         }
-        public static string EditorGetFolder(GameObject go)
+        public static string GetAbsFilePathOfGameObject(Texture2D txt)
+        {
+            var folder = EditorGetAssetPath(txt);
+            return EditorTools.ToAbsolutePath(folder);
+        }
+        public static void OpenSpriteEditor(string assetPath)
+        {
+            // 1. Chuẩn hóa đường dẫn (Quan trọng nhất)
+            string cleanPath = assetPath.Replace("\\", "/");
+            if (cleanPath.StartsWith(Application.dataPath))
+            {
+                cleanPath = "Assets" + cleanPath.Substring(Application.dataPath.Length);
+            }
+
+            // 2. Load Asset
+            UnityEngine.Object asset = AssetDatabase.LoadMainAssetAtPath(cleanPath);
+            if (asset == null)
+            {
+                Debug.LogError($"[Unvs] Không tìm thấy Asset tại: {cleanPath}. Hãy đảm bảo path bắt đầu bằng 'Assets/'.");
+                return;
+            }
+
+            // 3. Chọn đối tượng để Sprite Editor có ngữ cảnh làm việc
+            Selection.activeObject = asset;
+
+            // 4. Tìm Type bằng cách quét tất cả Assembly (Fix cho Unity mới)
+            Type spriteEditorWindowType = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(a => a.GetTypes())
+                .FirstOrDefault(t => t.Name == "SpriteEditorWindow");
+
+            if (spriteEditorWindowType != null)
+            {
+                EditorWindow.GetWindow(spriteEditorWindowType);
+                Debug.Log($"[Unvs] Đã mở Sprite Editor cho: {cleanPath}");
+            }
+            else
+            {
+                Debug.LogError("Vẫn không tìm thấy Sprite Editor Window. " +
+                               "Kiểm tra Window > Package Manager xem '2D Sprite' đã installed chưa.");
+            }
+        }
+        public static string EditorGetAssetPath(Texture2D txt)
+        {
+            return AssetDatabase.GetAssetPath(txt);
+        }
+
+        public static string GetAbsFilePathOfGameObject(GameObject go)
+        {
+            var folder = EditorGetAssetPath(go);
+            return EditorTools.ToAbsolutePath(folder);
+        }
+        public static string EditorGetAssetPath(GameObject go)
         {
             if (go == null) return string.Empty;
 
             // 1. Tìm đường dẫn Asset của GameObject (ví dụ: Assets/Prefabs/Player.prefab)
             string assetPath = AssetDatabase.GetAssetPath(go);
+
+            // Nếu GameObject này không phải là Asset (chỉ là object tạm trong Scene chưa lưu)
+            if (string.IsNullOrEmpty(assetPath))
+            {
+
+                return "";
+            }
+            return assetPath;
+           
+        }
+        public static string EditorGetFolder(GameObject go)
+        {
+            if (go == null) return string.Empty;
+
+            // 1. Tìm đường dẫn Asset của GameObject (ví dụ: Assets/Prefabs/Player.prefab)
+            string assetPath = GetAddress(go);// AssetDatabase.GetAssetPath(go);
 
             // Nếu GameObject này không phải là Asset (chỉ là object tạm trong Scene chưa lưu)
             if (string.IsNullOrEmpty(assetPath))
@@ -122,7 +189,57 @@ namespace unvs.editor.utils
             var entry = settings.FindAssetEntry(guid);
             return entry != null ? entry.address : "Not Addressable";
         }
-       
+        public static string EditorGetTueFolder(GameObject go)
+        {
+            if (go == null) return string.Empty;
+
+            // 1. Tìm đường dẫn Asset của GameObject (ví dụ: Assets/Prefabs/Player.prefab)
+            string assetPath = GetAssetTruePath(go);// AssetDatabase.GetAssetPath(go);
+
+            // Nếu GameObject này không phải là Asset (chỉ là object tạm trong Scene chưa lưu)
+            if (string.IsNullOrEmpty(assetPath))
+            {
+                Debug.LogWarning($"GameObject {go.name} is not a persistent asset.");
+                return "Assets"; // Trả về thư mục gốc mặc định
+            }
+
+            // 2. Lấy đường dẫn thư mục chứa file đó
+            string folderPath = Path.GetDirectoryName(assetPath);
+
+            // 3. Chuẩn hóa dấu gạch chéo theo chuẩn Unity (/) thay vì chuẩn Windows (\)
+            return folderPath.Replace('\\', '/');
+        }
+        public static string GetAssetTruePath(UnityEngine.Object obj)
+        {
+            if (obj == null) return string.Empty;
+
+            // 1. Thử lấy path trực tiếp (Dành cho file gốc trong Project window)
+            string path = AssetDatabase.GetAssetPath(obj);
+
+            // 2. Nếu path rỗng, có thể đây là một Instance của Prefab
+            if (string.IsNullOrEmpty(path))
+            {
+                // Tìm đối tượng gốc (Source Asset) từ Instance
+                UnityEngine.Object sourceAsset = PrefabUtility.GetCorrespondingObjectFromSource(obj);
+                if (sourceAsset != null)
+                {
+                    path = AssetDatabase.GetAssetPath(sourceAsset);
+                }
+            }
+
+            // 3. Nếu vẫn rỗng (Trường hợp đang mở Prefab Mode hoặc đối tượng tạm)
+            if (string.IsNullOrEmpty(path))
+            {
+                // Lấy path của Stage hiện tại (nếu đang mở cửa sổ edit Prefab)
+                var stage = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
+                if (stage != null)
+                {
+                    path = stage.assetPath;
+                }
+            }
+
+            return path;
+        }
         public static string GetAddress(GameObject go)
         {
             // 1. Tìm GUID của Asset từ GameObject
@@ -367,7 +484,11 @@ namespace unvs.editor.utils
 
         }
 
-        
+        public static void OpenSpriteEditor(Texture2D texture)
+        {
+            var spriteRenderPath = unvs.editor.utils.UnvsEditorUtils.EditorGetAssetPath(texture);
+            OpenSpriteEditor(spriteRenderPath);
+        }
     }
 
 

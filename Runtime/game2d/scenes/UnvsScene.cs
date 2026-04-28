@@ -18,6 +18,7 @@ using unvs.ext;
 using unvs.game2d.actors;
 using unvs.components;
 using unvs.shares;
+using unvs.types;
 
 namespace unvs.game2d.scenes
 {
@@ -42,7 +43,8 @@ namespace unvs.game2d.scenes
         public EditorUnvsSceneSpawPointEditor SpawnPoints;
 #endif
         public AssetReference selRef;
-        public _UnvsSceneEditorObject Links;
+        
+        public SceneLinkingData Links;
         //public string SceneLeft;
         //public string SceneRight;
 

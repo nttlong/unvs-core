@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using unvs.components;
 using unvs.components;
 
@@ -25,4 +26,11 @@ namespace unvs.types
         public Vector2 size;
         [SerializeField] public Vector2 Pivot;
     }
+    [Serializable]
+    public struct SceneLinkingData
+    {
+        public AssetReference LeftScene;
+        public AssetReference RightScene;
+    }
+
 }

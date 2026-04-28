@@ -404,13 +404,7 @@ namespace unvs.game2d.scenes
             EditorUtility.SetDirty(mat);
         }
 
-        [Serializable]
-        public struct _UnvsSceneEditorObject
-        {
-            public AssetReference LeftScene;
-            public AssetReference RightScene;
-        }
-
+        
     }
 }
 #endif
