@@ -8,43 +8,7 @@ using unvs.shares;
 
 namespace unvs.ext.physical2d
 {
-    public static class CompositeCollider2DExt
-    {
-        //public static bool GetHit(this CompositeCollider2D compositeColl, out RaycastHit2D hit, Vector2 direction, float distance = 10f, string Layer = Constants.Layers.WORLD_GROUND, params string[] extra)
-        //{
-        //    var filter = new ContactFilter2D();
-        //    filter.useLayerMask = true;
-        //    filter.layerMask = LayerMask.GetMask(Layer);
-        //    if (extra.Length > 0)
-        //    {
-        //        filter.layerMask |= LayerMask.GetMask(extra);
-        //    }
-        //    filter.useTriggers = false;
-
-        //    RaycastHit2D[] hits = new RaycastHit2D[1];
-        //    int count = compositeColl.Raycast(direction, filter, hits, distance);
-
-        //    if (count > 0)
-        //    {
-        //        hit = hits[0];
-        //        Bounds b = compositeColl.bounds;
-        //        Debug.DrawLine(b.center, hit.point, Color.red, 5f);
-        //        // Kiểm tra xem điểm va chạm có nằm "sau" mép ngoài cùng của Collider theo hướng bắn không
-        //        // Nếu điểm va chạm nằm lọt vào bên trong bounds, ta coi đó là lỗi vật lý và bỏ qua
-        //        if (direction == Vector2.up && hit.point.y <= b.max.y) return false;
-        //        if (direction == Vector2.down && hit.point.y >= b.min.y) return false;
-        //        if (direction == Vector2.right && hit.point.x <= b.max.x) return false;
-        //        if (direction == Vector2.left && hit.point.x >= b.min.x) return false;
-
-        //        // Vẽ để debug trực quan
-                
-        //        return true;
-        //    }
-
-        //    hit = new RaycastHit2D();
-        //    return false;
-        //}
-    }
+  
     public static class Physical2TransformExt
     {
         public static bool GetHit(this Collider2D compositeColl, out RaycastHit2D hit, Vector2 direction, float distance = float.PositiveInfinity, string Layer = Constants.Layers.WORLD_GROUND, params string[] extra)
@@ -224,7 +188,7 @@ namespace unvs.ext.physical2d
                 transform.position.y, // DOJump sẽ tự xử lý độ cao nhảy (height)
                 transform.position.z
             );
-
+            
             // Sử dụng DOJump để tạo quỹ đạo hình Parabol
             await transform.DOJump(
                                 targetPosition,
@@ -264,7 +228,7 @@ namespace unvs.ext.physical2d
             // d = sqrt(x^2 + y^2)
             float distance = Vector2.Distance(new Vector2(currentPos.x, currentPos.y),
                                               new Vector2(targetPos.x, targetPos.y));
-
+           
             // 3. Thực hiện di chuyển
             // Dùng Linear nếu là dốc thẳng, hoặc OutQuad nếu muốn nhân vật hơi khựng lại khi lên đỉnh dốc
             await transform.DOMove(targetPos, duration)

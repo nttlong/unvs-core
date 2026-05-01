@@ -157,8 +157,11 @@ namespace unvs.game2d.scenes
 
                 UnvsCinema.Instance.vcam.Watch(actor.camWatcher);
                 UnvsApp.Instance.currentActor = actor;
+            } else
+            {
+                UnvsCinema.Instance.vcam.Watch(ret.defaulCamWatcher);
             }
-            return ret;
+                return ret;
         }
         public async UniTask<UnvsScene> LoadChunkLeftAsync(UnvsScene fromScene, AssetReference sceneRef)
         {

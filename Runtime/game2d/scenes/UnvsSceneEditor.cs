@@ -268,7 +268,7 @@ namespace unvs.game2d.scenes
             {
                 this.ground.GizmosDraw(Color.red, 3f);
             }
-            if (!Application.isPlaying)
+            if (!Application.isPlaying && cam !=null)
             {
                 if(cam.orthographic)
                 this.vcam.SetOrthoSizeImmediate(this.OrthographicSize);
