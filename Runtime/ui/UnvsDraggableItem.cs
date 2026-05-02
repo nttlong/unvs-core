@@ -65,14 +65,7 @@ namespace unvs.ui
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            var results = new System.Collections.Generic.List<RaycastResult>();
-            EventSystem.current.RaycastAll(eventData, results);
-
-            Debug.Log($"Số lượng vật thể dưới chuột: {results.Count}");
-            foreach (var res in results)
-            {
-                Debug.Log($"Chạm phải: {res.gameObject.name} trên Layer: {LayerMask.LayerToName(res.gameObject.layer)}");
-            }
+           
             // 1. Xác định mục tiêu dưới chuột
             GameObject dropTarget = eventData.pointerCurrentRaycast.gameObject;
             if (dropTarget == null) dropTarget = eventData.pointerEnter;
@@ -94,12 +87,7 @@ namespace unvs.ui
                     // Nếu KHÔNG CÓ LOGIC NÀO xử lý (thả trượt hoặc sai quy tắc): Trả về Slot cũ
                     RollbackToOriginalSlot();
                 }
-                else
-                {
-                    // Nếu CÓ LOGIC ĐÃ XỬ LÝ (đã đổi parent, đã hủy item, hoặc đã dùng vật phẩm): 
-                    // Ta không làm gì cả, để cho logic đó toàn quyền điều khiển Item
-                    Debug.Log("[Unvs] Drop logic handled by an external system.");
-                }
+               
             }
 
             // 5. Reset các thuộc tính hình ảnh

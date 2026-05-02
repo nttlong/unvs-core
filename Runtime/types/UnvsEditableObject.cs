@@ -14,11 +14,19 @@ namespace unvs.types
         public Transform NewSlotOrDropContainer;
         internal bool hasChange;
 
-        public void Reset()
+        public void Cancel()
         {
             Item = null;
             OldSlot = null;
             NewSlotOrDropContainer = null;
+        }
+
+        public void Ok()
+        {
+            Item = null;
+            OldSlot = null;
+            NewSlotOrDropContainer = null;
+            hasChange = true;
         }
         // Thêm các thông tin như ItemData, SlotIndex...
     }

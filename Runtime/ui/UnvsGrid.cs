@@ -78,8 +78,7 @@ namespace unvs.ui
         internal void RaiseEventOnDrop(UnvsDragContext currentInfo)
         {
             OnDrop?.Invoke(currentInfo);
-
-            Debug.Log($"RaiseEventOnDrop,{currentInfo.Item},{currentInfo.NewSlotOrDropContainer}");
+           
             
         }
     }
