@@ -6,7 +6,7 @@ using unvs.components;
 
 namespace unvs.types
 {
-    public enum DockTYpe
+    public enum DockType
     {
         None = 0,
         Top=1,

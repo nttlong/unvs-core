@@ -7,7 +7,7 @@ namespace unvs.ui {
 
     public class UnvsDockPanel : MonoBehaviour
     {
-        public DockTYpe dockType;
+        public DockType dockType;
         private void OnValidate()
         {
             doAlign();
@@ -17,26 +17,182 @@ namespace unvs.ui {
         {
             var panel = GetComponent<Image>();
             if (panel == null) return;
-            if (dockType == DockTYpe.Top)
+            if (dockType == DockType.Top)
             {
-                panel.AnchorDockTop();
+                AnchorDockTop(panel);
             }
-            if (dockType == DockTYpe.Bottom)
+            else if (dockType == DockType.Bottom)
             {
-                panel.AnchorDockBottom();
+                AnchorDockBottom(panel);
             }
-            if (dockType == DockTYpe.Left)
+            else if (dockType == DockType.Left)
             {
-                panel.AnchorDockLeft();
+                AnchorDockLeft(panel);
             }
-            if (dockType == DockTYpe.Right)
+            else if (dockType == DockType.Right)
             {
-                panel.AnchorDockRight();
+                AnchorDockRight(panel);
             }
-            if (dockType == DockTYpe.Full)
+            else if (dockType == DockType.Full)
             {
                 AnchorDockFull(panel);
             }
+        }
+
+        private void AnchorDockTop(Image panel)
+        {
+            float topOffset = 0;
+            float leftOffset = 0;
+            float rightOffset = 0;
+
+            Transform parent = panel.transform.parent;
+            if (parent != null)
+            {
+                int myIndex = panel.transform.GetSiblingIndex();
+                for (int i = 0; i < myIndex; i++)
+                {
+                    var child = parent.GetChild(i);
+                    if (!child.gameObject.activeSelf) continue;
+
+                    var siblingDock = child.GetComponent<UnvsDockPanel>();
+                    var childRect = child as RectTransform;
+
+                    if (siblingDock != null && childRect != null)
+                    {
+                        if (siblingDock.dockType == DockType.Top)
+                            topOffset += childRect.sizeDelta.y;
+                        else if (siblingDock.dockType == DockType.Left)
+                            leftOffset += childRect.sizeDelta.x;
+                        else if (siblingDock.dockType == DockType.Right)
+                            rightOffset += childRect.sizeDelta.x;
+                    }
+                }
+            }
+
+            var height = panel.rectTransform.sizeDelta.y;
+            panel.rectTransform.anchorMin = new Vector2(0, 1);
+            panel.rectTransform.anchorMax = new Vector2(1, 1);
+            panel.rectTransform.pivot = new Vector2(0.5f, 1);
+
+            panel.rectTransform.offsetMin = new Vector2(leftOffset, -topOffset - height);
+            panel.rectTransform.offsetMax = new Vector2(-rightOffset, -topOffset);
+        }
+
+        private void AnchorDockBottom(Image panel)
+        {
+            float bottomOffset = 0;
+            float leftOffset = 0;
+            float rightOffset = 0;
+
+            Transform parent = panel.transform.parent;
+            if (parent != null)
+            {
+                int myIndex = panel.transform.GetSiblingIndex();
+                for (int i = 0; i < myIndex; i++)
+                {
+                    var child = parent.GetChild(i);
+                    if (!child.gameObject.activeSelf) continue;
+
+                    var siblingDock = child.GetComponent<UnvsDockPanel>();
+                    var childRect = child as RectTransform;
+
+                    if (siblingDock != null && childRect != null)
+                    {
+                        if (siblingDock.dockType == DockType.Bottom)
+                            bottomOffset += childRect.sizeDelta.y;
+                        else if (siblingDock.dockType == DockType.Left)
+                            leftOffset += childRect.sizeDelta.x;
+                        else if (siblingDock.dockType == DockType.Right)
+                            rightOffset += childRect.sizeDelta.x;
+                    }
+                }
+            }
+
+            var height = panel.rectTransform.sizeDelta.y;
+            panel.rectTransform.anchorMin = new Vector2(0, 0);
+            panel.rectTransform.anchorMax = new Vector2(1, 0);
+            panel.rectTransform.pivot = new Vector2(0.5f, 0);
+
+            panel.rectTransform.offsetMin = new Vector2(leftOffset, bottomOffset);
+            panel.rectTransform.offsetMax = new Vector2(-rightOffset, bottomOffset + height);
+        }
+
+        private void AnchorDockLeft(Image panel)
+        {
+            float leftOffset = 0;
+            float topOffset = 0;
+            float bottomOffset = 0;
+
+            Transform parent = panel.transform.parent;
+            if (parent != null)
+            {
+                int myIndex = panel.transform.GetSiblingIndex();
+                for (int i = 0; i < myIndex; i++)
+                {
+                    var child = parent.GetChild(i);
+                    if (!child.gameObject.activeSelf) continue;
+
+                    var siblingDock = child.GetComponent<UnvsDockPanel>();
+                    var childRect = child as RectTransform;
+
+                    if (siblingDock != null && childRect != null)
+                    {
+                        if (siblingDock.dockType == DockType.Left)
+                            leftOffset += childRect.sizeDelta.x;
+                        else if (siblingDock.dockType == DockType.Top)
+                            topOffset += childRect.sizeDelta.y;
+                        else if (siblingDock.dockType == DockType.Bottom)
+                            bottomOffset += childRect.sizeDelta.y;
+                    }
+                }
+            }
+
+            var width = panel.rectTransform.sizeDelta.x;
+            panel.rectTransform.anchorMin = new Vector2(0, 0);
+            panel.rectTransform.anchorMax = new Vector2(0, 1);
+            panel.rectTransform.pivot = new Vector2(0, 0.5f);
+
+            panel.rectTransform.offsetMin = new Vector2(leftOffset, bottomOffset);
+            panel.rectTransform.offsetMax = new Vector2(leftOffset + width, -topOffset);
+        }
+
+        private void AnchorDockRight(Image panel)
+        {
+            float rightOffset = 0;
+            float topOffset = 0;
+            float bottomOffset = 0;
+
+            Transform parent = panel.transform.parent;
+            if (parent != null)
+            {
+                int myIndex = panel.transform.GetSiblingIndex();
+                for (int i = 0; i < myIndex; i++)
+                {
+                    var child = parent.GetChild(i);
+                    if (!child.gameObject.activeSelf) continue;
+
+                    var siblingDock = child.GetComponent<UnvsDockPanel>();
+                    var childRect = child as RectTransform;
+
+                    if (siblingDock != null && childRect != null)
+                    {
+                        if (siblingDock.dockType == DockType.Right)
+                            rightOffset += childRect.sizeDelta.x;
+                        else if (siblingDock.dockType == DockType.Top)
+                            topOffset += childRect.sizeDelta.y;
+                        else if (siblingDock.dockType == DockType.Bottom)
+                            bottomOffset += childRect.sizeDelta.y;
+                    }
+                }
+            }
+
+            var width = panel.rectTransform.sizeDelta.x;
+            panel.rectTransform.anchorMin = new Vector2(1, 0);
+            panel.rectTransform.anchorMax = new Vector2(1, 1);
+            panel.rectTransform.pivot = new Vector2(1, 0.5f);
+
+            panel.rectTransform.offsetMin = new Vector2(-rightOffset - width, bottomOffset);
+            panel.rectTransform.offsetMax = new Vector2(-rightOffset, -topOffset);
         }
 
         private void AnchorDockFull(Image panel)
@@ -59,13 +215,13 @@ namespace unvs.ui {
 
                 if (siblingDock != null && childRect != null)
                 {
-                    if (siblingDock.dockType == DockTYpe.Top)
+                    if (siblingDock.dockType == DockType.Top)
                         topOffset += childRect.sizeDelta.y;
-                    else if (siblingDock.dockType == DockTYpe.Bottom)
+                    else if (siblingDock.dockType == DockType.Bottom)
                         bottomOffset += childRect.sizeDelta.y;
-                    else if (siblingDock.dockType == DockTYpe.Left)
+                    else if (siblingDock.dockType == DockType.Left)
                         leftOffset += childRect.sizeDelta.x;
-                    else if (siblingDock.dockType == DockTYpe.Right)
+                    else if (siblingDock.dockType == DockType.Right)
                         rightOffset += childRect.sizeDelta.x;
                 }
             }
