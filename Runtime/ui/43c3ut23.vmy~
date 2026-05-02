@@ -1,0 +1,107 @@
+namespace unvs.ui
+{
+    using UnityEngine;
+    using UnityEngine.UI;
+    using UnityEngine.EventSystems;
+    using Cysharp.Threading.Tasks.Triggers;
+    using unvs.ext;
+    using Unity.VisualScripting;
+
+    [RequireComponent(typeof(CanvasGroup))]
+    public class UnvsDraggableItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+    {
+        public Image image;
+        [HideInInspector] public Transform parentAfterDrag; // Biến này để Slot gán giá trị vào
+        private Vector2 _originalSize;
+        private CanvasGroup canvasGroup;
+        private RectTransform rectTransform;
+        private Canvas canvas;
+        private Transform _originalParent;
+        private Vector2 currentSize;
+        [SerializeField]
+        public Vector2 size;
+
+        private void Awake()
+        {
+            rectTransform = GetComponent<RectTransform>();
+            canvasGroup = GetComponent<CanvasGroup>();
+            canvas = GetComponentInParent<Canvas>();
+        }
+
+        public void OnBeginDrag(PointerEventData eventData)
+        {
+            if (canvas.GetComponent<VerticalLayoutGroup>()!= null ) 
+            canvas.GetComponent<VerticalLayoutGroup>().enabled = false;
+
+            parentAfterDrag = transform.parent;
+
+            // Sử dụng true để Unity tự tính toán lại Local Scale/Size sao cho 
+            // kích thước thực tế ngoài màn hình không thay đổi.
+            transform.SetParent(canvas.transform, true);
+
+            canvasGroup.blocksRaycasts = false;
+            //SetSize(eventData);
+            //parentAfterDrag = transform.parent;
+
+            //// Dùng false để GIỮ NGUYÊN tuyệt đối sizeDelta (100x100) và localScale (1.0).
+            //// Tránh việc Unity tự ý tính toán lại kích thước nếu Canvas và Slot có scale khác nhau.
+            //transform.SetParent(canvas.transform, false);
+
+            //// Cập nhật lại vị trí tuyệt đối của ảnh theo con trỏ chuột để tránh bị nhảy hình
+            //if (RectTransformUtility.ScreenPointToWorldPointInRectangle(
+            //    canvas.GetComponent<RectTransform>(), 
+            //    eventData.position, 
+            //    eventData.pressEventCamera, 
+            //    out Vector3 globalMousePos))
+            //{
+            //    rectTransform.position = globalMousePos;
+            //}
+
+            //canvasGroup.blocksRaycasts = false;
+        }
+
+        //private void SetSize(PointerEventData eventData)
+        //{
+        //    GameObject draggedObject = eventData.pointerDrag;
+        //    if (draggedObject != null)
+        //    {
+        //        // 1. Truy cập RectTransform (Dùng cho UI)
+        //        RectTransform rt = draggedObject.GetComponent<RectTransform>();
+        //        if (rt != null)
+        //        {
+        //            rt.sizeDelta = size; // 'size' là Vector2 bạn đã khai báo
+        //        }
+
+        //        // 2. Nếu muốn đảm bảo ảnh bên trong cũng khớp (Optional)
+        //        var img = draggedObject.GetComponent<UnityEngine.UI.Image>();
+        //        if (img != null)
+        //        {
+        //            // Set size thông qua Image component
+        //            img.rectTransform.sizeDelta = size;
+        //        }
+        //    }
+        //}
+
+        public void OnDrag(PointerEventData eventData)
+        {
+            // Tương thích cả Mouse và Gamepad Virtual Cursor
+            rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
+            //SetSize(eventData);
+        }
+
+        public void OnEndDrag(PointerEventData eventData)
+        {
+            // Truyền false để item không cố giữ transform của Canvas, mà ăn theo Slot mới
+            transform.SetParent(parentAfterDrag, false); 
+            
+            canvasGroup.blocksRaycasts = true;
+            canvasGroup.alpha = 1f;
+            
+            // Khôi phục lại vị trí, kích thước và scale để khớp hoàn toàn với Slot
+            rectTransform.anchoredPosition = Vector2.zero; 
+            rectTransform.sizeDelta = size;
+            transform.localScale = Vector3.one;
+            //SetSize(eventData);
+        }
+    }
+}

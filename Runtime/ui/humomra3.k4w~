@@ -18,7 +18,7 @@ namespace unvs.ui
         private RectTransform rectTransform;
         private Canvas canvas;
         private Transform _originalParent;
-        
+        private Vector2 currentSize;
         internal UnvsGrid owner;
         
 
@@ -40,7 +40,6 @@ namespace unvs.ui
             }
             owner.currentDrageInfo.Item = this;
             owner.currentDrageInfo.OldSlot = this.transform.parent;
-            _originalParent = this.transform.parent;
             if (canvas.GetComponent<HorizontalOrVerticalLayoutGroup>() != null)
                 canvas.GetComponent<HorizontalOrVerticalLayoutGroup>().enabled = false;
             parentAfterDrag = transform.parent;
@@ -65,14 +64,6 @@ namespace unvs.ui
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            var results = new System.Collections.Generic.List<RaycastResult>();
-            EventSystem.current.RaycastAll(eventData, results);
-
-            Debug.Log($"Số lượng vật thể dưới chuột: {results.Count}");
-            foreach (var res in results)
-            {
-                Debug.Log($"Chạm phải: {res.gameObject.name} trên Layer: {LayerMask.LayerToName(res.gameObject.layer)}");
-            }
             // 1. Xác định mục tiêu dưới chuột
             GameObject dropTarget = eventData.pointerCurrentRaycast.gameObject;
             if (dropTarget == null) dropTarget = eventData.pointerEnter;

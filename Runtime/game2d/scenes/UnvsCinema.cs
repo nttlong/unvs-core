@@ -21,6 +21,7 @@ using unvs.components;
 using unvs.game2d.objects.editor;
 using unvs.shares;
 using unvs.ui;
+using UnityEngine.EventSystems;
 
 namespace unvs.game2d.scenes{
     public class UnvsCinema : UnvsUIComponentInstance<UnvsCinema>
@@ -40,6 +41,7 @@ namespace unvs.game2d.scenes{
         public event Action<UnvsScene> BeforeUpdate;
         public event Action<UnvsScene> AfterUpdate;
         public Camera cam;
+        public Physics2DRaycaster physics2DRaycaster;
         public CinemachineCamera vcam;
         public CompositeCollider2D compositeCollider2D;
         public CinemachineConfiner2D confiner;
@@ -446,6 +448,7 @@ namespace unvs.game2d.scenes{
         {
             var cinema = this;
             cinema.cam = cinema.AddChildComponentIfNotExist<Camera>("Main Camera");
+            this.physics2DRaycaster= cinema.cam.AddComponentIfNotExist<Physics2DRaycaster>();
             cinema.cam.tag = "MainCamera";
             cinema.cam.orthographic = true;
             cinema.cam.AddComponentIfNotExist<CinemachineBrain>();

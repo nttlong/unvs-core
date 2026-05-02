@@ -1,11 +1,27 @@
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using unvs.components;
 using unvs.components;
+using unvs.ui;
 
 namespace unvs.types
 {
+    public class UnvsDragContext
+    {
+        public UnvsDraggableItem Item;
+        public Transform OldSlot;
+        public Transform NewSlotOrDropContainer;
+        internal bool hasChange;
+
+        public void Reset()
+        {
+            Item = null;
+            OldSlot = null;
+            NewSlotOrDropContainer = null;
+        }
+        // Thêm các thông tin như ItemData, SlotIndex...
+    }
     public enum DockType
     {
         None = 0,

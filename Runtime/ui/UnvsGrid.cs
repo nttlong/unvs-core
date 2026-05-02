@@ -1,8 +1,10 @@
 using Cysharp.Threading.Tasks.Triggers;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 using unvs.ext;
+using unvs.types;
 
 namespace unvs.ui
 {
@@ -14,20 +16,26 @@ namespace unvs.ui
         public string prefxSlotName = "UnvsSlot_";
         public Transform container;
         public int currentIndex=0;
+        public Canvas topCanvas;
+        internal UnvsDragContext currentDrageInfo;
+        public event Action<UnvsDragContext> OnDrop;
         private void Awake()
         {
             if (Application.isPlaying)
             {
                 foreach (Transform t in container.transform)
                 {
-                    var sprite= t.GetFirstComponent<Sprite>(true);
-                    this.AddSpriteToGrid(sprite, currentIndex, t.name);
+                    var sprite= t.GetFirstComponent<SpriteRenderer>(true);
+                    this.AddSpriteToGrid(sprite.sprite, currentIndex, t.name);
                     currentIndex++;
                 }
+                topCanvas = this.GetComponentInParent<Canvas>();
+                topCanvas.AddComponentIfNotExist<GraphicRaycaster>();
             }
         }
         public void AddSpriteToGrid(Sprite sprite, int index,string itemName)
         {
+            if (sprite == null) return;
             // 1. Tạo Slot
             GameObject slotObj = new GameObject($"{prefxSlotName}_{index}", typeof(RectTransform));
             slotObj.transform.SetParent(this.transform, false);
@@ -58,13 +66,21 @@ namespace unvs.ui
             itemRect.anchoredPosition = Vector2.zero;
 
             // 3. Thêm Drag & Drop
-            itemObj.AddComponent<UnvsDraggableItem>();
+            itemObj.AddComponent<UnvsDraggableItem>().owner = this;
         }
         private void OnValidate()
         {
             this.container = this.AddChildComponentIfNotExist<Transform>("container");
             this.container.gameObject.SetActive(false);
 
+        }
+
+        internal void RaiseEventOnDrop(UnvsDragContext currentInfo)
+        {
+            OnDrop?.Invoke(currentInfo);
+
+            Debug.Log($"RaiseEventOnDrop,{currentInfo.Item},{currentInfo.NewSlotOrDropContainer}");
+            
         }
     }
 }
