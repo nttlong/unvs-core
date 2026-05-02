@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -200,6 +200,115 @@ namespace unvs.ext
             }
 
             canvasGroup.alpha = 1f;
+        }
+
+        public static UnityEngine.UI.Image AnchorDockTop(this UnityEngine.UI.Image panel)
+        {
+            var height = panel.rectTransform.sizeDelta.y;
+            panel.rectTransform.anchorMin = new Vector2(0, 1);
+            panel.rectTransform.anchorMax = new Vector2(1, 1);
+            panel.rectTransform.pivot = new Vector2(0.5f, 1);
+
+            // Set size và vị trí
+            panel.rectTransform.sizeDelta = new Vector2(0, height);
+            panel.rectTransform.anchoredPosition = Vector2.zero; // Bám sát mép trên
+
+            return panel;
+        }
+
+        public static UnityEngine.UI.Image AnchorDockLeft(this UnityEngine.UI.Image panel)
+        {
+            var width = panel.rectTransform.sizeDelta.x;
+            panel.rectTransform.anchorMin = new Vector2(0, 0);
+            panel.rectTransform.anchorMax = new Vector2(0, 1);
+            panel.rectTransform.pivot = new Vector2(0, 0.5f);
+
+            // Set size và vị trí
+            panel.rectTransform.sizeDelta = new Vector2(width, 0);
+            panel.rectTransform.anchoredPosition = Vector2.zero; // Bám sát mép trái
+
+            return panel;
+        }
+
+        public static UnityEngine.UI.Image AnchorDockRight(this UnityEngine.UI.Image panel)
+        {
+            var width = panel.rectTransform.sizeDelta.x;
+            panel.rectTransform.anchorMin = new Vector2(1, 0);
+            panel.rectTransform.anchorMax = new Vector2(1, 1);
+            panel.rectTransform.pivot = new Vector2(1, 0.5f);
+
+            // Set size và vị trí
+            panel.rectTransform.sizeDelta = new Vector2(width, 0);
+            panel.rectTransform.anchoredPosition = Vector2.zero; // Bám sát mép phải
+
+            return panel;
+        }
+        public static UnityEngine.UI.Image AnchorDockBody(this UnityEngine.UI.Image panel)
+        {
+            float topOffset = 0;
+            float bottomOffset = 0;
+            Transform parent = panel.transform.parent;
+            int myIndex = panel.transform.GetSiblingIndex();
+
+            // Duyệt các anh em nằm TRÊN panel (index thấp hơn)
+            for (int i = 0; i < myIndex; i++)
+            {
+                var childRect = parent.GetChild(i) as RectTransform;
+                if (childRect != null && childRect.gameObject.activeSelf)
+                {
+                    // Dùng sizeDelta.y hoặc rect.height tùy vào việc con đó đã anchored chưa
+                    topOffset += childRect.sizeDelta.y;
+                }
+            }
+
+            // Duyệt các anh em nằm DƯỚI panel (index cao hơn)
+            for (int i = myIndex + 1; i < parent.childCount; i++)
+            {
+                var childRect = parent.GetChild(i) as RectTransform;
+                if (childRect != null && childRect.gameObject.activeSelf)
+                {
+                    bottomOffset += childRect.sizeDelta.y;
+                }
+            }
+
+            // Thiết lập Anchors Stretch
+            panel.rectTransform.anchorMin = new Vector2(0, 0);
+            panel.rectTransform.anchorMax = new Vector2(1, 1);
+            panel.rectTransform.pivot = new Vector2(0.5f, 0.5f);
+
+            // Áp dụng offset cố định
+            panel.rectTransform.offsetMin = new Vector2(0, bottomOffset);
+            panel.rectTransform.offsetMax = new Vector2(0, -topOffset);
+
+            return panel;
+        }
+        public static float GetHeight(this UnityEngine.UI.Image panel)
+        {
+            return panel.rectTransform.sizeDelta.y;
+        }
+        public static UnityEngine.UI.Image AnchorDockBottom(this UnityEngine.UI.Image panel)
+        {
+            var height = panel.rectTransform.sizeDelta.y;
+            panel.rectTransform.anchorMin = new Vector2(0, 0);
+            panel.rectTransform.anchorMax = new Vector2(1, 0);
+            panel.rectTransform.pivot = new Vector2(0.5f, 0);
+
+            panel.rectTransform.sizeDelta = new Vector2(0, height);
+            panel.rectTransform.anchoredPosition = Vector2.zero; // Bám sát mép dưới
+
+            return panel;
+        }
+        public static UnityEngine.UI.Image AnchorDockFull(this UnityEngine.UI.Image panel)
+        {
+            /*
+           Anchors: Thiết lập Min (0, 0) và Max (1, 1) (Chế độ Stretch toàn diện).
+
+Pivot: (0.5, 0.5).
+             */
+            panel.rectTransform.anchorMin = new Vector2(0, 0);
+            panel.rectTransform.anchorMax = new Vector2(1, 1);
+            panel.rectTransform.pivot = new Vector2(0.5f, 0.5f);
+            return panel;
         }
         public static async UniTask FadeInAsync(this UnityEngine.UI.Image panel, float fadingTime = 0.5f)
         {

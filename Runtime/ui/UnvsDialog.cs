@@ -10,7 +10,7 @@ using unvs.game2d.objects.editor;
 using unvs.game2d.scenes;
 using unvs.ui;
 
-namespace game2d.scenes {
+ namespace unvs.ui {
     public class UnvsDialog : UnvsUIComponentInstance<UnvsDialog>
     {
       

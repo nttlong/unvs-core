@@ -6,6 +6,15 @@ using unvs.components;
 
 namespace unvs.types
 {
+    public enum DockTYpe
+    {
+        None = 0,
+        Top=1,
+        Bottom=2,
+        Left=3,
+        Right=4,
+        Full=5
+    }
     [Serializable]
     public abstract class UnvsEditableProperty
     {
