@@ -408,7 +408,7 @@ namespace unvs.ext
             ret = tr.GetComponentInChildren<T>(includeHidden);
             return ret;
         }
-        public static T GetFirstComponent<T>(this Transform tr,bool includeHidden=false) where T : Component
+        public static T GetFirstComponent<T>(this Transform tr,bool includeHidden=false) where T : UnityEngine.Object
         {
             var ret= tr.GetComponent<T>();
             if (ret != null) return ret;
