@@ -206,13 +206,13 @@ namespace unvs.game2d.scenes
                     unvsScene.OnDestroying -= OnDestroyHandler;
                     this.Scenes.Remove(unvsScene);
                 }
-
-                unvsScene.OnDestroying += OnDestroyHandler;
                 if (this.Scenes.Count() > 1)
                 {
                     var s = Scenes.Select(p => p.Key).ToList();
                     UnvsCinema.Instance.ChangeCameraState(s, reset);
                 }
+                unvsScene.OnDestroying += OnDestroyHandler;
+                
 
             }
             if (_LastExitScene != unvsScene)
@@ -220,7 +220,7 @@ namespace unvs.game2d.scenes
                 _LastScene = unvsScene;
                 OnEnterScene?.Invoke(_LastScene);
             }
-
+            
         }
 
         public void RaiseExitScene(UnvsScene unvsScene)
@@ -239,7 +239,8 @@ namespace unvs.game2d.scenes
                 _LastExitScene = unvsScene;
                 OnExitScene?.Invoke(_LastExitScene);
             }
-
+            var s = Scenes.Select(p => p.Key).ToList();
+            UnvsCinema.Instance.ChangeCameraState(s, false);
         }
         public override void InitRuntime()
         {

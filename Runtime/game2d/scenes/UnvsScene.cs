@@ -32,7 +32,7 @@ namespace unvs.game2d.scenes
         [SerializeField] public float OrthographicSize = 20;
         public Transform deadZones;
         [SerializeField]
-        public Vector2 followOffset = new Vector3(0, 4);
+        public Vector3 followOffset = new Vector3(0, 4,-10);
         [Header("Links scene", order = -1)]
 #if UNITY_EDITOR
 

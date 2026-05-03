@@ -15,10 +15,12 @@ using unvs.actor.skills;
 using unvs.actor_physical;
 using unvs.components;
 using unvs.ext;
-using unvs.components;
+
 using unvs.game2d.objects.editor;
 using unvs.shares;
 using unvs.ui;
+using unvs.controllers;
+
 
 
 
@@ -155,7 +157,26 @@ namespace unvs.game2d.actors
         {
             if (Application.isPlaying)
             {
-                
+                if (!this.IsActivePlayer)
+                {
+                    GetComponent<CompositeCollider2D>().excludeLayers = LayerMask.GetMask(Constants.Layers.NPC, Constants.Layers.ACTOR);
+                    if (GetComponent<BasicController>() != null)
+                    {
+                        GetComponent<BasicController>().ControlDisable();
+                        this.SetMeOnLayer(Constants.Layers.NPC);
+                    } else
+                    {
+                        GetComponent<BasicController>().ControlEnable();
+                        this.SetMeOnLayer(Constants.Layers.ACTOR);
+                    }
+                }
+#if UNITY_EDITOR
+                if (this.CurrentSkill == null)
+                {
+                    unvs.editor.utils.Dialogs.Show($"Please, add skill to actor {name}");
+                    return;
+                } 
+#endif
                 this.CurrentSkill.Status = SkillSpeddEnum.Idle;
             }
         }
