@@ -80,11 +80,19 @@ namespace unvs.game2d.scenes
             if (ret == null)
             {
                 ret = await Commons.LoadPrefabsAsync<UnvsScene>(sceneRef, this.buffer);
+                
+                if (ret.followOffset == Vector3.zero)
+                {
+                    if (UnvsCinema.Instance != null)
+                    {
+                        ret.followOffset = UnvsCinema.Instance.DefaultTargetOffset;
+                    }
+                }
             }
             ret.transform.SetParent(this.interior.transform, true);
 
             UnvsCinema.Instance.UpdateWorld(ret, true,UpdateWorldEmun.Interior);
-            UnvsCinema.Instance.vcam.UpdateByUnvsScene(ret,UnvsCinema.Instance.LimitDistance);
+            UnvsCinema.Instance.vcam.UpdateByUnvsScene(ret);
 
             UnvsActor actor = ret.GetActiveActor();
             if (actor != null)
@@ -123,10 +131,17 @@ namespace unvs.game2d.scenes
             }
             UnvsCinema.Instance.ClearWorlds();
             var ret = await Commons.LoadPrefabsAsync<UnvsScene>(sceneRef, this.buffer);
+            if (ret.followOffset == Vector3.zero)
+            {
+                if (UnvsCinema.Instance != null)
+                {
+                    ret.followOffset = UnvsCinema.Instance.DefaultTargetOffset;
+                }
+            }
             ret.transform.SetParent(this.chunks.transform, true);
 
             UnvsCinema.Instance.UpdateWorld(ret, true, UpdateWorldEmun.New);
-            UnvsCinema.Instance.vcam.UpdateByUnvsScene(ret,UnvsCinema.Instance.LimitDistance);
+            UnvsCinema.Instance.vcam.UpdateByUnvsScene(ret);
 
             UnvsActor actor = ret.GetActiveActor();
 

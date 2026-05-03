@@ -31,7 +31,8 @@ namespace unvs.game2d.scenes{
         /// That mean z of follow offset o cinemachine is alway add negative of this value
         /// </summary>
         [Header("Camera")]
-        public float LimitDistance=0;
+        [SerializeField]
+        public Vector3 DefaultTargetOffset=new Vector3(0,0,-35);
         [Header("Cinema light")]
         public float DurationTimeSmoothChangeSate = 1.5f;
         public int MaintainGlobalLightNumber = 5;
@@ -81,8 +82,8 @@ namespace unvs.game2d.scenes{
                 }
             } else
             {
-                
-                chaneCameStepByOffset(s, Imediately, () =>
+               
+                changeCameStepByOffset(s, Imediately, () =>
                 {
                     
                 });
@@ -91,14 +92,14 @@ namespace unvs.game2d.scenes{
                 
             //ChangeCameraStateAsync(s).Forget();
         }
-        private bool chaneCameStepByOffset(List<UnvsScene> s, bool Imediately,Action OnChange)
+        private bool changeCameStepByOffset(List<UnvsScene> s, bool Imediately,Action OnChange)
         {
             UnvsScene nearset = null;
             if (Imediately)
             {
 
                 
-                vcam.GetComponent<CinemachineFollow>().FollowOffset = new Vector3(s[0].followOffset.x, s[0].followOffset.y, cam.OrthoSizeToPerspectiveDistance(s[0].OrthographicSize,this.LimitDistance));
+                vcam.GetComponent<CinemachineFollow>().FollowOffset = new Vector3(s[0].followOffset.x, s[0].followOffset.y, cam.OrthoSizeToPerspectiveDistance(s[0].OrthographicSize));
 
                 float height = s[0].OrthographicSize * 2f;
                 float width = height * cam.aspect; // cam.aspect = Screen.width / Screen.height
@@ -108,7 +109,10 @@ namespace unvs.game2d.scenes{
             }
             nearset = CalculateNearestScene(s);
             ctsChangeOffset = ctsChangeOffset.Refresh();
-            
+            if (nearset.followOffset == Vector3.zero)
+            {
+                nearset.followOffset = this.DefaultTargetOffset;
+            }
             vcam.ChangeFollowOffsetSmoothAsync(OnChange,nearset.followOffset, ctsChangeOffset.Token, 3).ContinueWith(() =>
             {
                
@@ -371,7 +375,7 @@ namespace unvs.game2d.scenes{
         
         float _lastPosition = 0;
         bool _wasMoving;
-        private float _lastLimitDistance;
+       
 
         public override bool DisablePlayerInput => false;
 
@@ -392,7 +396,7 @@ namespace unvs.game2d.scenes{
             //cam.transparencySortAxis = new Vector3(0, 0, 1);
 
            
-            _lastLimitDistance = LimitDistance;
+            
 
         }
         //void OnPreRender() // Trước khi render bất cứ thứ gì
@@ -405,18 +409,7 @@ namespace unvs.game2d.scenes{
 
         private void LateUpdate()
         {
-            if (_lastLimitDistance != LimitDistance )
-            {
-                if (this.vcam != null && this.vcam.GetComponent<CinemachineFollow>() != null)
-                {
-                    var offset = this.vcam.GetComponent<CinemachineFollow>().FollowOffset;
-                    /*
-                     * exclude _lastLimitDistance out of offset.z and add new LimitDistance
-                     */
-                    this.vcam.GetComponent<CinemachineFollow>().FollowOffset = offset - new Vector3(0, 0,  -_lastLimitDistance + LimitDistance);
-                    _lastLimitDistance = LimitDistance;
-                }
-            }
+            
             float newPos = getValue(cam.transform.position.x);
             // Tính toán độ lệch
             float delta = Mathf.Abs(newPos - _lastPosition);

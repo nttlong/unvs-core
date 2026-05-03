@@ -20,6 +20,8 @@ using unvs.game2d.objects.editor;
 using unvs.shares;
 using unvs.ui;
 using unvs.controllers;
+using unvs.ext.physical2d;
+
 
 
 
@@ -157,6 +159,10 @@ namespace unvs.game2d.actors
         {
             if (Application.isPlaying)
             {
+                if(this.coll.GetHit(out var hit, Vector2.down))
+                {
+                    this.StandBy(hit.point);
+                }
                 if (!this.IsActivePlayer)
                 {
                     GetComponent<CompositeCollider2D>().excludeLayers = LayerMask.GetMask(Constants.Layers.NPC, Constants.Layers.ACTOR);

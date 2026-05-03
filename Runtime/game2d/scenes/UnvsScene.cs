@@ -88,7 +88,13 @@ namespace unvs.game2d.scenes
         }
         public override void InitRuntime()
         {
-           
+            if (this.followOffset == Vector3.zero)
+            {
+                if(UnvsCinema.Instance != null)
+                {
+                    this.followOffset = UnvsCinema.Instance.DefaultTargetOffset;
+                }
+            }
             if (cam != null)
             {
                 cam.enabled = false;
