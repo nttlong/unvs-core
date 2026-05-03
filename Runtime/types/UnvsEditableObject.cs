@@ -30,6 +30,13 @@ namespace unvs.types
         }
         // Thêm các thông tin như ItemData, SlotIndex...
     }
+    [Serializable]
+    public struct SpawnPointInfo
+    {
+        public string name;
+        public GameObject Target;
+        public bool IsSelected;
+    }
     public enum DockType
     {
         None = 0,

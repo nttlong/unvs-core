@@ -101,7 +101,7 @@ namespace unvs.game2d.scenes
             if (this.support == null) this.support = this.AddChildComponentIfNotExist<Transform>("support");
             if (this.vcam != null)
             {
-                this.vcam.Lens.OrthographicSize = this.OrthographicSize;
+                //this.vcam.Lens.OrthographicSize = this.OrthographicSize;
                 this.vcam.GetComponent<CinemachineFollow>().FollowOffset = this.followOffset;
             }
             if (this.triggerRight != null)
@@ -223,7 +223,7 @@ namespace unvs.game2d.scenes
         {
             this.selRef = unvs.editor.utils.UnvsEditorUtils.EditorGetAssetReference(gameObject);
             if (this.vcam!=null)
-            this.vcam.SetOrthoSizeImmediate(this.OrthographicSize);
+            //this.vcam.SetOrthoSizeImmediate(this.OrthographicSize);
             if (this.cinemachineFollow != null)
             {
                  this.cinemachineFollow.FollowOffset= this.followOffset;
@@ -270,12 +270,12 @@ namespace unvs.game2d.scenes
             }
             if (!Application.isPlaying && cam !=null)
             {
-                if(cam.orthographic)
-                this.vcam.SetOrthoSizeImmediate(this.OrthographicSize);
-                else
-                {
+                //if(cam.orthographic)
+                //this.vcam.SetOrthoSizeImmediate(this.OrthographicSize);
+                //else
+                //{
                     this.vcam.GetComponent<CinemachineFollow>().FollowOffset = this.followOffset;
-                }
+                //}
             }
                 
 

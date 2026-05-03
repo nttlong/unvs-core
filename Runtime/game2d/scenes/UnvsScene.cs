@@ -29,10 +29,10 @@ namespace unvs.game2d.scenes
         [Header("Sene game world info")]
         public Transform checkPoints;
         public WorldJoinInfo JoinInfo = new WorldJoinInfo();
-        [SerializeField] public float OrthographicSize = 20;
+        //[SerializeField] public float OrthographicSize = 20;
         public Transform deadZones;
         [SerializeField]
-        public Vector3 followOffset = new Vector3(0, 4,-10);
+        public Vector3 followOffset = new Vector3(0, 0,0);
         [Header("Links scene", order = -1)]
 #if UNITY_EDITOR
 
@@ -118,6 +118,11 @@ namespace unvs.game2d.scenes
             if(!string.IsNullOrEmpty(spawnName))
             {
                 var tr = this.GetComponentInChildrenByName<Transform>(spawnName);
+                if (tr == null)
+                {
+                    Debug.LogError($"spawnName,{name}.{spawnName} was not found");
+                    return Vector2.zero;
+                }
                 var centrePoint = tr.GetSegment().Center();
                 var hit = centrePoint.RayCast(Vector2.down, Math.Abs(centrePoint.y - worldBound.bounds.max.y));
                 if(hit.collider!=null)

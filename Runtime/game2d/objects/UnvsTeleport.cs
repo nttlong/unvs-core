@@ -8,6 +8,10 @@ using unvs.ext;
 using unvs.game2d.scenes;
 using unvs.game2d.actors;
 using unvs.shares;
+using unvs.types;
+using Unity.VisualScripting;
+
+
 
 
 #if UNITY_EDITOR
@@ -26,7 +30,7 @@ namespace unvs.game2d.objects
         public AssetReference Target;
         public string TargetPath;
         public Transform otherSpawnPoints;
-        public UnvsScene TarggetScene;
+        //public UnvsScene TarggetScene;
         public bool IsNew;
         public string SpawnName;
         
@@ -69,7 +73,7 @@ namespace unvs.game2d.objects
                     var selected = SpawnList.FirstOrDefault(p => p.IsSelected);
                     if (selected.IsSelected)
                     {
-                        this.SpawnName = selected.name;
+                        this.SpawnName = selected.Target.name;
                     }
                 }
 
@@ -79,12 +83,13 @@ namespace unvs.game2d.objects
         [UnvsButton("Read all Spawn points")]
         public void EditorReadAllSpawnPoints()
         {
+            var lst= new List<SpawnPointInfo>();
             if (Target != null)
             {
                 this.TargetPath = Target.EditorGetAddressPath();
                 if (Target.editorAsset != null)
                 {
-
+                    
                     GameObject prefab = Target.editorAsset as GameObject;
 
                     if (prefab != null)
@@ -92,13 +97,15 @@ namespace unvs.game2d.objects
                         var tr = prefab.GetComponentInChildrenByName<Transform>("Spawn-Points");
                         if (tr != null)
                         {
-                            SpawnList = tr.GetComponentsInChildren<UnvsSpawnPoint>().Select(p => new SpawnPointInfo
+                            lst.AddRange( tr.GetComponentsInChildren<UnvsSpawnPoint>().Select(p => new SpawnPointInfo
                             {
 
                                 name = p.gameObject.name,
                                 Target = p.gameObject
-                            }).ToArray();
+                            }).ToArray());
+                            lst.AddRange(tr.GetComponent<EditorUnvsSceneSpawPointEditor>().spawnPoints);
                         }
+                       
                         this.otherSpawnPoints = tr;
 
 
@@ -107,6 +114,7 @@ namespace unvs.game2d.objects
                 }
 
             }
+            this.SpawnList = lst.ToArray();
 
         }
         [UnvsButton("Apply data")]

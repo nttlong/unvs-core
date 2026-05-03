@@ -1,7 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
-
 using game2d.scenes;
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,18 +8,18 @@ using System.Threading;
 using Unity.Cinemachine;
 using Unity.Mathematics;
 using Unity.VisualScripting;
-
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
+using unvs.components;
 using unvs.ext;
 using unvs.game2d.actors;
-using unvs.components;
 using unvs.game2d.objects.editor;
 using unvs.shares;
 using unvs.ui;
-using UnityEngine.EventSystems;
 
 namespace unvs.game2d.scenes{
     public class UnvsCinema : UnvsUIComponentInstance<UnvsCinema>
@@ -99,15 +97,16 @@ namespace unvs.game2d.scenes{
             {
 
                 
-                vcam.GetComponent<CinemachineFollow>().FollowOffset = new Vector3(s[0].followOffset.x, s[0].followOffset.y, cam.OrthoSizeToPerspectiveDistance(s[0].OrthographicSize));
+                //vcam.GetComponent<CinemachineFollow>().FollowOffset = new Vector3(s[0].followOffset.x, s[0].followOffset.y, cam.OrthoSizeToPerspectiveDistance(s[0].OrthographicSize));
 
-                float height = s[0].OrthographicSize * 2f;
-                float width = height * cam.aspect; // cam.aspect = Screen.width / Screen.height
-                camColl.size = new Vector2((float)width, (float)height);
-                confiner.InvalidateBoundingShapeCache();
+                ////float height = s[0].OrthographicSize * 2f;
+                //float width = height * cam.aspect; // cam.aspect = Screen.width / Screen.height
+                //camColl.size = new Vector2((float)width, (float)height);
+                //confiner.InvalidateBoundingShapeCache();
                 return false;
             }
             nearset = CalculateNearestScene(s);
+            if(nearset==null) return false;
             ctsChangeOffset = ctsChangeOffset.Refresh();
             if (nearset.followOffset == Vector3.zero)
             {
@@ -127,32 +126,32 @@ namespace unvs.game2d.scenes{
             if (Imediately)
             {
 
-                vcam.SetOrthoSizeImmediate(s[0].OrthographicSize);
-                vcam.GetComponent<CinemachineFollow>().FollowOffset = s[0].followOffset;
+                //vcam.SetOrthoSizeImmediate(s[0].OrthographicSize);
+                //vcam.GetComponent<CinemachineFollow>().FollowOffset = s[0].followOffset;
 
-                float height = s[0].OrthographicSize * 2f;
-                float width = height * cam.aspect; // cam.aspect = Screen.width / Screen.height
-                camColl.size = new Vector2((float)width, (float)height);
+                //float height = s[0].OrthographicSize * 2f;
+                //float width = height * cam.aspect; // cam.aspect = Screen.width / Screen.height
+                //camColl.size = new Vector2((float)width, (float)height);
                 return false;
             }
             nearset = CalculateNearestScene(s);
             ctsChangeOffset = ctsChangeOffset.Refresh();
-            ctsChangeOrthoSize = ctsChangeOrthoSize.Refresh();
-            if (vcam.Lens.OrthographicSize > nearset.OrthographicSize)
-            {
-                //vcam.ChangeFollowOffsetSmoothAsync(nearset.followOffset, ctsChangeOffset.Token, DurationTimeSmoothChangeSate).Forget();
-                //vcam.ChangeFollowOffsetSmoothAsync(nearset.OrthographicSize, ctsChangeOrthoSize.Token, DurationTimeSmoothChangeSate, 3).ContinueWith(() =>
-                //{
-                //    camColl.size = cam.GetCameraWorldSize();
-                //}).Forget();
+            //ctsChangeOrthoSize = ctsChangeOrthoSize.Refresh();
+            //if (vcam.Lens.OrthographicSize > nearset.OrthographicSize)
+            //{
+            //    //vcam.ChangeFollowOffsetSmoothAsync(nearset.followOffset, ctsChangeOffset.Token, DurationTimeSmoothChangeSate).Forget();
+            //    //vcam.ChangeFollowOffsetSmoothAsync(nearset.OrthographicSize, ctsChangeOrthoSize.Token, DurationTimeSmoothChangeSate, 3).ContinueWith(() =>
+            //    //{
+            //    //    camColl.size = cam.GetCameraWorldSize();
+            //    //}).Forget();
 
-            }
-            else
-            {
+            //}
+            //else
+            //{
                 //vcam.SetOrthoSizeSmoothlyAsync(nearset.OrthographicSize, DurationTimeSmoothChangeSate, 3, ctsChangeOrthoSize.Token)
                 //    .ContinueWith(() => { camColl.size = cam.GetCameraWorldSize(); }).Forget();
                 vcam.ChangeFollowOffsetSmoothAsync(OnChange, nearset.followOffset, ctsChangeOffset.Token, DurationTimeSmoothChangeSate).Forget();
-            }
+            //}
 
             return true;
         }
@@ -162,21 +161,21 @@ namespace unvs.game2d.scenes{
             UnvsScene nearset = CalculateNearestScene(s);
             ctsChangeOffset = ctsChangeOffset.Refresh();
             ctsChangeOrthoSize = ctsChangeOrthoSize.Refresh();
-            if(vcam.Lens.OrthographicSize> nearset.OrthographicSize)
-            {
-                await vcam.ChangeFollowOffsetSmoothAsync(()=> {
-                    camColl.size = cam.GetCameraWorldSize();
-                },nearset.followOffset, ctsChangeOffset.Token);
-                //await vcam.SetOrthoSizeSmoothlyAsync(nearset.OrthographicSize, -1, 3, ctsChangeOrthoSize.Token);
+            //if(vcam.Lens.OrthographicSize> nearset.OrthographicSize)
+            //{
+            //    await vcam.ChangeFollowOffsetSmoothAsync(()=> {
+            //        camColl.size = cam.GetCameraWorldSize();
+            //    },nearset.followOffset, ctsChangeOffset.Token);
+            //    //await vcam.SetOrthoSizeSmoothlyAsync(nearset.OrthographicSize, -1, 3, ctsChangeOrthoSize.Token);
                
-            }
-            else
-            {
+            //}
+            //else
+            //{
                 //await vcam.SetOrthoSizeSmoothlyAsync(nearset.OrthographicSize, -1, 3, ctsChangeOrthoSize.Token);
                 await vcam.ChangeFollowOffsetSmoothAsync(() => {
                     camColl.size = cam.GetCameraWorldSize();
                 }, nearset.followOffset, ctsChangeOffset.Token);
-            }
+            //}
                 
            
         }
@@ -446,6 +445,33 @@ namespace unvs.game2d.scenes{
 
 
 #if UNITY_EDITOR
+        [UnvsButton]
+        public void Force()
+        {
+            // Ép thông số cho hệ thống Graphics chung
+            GraphicsSettings.transparencySortMode = TransparencySortMode.Perspective;
+            GraphicsSettings.transparencySortAxis = new Vector3(0, 0, 1);
+
+            // Chọc thẳng vào URP Asset đang dùng để ép nó nhận giá trị
+            var pipeline = GraphicsSettings.defaultRenderPipeline;//as UniversalRenderPipelineAsset;
+            if (pipeline != null)
+            {
+                // Dùng SerializedObject để ép giá trị vào field bị ẩn của URP Asset
+                SerializedObject so = new SerializedObject(pipeline);
+                // Trong Unity 6, các biến này quản lý việc sắp xếp mặc định
+                var modeProp = so.FindProperty("m_TransparencySortMode");
+                var axisProp = so.FindProperty("m_TransparencySortAxis");
+
+                if (modeProp != null && axisProp != null)
+                {
+                    modeProp.intValue = (int)TransparencySortMode.Perspective;
+                    axisProp.vector3Value = new Vector3(0, 0, 1);
+                    so.ApplyModifiedProperties();
+                }
+
+                Debug.Log("Đã ép URP Asset dùng Perspective Z-Axis cho dự án Emotion!");
+            }
+        }
         [UnvsButton()]
         public void Generate()
         {

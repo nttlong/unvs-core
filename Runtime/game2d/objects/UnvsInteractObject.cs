@@ -27,7 +27,7 @@ namespace unvs.game2d.objects
         [SerializeField]
         public unvs.types.IconInfo icon;
         public InteractionDefinition Data;
-        public UnvsObjectAttributesData ObjectDefinition;
+        //public UnvsObjectAttributesData ObjectDefinition;
         /// <summary>
         /// This event is called only once when the object is interacted for the first time.
         /// </summary>

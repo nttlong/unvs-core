@@ -97,30 +97,31 @@ namespace unvs.ext
         /// <param name="scene"></param>
         public static void UpdateByUnvsScene(this CinemachineCamera vcam, UnvsScene scene)
         {
-            var state = vcam.AddComponentIfNotExist<UnvsCamStaus>();
+            vcam.GetComponent<CinemachineFollow>().FollowOffset = scene.followOffset;
+            //var state = vcam.AddComponentIfNotExist<UnvsCamStaus>();
 
-            if (UnvsCinema.Instance.cam.orthographic)
-            {
-                if (scene.followOffset != Vector3.zero)
-                {
+            //if (UnvsCinema.Instance.cam.orthographic)
+            //{
+            //    if (scene.followOffset != Vector3.zero)
+            //    {
 
-                    vcam.GetComponent<CinemachineFollow>().FollowOffset = scene.followOffset;
-                    if (state.isInProgress)
-                    {
-                        state.isInteruptValue = true;
-                        state.offSetValue = scene.followOffset;
-                    }
-                }
-                vcam.SetOrthoSizeImmediate(scene.OrthographicSize);
-                return;
-            } else
-            {
-               
-               
-                var z = UnvsCinema.Instance.cam.OrthoSizeToPerspectiveDistance(scene.OrthographicSize);
-                vcam.GetComponent<CinemachineFollow>().FollowOffset = scene.followOffset;// new Vector3(scene.followOffset.x, scene.followOffset.y, z);
-            }
-               
+            //        vcam.GetComponent<CinemachineFollow>().FollowOffset = scene.followOffset;
+            //        if (state.isInProgress)
+            //        {
+            //            state.isInteruptValue = true;
+            //            state.offSetValue = scene.followOffset;
+            //        }
+            //    }
+            //    vcam.SetOrthoSizeImmediate(scene.OrthographicSize);
+            //    return;
+            //} else
+            //{
+
+
+            //    //var z = UnvsCinema.Instance.cam.OrthoSizeToPerspectiveDistance(scene.OrthographicSize);
+            //    vcam.GetComponent<CinemachineFollow>().FollowOffset = scene.followOffset;// new Vector3(scene.followOffset.x, scene.followOffset.y, z);
+            //}
+
         }
         public static async UniTask ChangeFollowOffsetSmoothAsync(this CinemachineCamera vcam,Action OnChange, Vector3 targetOffset, CancellationToken cancellationToken, float duration = 1.0f)
         {
