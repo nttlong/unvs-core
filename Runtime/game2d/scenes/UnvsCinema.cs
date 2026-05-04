@@ -448,29 +448,30 @@ namespace unvs.game2d.scenes{
         [UnvsButton]
         public void Force()
         {
-            // Ép thông số cho hệ thống Graphics chung
             GraphicsSettings.transparencySortMode = TransparencySortMode.Perspective;
             GraphicsSettings.transparencySortAxis = new Vector3(0, 0, 1);
+            // Tìm đúng file Renderer 2D mà đại ca vừa tạo lại
+            var assets = AssetDatabase.FindAssets("t:Renderer2DData");
+            Debug.Log("Tìm thấy: " + assets.Length + " file Renderer 2D"); // Thêm dòng này để check
 
-            // Chọc thẳng vào URP Asset đang dùng để ép nó nhận giá trị
-            var pipeline = GraphicsSettings.defaultRenderPipeline;//as UniversalRenderPipelineAsset;
-            if (pipeline != null)
+            if (assets.Length == 0)
             {
-                // Dùng SerializedObject để ép giá trị vào field bị ẩn của URP Asset
-                SerializedObject so = new SerializedObject(pipeline);
-                // Trong Unity 6, các biến này quản lý việc sắp xếp mặc định
-                var modeProp = so.FindProperty("m_TransparencySortMode");
-                var axisProp = so.FindProperty("m_TransparencySortAxis");
-
-                if (modeProp != null && axisProp != null)
-                {
-                    modeProp.intValue = (int)TransparencySortMode.Perspective;
-                    axisProp.vector3Value = new Vector3(0, 0, 1);
-                    so.ApplyModifiedProperties();
-                }
-
-                Debug.Log("Đã ép URP Asset dùng Perspective Z-Axis cho dự án Emotion!");
+                Debug.LogError("Đéo tìm thấy file nào hết đại ca ơi!");
             }
+                foreach (var guid in assets)
+            {
+
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                var data = AssetDatabase.LoadAssetAtPath<Renderer2DData>(path);
+
+                // Dùng SerializedObject để chọc vào biến ẩn m_TransparencySortMode
+                SerializedObject so = new SerializedObject(data);
+                so.FindProperty("m_TransparencySortMode").intValue = (int)TransparencySortMode.Perspective;
+                so.FindProperty("m_TransparencySortAxis").vector3Value = new Vector3(0, 0, 1);
+                so.ApplyModifiedProperties();
+            }
+            AssetDatabase.SaveAssets();
+            Debug.Log("Đã mở khóa trục Z chuẩn Studio cho Renderer 2D!");
         }
         [UnvsButton()]
         public void Generate()
