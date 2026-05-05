@@ -416,7 +416,30 @@ namespace unvs.ext
             Mathf.Sign(v.y)
             );
         }
+        public static void GetMinMax(this Vector2[] points,
+        out float minX, out float maxX,
+        out float minY, out float maxY)
+        {
+            if (points == null || points.Length == 0)
+            {
+                minX = maxX = minY = maxY = 0;
+                return;
+            }
 
+            minX = maxX = points[0].x;
+            minY = maxY = points[0].y;
+
+            for (int i = 1; i < points.Length; i++)
+            {
+                var p = points[i];
+
+                if (p.x < minX) minX = p.x;
+                if (p.x > maxX) maxX = p.x;
+
+                if (p.y < minY) minY = p.y;
+                if (p.y > maxY) maxY = p.y;
+            }
+        }
         public static T GetHitCollider<T>(this Vector2 pos)
         {
             // 1. Use GetRayIntersectionAll to detect 2D Colliders from a 3D Camera ray

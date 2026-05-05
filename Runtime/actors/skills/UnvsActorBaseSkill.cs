@@ -248,7 +248,7 @@ namespace unvs.actor.skills
         {
             if (coll.GetHit(out var hit, Vector2.down, 0.05f))
             {
-                actor.SayText(hit.collider.tag);
+                
                 if (hit.collider.tag == Constants.Tags.RIGID_BOX)
                 {
                     return true;

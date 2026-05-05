@@ -78,7 +78,7 @@ MonoBehaviour:
   m_DebugLevel: 0
   m_StoreActionsOptimization: 0
   m_UseAdaptivePerformance: 1
-  m_ColorGradingMode: 0
+  m_ColorGradingMode: 1
   m_ColorGradingLutSize: 32
   m_AllowPostProcessAlphaOutput: 0
   m_UseFastSRGBLinearConversion: 0
@@ -110,7 +110,7 @@ MonoBehaviour:
   m_PrefilteringModeScreenSpaceOcclusion: 0
   m_PrefilterDebugKeywords: 1
   m_PrefilterWriteRenderingLayers: 1
-  m_PrefilterHDROutput: 1
+  m_PrefilterHDROutput: 0
   m_PrefilterAlphaOutput: 1
   m_PrefilterSSAODepthNormals: 1
   m_PrefilterSSAOSourceDepthLow: 1
@@ -133,7 +133,7 @@ MonoBehaviour:
   m_PrefilterNativeRenderPass: 1
   m_PrefilterUseLegacyLightmaps: 0
   m_PrefilterBicubicLightmapSampling: 1
-  m_PrefilterReflectionProbeRotation: 1
+  m_PrefilterReflectionProbeRotation: 0
   m_PrefilterReflectionProbeBlending: 1
   m_PrefilterReflectionProbeBoxProjection: 1
   m_PrefilterReflectionProbeAtlas: 1

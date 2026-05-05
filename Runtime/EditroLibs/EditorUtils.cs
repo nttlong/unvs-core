@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -13,6 +14,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Rendering;
 using unvs.components;
 using unvs.types;
 using static System.Net.WebRequestMethods;
@@ -488,6 +490,101 @@ namespace unvs.editor.utils
         {
             var spriteRenderPath = unvs.editor.utils.UnvsEditorUtils.EditorGetAssetPath(texture);
             OpenSpriteEditor(spriteRenderPath);
+        }
+
+        public static void ForceEnableZWriteAllMaterial()
+        {
+            // 1. Quét toàn bộ Material trong Project
+            string[] guids = AssetDatabase.FindAssets("t:Material");
+
+            foreach (string guid in guids)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                Material mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+
+                // 2. Ép mọi Material tuân thủ luật Z-Buffer thông minh'
+                if (mat.shader.name.Contains("Universal Render Pipeline"))
+                {
+                    Debug.Log($"Universal Render Pipeline={mat.shader.name}");
+                }
+                mat.SetFloat("_DepthBias", -1.0f);
+                if (mat != null && mat.shader.name.Contains("Universal Render Pipeline"))
+                {
+                    // Cho phép ghi chiều sâu
+                    mat.SetInt("_ZWrite", 1);
+                    // Chỉ vẽ nếu gần Camera hơn hoặc bằng
+                    mat.SetInt("_ZTest", (int)CompareFunction.LessEqual);
+
+                    // MẤU CHỐT: Bật Alpha Clipping cho mọi thứ
+                    // Điều này giúp phần trong suốt không bao giờ "đục lỗ" vật thể phía sau
+                    if (mat.HasProperty("_AlphaClip"))
+                    {
+                        mat.SetFloat("_AlphaClip", 1);
+                        mat.SetFloat("_Cutoff", 0.01f); // Ngưỡng cực nhỏ để giữ chân nhân vật
+                        mat.EnableKeyword("_ALPHATEST_ON");
+                        mat.renderQueue = (int)RenderQueue.AlphaTest; // 2450
+                    }
+                }
+                if (mat.HasProperty("_AlphaClip"))
+                {
+                    mat.SetFloat("_AlphaClip", 1);
+                    // Ép Cutoff xuống thấp để giữ lại chân nhân vật, 
+                    // nhưng phải đủ cao để bỏ qua phần rỗng hoàn toàn.
+                    mat.SetFloat("_Cutoff", 0.05f);
+
+                    // QUAN TRỌNG: Ép Render Queue về đúng thứ tự 3D chuyên nghiệp
+                    mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.AlphaTest; // 2450
+                    mat.EnableKeyword("_ALPHATEST_ON");
+                }
+                // CỰC KỲ QUAN TRỌNG: 
+
+            }
+            AssetDatabase.SaveAssets();
+            Debug.Log("Hệ thống đã được tổng quát hóa sang chuẩn Depth-Buffer 3D.");
+
+            List<Material> allMaterials = new List<Material>();
+
+            foreach (string guid in guids)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                Material mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+                if (mat != null) allMaterials.Add(mat);
+            }
+
+            // Thực hiện logic xử lý
+            Undo.RecordObjects(allMaterials.ToArray(), "Globalize Materials");
+            foreach (var mat in allMaterials)
+            {
+                // Code xử lý ZWrite và AlphaClip của bạn ở đây
+                ProcessMaterial(mat);
+            }
+
+            AssetDatabase.SaveAssets();
+            Debug.Log($"Đã xử lý {allMaterials.Count} materials.");
+        }
+        static void ProcessMaterial(Material mat)
+        {
+            // 1. Thiết lập ghi chiều sâu
+            mat.SetInt("_ZWrite", 1);
+            mat.SetInt("_ZTest", (int)UnityEngine.Rendering.CompareFunction.LessEqual);
+
+            // 2. Ép Material mặc định từ Transparent sang Opaque để hỗ trợ Z-Write
+            if (mat.HasProperty("_Surface")) mat.SetFloat("_Surface", 0); // 0 = Opaque
+            if (mat.HasProperty("_Blend")) mat.SetFloat("_Blend", 0);     // 0 = Alpha Test
+
+            // 3. Kích hoạt Alpha Clipping để xóa phần trắng thừa
+            if (mat.HasProperty("_AlphaClip"))
+            {
+                mat.SetFloat("_AlphaClip", 1);
+                mat.SetFloat("_Cutoff", 0.1f);
+                mat.EnableKeyword("_ALPHATEST_ON");
+
+                // Tắt keyword của Transparent để tránh xung đột
+                mat.DisableKeyword("_SURFACE_TYPE_TRANSPARENT");
+                mat.renderQueue = 2450;
+            }
+
+            EditorUtility.SetDirty(mat);
         }
     }
 

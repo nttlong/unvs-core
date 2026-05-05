@@ -25,6 +25,10 @@ namespace game2d.scenes {
         public async UniTask FadeInAsync(float durationTime = 1f)
         {
             if (durationTime == 0f) return;
+            this.canvas.gameObject.SetActive(true);
+            this.canvas.enabled = true;
+           
+            this.canvas.FullSize();
             panel.transform.position = new Vector3(panel.transform.position.x, panel.transform.position.y, 0);
             panel.enabled = true;
             panel.gameObject.SetActive(true);
@@ -37,6 +41,8 @@ namespace game2d.scenes {
             panel.enabled = true;
             panel.gameObject.SetActive(true);
             await panel.FadeOutAsync(durationTime);
+            this.canvas.gameObject.SetActive(false);
+            this.canvas.enabled = false;
         }
         public override void InitRunTime()
         {

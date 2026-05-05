@@ -52,6 +52,14 @@ namespace unvs.game2d.scenes
         }
         public async UniTask<UnvsScene> LoadInteriorAsync(AssetReference sceneRef, string spawnName, UnvsScene fromScene)
         {
+            if (UnvsCinema.Instance != null)
+            {
+                if (UnvsCinema.Instance.CamChangeFollowOffsetTask.Status == UniTaskStatus.Pending)
+                {
+                    //await UnvsCinema.Instance.CamChangeFollowOffsetTask.SuppressCancellationThrow();
+                    await UnvsCinema.Instance.CamChangeFollowOffsetTask;
+                }
+            }
             await UnvsFadeScreen.Instance.FadeInAsync(UnvsApp.Instance.DefaultFadeTimeLoadScene);
             if (fromScene == null) return null;
             lastInteriorScene = fromScene;
@@ -120,7 +128,15 @@ namespace unvs.game2d.scenes
 
         public async UniTask<UnvsScene> LoadNewAsync(AssetReference sceneRef, string spawnName, bool byPlayerFail=false)
         {
-
+            if (UnvsCinema.Instance != null)
+            {
+                if (UnvsCinema.Instance.CamChangeFollowOffsetTask.Status == UniTaskStatus.Pending)
+                {
+                    //await UnvsCinema.Instance.CamChangeFollowOffsetTask.SuppressCancellationThrow();
+                    await UnvsCinema.Instance.CamChangeFollowOffsetTask;
+                }
+            }
+            await UnvsFadeScreen.Instance.FadeInAsync(UnvsApp.Instance.DefaultFadeTimeLoadScene);
             this.clearAllChunks();
             this.chunks.gameObject.SetActive(true);
             this.interior.gameObject.SetActive(false);
@@ -164,8 +180,9 @@ namespace unvs.game2d.scenes
 
             UnvsCinema.Instance.UpdateMainCameraBoxCollider2dSize();
             UnvsApp.Instance.RaiseEnterScene(ret, true);
+            
             CenterScene();
-            ret.gameObject.SetActive(true);
+            
             if (actor != null)
             {
                 actor.StandBy(ret.GetStartPosition(spawnName));
@@ -176,7 +193,9 @@ namespace unvs.game2d.scenes
             {
                 UnvsCinema.Instance.vcam.Watch(ret.defaulCamWatcher);
             }
-                return ret;
+            ret.gameObject.SetActive(true);
+            await UnvsFadeScreen.Instance.FadeOutAsync(UnvsApp.Instance.DefaultFadeTimeLoadScene);
+            return ret;
         }
         public async UniTask<UnvsScene> LoadChunkLeftAsync(UnvsScene fromScene, AssetReference sceneRef)
         {

@@ -22,7 +22,8 @@ namespace unvs.actionsbasics
         public AudioInfo CloseSound;
         public async override UniTask ExecuteAsync(ActionBaseSender Sender)
         {
-            if(Sender.Source.IsDestroyed())
+           
+            if (Sender.Source.IsDestroyed())
             {
                 Sender.Cancel();
                 return;
@@ -66,6 +67,19 @@ namespace unvs.actionsbasics
        
 
 
+    }
+    public class WaitingCameraFinish : ActionBase
+    {
+        public override async UniTask ExecuteAsync(ActionBaseSender Sender)
+        {
+            if(UnvsCinema.Instance!=null )
+            {
+                if (UnvsCinema.Instance.CamChangeFollowOffsetTask.Status == UniTaskStatus.Pending)
+                {
+                    await UnvsCinema.Instance.CamChangeFollowOffsetTask;
+                }
+            }
+        }
     }
     public class TransitionAction : ActionBase
     {

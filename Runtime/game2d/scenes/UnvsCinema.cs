@@ -24,6 +24,7 @@ using unvs.ui;
 namespace unvs.game2d.scenes{
     public class UnvsCinema : UnvsUIComponentInstance<UnvsCinema>
     {
+        public UniTask CamChangeFollowOffsetTask;
         /// <summary>
         /// Limit z of cinema michonne, the distance of cam to plane of view is always bigger or equal by this value 
         /// That mean z of follow offset o cinemachine is alway add negative of this value
@@ -92,17 +93,18 @@ namespace unvs.game2d.scenes{
         }
         private bool changeCameStepByOffset(List<UnvsScene> s, bool Imediately,Action OnChange)
         {
+            ctsChangeOffset.Refresh();
             UnvsScene nearset = null;
             if (Imediately)
             {
 
-                
-                //vcam.GetComponent<CinemachineFollow>().FollowOffset = new Vector3(s[0].followOffset.x, s[0].followOffset.y, cam.OrthoSizeToPerspectiveDistance(s[0].OrthographicSize));
+                if(UnvsApp.Instance!=null && UnvsApp.Instance.currentActor != null)
+                {
+                    UnvsApp.Instance.currentActor.SayText($"changeCameStepByOffset.Imediately={Imediately}");
+                }
 
-                ////float height = s[0].OrthographicSize * 2f;
-                //float width = height * cam.aspect; // cam.aspect = Screen.width / Screen.height
-                //camColl.size = new Vector2((float)width, (float)height);
-                //confiner.InvalidateBoundingShapeCache();
+                vcam.UpdateFollowOffset(s[0].followOffset);
+                //vcam.GetComponent<CinemachineFollow>().FollowOffset = s[0].followOffset;
                 return false;
             }
             nearset = CalculateNearestScene(s);
@@ -112,11 +114,10 @@ namespace unvs.game2d.scenes{
             {
                 nearset.followOffset = this.DefaultTargetOffset;
             }
-            vcam.ChangeFollowOffsetSmoothAsync(OnChange,nearset.followOffset, ctsChangeOffset.Token, 3).ContinueWith(() =>
-            {
-               
-                
-            }).Forget();
+            var tsk =
+            vcam.ChangeFollowOffsetSmoothAsync(OnChange, nearset.followOffset, ctsChangeOffset.Token, 3).Preserve();
+            //tsk.Forget();
+            this.CamChangeFollowOffsetTask = tsk;
 
             return true;
         }
@@ -349,13 +350,15 @@ namespace unvs.game2d.scenes{
         }
 
         bool hasUpdate;
+        bool _hasWorldBoudChange;
         private void updateWorldBound()
         {
             
             var bounds = this.worldBoundDict.Where(p => p.Key != null && !p.Key.IsDestroying && !p.Key.IsDestroyed()).Select(p => p.Value).ToArray();
           
             this.worldBoundCollider2d.SetPath(0, bounds.CreateRectFromVectorList());
-            this.confiner.InvalidateBoundingShapeCache();
+            _hasWorldBoudChange = true;
+            
 
         }
 
@@ -393,22 +396,35 @@ namespace unvs.game2d.scenes{
 
             //// Thiết lập trục ưu tiên là trục Z (0, 0, 1)
             //cam.transparencySortAxis = new Vector3(0, 0, 1);
-
+            this.confiner.BoundingShape2D = this.compositeCollider2D;
+            this.confiner.InvalidateBoundingShapeCache();
            
             
 
         }
-        //void OnPreRender() // Trước khi render bất cứ thứ gì
-        //{
-            
-        //    // Ép cách tính Z luôn nhất quán, bất kể bạn thêm Layer nào sau này
-        //    cam.transparencySortMode = TransparencySortMode.Orthographic;
-        //    cam.transparencySortAxis = new Vector3(0, 0, 1);
-        //}
+        
+        
 
+        private void FixedUpdate()
+        {
+            if (_hasWorldBoudChange)
+            {
+                this.confiner.InvalidateBoundingShapeCache();
+                _hasWorldBoudChange = true;
+            }
+           
+        }
+        public Action OnFirstStart;
+        public bool IsStart=true;
         private void LateUpdate()
         {
-            
+            //if (IsStart && OnFirstStart!=null)
+            //{
+            //    OnFirstStart?.Invoke();
+               
+            //    IsStart = false;
+            //    OnFirstStart=null;
+            //}
             float newPos = getValue(cam.transform.position.x);
             // Tính toán độ lệch
             float delta = Mathf.Abs(newPos - _lastPosition);
@@ -453,15 +469,16 @@ namespace unvs.game2d.scenes{
             // Tìm đúng file Renderer 2D mà đại ca vừa tạo lại
             var assets = AssetDatabase.FindAssets("t:Renderer2DData");
             Debug.Log("Tìm thấy: " + assets.Length + " file Renderer 2D"); // Thêm dòng này để check
-
+           
             if (assets.Length == 0)
             {
                 Debug.LogError("Đéo tìm thấy file nào hết đại ca ơi!");
             }
                 foreach (var guid in assets)
             {
-
+                
                 var path = AssetDatabase.GUIDToAssetPath(guid);
+                Debug.Log($"file={path}");
                 var data = AssetDatabase.LoadAssetAtPath<Renderer2DData>(path);
 
                 // Dùng SerializedObject để chọc vào biến ẩn m_TransparencySortMode
@@ -530,8 +547,15 @@ namespace unvs.game2d.scenes{
 
         }
 
-       
 
+        public override void OnDrawGizmos()
+        {
+            var coll = this.worldBoundCollider2d.GetComponentInChildren<PolygonCollider2D>();
+            if(coll!=null)
+            {
+                coll.GizmosDraw(Color.yellow);
+            }
+        }
 
 
 

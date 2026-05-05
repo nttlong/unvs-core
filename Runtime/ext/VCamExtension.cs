@@ -14,15 +14,15 @@ using unvs.shares;
 
 namespace unvs.ext
 {
-    public class CamStateObject : MonoBehaviour
-    {
-        internal Vector3 offSetValue;
-        internal bool isInteruptValue;
-        internal bool isInProgress;
-    }
+    //public class CamStateObject : MonoBehaviour
+    //{
+    //    internal Vector3 offSetValue;
+    //    internal bool isInteruptValue;
+    //    internal bool isInProgress;
+    //}
     public static class VCamExtension
     {
-        
+
         public static void Watch(this CinemachineCamera vcam, Transform camWatcher)
         {
             if (vcam == null)
@@ -82,10 +82,10 @@ namespace unvs.ext
         /// </summary>
         public static float GetOrthoSize(this CinemachineCamera vcam)
         {
-            if(vcam == null) { return 0; }
+            if (vcam == null) { return 0; }
             return vcam.Lens.OrthographicSize;
         }
-        public static CinemachineCamera UpdateOffset2D(this CinemachineCamera vcam,Vector2 Offset)
+        public static CinemachineCamera UpdateOffset2D(this CinemachineCamera vcam, Vector2 Offset)
         {
             vcam.GetComponent<CinemachineFollow>().FollowOffset = new Vector3(Offset.x, Offset.y, -10);
             return vcam;
@@ -98,52 +98,46 @@ namespace unvs.ext
         public static void UpdateByUnvsScene(this CinemachineCamera vcam, UnvsScene scene)
         {
             vcam.GetComponent<CinemachineFollow>().FollowOffset = scene.followOffset;
-            //var state = vcam.AddComponentIfNotExist<UnvsCamStaus>();
 
-            //if (UnvsCinema.Instance.cam.orthographic)
-            //{
-            //    if (scene.followOffset != Vector3.zero)
-            //    {
-
-            //        vcam.GetComponent<CinemachineFollow>().FollowOffset = scene.followOffset;
-            //        if (state.isInProgress)
-            //        {
-            //            state.isInteruptValue = true;
-            //            state.offSetValue = scene.followOffset;
-            //        }
-            //    }
-            //    vcam.SetOrthoSizeImmediate(scene.OrthographicSize);
-            //    return;
-            //} else
-            //{
-
-
-            //    //var z = UnvsCinema.Instance.cam.OrthoSizeToPerspectiveDistance(scene.OrthographicSize);
-            //    vcam.GetComponent<CinemachineFollow>().FollowOffset = scene.followOffset;// new Vector3(scene.followOffset.x, scene.followOffset.y, z);
-            //}
 
         }
-        public static async UniTask ChangeFollowOffsetSmoothAsync(this CinemachineCamera vcam,Action OnChange, Vector3 targetOffset, CancellationToken cancellationToken, float duration = 1.0f)
+        public static void UpdateFollowOffset(this CinemachineCamera vam, Vector3 offset)
+        {
+           
+            var fo = vam.GetComponent<CinemachineFollow>();
+            if (fo != null)
+            {
+                if (fo.FollowOffset != offset)
+                {
+                    fo.FollowOffset = offset;
+                }
+            }
+        }
+        public static async UniTask ChangeFollowOffsetSmoothAsync(this CinemachineCamera vcam, Action OnChange, Vector3 targetOffset, CancellationToken cancellationToken, float duration = 1.0f)
         {
             var f = vcam.GetComponent<CinemachineFollow>();
             if (f == null) return;
             Vector3 oldOffset = f.FollowOffset;
-            UnvsApp.Instance.currentActor.SayText($"old={oldOffset.z},new ={targetOffset.z}");
-            if(oldOffset.z> targetOffset.z)
+
+            if (oldOffset.z > targetOffset.z)
             {
-                await ChangeFollowOffsetFarSmoothAsync(vcam, targetOffset, OnChange, cancellationToken,duration);
-            } else
-            {
-                await ChangeFollowOffsetFarSmoothAsync(vcam, targetOffset, OnChange, cancellationToken, duration);
-               // await ChangeFollowOffsetByYAsync(vcam, targetOffset, cancellationToken, duration);
+                await ChangeFollowOffsetAsync(vcam, targetOffset, OnChange, cancellationToken, duration);
+
             }
+            else
+            {
+
+                await ChangeFollowOffsetAsync(vcam, targetOffset, OnChange, cancellationToken, duration);
+
+            }
+
         }
         public static async UniTask ChangeFollowOffsetNearSmoothAsync(this CinemachineCamera vcam, Vector3 targetOffset, CancellationToken cancellationToken, float duration = 1.0f)
         {
             var f = vcam.GetComponent<CinemachineFollow>();
             if (f == null) return;
 
-            var state = vcam.AddComponentIfNotExist<CamStateObject>();
+            //var state = vcam.AddComponentIfNotExist<CamStateObject>();
             Vector3 startOffset = f.FollowOffset;
 
             // Chia thời gian cho 2 giai đoạn (mỗi giai đoạn chiếm 50% tổng duration)
@@ -153,32 +147,32 @@ namespace unvs.ext
             using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(userCts.Token, cancellationToken);
             var linkedToken = linkedCts.Token;
 
-            state.isInProgress = true;
+            //state.isInProgress = true;
 
             try
             {
                 // --- GIAI ĐOẠN 1: THAY ĐỔI TRỤC Z ---
-               // await ChangeFollowOffsetByZAsync(vcam, targetOffset, linkedToken, phaseDuration);
+                // await ChangeFollowOffsetByZAsync(vcam, targetOffset, linkedToken, phaseDuration);
                 await ChangeFollowOffsetByYAsync(vcam, targetOffset, linkedToken, phaseDuration);
             }
             catch (OperationCanceledException)
             {
-                if (state.isInteruptValue)
-                {
-                    ApplyInterrupt(f, state);
-                }
-                else if (f != null)
-                {
-                    f.FollowOffset = startOffset;
-                }
+                //if (state.isInteruptValue)
+                //{
+                //    ApplyInterrupt(f, state);
+                //}
+                //else if (f != null)
+                //{
+                //    f.FollowOffset = startOffset;
+                //}
             }
             finally
             {
-                if (state != null) state.isInProgress = false;
+                //if (state != null) state.isInProgress = false;
             }
         }
 
-        private static async UniTask  ChangeFollowOffsetByYAsync(this CinemachineCamera vcam, Vector3 targetOffset, CancellationToken linkedToken, float phaseDuration = 1.0f)
+        private static async UniTask ChangeFollowOffsetByYAsync(this CinemachineCamera vcam, Vector3 targetOffset, CancellationToken linkedToken, float phaseDuration = 1.0f)
         {
             var f = vcam.GetComponent<CinemachineFollow>();
             if (f == null) return;
@@ -192,7 +186,7 @@ namespace unvs.ext
             {
                 linkedToken.ThrowIfCancellationRequested();
 
-                
+
 
                 elapsedY += Time.deltaTime;
                 float t = Mathf.Clamp01(elapsedY / phaseDuration);
@@ -203,7 +197,7 @@ namespace unvs.ext
                 await UniTask.Yield(PlayerLoopTiming.Update, linkedToken);
             }
             f.FollowOffset = targetOffset;
-            
+
         }
 
         private static async UniTask ChangeFollowOffsetByZAsync(this CinemachineCamera vcam, Vector3 targetOffset, CancellationToken linkedToken, float phaseDuration = 1.0f)
@@ -234,48 +228,39 @@ namespace unvs.ext
                 await UniTask.Yield(PlayerLoopTiming.Update, linkedToken);
             }
             f.FollowOffset = targetZOnly;
-           
+
         }
 
         // Hàm hỗ trợ xử lý ngắt ngang
-        private static void ApplyInterrupt(CinemachineFollow f, CamStateObject state)
-        {
-            f.FollowOffset = state.offSetValue;
-            state.isInteruptValue = false;
-            state.isInProgress = false;
-        }
-        public static async UniTask ChangeFollowOffsetFarSmoothAsync(this CinemachineCamera vcam, Vector3 targetOffset,Action OnChange, CancellationToken cancellationToken, float duration = 1.0f)
+        //private static void ApplyInterrupt(CinemachineFollow f, CamStateObject state)
+        //{
+        //    //f.FollowOffset = state.offSetValue;
+        //    //state.isInteruptValue = false;
+        //    //state.isInProgress = false;
+        //}
+        public static async UniTask ChangeFollowOffsetFarSmoothAsync(this CinemachineCamera vcam, Vector3 targetOffset, Action OnChange, CancellationToken cancellationToken, float duration = 1.0f)
         {
             var f = vcam.GetComponent<CinemachineFollow>();
             if (f == null) return;
 
-            var state = vcam.AddComponentIfNotExist<CamStateObject>();
+
             Vector3 oldOffset = f.FollowOffset;
 
-            // Sử dụng using cho cả hai để đảm bảo giải phóng tài nguyên hệ thống
-            using var userCts = new CancellationTokenSource();
-            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(userCts.Token, cancellationToken);
 
-            // Lấy token tổng hợp để sử dụng xuyên suốt
-            var linkedToken = linkedCts.Token;
+            using var userCts = new CancellationTokenSource();
+
 
             float elapsed = 0;
-            state.isInProgress = true;
+
 
             try
             {
-                while (elapsed < duration)
+                while (elapsed < duration && !cancellationToken.IsCancellationRequested)
                 {
                     // Kiểm tra token tổng hợp trước
-                    linkedToken.ThrowIfCancellationRequested();
+                    cancellationToken.ThrowIfCancellationRequested();
 
-                    if (state.isInteruptValue)
-                    {
-                        f.FollowOffset = state.offSetValue;
-                        state.isInteruptValue = false;
-                        state.isInProgress = false;
-                        return; // Thoát ra, khối 'finally' sẽ lo việc reset isInProgress
-                    }
+
 
                     elapsed += Time.deltaTime;
                     float t = Mathf.Clamp01(elapsed / duration);
@@ -283,8 +268,8 @@ namespace unvs.ext
 
                     f.FollowOffset = Vector3.Lerp(oldOffset, targetOffset, step);
                     OnChange();
-                    // Truyền linkedToken vào đây để UniTask tự ngắt nếu 1 trong 2 nguồn bị hủy
-                    await UniTask.Yield(PlayerLoopTiming.PreUpdate, linkedToken);
+
+                    await UniTask.Yield(PlayerLoopTiming.PreUpdate, cancellationToken);
                 }
 
                 f.FollowOffset = targetOffset;
@@ -292,29 +277,72 @@ namespace unvs.ext
             }
             catch (OperationCanceledException)
             {
-                if (state.isInteruptValue)
-                {
-                    f.FollowOffset = state.offSetValue;
-                    state.isInteruptValue = false;
+                //if (state.isInteruptValue)
+                //{
+                //    f.FollowOffset = state.offSetValue;
+                //    state.isInteruptValue = false;
 
-                }
-                else
-                {
-                    if (f != null) f.FollowOffset = oldOffset;
-                }
+                //}
+                //else
+                //{
+                //    if (f != null) f.FollowOffset = oldOffset;
+                //}
 
             }
             finally
             {
                 // Dùng finally để đảm bảo dù chạy xong, bị lỗi, hay bị cancel thì flag vẫn về false
-                if (state != null) state.isInProgress = false;
+                //if (state != null) state.isInProgress = false;
+            }
+        }
+        public static async UniTask ChangeFollowOffsetAsync(
+                                             this CinemachineCamera vcam,
+                                                    Vector3 targetOffset,
+                                                    Action OnChange,
+                                                    CancellationToken cancellationToken,
+                                                    float duration = 1.0f)
+        {
+            var f = vcam.GetComponent<CinemachineFollow>();
+            if (f == null) return;
+
+            Vector3 oldOffset = f.FollowOffset.CloneToNew();
+            float elapsed = 0;
+
+            try
+            {
+                while (elapsed < duration)
+                {
+                    // Kiểm tra cancel và ném exception ngay lập tức nếu cần
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    elapsed += Time.deltaTime;
+                    float t = Mathf.Clamp01(elapsed / duration);
+
+                    // Dùng SmoothStep để gia tốc/giảm tốc mượt mà
+                    float step = Mathf.SmoothStep(0, 1, t);
+
+                    f.FollowOffset = Vector3.Lerp(oldOffset, targetOffset, step);
+
+                    // Invoke Action an toàn hơn
+                    OnChange?.Invoke();
+
+                    // Đợi frame tiếp theo
+                    await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+                }
+
+                // Đảm bảo kết thúc ở đúng vị trí đích
+                f.FollowOffset = targetOffset;
+                OnChange?.Invoke();
+            }
+            catch (OperationCanceledException)
+            {
+                f.FollowOffset=oldOffset;
             }
         }
 
-
         public static async UniTask SetOrthoSizeSmoothlyAsyncDelete(this CinemachineCamera vcam, float targetSize, float duration = -1f, float zoomSpeed = 3f, CancellationToken cancellationToken = default, Action<float> OnUpdating = null)
         {
-            if(targetSize==0) return;
+            if (targetSize == 0) return;
             try
             {
                 if (vcam == null) return;

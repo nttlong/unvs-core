@@ -44,6 +44,7 @@ namespace unvs.game2d.scenes
     {
         public bool useAssetReferenceAssetGUIDForName = true;
         public UnvsUIInput<UnvsApp> uiInputs;
+        public float FadeTimeStartGame = 0.5f;
         public float DefaultFadeTimeLoadScene=0;
         public GameObject controllerInput;
         [Header("prefabs requirements")]
@@ -124,23 +125,36 @@ namespace unvs.game2d.scenes
             uiInputs.StartInputController();
 
         }
-
+        async UniTask startGameAsyn()
+        {
+            var oldFadeTime = this.DefaultFadeTimeLoadScene;
+            this.DefaultFadeTimeLoadScene = 0;
+            await UnvsFadeScreen.Instance.FadeInAsync(this.FadeTimeStartGame);
+            await SceneLoader.LoadNewAsync(this.startScene, "", false);
+           
+            UnvsCinema.Instance.OnFirstStart = () =>
+            {
+               
+                Debug.Log("UnvsFadeScreen.Instance.FadeOutAsync(FadeTimeStartGame).Forget();");
+            };
+            await UnvsFadeScreen.Instance.FadeOutAsync(FadeTimeStartGame);
+            this.DefaultFadeTimeLoadScene = oldFadeTime;
+        }
         public virtual void InitEvents()
         {
             MainMenu.btnStart.onClick.AddListener(() =>
             {
-                SceneLoader.LoadNewAsync(this.startScene, "",false).ContinueWith(s =>
-                {
-                    MainMenu.Hide();
-                }).Forget();
+                MainMenu.Hide();
+                startGameAsyn().Forget();
             });
 
             MainMenu.btnExit.onClick.AddListener(() =>
             {
-                SceneLoader.LoadNewAsync(this.startScene, "", false).ContinueWith(s =>
-                {
-                    MainMenu.Hide();
-                }).Forget();
+                this.ExitGame();
+                //SceneLoader.LoadNewAsync(this.startScene, "", false).ContinueWith(s =>
+                //{
+                //    MainMenu.Hide();
+                //}).Forget();
             });
             container.gameObject.SetActive(true);
             InteractUI.Activate();
