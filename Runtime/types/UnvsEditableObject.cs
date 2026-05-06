@@ -37,6 +37,14 @@ namespace unvs.types
         public GameObject Target;
         public bool IsSelected;
     }
+    [Serializable]
+    public class SpriteMaterial
+    {
+        [SerializeField]
+        public SpriteRenderer spriteRenderer;
+        [SerializeField]
+        public Material material;
+    }
     public enum DockType
     {
         None = 0,

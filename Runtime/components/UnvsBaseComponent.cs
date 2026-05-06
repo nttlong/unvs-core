@@ -24,9 +24,17 @@ namespace unvs.components
                 var component = this.GetComponent(field.FieldType.GenericTypeArguments[0]);
 
 
-                if (ownerField != null && component!=null)
+                if (ownerField != null && component!=null && propertyInstance!=null)
                 {
-                    ownerField.SetValue(propertyInstance, component);
+                    try
+                    {
+                        ownerField.SetValue(propertyInstance, component);
+                    }
+                    catch (Exception)
+                    {
+
+                       
+                    }
 
 
                 }

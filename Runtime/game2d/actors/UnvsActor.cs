@@ -21,6 +21,8 @@ using unvs.shares;
 using unvs.ui;
 using unvs.controllers;
 using unvs.ext.physical2d;
+using unvs.editor.components;
+
 
 
 
@@ -197,6 +199,7 @@ namespace unvs.game2d.actors
     }
 #if UNITY_EDITOR
     [RequireComponent(typeof(UnvsDummyActor))]
+    [RequireComponent(typeof(UnvsEditorShaderApply))]
     public partial class UnvsActor : UnvsBaseComponent
     {
         [SerializeField]

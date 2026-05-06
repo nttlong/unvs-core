@@ -54,6 +54,7 @@ namespace unvs.game2d.objects
     {
         [Header("Spawn List", order = 1)]
         [SerializeField] public SpawnPointInfo[] SpawnList;
+
         public void OnValidate()
         {
 
@@ -73,6 +74,7 @@ namespace unvs.game2d.objects
                     var selected = SpawnList.FirstOrDefault(p => p.IsSelected);
                     if (selected.IsSelected)
                     {
+                        if(!selected.Target.IsDestroyed())
                         this.SpawnName = selected.Target.name;
                     }
                 }

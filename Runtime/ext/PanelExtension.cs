@@ -320,7 +320,8 @@ Pivot: (0.5, 0.5).
         /// </summary>
         public static async UniTask FadeOutAsync(this UnityEngine.UI.Image panel, CanvasGroup canvasGroup, float fadingTime = 0.5f)
         {
-            if (canvasGroup == null) return;
+            if(!Application.isPlaying) return;
+            if (canvasGroup == null|| canvasGroup.IsDestroyed()) return;
 
             float elapsedTime = 0;
             while (elapsedTime < fadingTime)
@@ -329,7 +330,7 @@ Pivot: (0.5, 0.5).
                 canvasGroup.alpha = Mathf.Clamp01(1f - (elapsedTime / fadingTime));
                 await UniTask.Yield(PlayerLoopTiming.Update);
             }
-
+            if (canvasGroup == null || canvasGroup.IsDestroyed()) return;
             canvasGroup.alpha = 0f;
             canvasGroup.blocksRaycasts = false; // Allow UI interactions
             panel.gameObject.SetActive(false);
