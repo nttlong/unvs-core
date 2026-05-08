@@ -2,9 +2,12 @@ using UnityEngine;
 
 namespace unvs.game2d.objects
 {
+
     public  partial class UnvsPickableObject : UnvsInteractObject
     {
-        public Texture2D inventoryIcon;
+        [SerializeField]
+        public Sprite inventoryIcon;
+        
         public override void InitRuntime()
         {
             base.InitRuntime();

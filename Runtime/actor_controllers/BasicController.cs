@@ -3,28 +3,36 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using unvs.actor.player;
 using unvs.actor.skills;
+using unvs.ext;
+using unvs.ext.physical2d;
 using unvs.game2d.actors;
+using unvs.game2d.objects;
+using unvs.game2d.scenes;
+using unvs.shares;
+using UNVS.Core.Actors.Skills;
+using static UnityEditor.PlayerSettings;
 
 namespace unvs.controllers
 {
-    
+
     public class BasicController : UnvsPlayer
     {
         protected UnvsActor actor;
 
-        
+
         protected MapAction look;
         protected MapAction move;
         protected MapAction jump;
         protected MapAction sprint;
+        protected MapAction interact;
         private bool _isSprint;
 
-        
+
         //private bool _isJumping;
         protected MapAction crouch;
-       
+
         private bool _isMove;
-        
+        private MapAction inventory;
 
         public override MapAction OnMapConrrol(string name)
         {
@@ -35,32 +43,63 @@ namespace unvs.controllers
             if (name == "jump") return this.jump;
             if (name == "sprint") return this.sprint;
             if (name == "crouch") return this.crouch;
+            if (name == "interact") return this.interact;
+            if(name== "inventory") return this.inventory;
             return null;
         }
 
         public override void InitRuntime()
         {
-            
+
             this.actor = this.GetComponent<UnvsActor>();
 
-        
+
             this.move = new MapAction();
             jump = new MapAction();
             this.sprint = new MapAction();
             crouch = new MapAction();
-            this.look= new MapAction();
-          
+            this.look = new MapAction();
+            this.interact = new MapAction();
+            this.inventory =new MapAction();
             this.move.performed += Move_performed;
             this.move.canceled += Move_canceled;
 
-           
+
             this.sprint.performed += Sprint_performed;
             this.sprint.canceled += Sprint_canceled;
             jump.started += Jump_performed;
             jump.canceled += Jump_canceled;
             crouch.performed += Crouch_performed;
             crouch.canceled += Crouch_canceled;
-            
+            interact.started += Interact_started;
+           
+            this.inventory.started += Inventory_started;
+
+        }
+
+        private void Inventory_started(InputAction.CallbackContext obj)
+        {
+            var inventorySkill = actor.Skills.Get<ActorUnvsInventorySkill>();
+            if (inventorySkill !=null)
+            {
+                inventorySkill.ToggleInventoryPanel();
+            }
+        }
+
+        
+
+        private void Interact_started(InputAction.CallbackContext obj)
+        {
+            if (obj.control.device is Mouse) return;
+            var go = actor.scanerBound.ScanObject(0, 0, Constants.Layers.INTERACT_OBJECT);
+            if (go == null) return;
+            UnvsInteractObject ret = go.GetComponent<UnvsInteractObject>();
+            if (ret == null) return;
+            this.actor.CurrentSkill.Direction = new Vector2(this.actor.coll.bounds.center.GetDirectionTo(ret.GetPosition()), 0);
+            ret.ExecuteAsync(this.actor, actor.RefreshToken()).ContinueWith(p =>
+            {
+
+            }).Forget();
         }
 
         private void Crouch_canceled(InputAction.CallbackContext obj)
@@ -68,7 +107,7 @@ namespace unvs.controllers
             var com = actor.GetComponent<CompositeCollider2D>();
 
             var cruchSkill = actor.Skills.Get<ActorUnvsCrouchSkill>();
-           
+
 
             actor.Skills.Get<ActorUnvsCrouchSkill>().StopAsync(actor.RefreshToken().Token).ContinueWith(ret =>
             {
@@ -88,6 +127,7 @@ namespace unvs.controllers
 
             var com = actor.GetComponent<CompositeCollider2D>();
             var cruchSkill = actor.Skills.Get<ActorUnvsCrouchSkill>();
+            if (cruchSkill == null) return;
             if (actor.CurrentSkill == cruchSkill) return;
             if (cruchSkill.IsHitTopGround())
             {

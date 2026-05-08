@@ -1,23 +1,30 @@
 
+using Cysharp.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.InputSystem;
 using unvs.actor.player;
 using unvs.actor.skills;
-using unvs.game2d.actors;
 using unvs.ext;
-using UnityEngine;
+using unvs.game2d.actors;
 using unvs.game2d.objects;
-using Cysharp.Threading.Tasks;
+using unvs.game2d.scenes;
 namespace unvs.controllers
 {
     public class BasicMouseController : BasicController{
         protected bool IsInInteraction;
-
-        protected MapAction interact => this.NewMapAction("interact", action =>
+        
+        protected new MapAction interact => this.NewMapAction("interact", action =>
         {
             action.started += ctx =>
             {
                 if(ctx.control.device is Mouse)
                 {
+                    if (UnvsApp.Instance.IsBeginDragItem)
+                    {
+                        actor.RefreshToken();
+                        return;
+                    }
+                    ;
                     if (IsInInteraction) actor.RefreshToken();
                     //this.actor.RefreshToken();
                     var pos = this.look.ReadValue<Vector2>().ToWorld();
@@ -46,12 +53,17 @@ namespace unvs.controllers
                     
                    
                 }
-                
+               
             };
             action.canceled += ctx =>
             {
                 if (ctx.control.device is Mouse)
                 {
+                    if (UnvsApp.Instance.IsBeginDragItem)
+                    {
+                        actor.RefreshToken();
+                        return;
+                    }
                     //this.actor.RefreshToken();
                     var pos = this.look.ReadValue<Vector2>().ToWorld();
                     this.actor.CurrentSkill.Direction = new Vector2(this.actor.coll.bounds.center.GetDirectionTo(pos), 0);

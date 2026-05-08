@@ -99,13 +99,9 @@ namespace unvs.game2d.scenes{
             if (Imediately)
             {
 
-                if(UnvsApp.Instance!=null && UnvsApp.Instance.currentActor != null)
-                {
-                    UnvsApp.Instance.currentActor.SayText($"changeCameStepByOffset.Imediately={Imediately}");
-                }
 
                 vcam.UpdateFollowOffset(s[0].followOffset);
-                //vcam.GetComponent<CinemachineFollow>().FollowOffset = s[0].followOffset;
+             
                 return false;
             }
             nearset = CalculateNearestScene(s);
@@ -408,35 +404,20 @@ namespace unvs.game2d.scenes{
 
         private void FixedUpdate()
         {
-            //if (vcam.Target.TrackingTarget != null && vcam.Target.TrackingTarget.position.z != CamWacherDistance)
-            //{
-            //    vcam.Watch
-            //    vcam.PreviousStateIsValid = false;
-            //    vcam.Target.TrackingTarget.position = new Vector3(vcam.Target.TrackingTarget.position.x, vcam.Target.TrackingTarget.position.y, CamWacherDistance);
-            //}
+          
                 
             if (_hasWorldBoudChange)
             {
                 this.confiner.InvalidateBoundingShapeCache();
                 _hasWorldBoudChange = true;
             }
-            if (UnvsApp.Instance != null && UnvsApp.Instance.currentActor!=null)
-            {
-               
-                UnvsApp.Instance.currentActor.SayText($"a={vcam.Target.TrackingTarget}");
-            }
+            
         }
         public Action OnFirstStart;
         public bool IsStart=true;
         private void LateUpdate()
         {
-            //if (IsStart && OnFirstStart!=null)
-            //{
-            //    OnFirstStart?.Invoke();
-               
-            //    IsStart = false;
-            //    OnFirstStart=null;
-            //}
+            
             float newPos = getValue(cam.transform.position.x);
             // Tính toán độ lệch
             float delta = Mathf.Abs(newPos - _lastPosition);

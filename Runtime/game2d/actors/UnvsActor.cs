@@ -242,7 +242,11 @@ namespace unvs.game2d.actors
 
            
         }
-        
+        [UnvsButton]
+        public void EditorCreateBagger()
+        {
+            this.AddComponentIfNotExist<UnvsBagger>();
+        }
 
     }
 

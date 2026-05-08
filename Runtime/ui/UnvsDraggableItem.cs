@@ -6,10 +6,11 @@ namespace unvs.ui
     using UnityEngine.EventSystems;
     using UnityEngine.UI;
     using unvs.ext;
+    using unvs.game2d.scenes;
     using unvs.types;
 
     [RequireComponent(typeof(CanvasGroup))]
-    public class UnvsDraggableItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+    public class UnvsDraggableItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler,IPointerClickHandler
     {
         public Image image;
         [HideInInspector] public Transform parentAfterDrag; // Biến này để Slot gán giá trị vào
@@ -34,6 +35,7 @@ namespace unvs.ui
 
         public void OnBeginDrag(PointerEventData eventData)
         {
+            
             if (owner.currentDrageInfo == null)
             {
                 owner.currentDrageInfo = new UnvsDragContext();
@@ -58,9 +60,11 @@ namespace unvs.ui
 
         public void OnDrag(PointerEventData eventData)
         {
+            UnvsApp.Instance.IsBeginDragItem = true;
             // Tương thích cả Mouse và Gamepad Virtual Cursor
             rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
-           
+            UnvsApp.Instance.currentActor.SayText("OnDrag");
+
         }
 
         public void OnEndDrag(PointerEventData eventData)
@@ -97,6 +101,8 @@ namespace unvs.ui
             // Bật lại LayoutGroup nếu có
             var layout = canvas.GetComponent<HorizontalOrVerticalLayoutGroup>();
             if (layout != null) layout.enabled = true;
+            UnvsApp.Instance.IsBeginDragItem = false;
+            UnvsApp.Instance.currentActor.SayText("OnEndDrag");
         }
 
         private void RollbackToOriginalSlot()
@@ -104,6 +110,12 @@ namespace unvs.ui
             transform.SetParent(_originalParent, false);
             rectTransform.anchoredPosition = Vector2.zero;
             transform.localScale = Vector3.one;
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            UnvsApp.Instance.IsBeginDragItem = true;
+            UnvsApp.Instance.currentActor.SayText("Start drag");
         }
     }
 }

@@ -3,16 +3,15 @@ using game2d.ext;
 using game2d.scenes;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
-using UnityEngine.UI;
+
 using unvs.ext;
-using unvs.game2d.objects;
+
 using unvs.game2d.actors;
 
 
@@ -21,7 +20,7 @@ using unvs.shares;
 using unvs.components;
 using unvs.game2d.objects.types;
 using unvs.controllers.inputs;
-using UnityEngine.UIElements;
+
 using unvs.ui;
 
 
@@ -65,7 +64,7 @@ namespace unvs.game2d.scenes
         public string startScenePath;
         public AssetReference startScene;
         [Header("Components")]
-        public UnvsUiInventory UiInventory;
+        public UnvsUIInventory UiInventory;
         public UnvsPlayerInput playerInput;
         public UnvsMainMenu MainMenu;
         public UnvsPauseMenu PauseMenu;
@@ -116,10 +115,8 @@ namespace unvs.game2d.scenes
             InteractUI = await Commons.LoadPrefabsAsync<UnvsInteractUI>(refInteractUI, container, true);
             ActorDialogue = await Commons.LoadPrefabsAsync<UnvsActorDialogue>(refActorDialogue, container, true);
             fadeScreen = await Commons.LoadPrefabsAsync<UnvsFadeScreen>(refFadeScreen, container, true);
-            //MainMenu.Show();
-            //ActorDialogue.Hide();
-            //dialog.Hide();
-            //PauseMenu.Hide();
+            UiInventory = await Commons.LoadPrefabsAsync<UnvsUIInventory>(refUiInventory, container, true);
+         
 
             InitEvents();
             uiInputs.StartInputController();
@@ -185,6 +182,8 @@ namespace unvs.game2d.scenes
         
         
         public Dictionary<UnvsScene,string> Scenes { get; private set; }
+        public bool IsBeginDragItem { get; internal set; }
+
         private UnvsScene _LastScene;
         private UnvsScene _LastExitScene;
         private CheckPintInfo restartCheckPoint;
@@ -367,7 +366,7 @@ namespace unvs.game2d.scenes
         [UnvsButton("Generate Inventory")]
         public void GenerateInventoryUI()
         {
-            var r = this.EditorCreatePrefab<UnvsUiInventory>("UnvsUiInventory");
+            var r = this.EditorCreatePrefab<UnvsUIInventory>("UnvsUiInventory");
             this.UiInventory = r.value;
 
             this.refUiInventory = unvs.editor.utils.UnvsEditorUtils.CreateAssetReference(r.PrefabPath);
