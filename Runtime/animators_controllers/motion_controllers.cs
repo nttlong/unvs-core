@@ -92,8 +92,14 @@ namespace unvs.animators_controllers
         public unvs.animators_controllers.texturesEditor[] textures;
 #endif
         [UnvsButton("Load Motions")]
-        public void LoadMotions()
-        {
+        public void LoadMotions() { 
+
+
+        var anim = this.Owner.GetComponentInChildren<Animator>();
+            if (anim == null)
+            {
+                unvs.editor.utils.Dialogs.Show($"Please, create animator for {Owner.name}");
+            }
             this.Owner.GetComponentInChildren<Animator>().AddComponentIfNotExist<UnsvPalyerAnimatorEvent>();
            
             this.animStates = this.Owner.GetComponentInChildren<Animator>().EditorExtractAllMotions().ToArray();

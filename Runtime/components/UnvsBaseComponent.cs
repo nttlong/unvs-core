@@ -4,6 +4,9 @@ using System.Linq;
 using System.Reflection;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering;
+using unvs.ext;
+using unvs.game2d.objects.editor;
 using unvs.shares;
 using unvs.types;
 
@@ -58,6 +61,31 @@ namespace unvs.components
         public virtual void OnValidate()
         {
             InitProperties();
+        }
+        [UnvsButton]
+        public void AddSoringGroup()
+        {
+            foreach (var item in GetComponentsInChildren<SpriteRenderer>(true))
+            {
+                item.AddComponentIfNotExist<SortingGroup>();
+            }
+
+
+        }
+        [UnvsButton]
+        public void RemoveSortingGroup()
+        {
+            foreach (var item in GetComponentsInChildren<SpriteRenderer>(true))
+            {
+                var b=item.GetComponent<SortingGroup>();
+                if (b != null)
+                {
+                    DestroyImmediate(b);
+                }
+                //item.AddComponentIfNotExist<SortingGroup>();
+            }
+
+
         }
 #endif
 

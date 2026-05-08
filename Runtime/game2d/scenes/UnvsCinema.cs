@@ -32,6 +32,7 @@ namespace unvs.game2d.scenes{
         [Header("Camera")]
         [SerializeField]
         public Vector3 DefaultTargetOffset=new Vector3(0,0,-35);
+        public float CamWacherDistance = -30;
         [Header("Cinema light")]
         public float DurationTimeSmoothChangeSate = 1.5f;
         public int MaintainGlobalLightNumber = 5;
@@ -407,12 +408,23 @@ namespace unvs.game2d.scenes{
 
         private void FixedUpdate()
         {
+            //if (vcam.Target.TrackingTarget != null && vcam.Target.TrackingTarget.position.z != CamWacherDistance)
+            //{
+            //    vcam.Watch
+            //    vcam.PreviousStateIsValid = false;
+            //    vcam.Target.TrackingTarget.position = new Vector3(vcam.Target.TrackingTarget.position.x, vcam.Target.TrackingTarget.position.y, CamWacherDistance);
+            //}
+                
             if (_hasWorldBoudChange)
             {
                 this.confiner.InvalidateBoundingShapeCache();
                 _hasWorldBoudChange = true;
             }
-           
+            if (UnvsApp.Instance != null && UnvsApp.Instance.currentActor!=null)
+            {
+               
+                UnvsApp.Instance.currentActor.SayText($"a={vcam.Target.TrackingTarget}");
+            }
         }
         public Action OnFirstStart;
         public bool IsStart=true;

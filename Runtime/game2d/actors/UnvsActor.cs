@@ -1,27 +1,24 @@
-﻿using Cysharp.Threading.Tasks;
-using Cysharp.Threading.Tasks.Triggers;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using Unity.VisualScripting;
-using UnityEditor;
-using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.Rendering;
-using UnityEngine.Rendering.Universal;
-using UnityEngine.U2D.Animation;
+﻿
 using unvs.actor.player;
 using unvs.actor.skills;
-using unvs.actor_physical;
+
 using unvs.components;
 using unvs.ext;
 
-using unvs.game2d.objects.editor;
+
 using unvs.shares;
 using unvs.ui;
 using unvs.controllers;
 using unvs.ext.physical2d;
-using unvs.editor.components;
+using UnityEngine;
+using Unity.VisualScripting;
+using System.Threading;
+using UnityEngine.Rendering;
+
+
+
+
+
 
 
 
@@ -30,8 +27,8 @@ using unvs.editor.components;
 
 
 #if UNITY_EDITOR
-
-
+using unvs.editor.components;
+using unvs.game2d.objects.editor;
 #endif
 using unvs.sys;
 
@@ -234,8 +231,7 @@ namespace unvs.game2d.actors
 
 
         }
-
-
+        
         public override void OnValidate()
         {
             base.OnValidate();

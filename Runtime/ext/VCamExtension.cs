@@ -34,6 +34,7 @@ namespace unvs.ext
             vcam.LookAt = null;
             //vcam.Target.TrackingTarget = null;
             //vcam.Target.LookAtTarget = null;
+            
             vcam.Follow = camWatcher;
             vcam.LookAt = camWatcher;
 
