@@ -31,16 +31,15 @@ namespace unvs.game2d.objects
         public string TargetPath;
         public Transform otherSpawnPoints;
         //public UnvsScene TarggetScene;
-        public bool IsNew;
+       
+        public TeleportType TeleportType;
         public string SpawnName;
         
         [Header("Feedback audio", order = 2)]
         [SerializeField]
         public AudioInfo OpenSound;
         [SerializeField] public AudioInfo CloseSound;
-       
-        
-        
+        internal UnvsTeleport TargetSpawn;
 
         public override void InitRuntime()
         {

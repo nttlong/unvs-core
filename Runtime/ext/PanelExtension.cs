@@ -333,6 +333,7 @@ Pivot: (0.5, 0.5).
             if (canvasGroup == null || canvasGroup.IsDestroyed()) return;
             canvasGroup.alpha = 0f;
             canvasGroup.blocksRaycasts = false; // Allow UI interactions
+            await UniTask.Yield(PlayerLoopTiming.PostLateUpdate);
             panel.gameObject.SetActive(false);
         }
         public static async UniTask FadeOutAsync(this UnityEngine.UI.Image panel, float fadingTime = 0.5f)

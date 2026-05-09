@@ -8,15 +8,16 @@
 using Cysharp.Threading.Tasks;
 using System;
 using System.Linq;
-
 using Unity.Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Rendering.Universal;
+using unvs.actions;
+using unvs.components;
 using unvs.ext;
 using unvs.game2d.actors;
-using unvs.components;
+using unvs.game2d.objects;
 using unvs.shares;
 using unvs.types;
 
@@ -207,7 +208,18 @@ namespace unvs.game2d.scenes
             this.OnDestroying?.Invoke(this);
             UnvsApp.Instance.RaiseEventScenseDestroying(this);
         }
-        
 
+        public bool SetTempSpawnInfo(string spawnName, UnvsTeleport tmpTeleportObject)
+        {
+            var tr = this.GetComponentInChildrenByName<Transform>(spawnName);
+            if(tr == null) return false;
+            var teleport= tr.AddComponentIfNotExist<UnvsTeleport>();
+            teleport.Data = tmpTeleportObject.Data;
+            teleport.Target = tmpTeleportObject.GetComponentInParent<UnvsScene>(true).selRef;
+            teleport.SpawnName = tmpTeleportObject.name;
+            teleport.TeleportType = TeleportType.ReturnToScene;
+            teleport.TargetSpawn = tmpTeleportObject;
+            return true;
+        }
     }
 }

@@ -99,7 +99,7 @@ namespace unvs.ext
         public static void UpdateByUnvsScene(this CinemachineCamera vcam, UnvsScene scene)
         {
             vcam.GetComponent<CinemachineFollow>().FollowOffset = scene.followOffset;
-
+            
 
         }
         public static void UpdateFollowOffset(this CinemachineCamera vam, Vector3 offset)

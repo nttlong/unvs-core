@@ -43,8 +43,10 @@ namespace unvs.game2d.scenes
     {
         public bool useAssetReferenceAssetGUIDForName = true;
         public UnvsUIInput<UnvsApp> uiInputs;
+        [Header("Visual loading")]
         public float FadeTimeStartGame = 0.5f;
         public float DefaultFadeTimeLoadScene=0;
+        public int DelayFrameBeforeInteriorSceneShow = 10;
         public GameObject controllerInput;
         [Header("prefabs requirements")]
         public AssetReference refPlayerInput;
@@ -187,7 +189,7 @@ namespace unvs.game2d.scenes
         private UnvsScene _LastScene;
         private UnvsScene _LastExitScene;
         private CheckPintInfo restartCheckPoint;
-        
+     
 
         public void RaiseResart(CheckPintInfo value)
         {

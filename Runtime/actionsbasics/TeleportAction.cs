@@ -22,7 +22,7 @@ namespace unvs.actionsbasics
         public AudioInfo CloseSound;
         public async override UniTask ExecuteAsync(ActionBaseSender Sender)
         {
-           
+
             if (Sender.Source.IsDestroyed())
             {
                 Sender.Cancel();
@@ -43,28 +43,37 @@ namespace unvs.actionsbasics
             if (string.IsNullOrEmpty(teleportObject.TargetPath))
             {
                 actor.speaker?.SayIThisDoesNotDoAnything();
-                
+
                 Sender.Cancel();
                 return;
             }
             UnvsCinema.Instance.audioSource = new AudioSource();
 
             teleportObject.OpenSound.PlayBetterAudioClipAsync(OpenSound).Forget();
-            if (teleportObject.IsNew)
+            if (teleportObject.TeleportType == types.TeleportType.NewScene)
             {
-                await UnvsSceneLoader.Instance.LoadNewAsync(teleportObject.Target, teleportObject.SpawnName,false);
-                
+                await UnvsSceneLoader.Instance.LoadNewAsync(teleportObject.Target, teleportObject.SpawnName, false);
+
 
             }
-            else
+            else if (teleportObject.TeleportType == types.TeleportType.Interior)
             {
                 var fromScene = Sender.Source.GetComponentInParent<UnvsScene>();
                 await UnvsSceneLoader.Instance.LoadInteriorAsync(teleportObject.Target, teleportObject.SpawnName, fromScene);
             }
+            else if (teleportObject.TeleportType == types.TeleportType.TempScene)
+            {
+                await UnvsSceneLoader.Instance.LoadTempSceneAsync(teleportObject.Target, teleportObject, teleportObject.SpawnName);
+            }
+            else if (teleportObject.TeleportType == types.TeleportType.ReturnToScene)
+            {
+                await UnvsSceneLoader.Instance.ReturnFromTempScene(teleportObject,teleportObject.SpawnName);
+            }
+
             await teleportObject.CloseSound.PlayBetterAudioClipAsync(CloseSound);
         }
 
-       
+
 
 
     }
@@ -72,7 +81,7 @@ namespace unvs.actionsbasics
     {
         public override async UniTask ExecuteAsync(ActionBaseSender Sender)
         {
-            if(UnvsCinema.Instance!=null )
+            if (UnvsCinema.Instance != null)
             {
                 if (UnvsCinema.Instance.CamChangeFollowOffsetTask.Status == UniTaskStatus.Pending)
                 {
@@ -89,21 +98,21 @@ namespace unvs.actionsbasics
             var tras = Sender.GetSourceComponent<UnvsTransitionable>();
             if (tras == null)
             {
-                var pro=Sender.Source.GetType().GetFields().FirstOrDefault(p=>p.FieldType== typeof(UnvsTransitionable));
-                if(pro == null)
+                var pro = Sender.Source.GetType().GetFields().FirstOrDefault(p => p.FieldType == typeof(UnvsTransitionable));
+                if (pro == null)
                 {
                     Sender.Cancel();
                     return;
                 }
-                tras=pro.GetValue(Sender.Source) as UnvsTransitionable;
+                tras = pro.GetValue(Sender.Source) as UnvsTransitionable;
             }
-            if(tras == null)
+            if (tras == null)
             {
                 Sender.Cancel();
                 return;
             }
             UnvsTransitionDefinitionsExt.PlayTransition(tras.Transition, tras);
-            
+
         }
     }
 }

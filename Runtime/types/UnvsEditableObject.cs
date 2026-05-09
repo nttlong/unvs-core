@@ -45,6 +45,14 @@ namespace unvs.types
         [SerializeField]
         public Material material;
     }
+    public enum TeleportType
+    {
+        Interior=0,
+        NewScene=1,
+        TempScene=2,
+        [HideInInspector]
+        ReturnToScene = 3
+    }
     public enum DockType
     {
         None = 0,
