@@ -383,7 +383,18 @@ namespace unvs.game2d.scenes{
             
             
         }
+        public void UpdateLoadChunkSceneTrackerSize(Vector3 followOfsset)
+        {
+            this.vcam.PreviousStateIsValid = false;
+            vcam.GetComponent<CinemachineFollow>().FollowOffset = followOfsset;
 
+            UnvsCinema.Instance.camColl.size = UnvsCinema.Instance.cam.GetCameraWorldSize();
+        }
+
+        public void UpdateLoadChunkSceneTrackerSizeByCurrentFollowOffset()
+        {
+            UnvsCinema.Instance.camColl.size = UnvsCinema.Instance.cam.GetCameraWorldSize();
+        }
 
 
 #if UNITY_EDITOR
@@ -483,18 +494,7 @@ namespace unvs.game2d.scenes{
             }
         }
 
-        public void UpdateLoadChunkSceneTrackerSize(Vector3 followOfsset)
-        {
-            this.vcam.PreviousStateIsValid = false;
-            vcam.GetComponent<CinemachineFollow>().FollowOffset = followOfsset;
-            
-            UnvsCinema.Instance.camColl.size = UnvsCinema.Instance.cam.GetCameraWorldSize();
-        }
-
-        public void UpdateLoadChunkSceneTrackerSizeByCurrentFollowOffset()
-        {
-            UnvsCinema.Instance.camColl.size = UnvsCinema.Instance.cam.GetCameraWorldSize();
-        }
+       
 
 
 

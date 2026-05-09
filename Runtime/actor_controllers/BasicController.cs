@@ -10,7 +10,7 @@ using unvs.game2d.objects;
 using unvs.game2d.scenes;
 using unvs.shares;
 using UNVS.Core.Actors.Skills;
-using static UnityEditor.PlayerSettings;
+//using static UnityEditor.PlayerSettings;
 
 namespace unvs.controllers
 {
