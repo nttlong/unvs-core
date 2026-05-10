@@ -5,8 +5,8 @@ namespace unvs.game2d.objects
 
     public  partial class UnvsPickableObject : UnvsInteractObject
     {
-        [SerializeField]
-        public Sprite inventoryIcon;
+        //[SerializeField]
+        //public Sprite avatarIcon;
         
         public override void InitRuntime()
         {

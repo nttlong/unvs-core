@@ -26,9 +26,18 @@ namespace unvs.game2d.objects
         [Header("Interact info")]
         public BoxCollider2D coll;
         public UnityEngine.Localization.LocalizedString Description;
-        
+        /// <summary>
+        /// The icon when gamer hold over interactable object
+        /// </summary>
+        [Tooltip("The display icon when gamer hold over interactable object")]
         [SerializeField]
-        public unvs.types.IconInfo icon;
+        public unvs.types.IconInfo Icon;
+        /// <summary>
+        /// The icon when gamer show in inventory if null use spriterenderer instead
+        /// </summary>
+        [Tooltip("The icon when gamer show in inventory if it's null use SpriteRenderer instead")]
+        [SerializeField]
+        public Sprite ViewIcon;
         public InteractionDefinition Data;
         //public UnvsObjectAttributesData ObjectDefinition;
         /// <summary>

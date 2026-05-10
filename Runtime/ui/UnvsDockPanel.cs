@@ -11,15 +11,15 @@ namespace unvs.ui {
         public DockType dockType;
         private void OnValidate()
         {
-            var panel= this.transform.parent.GetComponentInParent<UnityEngine.UI.Image>();
-            if (panel!=null)
-            {
-                var layout = panel.GetComponent<HorizontalOrVerticalLayoutGroup>();
-                if (layout != null)
-                {
-                    layout.enabled = false;
-                }
-            }
+            //var panel= this.transform.parent.GetComponentInParent<UnityEngine.UI.Image>();
+            //if (panel!=null)
+            //{
+            //    var layout = panel.GetComponent<HorizontalOrVerticalLayoutGroup>();
+            //    if (layout != null)
+            //    {
+            //        layout.enabled = false;
+            //    }
+            //}
            
             doAlign();
         }

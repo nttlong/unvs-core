@@ -8,6 +8,7 @@ using unvs.actor.skills;
 using unvs.game2d.objects;
 using unvs.game2d.actors;
 using unvs.ui;
+using unvs.game2d.scenes;
 
 namespace unvs.actionsbasics
 {
@@ -15,13 +16,27 @@ namespace unvs.actionsbasics
     {
         public override async UniTask ExecuteAsync(ActionBaseSender Sender)
         {
+           
             var item=Sender.GetSourceComponent<UnvsCollectableItem>();
-            if(item!=null)
+            
+            if(item==null)
             {
                 Sender.Cancel();
                 return;
             }
-            UnvsDialog.Instance.DoReviewItem(item.icon.srpite, item.Description);
+            var itemSprite = item.GetInventoryIcon();
+            UnvsApp.SayText($"itemSprite={itemSprite}");
+            UnvsDialog.Instance.HideFooter();
+            await UnvsDialog.Instance.DoReviewItemAsync(itemSprite, item.Description);
+            
+            await UniTask.Yield();
+        }
+    }
+    public class ShowInventoty : ActionBase
+    {
+        public override async UniTask ExecuteAsync(ActionBaseSender Sender)
+        {
+            UnvsUIInventory.Instance.Show();
             await UniTask.Yield();
         }
     }

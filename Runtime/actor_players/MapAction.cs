@@ -13,7 +13,7 @@ namespace unvs.actor.player
         public event Action<CallbackContext> performed;
         internal void InvokeStarted(CallbackContext ctx) => started?.Invoke(ctx);
         internal void InvokeCanceled(CallbackContext ctx) => canceled?.Invoke(ctx);
-        internal void InvokePerformedd(CallbackContext ctx) => performed?.Invoke(ctx);
+        internal void InvokePerformed(CallbackContext ctx) => performed?.Invoke(ctx);
 
         public T ReadValue<T>() where T : struct
         {

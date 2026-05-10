@@ -90,7 +90,7 @@ namespace unvs.controllers.inputs {
                     Action<CallbackContext> performed = ctx =>
                     {
                         if (!_disableEvent)
-                            action.InvokePerformedd(ctx);
+                            action.InvokePerformed(ctx);
                     };
                     UnvsGlobalInput.UI[key].performed += performed;
                     if (_performed == null) _performed = new Dictionary<string, Action<CallbackContext>>();

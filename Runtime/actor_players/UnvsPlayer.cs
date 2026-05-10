@@ -113,7 +113,7 @@ namespace unvs.actor.player {
                     Action<CallbackContext> performed = ctx =>
                     {
                         if (!_disableEvent)
-                            action.InvokePerformedd(ctx);
+                            action.InvokePerformed(ctx);
                     };
                     UnvsGlobalInput.Player[key].performed += performed;
                     if(_performed==null) _performed = new Dictionary<string, Action<CallbackContext>>();

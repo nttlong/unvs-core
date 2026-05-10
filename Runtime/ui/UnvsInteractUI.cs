@@ -148,10 +148,10 @@ namespace unvs.ui
 
             if (interactObject != null)
             {
-                if (interactObject.icon.srpite != null)
+                if (interactObject.Icon.srpite != null)
                 {
                    
-                    ChangeIcon(interactObject.icon);
+                    ChangeIcon(interactObject.Icon);
                     UpdateCursorPosition();
                 }
             }

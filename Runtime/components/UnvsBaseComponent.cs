@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
@@ -15,7 +15,7 @@ namespace unvs.components
 
     public abstract class UnvsBaseComponent : MonoBehaviour
     {
-
+        public event Action OnDestroying;
         public virtual void InitProperties()
         {
             var fields = Commons.GetAllGenericFields(this, typeof(UnvsProperty<>));
@@ -40,6 +40,24 @@ namespace unvs.components
                     }
 
 
+                }
+            }
+        }
+        public virtual void OnDestroy()
+        {
+            if (OnDestroying != null)
+            {
+                var invocationList = OnDestroying.GetInvocationList();
+                foreach (var action in invocationList)
+                {
+                    try
+                    {
+                        ((Action)action).Invoke();
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError($"Error when clean component: {ex.Message}");
+                    }
                 }
             }
         }

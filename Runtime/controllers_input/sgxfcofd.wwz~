@@ -1,4 +1,4 @@
-﻿
+
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using System;
@@ -84,8 +84,7 @@ namespace unvs.controllers.inputs
             }
 
         }
-        public static event Action OnPlayerInputReady;
-        public static event Action OnUIInputReady;
+        public static event Action OnReady;
         internal static void MapPlayerEvents()
         {
             var typ = inputIns.GetType();
@@ -105,9 +104,8 @@ namespace unvs.controllers.inputs
                     Player[p.Name] = val;
 
                 }
-                OnPlayerInputReady?.Invoke();
             }
-            
+            OnReady?.Invoke();
         }
         internal static void MapUIEvents()
         {
@@ -125,9 +123,7 @@ namespace unvs.controllers.inputs
 
 
                 }
-                OnUIInputReady?.Invoke();
             }
-            
         }
 
         internal static void SetActivePlayer(bool v)
@@ -180,7 +176,7 @@ namespace unvs.controllers.inputs
                 }
             };
         }
-        public static MapAction NewMapPlayerAction(UnvsBaseComponent component,string name, Action<MapAction> InitEvents)
+        public static MapAction NewMapAction(UnvsBaseComponent component,string name, Action<MapAction> InitEvents)
         {
             if(!Application.isPlaying) return null;
             if (!Player.Keys.Contains(name, StringComparer.OrdinalIgnoreCase))
@@ -198,7 +194,7 @@ namespace unvs.controllers.inputs
         }
         public static MapAction NewMapUIAction(UnvsBaseComponent component, string name, Action<MapAction> InitEvents)
         {
-            
+            if (!Application.isPlaying) return null;
             if (!UI.Keys.Contains(name, StringComparer.OrdinalIgnoreCase))
             {
                 Debug.LogError($"{name} was not found in {string.Join(',', UnvsGlobalInput.Player.Keys)}");
@@ -212,62 +208,117 @@ namespace unvs.controllers.inputs
 
 
         }
+     
+        
+        static void applyAction(string key, MapAction action, UnvsBaseComponent component)
+        {
+            if (action != null)
+            {
+                // kiem tra action co start thi goi
+
+                if (action.hasStarted)
+                {
+                    Action<CallbackContext> start = ctx =>
+                    {
+                        if (InvalidateComponent(component)) return;
+                        
+                            action.InvokeStarted(ctx);
+                    };
+                    Player[key].started += start;
+
+                    component.OnDestroying += () =>
+                    {
+                        Player[key].started -= start;
+                    };
+                }
+                if (action.hasCanceled)
+                {
+                    Action<CallbackContext> canceled = ctx =>
+                    {
+                        if (InvalidateComponent(component)) return;
+                        action.InvokeCanceled(ctx);
+                    };
+                    Player[key].canceled += canceled;
+
+                    component.OnDestroying += () =>
+                    {
+                        Player[key].canceled -= canceled;
+                    };
+                }
+                if (action.hasPerformed)
+                {
+                    Action<CallbackContext> performed = ctx =>
+                    {
+                        if (InvalidateComponent(component)) return;
+                        action.InvokePerformedd(ctx);
+                    };
+                    Player[key].performed += performed;
+
+                    component.OnDestroying += () =>
+                    {
+                        Player[key].performed -= performed;
+                    };
+                }
+
+                
+            }
+        }
 
         private static bool InvalidateComponent(UnvsBaseComponent component)
         {
-
-            if (component == null)
-            {
-                return true;
-            }
-
-
-            if (!component.enabled || !component.gameObject.activeInHierarchy)
-            {
-                return true;
-            }
-
-
-            return false;
+            throw new NotImplementedException();
         }
-        static void applyAction(string key, MapAction action, UnvsBaseComponent component)
-     => BindInput(Player[key], action, component);
 
         static void applyUIAction(string key, MapAction action, UnvsBaseComponent component)
-            => BindInput(UI[key], action, component);
-
-        private static void BindInput(InputAction input, MapAction action, UnvsBaseComponent component)
         {
-            if (action == null || input == null) return;
-
-            if (action.hasStarted)
+            if (action != null)
             {
-                Action<CallbackContext> start = ctx => {
-                    if (InvalidateComponent(component)) return;
-                    action.InvokeStarted(ctx);
-                };
-                input.started += start;
-                component.OnDestroying += () => input.started -= start;
-            }
+                // kiem tra action co start thi goi
 
-            if (action.hasCanceled)
-            {
-                Action<CallbackContext> canceled = ctx => {
-                    if (InvalidateComponent(component)) return;
-                    action.InvokeCanceled(ctx);
-                };
-                input.canceled += canceled;
-                component.OnDestroying += () => input.canceled -= canceled;
-            }
+                if (action.hasStarted)
+                {
+                    Action<CallbackContext> start = ctx =>
+                    {
+                        if (component.enabled)
+                            action.InvokeStarted(ctx);
+                    };
+                    UI[key].started += start;
+                    component.OnDestroying += () =>
+                    {
+                        UI[key].started -= start;
+                    };
 
-            if (action.hasPerformed)
-            {
-                Action<CallbackContext> performed = ctx => {
-                    if (InvalidateComponent(component)) return;
-                    action.InvokePerformed(ctx); // Đã sửa typo
-                };
-                input.performed += performed;
-                component.OnDestroying += () => input.performed -= performed;
+                }
+                if (action.hasCanceled)
+                {
+                    Action<CallbackContext> canceled = ctx =>
+                    {
+                        if (component.enabled)
+                            action.InvokeCanceled(ctx);
+                    };
+                    UI[key].canceled += canceled;
+
+                    component.OnDestroying += () =>
+                    {
+                        UI[key].canceled -= canceled;
+                    };
+                }
+                if (action.hasPerformed)
+                {
+                    Action<CallbackContext> performed = ctx =>
+                    {
+                        if (component.enabled)
+                            action.InvokePerformedd(ctx);
+                    };
+                    UI[key].performed += performed;
+
+                    component.OnDestroying += () =>
+                    {
+                        UI[key].performed -= performed;
+                    };
+                }
+
+                
             }
         }
     }

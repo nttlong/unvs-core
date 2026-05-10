@@ -112,6 +112,7 @@ namespace unvs.game2d.scenes
             cinema = await refCinema.LoadPrefabsAsync<UnvsCinema>(container, true);
             MainMenu = await refMainMenu.LoadPrefabsAsync<UnvsMainMenu>(container, true);
             PauseMenu = await Commons.LoadPrefabsAsync<UnvsPauseMenu>(refPauseMenu, container, true);
+           
             dialog = await Commons.LoadPrefabsAsync<UnvsDialog>(refDialog, container, true);
             playerInput = await Commons.LoadPrefabsAsync<UnvsPlayerInput>(refPlayerInput, container, true);
             InteractUI = await Commons.LoadPrefabsAsync<UnvsInteractUI>(refInteractUI, container, true);
