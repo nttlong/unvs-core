@@ -17,10 +17,11 @@ namespace unvs.controllers
         {
             action.started += ctx =>
             {
+                if (!Application.isPlaying) return;
                 if(ctx.control.device is Mouse)
                 {
                    
-                    ;
+                    
                     if (IsInInteraction) actor.RefreshToken();
                     //this.actor.RefreshToken();
                     var pos = this.look.ReadValue<Vector2>().ToWorld();

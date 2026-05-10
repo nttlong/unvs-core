@@ -15,6 +15,7 @@ using unvs.ext;
 using unvs.game2d.actors;
 
 
+
 using unvs.shares;
 
 using unvs.components;
@@ -46,7 +47,7 @@ namespace unvs.game2d.scenes
         [Header("Visual loading")]
         public float FadeTimeStartGame = 0.5f;
         public float DefaultFadeTimeLoadScene=0;
-        public int DelayFrameBeforeInteriorSceneShow = 10;
+        public int DelayFrameBeforeInteriorSceneShow = 15;
         public GameObject controllerInput;
         [Header("prefabs requirements")]
         public AssetReference refPlayerInput;

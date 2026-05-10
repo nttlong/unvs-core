@@ -159,6 +159,7 @@ namespace unvs.game2d.scenes
         }
         public async UniTask<UnvsScene> LoadInteriorAsync(AssetReference sceneRef, string spawnName, UnvsScene fromScene)
         {
+            UnvsCinema.Instance.requestInvalidateBoundingShapeCache = true;
             if (UnvsCinema.Instance != null)
             {
                 if (UnvsCinema.Instance.CamChangeFollowOffsetTask.Status == UniTaskStatus.Pending)
@@ -236,6 +237,7 @@ namespace unvs.game2d.scenes
             await UniTask.DelayFrame(UnvsApp.Instance.DelayFrameBeforeInteriorSceneShow);
             await UnvsFadeScreen.Instance.FadeOutAsync(UnvsApp.Instance.DefaultFadeTimeLoadScene);
             UnvsApp.Instance.RaiseEnterScene(ret);
+            UnvsCinema.Instance.requestInvalidateBoundingShapeCache = false;
             return ret;
         }
 

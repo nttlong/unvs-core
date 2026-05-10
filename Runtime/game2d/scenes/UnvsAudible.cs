@@ -8,7 +8,9 @@ using unvs.ext;
 using unvs.components;
 using unvs.game2d.objects.editor;
 using unvs.shares;
-using unvs.components;
+
+using unvs.types;
+
 
 #if UNITY_EDITOR
 using unvs.editor.components;
@@ -71,6 +73,11 @@ namespace unvs.game2d.scenes
                 scene.wallRight.bounds.min.x);
             }
             scene.groundThickness.AddComponentIfNotExist<UnvsGeometryChunks>();
+            var au=scene.groundThickness.AddComponentIfNotExist<UnvsAudible>();
+            this.SetMeOnLayer(Constants.Layers.EDITOR);
+            au.audioInfo = this.audioInfo;
+            au.audioInfo.volume = 0.7f;
+            au.SetMeOnLayer(Constants.Layers.WORLD_GROUND);
         }
         [UnvsButton("Geometry outline")]
         public async UniTask EditorGeometryOutline()
@@ -100,6 +107,11 @@ namespace unvs.game2d.scenes
                 output_path= fullPath,
                 output_path_psd= fullPathPsd,
             });
+        }
+        public override void OnValidate()
+        {
+            base.OnValidate();
+            
         }
 
 #endif

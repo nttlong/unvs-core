@@ -12,6 +12,7 @@ using unvs.game2d.actors;
 
 
 using unvs.shares;
+using unvs.types;
 namespace unvs.actionsbasics
 {
     public class TeleportAction : unvs.actions.ActionBase

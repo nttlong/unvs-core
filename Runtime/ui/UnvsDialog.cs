@@ -15,6 +15,7 @@ using unvs.game2d.scenes;
 using unvs.shares;
 
 namespace unvs.ui {
+    [RequireComponent(typeof(AudioSource))]
     public class UnvsDialog : UnvsUIComponentInstance<UnvsDialog>
     {
         private UniTaskCompletionSource _dialogTaskSource;
@@ -71,9 +72,10 @@ namespace unvs.ui {
             this.foolterPanel.Show();
             _dialogTaskSource?.TrySetResult();
         }
-        public UniTask DoReviewItemAsync(Sprite iconSprite, LocalizedString description)
+        public UniTask DoReviewItemAsync(Sprite iconSprite, LocalizedString description, params types.AudioInfo[] feedBack)
         {
-            
+            var audio = this.AudioOpen;
+            audio = audio.GetBetter(feedBack);
             icon.sprite = iconSprite;
             if(description!=null && !description.IsEmpty)
             {
@@ -82,6 +84,7 @@ namespace unvs.ui {
             {
                 this.text.text = "?????";
             }
+            audio.Play(this.GetComponent<AudioSource>());
             Show();
             return _dialogTaskSource.Task;
         }

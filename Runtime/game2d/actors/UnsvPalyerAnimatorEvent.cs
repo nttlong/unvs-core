@@ -7,6 +7,7 @@ using unvs.ext;
 using unvs.ext.physical2d;
 using unvs.game2d.scenes;
 using unvs.shares;
+using unvs.types;
 using static Unity.Cinemachine.IInputAxisOwner.AxisDescriptor;
 
 namespace unvs.game2d.actors
@@ -31,7 +32,7 @@ namespace unvs.game2d.actors
     {
        
         private Animator _anim;
-        private AudioSource _audoiSource;
+        private AudioSource _audioSource;
         private List<MotionAudio> _clips;
         private Collider2D _coll;
         private int _layerMask;
@@ -40,37 +41,40 @@ namespace unvs.game2d.actors
         {
             if (Application.isPlaying)
             {
-                _polyColl = GetComponent<PolygonCollider2D>();
-                _spriteRenderer = GetComponent<SpriteRenderer>();
+                //_polyColl = GetComponent<PolygonCollider2D>();
+                //_spriteRenderer = GetComponent<SpriteRenderer>();
              
                 _anim = GetComponent<Animator>();
-                _audoiSource = GetComponent<AudioSource>();
+                _audioSource = GetComponent<AudioSource>();
              
-                _coll = this.GetComponentInParent<Collider2D>();
-                _layerMask = LayerMask.GetMask(Constants.Layers.TERRANT, Constants.Layers.GROUND_FLOOR);
+                _coll = this.GetComponentInParent<CompositeCollider2D>();
+                _layerMask = LayerMask.GetMask(Constants.Layers.TERRANT, Constants.Layers.GROUND_FLOOR, Constants.Layers.WORLD_GROUND, Constants.Layers.WORLD_GROUND);
             }
         }
         public void OnKeyFrame()
         {
+           
             if (_anim == null) return;
             RaycastHit2D[] hits = new RaycastHit2D[5];   // mảng kết quả (dùng 1-10 là đủ)
 
-
+            //_coll.GetHit(out var hit,Vector2.down,10f, Constants.Layers.TERRANT, Constants.Layers.WORLD_GROUND)
            var audibleObject = _coll.RayCastDownHit< UnvsAudible>( _layerMask);
             if(audibleObject != null)
             {
+                UnvsApp.SayText($"OnKeyFrame={audibleObject.name}");
                 AudioInfo audioInfo = audibleObject.audioInfo;
                 if (audioInfo.Clip != null)
                 {
-                    this._audoiSource.PlayOneShot(audioInfo.Clip, audioInfo.volume);
+                    
+                    this._audioSource.PlayOneShot(audioInfo.Clip, audioInfo.volume);
                     return;
                 }
             }
             
             playActorSound();
         }
-        private PolygonCollider2D _polyColl;
-        private SpriteRenderer _spriteRenderer;
+        //private PolygonCollider2D _polyColl;
+        //private SpriteRenderer _spriteRenderer;
 
        
         private void playActorSound()
@@ -86,7 +90,7 @@ namespace unvs.game2d.actors
                     {
                         if (stateInfo.speed == item.value)
                         {
-                            this._audoiSource.PlayOneShot(item.audio.Clip, item.audio.volume);
+                            this._audioSource.PlayOneShot(item.audio.Clip, item.audio.volume);
 
                         }
 
@@ -95,7 +99,7 @@ namespace unvs.game2d.actors
                     {
                         if (stateInfo.IsName(item.name))
                         {
-                            this._audoiSource.PlayOneShot(item.audio.Clip, item.audio.volume);
+                            this._audioSource.PlayOneShot(item.audio.Clip, item.audio.volume);
                         }
                     }
                 }

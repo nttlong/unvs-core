@@ -1,11 +1,10 @@
 ﻿using Cysharp.Threading.Tasks;
-using game2d.scenes;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
+
 using Unity.Cinemachine;
 using Unity.Mathematics;
 using Unity.VisualScripting;
@@ -14,15 +13,15 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
-using UnityEngine.UI;
-using unvs.components;
+
 using unvs.ext;
-using unvs.game2d.actors;
+
 using unvs.game2d.objects.editor;
 using unvs.shares;
 using unvs.ui;
 
-namespace unvs.game2d.scenes{
+namespace unvs.game2d.scenes
+{
     public class UnvsCinema : UnvsUIComponentInstance<UnvsCinema>
     {
         public UniTask CamChangeFollowOffsetTask;
@@ -32,11 +31,12 @@ namespace unvs.game2d.scenes{
         /// </summary>
         [Header("Camera")]
         [SerializeField]
-        public Vector3 DefaultTargetOffset=new Vector3(0,0,-35);
+        public Vector3 DefaultTargetOffset = new Vector3(0, 0, -35);
         public float CamWacherDistance = -30;
         [Header("Cinema light")]
         public float DurationTimeSmoothChangeSate = 1.5f;
         public int MaintainGlobalLightNumber = 5;
+        public int FrequencyOfWorldBoundUpdating = 600;
         [SerializeField]
         public GlobalLightChunkInfo[] worldLightMaintain;
         private List<GlobalLightChunkInfo> _lights = new List<GlobalLightChunkInfo>();
@@ -47,12 +47,12 @@ namespace unvs.game2d.scenes{
         public CinemachineCamera vcam;
         public CompositeCollider2D compositeCollider2D;
         public CinemachineConfiner2D confiner;
-       
+
         public BoxCollider2D camColl;
-        
-        Dictionary<UnvsScene,PolygonCollider2D> worldBoundDict=new Dictionary<UnvsScene, PolygonCollider2D>();
+
+        Dictionary<UnvsScene, PolygonCollider2D> worldBoundDict = new Dictionary<UnvsScene, PolygonCollider2D>();
         //Dictionary<UnvsScene, Light2D> lightDict = new Dictionary<UnvsScene, Light2D>();
-       
+
         public PolygonCollider2D worldBoundCollider2d;
         public Transform centerWatch;
         CancellationTokenSource ctsChangeOffset;
@@ -60,24 +60,24 @@ namespace unvs.game2d.scenes{
         public Transform sceneLoaderTracing;
         public BoxCollider2D centerCamTracing;
         public Light2D globalLight;
-       
-       
-       
-        
+
+
+
+
         [SerializeField] public AudioSource audioSource;
 
-        
-        public void ChangeCameraState(List<UnvsScene> s,bool Imediately)
+
+        public void ChangeCameraState(List<UnvsScene> s, bool Imediately)
         {
 
             changeCameStepByOffset(s, Imediately, () =>
             {
-                
+
             });
 
             //ChangeCameraStateAsync(s).Forget();
         }
-        private bool changeCameStepByOffset(List<UnvsScene> s, bool Imediately,Action OnChange)
+        private bool changeCameStepByOffset(List<UnvsScene> s, bool Imediately, Action OnChange)
         {
             ctsChangeOffset.Refresh();
             UnvsScene nearset = null;
@@ -90,46 +90,32 @@ namespace unvs.game2d.scenes{
                 return false;
             }
             nearset = CalculateNearestScene(s);
-            if(nearset==null) return false;
+            if (nearset == null) return false;
             ctsChangeOffset = ctsChangeOffset.Refresh();
             if (nearset.followOffset == Vector3.zero)
             {
                 nearset.followOffset = this.DefaultTargetOffset;
             }
+            //this._isFollwingOffsetChanging = true;
             var tsk =
             vcam.ChangeFollowOffsetSmoothAsync(OnChange, nearset.followOffset, ctsChangeOffset.Token, 3).ContinueWith(() =>
             {
                 camColl.size = cam.GetCameraWorldSize();
+                //this._isFollwingOffsetChanging = false;
             }).Preserve();
             //tsk.Forget();
             this.CamChangeFollowOffsetTask = tsk;
 
             return true;
         }
-        //private bool chaneCameSetByOrthoSize(List<UnvsScene> s, bool Imediately,Action OnChange)
-        //{
-        //    UnvsScene nearset = null;
-        //    if (Imediately)
-        //    {
-
-                
-        //        return false;
-        //    }
-        //    nearset = CalculateNearestScene(s);
-        //    ctsChangeOffset = ctsChangeOffset.Refresh();
-            
-        //        vcam.ChangeFollowOffsetSmoothAsync(OnChange, nearset.followOffset, ctsChangeOffset.Token, DurationTimeSmoothChangeSate).Forget();
-          
-
-        //    return true;
-        //}
 
         public async UniTask ChangeCameraStateAsync(List<UnvsScene> s)
         {
             UnvsScene nearset = CalculateNearestScene(s);
             ctsChangeOffset = ctsChangeOffset.Refresh();
             ctsChangeOrthoSize = ctsChangeOrthoSize.Refresh();
-            await vcam.ChangeFollowOffsetSmoothAsync(() => {
+            await vcam.ChangeFollowOffsetSmoothAsync(() =>
+            {
                 camColl.size = cam.GetCameraWorldSize();
             }, nearset.followOffset, ctsChangeOffset.Token);
 
@@ -145,13 +131,13 @@ namespace unvs.game2d.scenes{
 
             foreach (var s in scenes)
             {
-                if(s==null||s.IsDestroying||s.IsDestroyed()) continue;
-               
+                if (s == null || s.IsDestroying || s.IsDestroyed()) continue;
+
                 float distLeft = math.abs(s.wallLeft.bounds.max.x - centerX);
                 float distRight = math.abs(s.wallRight.bounds.min.x - centerX);
                 float currentMin = math.min(distLeft, distRight);
 
-               
+
                 if (currentMin < minDistance)
                 {
                     minDistance = currentMin;
@@ -161,13 +147,13 @@ namespace unvs.game2d.scenes{
 
             return closestScene;
         }
-        
+
         /// <summary>
         /// This method update cam worls bound. light,...
         /// The next pharse is ambient
         /// </summary>
         /// <param name="ret"></param>
-        public void UpdateWorld(UnvsScene ret,bool reset, UpdateWorldEmun UpdateType)
+        public void UpdateWorld(UnvsScene ret, bool reset, UpdateWorldEmun UpdateType)
         {
             if (reset)
             {
@@ -176,35 +162,35 @@ namespace unvs.game2d.scenes{
                 //this.lightDict.Clear();
             }
             this.BeforeUpdate?.Invoke(ret);
-            
+
             this.worldBoundDict.Add(ret, ret.worldBound);
             if (ret.light2d != null)
             {
                 ret.light2d.enabled = false;
                 ret.light2d.gameObject.SetActive(false);
                 ret.light2d.transform.position = ret.worldBound.bounds.center;
-                if(_lights.Count> this.MaintainGlobalLightNumber)
+                if (_lights.Count > this.MaintainGlobalLightNumber)
                 {
                     removeLight(UpdateType);
                 }
                 this._lights.Add(new GlobalLightChunkInfo
                 {
                     color = ret.light2d.color,
-                    createdOn=DateTime.Now,
+                    createdOn = DateTime.Now,
                     intensity = ret.light2d.intensity,
-                    position= ret.light2d.transform.position,
+                    position = ret.light2d.transform.position,
                 });
             }
             worldLightMaintain = this._lights.ToArray();
-           
 
-         
+
+
             updateWorldBound();
             this.AfterUpdate?.Invoke(ret);
-            
-                
-                
-         
+
+
+
+
         }
 
         private void removeLight(UpdateWorldEmun UpdateType)
@@ -251,31 +237,25 @@ namespace unvs.game2d.scenes{
             }
         }
 
-        bool hasUpdate;
-        private bool _needInvalidate;
-        bool _hasWorldBoudChange;
+
         private void updateWorldBound()
         {
-            //if (vcam.transform.parent != null)
-            //{
-            //    vcam.transform.SetParent(null, false);
-            //}
-            //if (cam.transform.parent != null)
-            //{
-            //    cam.transform.SetParent(null, false);
-            //}
-            //if(this.compositeCollider2D.transform.parent != null)
-            //{
-            //    compositeCollider2D.transform.SetParent(null, false);
-            //}
+            if (this.confiner.BoundingShape2D == null)
+            {
+
+                this.confiner.BoundingShape2D = this.compositeCollider2D;
+
+            }
             var bounds = this.worldBoundDict.Where(p => p.Key != null && !p.Key.IsDestroying && !p.Key.IsDestroyed()).Select(p => p.Value).ToArray();
-          
+
             this.worldBoundCollider2d.SetPath(0, bounds.CreateRectFromVectorList());
-           
+
             this.worldBoundCollider2d.compositeOperation = Collider2D.CompositeOperation.Merge;
-            _hasWorldBoudChange = true;
-            this.vcam.PreviousStateIsValid = false;
-            
+            this.compositeCollider2D.GenerateGeometry();
+            if(requestInvalidateBoundingShapeCache)
+                this.vcam.PreviousStateIsValid = false;
+            //if (FrequencyOfWorldBoundUpdating > 0)
+            //    this.confiner.InvalidateBoundingShapeCache();
 
         }
 
@@ -283,7 +263,7 @@ namespace unvs.game2d.scenes{
         {
             this.worldBoundDict.Clear();
             this._lights.Clear();
-            
+
         }
         public override void InitEvents()
         {
@@ -291,10 +271,10 @@ namespace unvs.game2d.scenes{
         }
         public event Action OnCameraMove;
         public event Action OnCameraStop;
-        
+
         float _lastPosition = 0;
         bool _wasMoving;
-       
+
 
         public override bool DisablePlayerInput => false;
 
@@ -308,56 +288,52 @@ namespace unvs.game2d.scenes{
         {
             base.InitRunTime();
             _lastPosition = getValue(cam.transform.position.x);
-            audioSource=this.GetComponentInChildren<AudioSource>(true);
-            //cam.transparencySortMode = TransparencySortMode.Orthographic;
+            audioSource = this.GetComponentInChildren<AudioSource>(true);
 
-            //// Thiết lập trục ưu tiên là trục Z (0, 0, 1)
-            //cam.transparencySortAxis = new Vector3(0, 0, 1);
-            //this.confiner.BoundingShape2D = this.compositeCollider2D;
-         //   this.confiner.InvalidateBoundingShapeCache();
-           
-            
+
 
         }
-        
-        
-        void  SayText(string msg)
-        {
-            if(UnvsApp.Instance != null && UnvsApp.Instance.currentActor != null)
-            {
-                UnvsApp.Instance.currentActor.SayText(msg);
-            }
-        }
-        private void FixedUpdate()
-        {
 
-            //SayText($"this.confiner.BoundingShape2D={this.confiner.BoundingShape2D}");
 
-            if (this.confiner.BoundingShape2D == null)
-            {
 
-                this.confiner.BoundingShape2D = this.compositeCollider2D;
-
-            }
-           
-
-        }
         public Action OnFirstStart;
-        public bool IsStart=true;
-        internal bool needFadeOut;
+        public bool requestInvalidateBoundingShapeCache;
 
-        async void LateUpdate()
+        //private bool _isFollwingOffsetChanging;
+
+
+
+        void LateUpdate()
         {
-            this.confiner.InvalidateBoundingShapeCache();
+            updateWorldBoundRules();
+
             float newPos = getValue(cam.transform.position.x);
             // Tính toán độ lệch
             float delta = Mathf.Abs(newPos - _lastPosition);
 
+            calculateCameraEvent(newPos, delta);
+
+            // Các logic về Light và Tracing giữ nguyên
+            updateingLightSource();
+
+        }
+
+        private void updateingLightSource()
+        {
+            this.sceneLoaderTracing.transform.position = new Vector3(this.cam.transform.position.x, this.cam.transform.position.y, 0);
+            this.centerWatch.transform.position = new Vector3(this.camColl.bounds.center.x, this.camColl.bounds.center.y, 0);
+            var data = Light2DExtension.MixGlobalLightSources(this.camColl.bounds.center, _lights);
+            this.globalLight.intensity = data.Intensity;
+            this.globalLight.color = data.Color;
+        }
+
+        private void calculateCameraEvent(float newPos, float delta)
+        {
             // Kiểm tra nếu đang di chuyển (vượt ngưỡng)
             if (delta > 0.01f) // Ngưỡng nhỏ để nhạy hơn
             {
                 OnCameraMove?.Invoke();
-                
+
                 _wasMoving = true; // Đánh dấu là đang di chuyển
             }
             else
@@ -366,23 +342,46 @@ namespace unvs.game2d.scenes{
                 if (_wasMoving)
                 {
                     OnCameraStop?.Invoke();
-                   
+
                     _wasMoving = false;
-                   
+
                 }
             }
 
             _lastPosition = newPos;
-
-            // Các logic về Light và Tracing giữ nguyên
-            this.sceneLoaderTracing.transform.position =new Vector3( this.cam.transform.position.x, this.cam.transform.position.y,0);
-            this.centerWatch.transform.position = new Vector3( this.camColl.bounds.center.x, this.camColl.bounds.center.y,0);
-            var data = Light2DExtension.MixGlobalLightSources(this.camColl.bounds.center, _lights);
-            this.globalLight.intensity = data.Intensity;
-            this.globalLight.color = data.Color;
-            
-            
         }
+
+        private void updateWorldBoundRules()
+        {
+            if (this.requestInvalidateBoundingShapeCache)
+            {
+                this.confiner.InvalidateBoundingShapeCache();
+            }
+            else
+            {
+                if (CamChangeFollowOffsetTask.Status == UniTaskStatus.Pending)
+                {
+                    this.confiner.InvalidateBoundingShapeCache();
+                }
+                else
+                {
+                    if (FrequencyOfWorldBoundUpdating > 0)
+                    {
+                        if (Time.frameCount % FrequencyOfWorldBoundUpdating == 0)
+                        {
+
+
+                            this.confiner.InvalidateBoundingShapeCache();
+                        }
+                    }
+                    else
+                    {
+                        this.confiner.InvalidateBoundingShapeCache();
+                    }
+                }
+            }
+        }
+
         public void UpdateLoadChunkSceneTrackerSize(Vector3 followOfsset)
         {
             this.vcam.PreviousStateIsValid = false;
@@ -406,14 +405,14 @@ namespace unvs.game2d.scenes{
             // Tìm đúng file Renderer 2D mà đại ca vừa tạo lại
             var assets = AssetDatabase.FindAssets("t:Renderer2DData");
             Debug.Log("Tìm thấy: " + assets.Length + " file Renderer 2D"); // Thêm dòng này để check
-           
+
             if (assets.Length == 0)
             {
                 Debug.LogError("Đéo tìm thấy file nào hết đại ca ơi!");
             }
-                foreach (var guid in assets)
+            foreach (var guid in assets)
             {
-                
+
                 var path = AssetDatabase.GUIDToAssetPath(guid);
                 Debug.Log($"file={path}");
                 var data = AssetDatabase.LoadAssetAtPath<Renderer2DData>(path);
@@ -432,7 +431,7 @@ namespace unvs.game2d.scenes{
         {
             var cinema = this;
             cinema.cam = cinema.AddChildComponentIfNotExist<Camera>("Main Camera");
-            this.physics2DRaycaster= cinema.cam.AddComponentIfNotExist<Physics2DRaycaster>();
+            this.physics2DRaycaster = cinema.cam.AddComponentIfNotExist<Physics2DRaycaster>();
             cinema.cam.tag = "MainCamera";
             cinema.cam.orthographic = true;
             cinema.cam.AddComponentIfNotExist<CinemachineBrain>();
@@ -444,11 +443,11 @@ namespace unvs.game2d.scenes{
             cinema.compositeCollider2D.geometryType = CompositeCollider2D.GeometryType.Polygons;
             cinema.confiner = cinema.vcam.AddComponentIfNotExist<CinemachineConfiner2D>();
             cinema.confiner.BoundingShape2D = cinema.compositeCollider2D;
-          
-            
+
+
             cinema.worldBoundCollider2d = this.AddChildComponentIfNotExist<PolygonCollider2D>("worldBoundCollider2d");
             cinema.worldBoundCollider2d.compositeOperation = Collider2D.CompositeOperation.Merge;
-         
+
             cinema.worldBoundCollider2d.transform.SetParent(cinema.compositeCollider2D.transform);
             cinema.compositeCollider2D.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
             cinema.compositeCollider2D.isTrigger = true;
@@ -473,14 +472,14 @@ namespace unvs.game2d.scenes{
             cwc.SetMeOnTag(Constants.Tags.TRIGGER_SCENE_CHANGE);
             cwc.SetMeOnTag(Constants.Layers.TRIGGER_SCENE_CHANGE);
             cwc.isTrigger = true;
-            this.centerCamTracing= cwc;
+            this.centerCamTracing = cwc;
             this.globalLight = this.AddChildComponentIfNotExist<Light2D>("globalLight");
             this.globalLight.lightType = Light2D.LightType.Global;
             this.globalLight.enabled = true;
             this.audioSource = this.AddChildComponentIfNotExist<AudioSource>("audio-source");
-            
-          
-            
+
+
+
 
         }
 
@@ -488,13 +487,13 @@ namespace unvs.game2d.scenes{
         public override void OnDrawGizmos()
         {
             var coll = this.worldBoundCollider2d.GetComponentInChildren<PolygonCollider2D>();
-            if(coll!=null)
+            if (coll != null)
             {
                 coll.GizmosDraw(Color.yellow);
             }
         }
 
-       
+
 
 
 

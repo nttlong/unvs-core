@@ -8,8 +8,13 @@ using unvs.game2d.scenes;
 
 namespace unvs.ui
 {
-     public abstract class UnvsUIComponent : UnvsBaseComponent
+    public abstract class UnvsUIComponent : UnvsBaseComponent
     {
+
+        [Header("Feedback audio")]
+        public types.AudioInfo AudioOpen;
+        public types.AudioInfo AudioClose;
+
         public Canvas canvas;
         public bool IsShow;
         public abstract void InitEvents();
@@ -39,7 +44,7 @@ namespace unvs.ui
                 canvas.gameObject.SetActive(false);
             }
             IsShow = false;
-            if(UnvsGlobalInput.Player != null)
+            if (UnvsGlobalInput.Player != null)
             {
                 if (EnablePlayerInput)
                 {
@@ -50,7 +55,7 @@ namespace unvs.ui
             //UnvsSceneLoader.GameShow();
         }
 
-       
+
 
         public virtual void Show()
         {
@@ -67,9 +72,9 @@ namespace unvs.ui
                 canvas.enabled = true;
                 canvas.gameObject.SetActive(true);
             }
-           
+
             this.ApplyNavigate<Button>();
-            IsShow=true;
+            IsShow = true;
             if (UnvsGlobalInput.Player != null)
             {
                 if (DisablePlayerInput)
@@ -104,14 +109,15 @@ namespace unvs.ui
                     if (IsShow)
                     {
                         this.Show();
-                    }else
+                    }
+                    else
                     {
                         this.Hide();
                     }
                     //canvas.enabled = IsShow;
 
                 }
-               
+
                 InitEvents();
             }
         }

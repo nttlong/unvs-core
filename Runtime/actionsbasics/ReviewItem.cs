@@ -14,6 +14,8 @@ namespace unvs.actionsbasics
 {
     public class ReviewItem : ActionBase
     {
+        [SerializeField]
+        public types.AudioInfo feedbackAuio;
         public override async UniTask ExecuteAsync(ActionBaseSender Sender)
         {
            

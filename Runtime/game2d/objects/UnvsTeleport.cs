@@ -36,6 +36,7 @@ namespace unvs.game2d.objects
         public string SpawnName;
         
         [Header("Feedback audio", order = 2)]
+       
         [SerializeField]
         public AudioInfo OpenSound;
         [SerializeField] public AudioInfo CloseSound;

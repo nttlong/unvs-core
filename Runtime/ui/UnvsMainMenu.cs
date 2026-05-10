@@ -12,6 +12,7 @@ using unvs.game2d.scenes;
 
 namespace unvs.ui
 {
+    [RequireComponent(typeof(AudioSource))]
     public class UnvsMainMenu : UnvsUIComponent
     {
        
@@ -36,7 +37,16 @@ namespace unvs.ui
                 OnExit?.Invoke();
             });
         }
-        
+        public override void Show()
+        {
+            base.Show();
+            this.AudioOpen.Play(this.GetComponent<AudioSource>());
+        }
+        public override void Hide()
+        {
+            base.Hide();
+            this.AudioClose.Play(this.GetComponent<AudioSource>());
+        }
         public override void InitRunTime()
         {
             

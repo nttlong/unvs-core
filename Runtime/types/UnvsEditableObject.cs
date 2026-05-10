@@ -88,5 +88,44 @@ namespace unvs.types
         public AssetReference LeftScene;
         public AssetReference RightScene;
     }
+    
 
+
+    [Serializable]
+    public struct AudioInfo
+    {
+        [SerializeField]
+        public AudioClip Clip;
+        [Range(0, 1)]
+        [SerializeField]
+        public float volume;
+
+        public bool IsEmpty()
+        {
+            return Clip == null;
+        }
+        public static AudioInfo EmptyNew()
+        {
+            return new AudioInfo()
+            {
+                volume = 1f
+            };
+        }
+
+        public AudioInfo GetBetter(AudioInfo[] feedBack)
+        {
+            foreach (var item in feedBack)
+            {
+                if(!item.IsEmpty()) return item;
+            }
+            return this;
+        }
+
+        public void Play(AudioSource audioSource)
+        {
+            if(audioSource == null) return;
+            if(this.IsEmpty()) return;
+            audioSource.PlayOneShot(this.Clip);
+        }
+    }
 }

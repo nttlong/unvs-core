@@ -39,7 +39,12 @@ namespace unvs.ui
         public override void Show()
         {
             base.Show();
-           
+            this.AudioOpen.Play(this.GetComponent<AudioSource>());
+        }
+        public override void Hide()
+        {
+            base.Hide();
+            this.AudioClose.Play(this.GetComponent<AudioSource>());
         }
         public virtual void Toggle()
         {
@@ -47,12 +52,7 @@ namespace unvs.ui
             if(isShow ) Show();
             else Hide();
         }
-        public override void Hide()
-        {
-            base.Hide();
-            //if(actionPause != null)
-            //actionPause.started -= ActionPause_started;
-        }
+        
         
         public override void InitEvents()
         {

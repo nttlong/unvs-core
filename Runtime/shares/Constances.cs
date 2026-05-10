@@ -72,9 +72,12 @@ namespace unvs.shares
 
             public const string PLAYER_HEADER = "PLAYER-HEADER";
 
-            public static string WORLD_LIQUID = "WORLD-LIQUID";
+            public const string WORLD_LIQUID = "WORLD-LIQUID";
 
-            public static string DYNAMIC_GROUND = "DYNAMIC-GROUND";
+            public const string DYNAMIC_GROUND = "DYNAMIC-GROUND";
+
+            public const string EDITOR = "EDITOR";
+
         }
         public class Scenes
         {

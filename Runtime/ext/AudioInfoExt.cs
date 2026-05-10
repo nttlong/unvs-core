@@ -8,7 +8,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using unvs.game2d.scenes;
-using unvs.shares;
+
+using unvs.types;
 
 namespace unvs.ext {
     public static class AudioInfoExt 

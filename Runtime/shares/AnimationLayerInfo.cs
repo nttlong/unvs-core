@@ -14,28 +14,7 @@ namespace unvs.shares
         public int Index;
     }
     
-    [Serializable]
-    public struct AudioInfo
-    {
-        [SerializeField]
-        public AudioClip Clip;
-        [Range(0,1)]
-        [SerializeField]
-        public float volume;
-
-        public bool IsEmpty()
-        {
-            return Clip == null;
-        }
-        public static AudioInfo EmptyNew()
-        {
-            return new AudioInfo()
-            {
-                volume = 1f
-            };
-        }
-        
-    }
+    
     [Serializable]
     public struct UnvsActorPhysicalSolverRuntime
     {
