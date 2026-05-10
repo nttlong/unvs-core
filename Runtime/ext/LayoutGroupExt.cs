@@ -24,5 +24,19 @@ namespace unvs.ext{
             layout.childScaleWidth = true;
             layout.childAlignment = UnityEngine.TextAnchor.MiddleCenter;
         }
+        public static void ApplyLayoutAsDockPanelContainer(this HorizontalOrVerticalLayoutGroup layout)
+        {
+            layout.childControlHeight = true;
+            layout.childControlWidth = true;
+
+            layout.childScaleHeight = false;
+            layout.childScaleWidth = true;
+
+
+            layout.childForceExpandHeight = false;
+            layout.childForceExpandWidth = true;
+          
+            layout.childAlignment = UnityEngine.TextAnchor.MiddleCenter;
+        }
     }
 }

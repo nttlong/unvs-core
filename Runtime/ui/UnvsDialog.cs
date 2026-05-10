@@ -1,23 +1,22 @@
 using game2d.ext;
-using System;
-using System.Runtime.CompilerServices;
+
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using unvs.ext;
-using unvs.components;
-using unvs.game2d.objects.editor;
-using unvs.game2d.scenes;
-using unvs.ui;
 
- namespace unvs.ui {
+using unvs.game2d.objects.editor;
+
+using UnityEngine.Localization;
+
+namespace unvs.ui {
     public class UnvsDialog : UnvsUIComponentInstance<UnvsDialog>
     {
       
         public Image panel;
         public Image contentPanel;
         public Image foolterPanel;
-        public Image icon;
+        public UnityEngine.UI.Image icon;
         public TextMeshProUGUI text;
         public Button btnOk;
         public Button btnCancel;
@@ -36,6 +35,18 @@ using unvs.ui;
             
             canvas.FullSize();
         }
+        public void DoReviewItem(Sprite iconSprite, LocalizedString description)
+        {
+            icon.sprite = iconSprite;
+            if(description!=null && !description.IsEmpty)
+            {
+                this.text.text = description.ToString();
+            } else
+            {
+                this.text.text = "?????";
+            }
+        }
+
 #if UNITY_EDITOR
         [UnvsButton()]
         public  void Generate()
@@ -60,7 +71,8 @@ using unvs.ui;
             dialog.EditorSetDirty();
         }
 
-        
+       
+
 
 
 #endif

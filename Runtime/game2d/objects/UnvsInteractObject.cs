@@ -14,6 +14,7 @@ using unvs.components;
 using unvs.ext.physical2d;
 using unvs.ui;
 using unvs.components;
+using unvs.game2d.actors;
 namespace unvs.game2d.objects
 {
 
@@ -24,6 +25,8 @@ namespace unvs.game2d.objects
     {
         [Header("Interact info")]
         public BoxCollider2D coll;
+        public UnityEngine.Localization.LocalizedString Description;
+        
         [SerializeField]
         public unvs.types.IconInfo icon;
         public InteractionDefinition Data;
@@ -105,7 +108,7 @@ namespace unvs.game2d.objects
 #if UNITY_EDITOR
     public partial class UnvsInteractObject : UnvsComponent
     {
-
+        public string DefauttDescription;
         public virtual void OnValidate()
         {
             this.SetMeOnLayer(Constants.Layers.INTERACT_OBJECT);
