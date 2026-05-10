@@ -6,7 +6,7 @@ using unvs.shares;
 
 namespace unvs.components
 {
-    public partial class UnvsTempTeleport : UnvsTeleport
+    public partial class UnvsInpsectRegion : UnvsBaseComponent
     {
         
     }

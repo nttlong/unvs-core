@@ -17,6 +17,7 @@ using unvs.game2d.objects.editor;
 using unvs.game2d.scenes;
 using unvs.shares;
 using unvs.game2d.objects;
+using unvs.types;
 
 namespace unvs.ui
 {
@@ -38,6 +39,8 @@ namespace unvs.ui
         /// </summary>
         public override bool EnablePlayerInput => false;
 
+        public bool Locked { get; internal set; }
+
         public event Action<Vector2, Image, GameObject> OnHoverInteractObject;
         public override void InitEvents()
         {
@@ -57,27 +60,29 @@ namespace unvs.ui
             canvas.SetMeOnLayer(Constants.Layers.UI);
             canvas.sortingOrder = 1024;
             cursor = canvas.transform.AddChildComponentIfNotExist<Image>("cursor");
-            //if (defaultCursorIcon != null)
-            //{
-            //    // Create a new Sprite from the texture
-            //    // Rect defines the area (full texture), Pivot (0.5, 0.5) centers it
-
-            //    defautlSprite = Sprite.Create(
-            //         defaultCursorIcon,
-            //         new Rect(0, 0, 32, 32),
-            //         new Vector2(0.5f, 0.5f)
-            //     );
-            //    cursor.sprite = defautlSprite;
-
-            //    // 4. Set the UI size based on the texture dimensions
-            //    cursor.rectTransform.sizeDelta = new Vector2(defaultCursorIcon.width, defaultCursorIcon.height);
-            //}
+          
             cursor.sprite = DefaultIcon.srpite;
             // 5. Reset position to center of screen initially
             cursor.rectTransform.anchoredPosition = DefaultIcon.Pivot;
             cursor.rectTransform.sizeDelta = DefaultIcon.size;
             // Hide the system cursor
             Cursor.visible = false;
+        }
+        public void ChangeIcon(IconInfo icon)
+        {
+            if(icon.srpite!=null)
+            {
+                cursor.sprite = icon.srpite;
+                if (icon.size != Vector2.zero)
+                    cursor.rectTransform.sizeDelta = icon.size;
+                cursor.rectTransform.anchoredPosition = icon.Pivot;
+                UpdateCursorPosition();
+            }
+          
+        }
+        public void RestoreDefaultIcon()
+        {
+            cursor.sprite = DefaultIcon.srpite;
         }
         void UpdateCursorPosition()
         {
@@ -119,6 +124,7 @@ namespace unvs.ui
         }
         private void LateUpdate()
         {
+            if(Locked) return;
 
             if(UnvsCinema.Instance==null) return;
             //if (UnvsCinema.Instance.IsInUpdateState) return;
@@ -144,10 +150,8 @@ namespace unvs.ui
             {
                 if (interactObject.icon.srpite != null)
                 {
-                    cursor.sprite = interactObject.icon.srpite;
-                    if(interactObject.icon.size!=Vector2.zero)
-                    cursor.rectTransform.sizeDelta = interactObject.icon.size;
-                    cursor.rectTransform.anchoredPosition = interactObject.icon.Pivot;
+                   
+                    ChangeIcon(interactObject.icon);
                     UpdateCursorPosition();
                 }
             }
@@ -158,10 +162,6 @@ namespace unvs.ui
         }
 
         
-
-       
-
-
     }
 #if UNITY_EDITOR
     public partial class UnvsInteractUI : UnvsUIComponentInstance<UnvsInteractUI>

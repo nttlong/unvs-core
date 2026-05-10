@@ -19,11 +19,7 @@ namespace unvs.controllers
             {
                 if(ctx.control.device is Mouse)
                 {
-                    if (UnvsApp.Instance.IsBeginDragItem)
-                    {
-                        actor.RefreshToken();
-                        return;
-                    }
+                   
                     ;
                     if (IsInInteraction) actor.RefreshToken();
                     //this.actor.RefreshToken();
@@ -59,11 +55,7 @@ namespace unvs.controllers
             {
                 if (ctx.control.device is Mouse)
                 {
-                    if (UnvsApp.Instance.IsBeginDragItem)
-                    {
-                        actor.RefreshToken();
-                        return;
-                    }
+                    
                     //this.actor.RefreshToken();
                     var pos = this.look.ReadValue<Vector2>().ToWorld();
                     this.actor.CurrentSkill.Direction = new Vector2(this.actor.coll.bounds.center.GetDirectionTo(pos), 0);

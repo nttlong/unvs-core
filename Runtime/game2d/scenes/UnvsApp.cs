@@ -184,7 +184,7 @@ namespace unvs.game2d.scenes
         
         
         public Dictionary<UnvsScene,string> Scenes { get; private set; }
-        public bool IsBeginDragItem { get; internal set; }
+      
 
         private UnvsScene _LastScene;
         private UnvsScene _LastExitScene;
@@ -256,6 +256,21 @@ namespace unvs.game2d.scenes
             }
             var s = Scenes.Select(p => p.Key).ToList();
             UnvsCinema.Instance.ChangeCameraState(s, false);
+        }
+        public static void SayText(string v)
+        {
+            if (Instance != null && Instance.currentActor != null)
+            {
+                Instance.currentActor.SayText(v);
+            }
+        }
+
+        public static void SayOff()
+        {
+            if (Instance != null && Instance.currentActor != null)
+            {
+                Instance.currentActor.SayOff();
+            }
         }
         public override void InitRuntime()
         {
@@ -373,6 +388,8 @@ namespace unvs.game2d.scenes
 
             this.refUiInventory = unvs.editor.utils.UnvsEditorUtils.CreateAssetReference(r.PrefabPath);
         }
+
+        
 
 
 

@@ -9,6 +9,7 @@ namespace unvs.components
     public partial class UnvsBagger : UnvsComponent
     {
         public Transform bagger;
+        public event Action<GameObject> OnAddItem;
         public override void InitRuntime()
         {
             bagger.gameObject.SetActive(false);
@@ -18,7 +19,14 @@ namespace unvs.components
         {
             item.owner=this;
             item.transform.SetParent(bagger.transform);
-           
+            OnAddItem?.Invoke(item.gameObject);
+
+
+        }
+
+        public UnvsCollectableItem FindItem(string name)
+        {
+            return this.GetComponentInChildrenByName<UnvsCollectableItem>(name);
         }
     }
 #if UNITY_EDITOR

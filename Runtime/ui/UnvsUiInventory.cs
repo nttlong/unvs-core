@@ -1,9 +1,13 @@
+using Script.unvs.ext;
 using System;
 using System.ComponentModel;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using unvs.components;
+using unvs.controllers.inputs;
 using unvs.ext;
+using unvs.game2d.objects;
 using unvs.game2d.objects.editor;
 using unvs.game2d.scenes;
 
@@ -13,7 +17,8 @@ namespace unvs.ui
     {
         public Image panel;
         public UnvsGrid grid;
-        private UnvsBagger lastBagger;
+        public UnvsBagger lastBagger;
+        
 
         public override bool DisablePlayerInput => false;
 
@@ -25,6 +30,7 @@ namespace unvs.ui
         }
         public override void Show()
         {
+            
             //_isShow=true;
             base.Show();
         }
@@ -42,15 +48,23 @@ namespace unvs.ui
             if (!IsShow)
             {
                 LoadItems(bagger);
-           
+                lastBagger=bagger;
+                lastBagger.OnAddItem += LastBagger_OnAddItem;
                 Show();
 
             }
             else
             {
                 Hide();
+                lastBagger.OnAddItem -= LastBagger_OnAddItem;
+                UnvsApp.SayOff();
             }
             
+        }
+
+        private void LastBagger_OnAddItem(GameObject obj)
+        {
+            LoadItems(lastBagger);
         }
 
         private void LoadItems(UnvsBagger bagger)
@@ -63,6 +77,49 @@ namespace unvs.ui
                 this.grid.AddSpriteToGrid(sprite.sprite, t.name);
 
             }
+        }
+        private void LateUpdate()
+        {
+            var v = UnvsGlobalInput.LookAction.ReadValue<Vector2>();
+            var panelRect = this.panel.GetComponent<RectTransform>();
+            Vector3[] corners = new Vector3[4];
+            panelRect.GetWorldCorners(corners);
+            
+            UnvsCollectableItem collectableItem = null;
+            var rects=this.GetComponentsInChildren<UnvsDraggableItem>().Select(p=>p.GetComponent<RectTransform>()).ToArray();
+            if(v.IsInner(rects,out var item))
+            {
+                
+               
+                if (lastBagger != null)
+                {
+                    var draggItem = item.GetComponent<UnvsDraggableItem>();
+                   
+                    if (draggItem != null)
+                    {
+                        collectableItem = lastBagger.FindItem(draggItem.name);
+                       
+                    }
+                }
+                if (collectableItem != null)
+                {
+                    UnvsInteractUI.Instance.Locked=true;
+                    UnvsInteractUI.Instance.ChangeIcon(collectableItem.icon);
+                    UnvsGlobalInput.PlayerDisable();
+                }
+                else
+                {
+                    UnvsInteractUI.Instance.Locked = false;
+                    UnvsInteractUI.Instance.RestoreDefaultIcon();
+                    UnvsGlobalInput.PlayerEnable();
+                }
+            } else
+            {
+                UnvsInteractUI.Instance.Locked = false;
+                UnvsGlobalInput.PlayerEnable();
+            }
+            
+           
         }
     }
 #if UNITY_EDITOR

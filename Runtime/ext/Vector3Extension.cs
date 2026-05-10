@@ -14,6 +14,7 @@ using unvs.game2d.scenes;
 using unvs.game2d.actors;
 using unvs.shares;
 using static UnityEngine.LowLevelPhysics2D.PhysicsLayers;
+using unvs.ui;
 
 
 
@@ -884,6 +885,32 @@ namespace unvs.ext
                 default:
                     return box.bounds.center;
             }
+        }
+
+        public static bool IsInner(this Vector2 screenPoint, RectTransform[] rects,out RectTransform retItem)
+        {
+            // Get the RectTransform of the Image
+            foreach (var item in rects)
+            {
+                RectTransform rectTransform=item.GetComponent<RectTransform>();
+                // Get the camera associated with the Canvas. 
+                // For 'Screen Space - Overlay', this should be null.
+                // For 'Screen Space - Camera' or 'World Space', it requires the world camera.
+                // For 'Screen Space - Camera' or 'World Space', it requires the world camera.
+                //Canvas canvas = panel.canvas;
+                //Camera cam = (canvas.renderMode == RenderMode.ScreenSpaceOverlay) ? null : canvas.worldCamera;
+
+
+
+                // Internal Unity method to check if a screen point resides inside the RectTransform
+                if ( RectTransformUtility.RectangleContainsScreenPoint(rectTransform, screenPoint, null))
+                {
+                    retItem= item;
+                    return true;
+                }
+            }
+            retItem=null;
+            return false;
         }
     }
     public enum PositionEnum
