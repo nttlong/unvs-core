@@ -29,14 +29,8 @@ namespace unvs.game2d.scenes
         /// Limit z of cinema michonne, the distance of cam to plane of view is always bigger or equal by this value 
         /// That mean z of follow offset o cinemachine is alway add negative of this value
         /// </summary>
-        [Header("Camera")]
-        [SerializeField]
-        public Vector3 DefaultTargetOffset = new Vector3(0, 0, -35);
-        public float CamWacherDistance = -30;
-        [Header("Cinema light")]
-        public float DurationTimeSmoothChangeSate = 1.5f;
-        public int MaintainGlobalLightNumber = 5;
-        public int FrequencyOfWorldBoundUpdating = 600;
+        
+       
         [SerializeField]
         public GlobalLightChunkInfo[] worldLightMaintain;
         private List<GlobalLightChunkInfo> _lights = new List<GlobalLightChunkInfo>();
@@ -94,7 +88,7 @@ namespace unvs.game2d.scenes
             ctsChangeOffset = ctsChangeOffset.Refresh();
             if (nearset.followOffset == Vector3.zero)
             {
-                nearset.followOffset = this.DefaultTargetOffset;
+                nearset.followOffset = UnvsApp.Instance.Settings.DefaultTargetOffset;
             }
             //this._isFollwingOffsetChanging = true;
             var tsk =
@@ -169,7 +163,7 @@ namespace unvs.game2d.scenes
                 ret.light2d.enabled = false;
                 ret.light2d.gameObject.SetActive(false);
                 ret.light2d.transform.position = ret.worldBound.bounds.center;
-                if (_lights.Count > this.MaintainGlobalLightNumber)
+                if (_lights.Count > UnvsApp.Instance.Settings.MaintainGlobalLightNumber)
                 {
                     removeLight(UpdateType);
                 }
@@ -365,9 +359,9 @@ namespace unvs.game2d.scenes
                 }
                 else
                 {
-                    if (FrequencyOfWorldBoundUpdating > 0)
+                    if (UnvsApp.Instance.Settings.FrequencyOfWorldBoundUpdating > 0)
                     {
-                        if (Time.frameCount % FrequencyOfWorldBoundUpdating == 0)
+                        if (Time.frameCount % UnvsApp.Instance.Settings.FrequencyOfWorldBoundUpdating == 0)
                         {
 
 

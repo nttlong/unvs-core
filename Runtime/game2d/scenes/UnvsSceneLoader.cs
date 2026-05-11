@@ -99,7 +99,7 @@ namespace unvs.game2d.scenes
                     UnvsCinema.Instance.UpdateLoadChunkSceneTrackerSizeByCurrentFollowOffset();
                 }
             }
-            await UnvsFadeScreen.Instance.FadeInAsync(UnvsApp.Instance.DefaultFadeTimeLoadScene);
+            await UnvsFadeScreen.Instance.FadeInAsync(UnvsApp.Instance.Settings.DefaultFadeTimeLoadScene);
             if (this._litsOfTempSpawns == null)
             {
                 this._litsOfTempSpawns = new List<UnvsTeleport>();
@@ -153,7 +153,7 @@ namespace unvs.game2d.scenes
 
 
             lastInteriorScene = ret;
-            await UnvsFadeScreen.Instance.FadeOutAsync(UnvsApp.Instance.DefaultFadeTimeLoadScene);
+            await UnvsFadeScreen.Instance.FadeOutAsync(UnvsApp.Instance.Settings.DefaultFadeTimeLoadScene);
             UnvsApp.Instance.RaiseEnterScene(ret);
             return ret;
         }
@@ -168,7 +168,7 @@ namespace unvs.game2d.scenes
                     UnvsCinema.Instance.UpdateLoadChunkSceneTrackerSizeByCurrentFollowOffset();
                 }
             }
-            await UnvsFadeScreen.Instance.FadeInAsync(UnvsApp.Instance.DefaultFadeTimeLoadScene);
+            await UnvsFadeScreen.Instance.FadeInAsync(UnvsApp.Instance.Settings.DefaultFadeTimeLoadScene);
             if (fromScene == null) return null;
             lastInteriorScene = fromScene;
             lastInteriorScene.transform.SetParent(this.backupInterior.transform, true);
@@ -234,8 +234,8 @@ namespace unvs.game2d.scenes
             UnvsCinema.Instance.UpdateWorld(ret, true, UpdateWorldEmun.Interior);
             UnvsCinema.Instance.compositeCollider2D.GenerateGeometry();
             UnvsCinema.Instance.confiner.InvalidateBoundingShapeCache();
-            await UniTask.DelayFrame(UnvsApp.Instance.DelayFrameBeforeInteriorSceneShow);
-            await UnvsFadeScreen.Instance.FadeOutAsync(UnvsApp.Instance.DefaultFadeTimeLoadScene);
+            await UniTask.DelayFrame(UnvsApp.Instance.Settings.DelayFrameBeforeInteriorSceneShow);
+            await UnvsFadeScreen.Instance.FadeOutAsync(UnvsApp.Instance.Settings.DefaultFadeTimeLoadScene);
             UnvsApp.Instance.RaiseEnterScene(ret);
             UnvsCinema.Instance.requestInvalidateBoundingShapeCache = false;
             return ret;
@@ -253,7 +253,7 @@ namespace unvs.game2d.scenes
                    
                 }
             }
-            await UnvsFadeScreen.Instance.FadeInAsync(UnvsApp.Instance.DefaultFadeTimeLoadScene);
+            await UnvsFadeScreen.Instance.FadeInAsync(UnvsApp.Instance.Settings.DefaultFadeTimeLoadScene);
             this.clearAllChunks();
             this.chunks.gameObject.SetActive(true);
             this.interior.gameObject.SetActive(false);
@@ -268,7 +268,7 @@ namespace unvs.game2d.scenes
             {
                 if (UnvsCinema.Instance != null)
                 {
-                    ret.followOffset = UnvsCinema.Instance.DefaultTargetOffset;
+                    ret.followOffset = UnvsApp.Instance.Settings.DefaultTargetOffset;
                 }
             }
             UnvsCinema.Instance.UpdateLoadChunkSceneTrackerSize(ret.followOffset);
@@ -313,7 +313,7 @@ namespace unvs.game2d.scenes
             UnvsCinema.Instance.UpdateWorld(ret, true, UpdateWorldEmun.New);
             UnvsCinema.Instance.vcam.UpdateByUnvsScene(ret);
             ret.gameObject.SetActive(true);
-            await UnvsFadeScreen.Instance.FadeOutAsync(UnvsApp.Instance.DefaultFadeTimeLoadScene);
+            await UnvsFadeScreen.Instance.FadeOutAsync(UnvsApp.Instance.Settings.DefaultFadeTimeLoadScene);
             UnvsApp.Instance.RaiseEnterScene(ret, true);
             return ret;
         }
@@ -453,7 +453,7 @@ namespace unvs.game2d.scenes
         private async UniTask clearChunkLeftIfExeedeAsync()
         {
             var len = this.chunks.GetComponentsInChildren<UnvsScene>().Length;
-            if (len >= UnvsApp.Instance.ChunLenght)
+            if (len >= UnvsApp.Instance.Settings.ChunLenght)
             {
                 var deleteScene = this.chunks.GetComponentsInChildren<UnvsScene>()[0];
                 if (deleteScene.rightScene != null)
@@ -467,9 +467,9 @@ namespace unvs.game2d.scenes
         private async UniTask clearChunkRightIfExeedeAsync()
         {
             var len = this.chunks.GetComponentsInChildren<UnvsScene>().Length;
-            if (len >= UnvsApp.Instance.ChunLenght)
+            if (len >= UnvsApp.Instance.Settings.ChunLenght)
             {
-                var deleteScene = this.chunks.GetComponentsInChildren<UnvsScene>()[UnvsApp.Instance.ChunLenght - 1];
+                var deleteScene = this.chunks.GetComponentsInChildren<UnvsScene>()[UnvsApp.Instance.Settings.ChunLenght - 1];
                 if (deleteScene.leftScene != null)
                 {
                     deleteScene.leftScene.TurnOnRight();

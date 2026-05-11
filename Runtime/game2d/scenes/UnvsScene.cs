@@ -93,7 +93,7 @@ namespace unvs.game2d.scenes
             {
                 if(UnvsCinema.Instance != null)
                 {
-                    this.followOffset = UnvsCinema.Instance.DefaultTargetOffset;
+                    this.followOffset = UnvsApp.Instance.Settings.DefaultTargetOffset;
                 }
             }
             if (cam != null)

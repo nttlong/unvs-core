@@ -23,6 +23,8 @@ using unvs.game2d.objects.types;
 using unvs.controllers.inputs;
 
 using unvs.ui;
+using unvs.data;
+
 
 
 
@@ -42,12 +44,11 @@ namespace unvs.game2d.scenes
     
     public class UnvsApp : UnvsComponent
     {
+        [Header("Game settings")]
+        public UnvsGameSettings Settings;
         public bool useAssetReferenceAssetGUIDForName = true;
         public UnvsUIInput<UnvsApp> uiInputs;
-        [Header("Visual loading")]
-        public float FadeTimeStartGame = 0.5f;
-        public float DefaultFadeTimeLoadScene=0;
-        public int DelayFrameBeforeInteriorSceneShow = 15;
+      
         public GameObject controllerInput;
         [Header("prefabs requirements")]
         public AssetReference refPlayerInput;
@@ -61,8 +62,7 @@ namespace unvs.game2d.scenes
         public AssetReference refPauseMenu;
         public AssetReference refFadeScreen;
         public AssetReference refDialog;
-        public int ChunLenght = 3;
-        public int fps = 120;
+        
         [Header("Sart Path")]
         public string startScenePath;
         public AssetReference startScene;
@@ -128,9 +128,9 @@ namespace unvs.game2d.scenes
         }
         async UniTask startGameAsyn()
         {
-            var oldFadeTime = this.DefaultFadeTimeLoadScene;
-            this.DefaultFadeTimeLoadScene = 0;
-            await UnvsFadeScreen.Instance.FadeInAsync(this.FadeTimeStartGame);
+            var oldFadeTime = this.Settings.DefaultFadeTimeLoadScene;
+            this.Settings.DefaultFadeTimeLoadScene = 0;
+            await UnvsFadeScreen.Instance.FadeInAsync(this.Settings.FadeTimeStartGame);
             await SceneLoader.LoadNewAsync(this.startScene, "", false);
            
             UnvsCinema.Instance.OnFirstStart = () =>
@@ -138,8 +138,8 @@ namespace unvs.game2d.scenes
                
                 Debug.Log("UnvsFadeScreen.Instance.FadeOutAsync(FadeTimeStartGame).Forget();");
             };
-            await UnvsFadeScreen.Instance.FadeOutAsync(FadeTimeStartGame);
-            this.DefaultFadeTimeLoadScene = oldFadeTime;
+            await UnvsFadeScreen.Instance.FadeOutAsync(this.Settings.FadeTimeStartGame);
+            this.Settings.DefaultFadeTimeLoadScene = oldFadeTime;
         }
         public virtual void InitEvents()
         {
@@ -277,7 +277,7 @@ namespace unvs.game2d.scenes
         public override void InitRuntime()
         {
             Instance = this;
-            Application.targetFrameRate = this.fps;
+            Application.targetFrameRate = this.Settings.fps;
             InitRuntimeAsync().ContinueWith(() =>
             {
                
@@ -297,6 +297,10 @@ namespace unvs.game2d.scenes
         [UnvsButton]
         public async UniTask ValidateGameApp()
         {
+            if (this.Settings == null)
+            {
+                unvs.editor.utils.Dialogs.Show($"Please create {this.Settings}, by using Create->Unvs->Data->Game Settings");
+            }
            var ret= this.refPlayerInput.LoadAssetAsync<GameObject>();
             this.controllerInput = await ret.ToUniTask();
             var input= this.controllerInput.GetComponent< UnvsPlayerInputMap >();
