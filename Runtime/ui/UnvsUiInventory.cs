@@ -104,7 +104,8 @@ namespace unvs.ui
                 if (collectableItem != null)
                 {
                     UnvsInteractUI.Instance.Locked=true;
-                    UnvsInteractUI.Instance.ChangeIcon(collectableItem.Icon);
+                    if(collectableItem.CursorData!=null)
+                    UnvsInteractUI.Instance.ChangeIcon(collectableItem.CursorData);
                     UnvsGlobalInput.PlayerDisable();
                 }
                 else

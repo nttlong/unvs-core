@@ -144,7 +144,7 @@ namespace unvs.animators_controllers
                 texttue=p.sprite.texture,
                 transform=p.transform.parent,
                 owner=Owner as MonoBehaviour,
-                folderPath= unvs.editor.utils.UnvsEditorUtils.EditorGetTueFolder((Owner as MonoBehaviour).gameObject),
+                folderPath= unvs.editor.utils.UnvsEditorUtils.EditorGetTrueFolder((Owner as MonoBehaviour).gameObject),
                
             }).ToArray();
            

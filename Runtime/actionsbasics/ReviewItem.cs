@@ -27,7 +27,7 @@ namespace unvs.actionsbasics
                 return;
             }
             var itemSprite = item.GetInventoryIcon();
-            UnvsApp.SayText($"itemSprite={itemSprite}");
+        
             UnvsDialog.Instance.HideFooter();
             await UnvsDialog.Instance.DoReviewItemAsync(itemSprite, item.Description);
             

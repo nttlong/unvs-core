@@ -61,7 +61,7 @@ namespace unvs.game2d.actors
            var audibleObject = _coll.RayCastDownHit< UnvsAudible>( _layerMask);
             if(audibleObject != null)
             {
-                UnvsApp.SayText($"OnKeyFrame={audibleObject.name}");
+               
                 AudioInfo audioInfo = audibleObject.audioInfo;
                 if (audioInfo.Clip != null)
                 {

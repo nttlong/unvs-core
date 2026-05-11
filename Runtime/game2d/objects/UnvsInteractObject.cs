@@ -32,9 +32,9 @@ namespace unvs.game2d.objects
         /// <summary>
         /// The icon when gamer hold over interactable object
         /// </summary>
-        [Tooltip("The display icon when gamer hold over interactable object")]
-        [SerializeField]
-        public unvs.types.IconInfo Icon;
+        //[Tooltip("The display icon when gamer hold over interactable object")]
+        //[SerializeField]
+        //public unvs.types.IconInfo Icon;
         /// <summary>
         /// The icon when gamer show in inventory if null use spriterenderer instead
         /// </summary>
@@ -59,7 +59,7 @@ namespace unvs.game2d.objects
         public override void InitRuntime()
         {
 
-            this.Icon.sprites = this.CursorData.GetAllSprites();
+            //this.Icon.sprites = this.CursorData.GetAllSprites();
 
 
         }

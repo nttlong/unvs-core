@@ -1,45 +1,49 @@
 namespace unvs.data
 {
-    using System;
+ 
     using System.Linq;
+    using Unity.VisualScripting;
     using UnityEngine;
     using UnityEngine.U2D;
-    using unvs.components;
-    using unvs.game2d.objects;
-    using unvs.game2d.objects.editor;
+
+    
 
     [CreateAssetMenu(fileName = "Cursor", menuName = "Unvs/Data/Cursor")]
     public partial class UnvsCursor : UnvsScriptObject
     {
        
         public types.IconInfo icon;
-        public SpriteAtlas Icons;
+      
         private void OnEnable()
         {
-            if (Icons == null) return;
+            if (SpriteAtlasIcons == null) return;
 
 
-            Sprite[] allSprites = new Sprite[Icons.spriteCount];
+            Sprite[] allSprites = new Sprite[SpriteAtlasIcons.spriteCount];
 
 
-            Icons.GetSprites(allSprites);
+            SpriteAtlasIcons.GetSprites(allSprites);
             icon.sprites = allSprites;
         }
-        [UnvsButton]
-        public Sprite[] GetAllSprites()
-        {
-            Sprite[] allSprites = new Sprite[Icons.spriteCount];
-            Icons.GetSprites(allSprites);
-            return allSprites;
-        }
+        
     }
+#if UNITY_EDITOR
     public partial class UnvsCursor : UnvsScriptObject
     {
-
-        [UnvsButton]
-        public void LoadAllSprites()
+        public SpriteAtlas SpriteAtlasIcons;
+        public string[] names;
+        public string FolderPath;
+        [game2d.objects.editor.UnvsButton]
+        public void GetAllSprites()
         {
-
+            if (SpriteAtlasIcons == null || SpriteAtlasIcons.IsDestroyed()) return;
+            FolderPath = unvs.editor.utils.UnvsEditorUtils.EditorGetTrueAssetPath(SpriteAtlasIcons);
+            unvs.editor.utils.Dialogs.Show($"Icons.spriteCount={SpriteAtlasIcons.spriteCount}");
+            Sprite[] allSprites = new Sprite[SpriteAtlasIcons.spriteCount];
+            SpriteAtlasIcons.GetSprites(allSprites);
+            names = allSprites.Select(p => p.name).ToArray();
+            icon.sprites = allSprites.Select(p => unvs.editor.utils.SpriteTools.GetOriginalSprite(p, FolderPath)).ToArray();
         }
-    }
+    } 
+#endif
 }

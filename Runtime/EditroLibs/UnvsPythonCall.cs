@@ -369,5 +369,37 @@ namespace unvs.editor.utils
             };
         }
     }
+    public class SpriteTools
+    {
+
+        public static Sprite GetOriginalSprite(Sprite cloneSprite, string folderPath)
+        {
+            if (cloneSprite == null) return null;
+
+            // 1. Lấy tên sạch (ví dụ: "Lớp 2")
+            string cleanName = cloneSprite.name.Replace("(Clone)", "").Trim();
+
+            // 2. Tìm GUID của file chứa Sprite đó (ví dụ file pickable.psd)
+            string[] guids = AssetDatabase.FindAssets($"{cleanName} t:Sprite", new string[] { folderPath });
+
+            foreach (var guid in guids)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+
+                // 3. QUAN TRỌNG: Load tất cả các Sprite con bên trong file đó
+                UnityEngine.Object[] allAssets = AssetDatabase.LoadAllAssetsAtPath(path);
+
+                foreach (var asset in allAssets)
+                {
+                    // 4. So sánh tên chính xác với Sub-Asset
+                    if (asset is Sprite s && s.name == cleanName)
+                    {
+                        return s;
+                    }
+                }
+            }
+            return null;
+        }
+    }
 }
 #endif

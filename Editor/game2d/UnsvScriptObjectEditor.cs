@@ -33,11 +33,7 @@ namespace editor.game2d
                 fontStyle = FontStyle.Bold
             };
             var errMsg = string.Empty;
-            ((UnvsBaseComponent)target).OnEditorError = err =>
-            {
-                errMsg = err;
-
-            };
+            
             foreach (var method in methods)
             {
                 // Kiểm tra xem method có gắn attribute không

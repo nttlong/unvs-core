@@ -15,6 +15,7 @@ using UnityEngine;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Rendering;
+
 using unvs.components;
 using unvs.types;
 using static System.Net.WebRequestMethods;
@@ -191,7 +192,36 @@ namespace unvs.editor.utils
             var entry = settings.FindAssetEntry(guid);
             return entry != null ? entry.address : "Not Addressable";
         }
-        public static string EditorGetTueFolder(GameObject go)
+        public static string EditorGetTrueFolder(GameObject go)
+        {
+            if (go == null) return string.Empty;
+
+            // 1. Tìm đường dẫn Asset của GameObject (ví dụ: Assets/Prefabs/Player.prefab)
+            string assetPath = GetAssetTruePath(go);// AssetDatabase.GetAssetPath(go);
+
+            // Nếu GameObject này không phải là Asset (chỉ là object tạm trong Scene chưa lưu)
+            if (string.IsNullOrEmpty(assetPath))
+            {
+                Debug.LogWarning($"GameObject {go.name} is not a persistent asset.");
+                return "Assets"; // Trả về thư mục gốc mặc định
+            }
+
+            // 2. Lấy đường dẫn thư mục chứa file đó
+            string folderPath = Path.GetDirectoryName(assetPath);
+
+            // 3. Chuẩn hóa dấu gạch chéo theo chuẩn Unity (/) thay vì chuẩn Windows (\)
+            return folderPath.Replace('\\', '/');
+        }
+        /// <summary>
+        /// Get folder path of any avalable object
+        /// </summary>
+        /// <param name="go"></param>
+        /// <returns></returns>
+        public static string EditorGetAbsFolderPath(UnityEngine.Object go)
+        {
+            return EditorTools.ToAbsolutePath(EditorGetTrueAssetPath(go));
+        }
+        public static string EditorGetTrueAssetPath(UnityEngine.Object go)
         {
             if (go == null) return string.Empty;
 

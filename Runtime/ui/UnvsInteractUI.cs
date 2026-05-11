@@ -11,6 +11,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 using unvs.components;
+using unvs.data;
 using unvs.ext;
 using unvs.game2d.objects;
 using unvs.game2d.objects.editor;
@@ -25,11 +26,12 @@ namespace unvs.ui
     public partial class UnvsInteractUI : UnvsUIComponentInstance<UnvsInteractUI>
     {
         //public Texture2D defaultCursorIcon;
-        public Image cursor;
+        public Image virtualCursor;
         private types.IconInfo _currentCursor;
         private Vector2 _virtualMousePos;
-        [SerializeField]
-        public types.IconInfo DefaultIcon;
+        //[SerializeField]
+        //public types.IconInfo DefaultIcon;
+        public UnvsCursor DefaultCursor;
        
         [SerializeField] float gamepadSensitivity = 1000f;
         private float _animTimer;
@@ -64,34 +66,41 @@ namespace unvs.ui
             canvas.FullSize();
             canvas.SetMeOnLayer(Constants.Layers.UI);
             canvas.sortingOrder = 1024;
-            cursor = canvas.transform.AddChildComponentIfNotExist<Image>("cursor");
-            _currentCursor = DefaultIcon;
+            virtualCursor = canvas.transform.AddChildComponentIfNotExist<Image>("cursor");
+            ChangeIcon(this.DefaultCursor);
+
             //cursor.sprite = DefaultIcon.srpite;
-            // 5. Reset position to center of screen initially
-            cursor.rectTransform.anchoredPosition = DefaultIcon.Pivot;
-            cursor.rectTransform.sizeDelta = DefaultIcon.size;
+            //// 5. Reset position to center of screen initially
+            //cursor.rectTransform.anchoredPosition = DefaultIcon.Pivot;
+            //cursor.rectTransform.sizeDelta = DefaultIcon.size;
             // Hide the system cursor
             Cursor.visible = false;
+            //Cursor.SetCursor()
         }
-        public void ChangeIcon(IconInfo icon)
+        public void ChangeIcon(UnvsCursor cursorData)
         {
-            if(icon.sprites.Length>0)
+            var c = cursorData ?? DefaultCursor;
+            if(c == null)
             {
-                _currentCursor = icon;
-                if (icon.size != Vector2.zero)
-                    cursor.rectTransform.sizeDelta = icon.size;
-                cursor.rectTransform.anchoredPosition = icon.Pivot;
+                return;
+            }
+            if (c.icon.sprites.Length>0)
+            {
+                _currentCursor = cursorData.icon;
+                if (cursorData.icon.size != Vector2.zero)
+                    virtualCursor.rectTransform.sizeDelta = cursorData.icon.size;
+                virtualCursor.rectTransform.anchoredPosition = cursorData.icon.Pivot;
                 UpdateCursorPosition();
             }
           
         }
         public void RestoreDefaultIcon()
         {
-            _currentCursor=DefaultIcon;
+            ChangeIcon(DefaultCursor);
         }
         void UpdateCursorPosition()
         {
-            if (cursor == null) return;
+            if (virtualCursor == null) return;
             Vector2 deltaMouse = Vector2.zero;
             Vector2 stickInput = Vector2.zero;
 
@@ -125,7 +134,7 @@ namespace unvs.ui
             _virtualMousePos.x = Mathf.Clamp(_virtualMousePos.x, 0, Screen.width);
             _virtualMousePos.y = Mathf.Clamp(_virtualMousePos.y, 0, Screen.height);
 
-            cursor.rectTransform.position = _virtualMousePos;
+            virtualCursor.rectTransform.position = _virtualMousePos;
         }
         private void LateUpdate()
         {
@@ -133,7 +142,7 @@ namespace unvs.ui
 
             if(UnvsCinema.Instance==null) return;
             //if (UnvsCinema.Instance.IsInUpdateState) return;
-            if (cursor == null) return;
+            if (virtualCursor == null) return;
             UpdateCursorPosition();
 
             var pos = (Vector2)_virtualMousePos;
@@ -146,7 +155,8 @@ namespace unvs.ui
 
             if (!safeRect.Contains(pos))
             {
-                _currentCursor = DefaultIcon;
+                ChangeIcon(DefaultCursor);
+                //_currentCursor = DefaultIcon.;
                 //cursor.sprite = this.DefaultIcon.srpite;
                 return;
             }
@@ -154,21 +164,30 @@ namespace unvs.ui
 
             if (interactObject != null)
             {
-                if (interactObject.Icon.sprites.Length>0)
+                if (interactObject.CursorData!=null)
                 {
+                  
+                    ChangeIcon(interactObject.CursorData);
                    
-                    ChangeIcon(interactObject.Icon);
-                    UpdateCursorPosition();
+                } else
+                {
+                  
+                    ChangeIcon(DefaultCursor);
+                   
+                   
                 }
             }
             else
             {
-                _animTimer += Time.unscaledDeltaTime;
-               
-                cursor.sprite = _currentCursor.GetFrame(_animTimer);
-              
+                
+                ChangeIcon(DefaultCursor);
+
 
             }
+            _animTimer += Time.unscaledDeltaTime;
+
+            virtualCursor.sprite = _currentCursor.GetFrame(_animTimer);
+            UpdateCursorPosition();
         }
 
         
