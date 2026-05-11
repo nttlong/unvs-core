@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Playables;
 using unvs.components;
 using unvs.components;
 using unvs.ui;
@@ -77,11 +78,23 @@ namespace unvs.types
     public struct IconInfo
     {
         [SerializeField]
-        public Sprite srpite;
+        public Sprite[] sprites;
         [SerializeField]
         public Vector2 size;
         [SerializeField] public Vector2 Pivot;
+
+        [SerializeField] public float frameRate; // Tốc độ animation (FPS)
+        // Hàm lấy sprite tại thời điểm hiện tại
+        public Sprite GetFrame(float time)
+        {
+            if (sprites == null || sprites.Length == 0) return null;
+            if (sprites.Length == 1) return sprites[0];
+            int index = Mathf.FloorToInt(time * frameRate) % sprites.Length;
+            return sprites[index];
+        }
+        
     }
+   
     [Serializable]
     public struct SceneLinkingData
     {

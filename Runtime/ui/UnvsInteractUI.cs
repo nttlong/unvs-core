@@ -2,7 +2,6 @@
 using Cysharp.Threading.Tasks.Triggers;
 using game2d.ext;
 using game2d.scenes;
-
 using System;
 using Unity.Burst.Intrinsics;
 using Unity.Cinemachine;
@@ -11,13 +10,14 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
-using unvs.ext;
 using unvs.components;
+using unvs.ext;
+using unvs.game2d.objects;
 using unvs.game2d.objects.editor;
 using unvs.game2d.scenes;
 using unvs.shares;
-using unvs.game2d.objects;
 using unvs.types;
+using static PlasticPipe.Server.MonitorStats;
 
 namespace unvs.ui
 {
@@ -26,10 +26,15 @@ namespace unvs.ui
     {
         //public Texture2D defaultCursorIcon;
         public Image cursor;
+        private types.IconInfo _currentCursor;
         private Vector2 _virtualMousePos;
         [SerializeField]
         public types.IconInfo DefaultIcon;
+       
         [SerializeField] float gamepadSensitivity = 1000f;
+        private float _animTimer;
+        
+
         /// <summary>
         /// THis UI allow showing when game playing, so no need to hide or show player
         /// </summary>
@@ -60,8 +65,8 @@ namespace unvs.ui
             canvas.SetMeOnLayer(Constants.Layers.UI);
             canvas.sortingOrder = 1024;
             cursor = canvas.transform.AddChildComponentIfNotExist<Image>("cursor");
-          
-            cursor.sprite = DefaultIcon.srpite;
+            _currentCursor = DefaultIcon;
+            //cursor.sprite = DefaultIcon.srpite;
             // 5. Reset position to center of screen initially
             cursor.rectTransform.anchoredPosition = DefaultIcon.Pivot;
             cursor.rectTransform.sizeDelta = DefaultIcon.size;
@@ -70,9 +75,9 @@ namespace unvs.ui
         }
         public void ChangeIcon(IconInfo icon)
         {
-            if(icon.srpite!=null)
+            if(icon.sprites.Length>0)
             {
-                cursor.sprite = icon.srpite;
+                _currentCursor = icon;
                 if (icon.size != Vector2.zero)
                     cursor.rectTransform.sizeDelta = icon.size;
                 cursor.rectTransform.anchoredPosition = icon.Pivot;
@@ -82,7 +87,7 @@ namespace unvs.ui
         }
         public void RestoreDefaultIcon()
         {
-            cursor.sprite = DefaultIcon.srpite;
+            _currentCursor=DefaultIcon;
         }
         void UpdateCursorPosition()
         {
@@ -141,14 +146,15 @@ namespace unvs.ui
 
             if (!safeRect.Contains(pos))
             {
-                cursor.sprite = this.DefaultIcon.srpite;
+                _currentCursor = DefaultIcon;
+                //cursor.sprite = this.DefaultIcon.srpite;
                 return;
             }
             var interactObject = pos.GetHitCollider<UnvsInteractObject>(Constants.Layers.INTERACT_OBJECT);
 
             if (interactObject != null)
             {
-                if (interactObject.Icon.srpite != null)
+                if (interactObject.Icon.sprites.Length>0)
                 {
                    
                     ChangeIcon(interactObject.Icon);
@@ -157,7 +163,11 @@ namespace unvs.ui
             }
             else
             {
-                cursor.sprite = this.DefaultIcon.srpite; 
+                _animTimer += Time.unscaledDeltaTime;
+               
+                cursor.sprite = _currentCursor.GetFrame(_animTimer);
+              
+
             }
         }
 

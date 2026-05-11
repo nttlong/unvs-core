@@ -15,6 +15,7 @@ using unvs.ext.physical2d;
 using unvs.ui;
 using unvs.components;
 using unvs.game2d.actors;
+using unvs.data;
 namespace unvs.game2d.objects
 {
 
@@ -23,6 +24,8 @@ namespace unvs.game2d.objects
   
     public partial class UnvsInteractObject : UnvsComponent
     {
+        [Header("Visualize")]
+        public UnvsCursor CursorData;
         [Header("Interact info")]
         public BoxCollider2D coll;
         public UnityEngine.Localization.LocalizedString Description;
@@ -55,9 +58,10 @@ namespace unvs.game2d.objects
         
         public override void InitRuntime()
         {
-            
-            //if(this.mousePoint==null)
-            //this.mousePoint = UnvsInteractUI.Instance.defaultCursorIcon;
+
+            this.Icon.sprites = this.CursorData.GetAllSprites();
+
+
         }
 
         public virtual Vector2 GetPosition(string Layer = Constants.Layers.WORLD_GROUND, params string[] extra)

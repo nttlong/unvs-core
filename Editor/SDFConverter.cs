@@ -8,7 +8,7 @@ public class SDFConverter : Editor
 {
     private static readonly string[] SupportedExtensions = { ".psd", ".png", ".jpg", ".jpeg", ".tga", ".tiff" };
 
-    [MenuItem("Assets/Convert to SDF", false, 1)]
+    [MenuItem("Assets/Create/Unvs/PSD/Convert to SDF", false, 1)]
     private static void SDFConverterMenu()
     {
         Object[] selectedObjects = Selection.objects;
