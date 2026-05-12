@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
 using unvs.actor.player;
 using unvs.components;
 using static UnityEngine.InputSystem.DefaultInputActions;
@@ -85,7 +86,27 @@ namespace unvs.controllers.inputs
 
         }
         public static event Action OnPlayerInputReady;
-        public static event Action OnUIInputReady;
+        static event Action _OnUIInputReady;
+        public static event Action OnUIInputReady
+        {
+            add
+            {
+                if (UI == null)
+                {
+                    _OnUIInputReady += value;
+                } else
+                {
+                    value?.Invoke();
+                }
+            }
+            remove
+            {
+                if (UI == null)
+                {
+                    _OnUIInputReady -= value;
+                }
+            }
+        }
         internal static void MapPlayerEvents()
         {
             var typ = inputIns.GetType();
@@ -125,7 +146,7 @@ namespace unvs.controllers.inputs
 
 
                 }
-                OnUIInputReady?.Invoke();
+                _OnUIInputReady?.Invoke();
             }
             
         }
@@ -270,6 +291,7 @@ namespace unvs.controllers.inputs
                 component.OnDestroying += () => input.performed -= performed;
             }
         }
+        
     }
     public struct ActionSender
     {

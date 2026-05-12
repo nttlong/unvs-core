@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
-
+using unvs.game2d.scenes;
 using unvs.shares;
 
 namespace unvs.ext
@@ -21,7 +21,6 @@ namespace unvs.ext
             CanvasScaler canvasScaler = UICanvas.AddComponentIfNotExist<CanvasScaler>();
             canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             UICanvas.worldCamera = Camera.main;
-            // 2. Đặt Reference Resolution (1080x1920 cho portrait mobile chuẩn)
             canvasScaler.referenceResolution = Commons.GetScreenSize();
             rect.anchoredPosition = new Vector2(0f, 0f);
             rect.sizeDelta = Commons.GetScreenSize();
@@ -29,27 +28,53 @@ namespace unvs.ext
             canvasScaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
             canvasScaler.matchWidthOrHeight = 0.5f;  // 0 = match width (landscape tốt),
             UICanvas.SetMeOnLayer(Constants.Layers.UI);
-            //var check = UICanvasList.FirstOrDefault(p => p == UICanvas);
-            //if (check==null)
-            //{
-            //    var lst = new List<Canvas>(UICanvasList);
-            //    lst.Add(UICanvas);
-            //    UICanvasList = lst.ToArray();
-            //}
+
+        }
+        public static void UIFullSize(this Canvas UICanvas, CanvasScaler.ScaleMode mode = CanvasScaler.ScaleMode.ScaleWithScreenSize)
+        {
+            if (UICanvas == null) return;
+            var rect = UICanvas.GetComponent<RectTransform>();
+            
+            CanvasScaler canvasScaler = UICanvas.AddComponentIfNotExist<CanvasScaler>();
+           
+            UICanvas.worldCamera = Camera.main;
+
+            rect.anchoredPosition = new Vector2(0f, 0f);
+            UICanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            if (Commons.IsMobile())
+            {
+                
+                canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+                canvasScaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+                canvasScaler.matchWidthOrHeight = 0.5f;  // 0 = match width (landscape tốt),
+                rect.sizeDelta = Commons.GetScreenSize();
+                canvasScaler.referenceResolution = Commons.GetScreenSize();
+            }
+            else
+            {
+                
+              
+                canvasScaler.uiScaleMode = mode;
+                rect.sizeDelta = Commons.GetUIScreenSize();
+                canvasScaler.referenceResolution = Commons.GetUIScreenSize();
+            }
+
+            UICanvas.SetMeOnLayer(Constants.Layers.UI);
+
         }
         public static void DoActive(this Canvas UICanvas)
         {
             if (!Application.isPlaying) return;
             if (UICanvas == null) return;
-            foreach(var p  in UICanvasList)
+            foreach (var p in UICanvasList)
             {
-                if(p != null)
+                if (p != null)
                 {
-                    if(p!= UICanvas)
+                    if (p != UICanvas)
                     {
                         p.gameObject.SetActive(false);
                     }
-                   
+
                 }
             }
             UICanvas.enabled = true;

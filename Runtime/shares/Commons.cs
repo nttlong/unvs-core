@@ -45,10 +45,27 @@ namespace unvs.shares
 
     public static class Commons
     {
-        
+        public static Vector2 GetUIScreenSize()
+        {
+            if (Commons.IsMobile())
+                return new Vector2(Screen.width, Screen.height);
+            else
+            {
+                if (UnvsApp.Instance != null && UnvsApp.Instance.Settings != null)
+                {
+                    return UnvsApp.Instance.Settings.PCUIScreenSize;
+                }
+                else
+                {
+                    return new Vector2(Screen.width, Screen.height);
+                }
+            }
+        }
         public static Vector2 GetScreenSize()
         {
+           
             return new Vector2(Screen.width, Screen.height);
+            
         }
         public static GameRuntimePlatform GetCurrent()
         {
@@ -268,7 +285,7 @@ namespace unvs.shares
         public static string GetObjectName(this AssetReference assetRef)
         {
 #if UNITY_EDITOR
-            if (UnvsApp.Instance != null && UnvsApp.Instance.useAssetReferenceAssetGUIDForName)
+            if (UnvsApp.Instance != null && UnvsApp.Instance.Settings.useAssetReferenceAssetGUIDForName)
             {
                 return assetRef.AssetGUID;
             }
@@ -290,7 +307,7 @@ namespace unvs.shares
             GameObject go = await LoadPrefabsAsync(assetRef, parent);
             go.SetActive(active);
 #if UNITY_EDITOR
-            if(UnvsApp.Instance!=null && UnvsApp.Instance.useAssetReferenceAssetGUIDForName)
+            if(UnvsApp.Instance!=null && UnvsApp.Instance.Settings.useAssetReferenceAssetGUIDForName)
             {
                 go.name = go.name = assetRef.AssetGUID;
             } else

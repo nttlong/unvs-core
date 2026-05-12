@@ -1,24 +1,20 @@
 ﻿using Cysharp.Threading.Tasks;
-using Cysharp.Threading.Tasks.Triggers;
-using game2d.ext;
-using game2d.scenes;
+
 using System;
-using Unity.Burst.Intrinsics;
-using Unity.Cinemachine;
-using Unity.VisualScripting;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Rendering.Universal;
+
 using UnityEngine.UI;
-using unvs.components;
+using unvs.actor.player;
+using unvs.controllers.inputs;
 using unvs.data;
 using unvs.ext;
 using unvs.game2d.objects;
 using unvs.game2d.objects.editor;
 using unvs.game2d.scenes;
 using unvs.shares;
-using unvs.types;
-using static PlasticPipe.Server.MonitorStats;
+
 
 namespace unvs.ui
 {
@@ -51,34 +47,44 @@ namespace unvs.ui
         public event Action<Vector2, Image, GameObject> OnHoverInteractObject;
         public override void InitEvents()
         {
-           
+
+            UnvsGlobalInput.OnUIInputReady += () =>
+            {
+                this.look = UnvsGlobalInput.NewMapUIAction(this, "Look", action =>
+                {
+                    action.performed += ctx =>
+                    {
+                        _virtualMousePos = ctx.ReadValue<Vector2>();
+                        UnvsApp.SayText($"pos={_virtualMousePos}");
+                      
+                      
+                        updateCursor();
+                    };
+                });
+            };
         }
         
         public override void InitRunTime()
         {
             base.InitRunTime();
             InitUI();
+            
         }
         
         private void InitUI()
         {
             canvas.SetMeOnLayer(Constants.Layers.TOP_UI);
-            canvas.FullSize();
+            canvas.UIFullSize();
             canvas.SetMeOnLayer(Constants.Layers.UI);
             canvas.sortingOrder = 1024;
             virtualCursor = canvas.transform.AddChildComponentIfNotExist<Image>("cursor");
-            ChangeIcon(this.DefaultCursor);
-
-            //cursor.sprite = DefaultIcon.srpite;
-            //// 5. Reset position to center of screen initially
-            //cursor.rectTransform.anchoredPosition = DefaultIcon.Pivot;
-            //cursor.rectTransform.sizeDelta = DefaultIcon.size;
-            // Hide the system cursor
+           
             Cursor.visible = false;
-            //Cursor.SetCursor()
+          
         }
         public void ChangeIcon(UnvsCursor cursorData)
         {
+            this.Cts=this.Cts.Refresh();
             var c = cursorData ?? DefaultCursor;
             if(c == null)
             {
@@ -101,45 +107,25 @@ namespace unvs.ui
         void UpdateCursorPosition()
         {
             if (virtualCursor == null) return;
-            Vector2 deltaMouse = Vector2.zero;
-            Vector2 stickInput = Vector2.zero;
-
-            // 1. Check Mouse (New System)
-            if (Mouse.current != null)
-            {
-                deltaMouse = Mouse.current.delta.ReadValue();
-            }
-
-            // 2. Check Gamepad (New System)
-            if (Gamepad.current != null)
-            {
-                // Right Stick thường là stick phía tay phải
-                stickInput = Gamepad.current.rightStick.ReadValue();
-            }
-
-            // --- Logic cập nhật vị trí ---
-
-            // Nếu chuột di chuyển (delta khác 0)
-            if (deltaMouse.sqrMagnitude > 0.01f)
-            {
-                // Với hệ thống mới, bạn có thể lấy vị trí chuột trực tiếp
-                _virtualMousePos = Mouse.current.position.ReadValue();
-            }
-            else if (stickInput.sqrMagnitude > 0.1f) // Deadzone
-            {
-                _virtualMousePos += (Vector2)stickInput * gamepadSensitivity * Time.deltaTime;
-            }
-
-            // Clamp và Update UI như cũ
+            
+           
             _virtualMousePos.x = Mathf.Clamp(_virtualMousePos.x, 0, Screen.width);
             _virtualMousePos.y = Mathf.Clamp(_virtualMousePos.y, 0, Screen.height);
 
             virtualCursor.rectTransform.position = _virtualMousePos;
         }
-        private void LateUpdate()
+        bool _isInitCursor=false;
+        private MapAction look;
+        private CancellationTokenSource Cts=new CancellationTokenSource();
+
+        void updateCursor()
         {
             if(Locked) return;
-
+            if(!_isInitCursor)
+            {
+                _currentCursor = DefaultCursor.icon;
+                _isInitCursor = true;
+            }
             if(UnvsCinema.Instance==null) return;
             //if (UnvsCinema.Instance.IsInUpdateState) return;
             if (virtualCursor == null) return;
@@ -185,9 +171,10 @@ namespace unvs.ui
 
             }
             _animTimer += Time.unscaledDeltaTime;
-
-            virtualCursor.sprite = _currentCursor.GetFrame(_animTimer);
+            _currentCursor.PlayAnimAsync(virtualCursor,this.Cts.Token).Forget();
+           
             UpdateCursorPosition();
+            
         }
 
         

@@ -212,6 +212,19 @@ namespace unvs.ext
         {
             return ((Vector2)worldPos).ToScreen();
         }
+        public static Vector2 ToUIScreen(this Vector2 gameWorldPos)
+        {
+            var uiSize = Commons.GetUIScreenSize(); // e.g., 1920x1080
+            var screenSize = Commons.GetScreenSize(); // e.g., 2560x1440
+            var screenPos = gameWorldPos.ToScreen(); // Position in pixels
+
+            // Calculate the scaling factor for each axis
+            float scaleX = uiSize.x / screenSize.x;
+            float scaleY = uiSize.y / screenSize.y;
+
+            // Multiply the screen position by the scale factor to get UI coordinates
+            return new Vector2(screenPos.x * scaleX, screenPos.y * scaleY);
+        }
         /// <summary>
         /// Chuyển đổi tọa độ World sang tọa độ Screen (Pixel)
         /// </summary>

@@ -50,7 +50,7 @@ namespace unvs.ui
         public override void InitRunTime()
         {
             
-            this.canvas.FullSize();
+            this.canvas.UIFullSize();
             this.panel.DockFull();
             GameObjectExtension.ApplyNavigate<Button>(this.gameObject);
         }

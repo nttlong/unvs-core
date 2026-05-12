@@ -64,7 +64,7 @@ namespace unvs.ui
             if (canvas == null)
             {
                 canvas = this.GetComponentInChildren<Canvas>(true);
-                if (canvas != null) canvas.FullSize();
+                if (canvas != null) canvas.UIFullSize();
             }
 
             if (canvas != null)
@@ -105,7 +105,7 @@ namespace unvs.ui
                 //    canvas = this.GetComponentInChildren<Canvas>(true);
                 if (canvas != null)
                 {
-                    canvas.FullSize();
+                    canvas.UIFullSize();
                     if (IsShow)
                     {
                         this.Show();

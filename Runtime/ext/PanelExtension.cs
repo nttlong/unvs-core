@@ -16,9 +16,13 @@ namespace unvs.ext
             var v = (Commons.GetScreenSize()-new Vector2(widthInPixels,heightInPixels))/2;
             panel.SetPosition(v.x,v.y,widthInPixels,heightInPixels);
         }
-        public static void SetPosition(this Image panel,Vector2 pos)
+        public static void SetPosition(this Image panel,Vector2 pos,Vector2 sizeOfPanel)
         {
-            var size=panel.GetSize();
+            var size = panel.GetSize();
+            if (sizeOfPanel != Vector2.zero)
+            {
+                size = sizeOfPanel;
+            }
             SetPosition(panel,pos.x,pos.y,size.x,size.y);
         }
         public static void SetPosition(

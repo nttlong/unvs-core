@@ -46,7 +46,7 @@ namespace unvs.game2d.scenes
     {
         [Header("Game settings")]
         public UnvsGameSettings Settings;
-        public bool useAssetReferenceAssetGUIDForName = true;
+        
         public UnvsUIInput<UnvsApp> uiInputs;
       
         public GameObject controllerInput;
@@ -286,8 +286,9 @@ namespace unvs.game2d.scenes
 
 #if UNITY_EDITOR
        
-        private void OnValidate()
+        public override void OnValidate()
         {
+           
             if(startScene!=null)
             {
                 startScenePath = startScene.EditorGetAddressPath();

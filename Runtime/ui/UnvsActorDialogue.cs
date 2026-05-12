@@ -21,7 +21,10 @@ namespace unvs.ui
         public Image panel;
         public TextMeshProUGUI txt;
         [SerializeField]
-        public Vector2 Size;
+        private Vector2 Size;
+
+        //[SerializeField]
+        //public Vector2 Size;
         /// <summary>
         /// THis UI is Actor dilog 
         /// </summary>
@@ -32,7 +35,7 @@ namespace unvs.ui
         public override void InitRunTime()
         {
             base.InitRunTime();
-           
+            this.canvas.UIFullSize(CanvasScaler.ScaleMode.ConstantPixelSize);
         }
         public UnvsActorDialogue Show(Vector2 pos,string content)
         {
@@ -40,7 +43,7 @@ namespace unvs.ui
             pos = pos.ToScreen();
             
             var v = pos - this.Size / 2;
-            this.panel.SetPosition(new Vector2(v.x,pos.y));
+            this.panel.SetPosition(new Vector2(v.x,pos.y),this.Size);
             this.txt.text = content;
             return this;
 
@@ -58,10 +61,7 @@ namespace unvs.ui
             this.panel.AddComponentIfNotExist<VerticalLayoutGroup>().FixFullLayoutChildren();
             this.txt=this.panel.AddChildComponentIfNotExist<TextMeshProUGUI>("txt");
         }
-        public void OnDrawGizmos()
-        {
-            this.Size=this.panel.GetSize();
-        }
+        
 
 #endif
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using System;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Playables;
@@ -92,7 +93,39 @@ namespace unvs.types
             int index = Mathf.FloorToInt(time * frameRate) % sprites.Length;
             return sprites[index];
         }
-        
+        public async UniTask PlayAnimAsync(UnityEngine.UI.Image virtualCursor, System.Threading.CancellationToken token)
+        {
+            if (sprites.Length == 1)
+            {
+                virtualCursor.sprite = sprites[0];
+                return;
+            }
+            if (sprites == null || sprites.Length <= 1) return;
+
+            float startTime = Time.time;
+
+            try
+            {
+                // Loop until the cancellation is requested
+                while (!token.IsCancellationRequested)
+                {
+                    float elapsedTime = Time.time - startTime;
+
+                    // Here you would typically apply the sprite to a target UI Image or Renderer.
+                    // Since this is a struct, we assume the caller handles the display 
+                    // or you could pass an Action<Sprite> to this method.
+                   
+                    virtualCursor.sprite = GetFrame(elapsedTime);
+                    // Wait for the next frame to save performance (approx 1/FPS)
+                    // Using PlayerLoop.Update ensures it stays in sync with Unity's frame rate
+                    await UniTask.Yield(PlayerLoopTiming.Update, token);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Handle cancellation gracefully if needed
+            }
+        }
     }
    
     [Serializable]

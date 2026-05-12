@@ -28,7 +28,7 @@ namespace game2d.scenes {
             this.canvas.gameObject.SetActive(true);
             this.canvas.enabled = true;
            
-            this.canvas.FullSize();
+            this.canvas.UIFullSize();
             panel.transform.position = new Vector3(panel.transform.position.x, panel.transform.position.y, 0);
             panel.enabled = true;
             panel.gameObject.SetActive(true);
@@ -46,7 +46,7 @@ namespace game2d.scenes {
         }
         public override void InitRunTime()
         {
-            this.canvas.FullSize();
+            this.canvas.UIFullSize();
             this.panel.DockFull();
             this.panel.FadeOutAsync(0.1f).Forget();
             Instance = this;

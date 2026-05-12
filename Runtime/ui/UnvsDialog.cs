@@ -27,6 +27,8 @@ namespace unvs.ui {
         public Button btnOk;
         public Button btnCancel;
         private MapAction CloseAny;
+        [SerializeField]
+        public Vector2 Size;
 
         public override bool DisablePlayerInput => true;
 
@@ -50,14 +52,14 @@ namespace unvs.ui {
         public override void InitRunTime()
         {
             base.InitRunTime();
-            canvas.FullSize();
+            canvas.UIFullSize();
         }
         public override void Show()
         {
             _dialogTaskSource = new UniTaskCompletionSource();
-            var screenSize=Commons.GetScreenSize();
+            var screenSize=Commons.GetUIScreenSize();
             var x = (screenSize - this.panel.GetSize()) / 2;
-            this.panel.SetPosition(x);
+            this.panel.SetPosition(x,this.Size);
             UnvsActorDialogue.Instance.Hide();
             base.Show();
         }
@@ -113,7 +115,10 @@ namespace unvs.ui {
             dialog.EditorSetDirty();
         }
 
-        
+        private void OnValidate()
+        {
+            this.Size=this.panel.GetSize();
+        }
 
 
 

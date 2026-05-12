@@ -14,17 +14,7 @@ namespace unvs.data
        
         public types.IconInfo icon;
       
-        private void OnEnable()
-        {
-            if (SpriteAtlasIcons == null) return;
-
-
-            Sprite[] allSprites = new Sprite[SpriteAtlasIcons.spriteCount];
-
-
-            SpriteAtlasIcons.GetSprites(allSprites);
-            icon.sprites = allSprites;
-        }
+        
         
     }
 #if UNITY_EDITOR
