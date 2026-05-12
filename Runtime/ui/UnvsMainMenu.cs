@@ -29,16 +29,7 @@ namespace unvs.ui
 
         public override void InitEvents()
         {
-            //UnvsGlobalInput.OnUIInputReady += () =>
-            //{
-            //    UnvsGlobalInput.NewMapUIAction(this, "Click", action =>
-            //    {
-            //        action.started += ctx =>
-            //        {
-            //            base.ApplyNaviagatorButtons();
-            //        };
-            //    });
-            //};
+           
             btnStart.onClick.AddListener(() =>
             {
                 OnStart?.Invoke();

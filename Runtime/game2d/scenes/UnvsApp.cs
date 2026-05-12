@@ -90,20 +90,23 @@ namespace unvs.game2d.scenes
         public static UnvsApp Instance { get; private set; }
         public event Action<UnvsScene> OnEnterScene;
         public event Action<UnvsScene> OnExitScene;
+        
         public  void ExitGame()
         {
-           
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
 
-                        // This will stop the Play Mode in the Unity Editor
-                        UnityEditor.EditorApplication.isPlaying = false;
-            #else
+            UnvsGlobalInput.EditorExitGame();
+            // This will stop the Play Mode in the Unity Editor
+           
+#else
                 // This will close the actual built application (.exe, .app, .apk)
-                Application.Quit();
-                System.Diagnostics.Process.GetCurrentProcess().Kill();
-            #endif
+               UnvsGlobalInput.ExitGame();
+               
+#endif
+
+
         }
-       
+
         public virtual async UniTask InitRuntimeAsync()
         {
             
@@ -150,10 +153,10 @@ namespace unvs.game2d.scenes
                     
                     action.performed += ctx =>
                     {
-                        UnvsApp.SayText("Pause-performed");
-                        //if (MainMenu.IsShow) return;
+
+                        if (this.MainMenu.IsShow) return;
                         this.PauseMenu.Toggle();
-                        //UnvsPauseMenu.Instance.Toggle();
+                        
                     };
                 });
             };

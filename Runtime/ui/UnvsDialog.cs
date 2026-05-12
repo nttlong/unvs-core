@@ -18,7 +18,7 @@ namespace unvs.ui {
     [RequireComponent(typeof(AudioSource))]
     public class UnvsDialog : UnvsUIComponentInstance<UnvsDialog>
     {
-        private UniTaskCompletionSource _dialogTaskSource;
+        public UniTaskCompletionSource DialogShowingTask;
         public Image panel;
         public Image contentPanel;
         public Image foolterPanel;
@@ -56,11 +56,12 @@ namespace unvs.ui {
         }
         public override void Show()
         {
-            _dialogTaskSource = new UniTaskCompletionSource();
+            DialogShowingTask = new UniTaskCompletionSource();
             var screenSize=Commons.GetUIScreenSize();
             var x = (screenSize - this.panel.GetSize()) / 2;
             this.panel.SetPosition(x,this.Size);
             UnvsActorDialogue.Instance.Hide();
+            UnvsInteractUI.Instance.HideInteracIconOfItem();
             base.Show();
         }
         public void HideFooter()
@@ -72,7 +73,7 @@ namespace unvs.ui {
             
             base.Hide();
             this.foolterPanel.Show();
-            _dialogTaskSource?.TrySetResult();
+            DialogShowingTask?.TrySetResult();
         }
         public UniTask DoReviewItemAsync(Sprite iconSprite, LocalizedString description, params types.AudioInfo[] feedBack)
         {
@@ -88,7 +89,7 @@ namespace unvs.ui {
             }
             audio.Play(this.GetComponent<AudioSource>());
             Show();
-            return _dialogTaskSource.Task;
+            return DialogShowingTask.Task;
         }
 
 #if UNITY_EDITOR

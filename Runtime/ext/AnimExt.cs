@@ -390,98 +390,40 @@ namespace unvs.ext
             target.position = targetPos;
             ik.UpdateManager();
         }
-        //public static async UniTask MoveTargetToPointAsync(this IKManager2D ik, Transform target, Vector2 pos, float duration = 1f, CancellationToken token = default)
-        //{
-        //    if (target == null || ik == null) return;
-
-        //    // 1. Tìm Solver điều khiển target này
-        //    // Sử dụng GetChain(0).target để khớp chính xác
-        //    var solver = ik.solvers.Find(s => s.GetChain(0).target == target);
-        //    if (solver == null) return;
-
-        //    Vector3 startPos = target.position;
-        //    Vector3 targetPos = new Vector3(pos.x, pos.y, target.position.z);
-        //    float elapsed = 0f;
-
-        //    while (elapsed < duration)
-        //    {
-        //        if (token.IsCancellationRequested) return;
-
-        //        elapsed += Time.deltaTime;
-        //        float percent = Mathf.Clamp01(elapsed / duration);
-        //        float curve = Mathf.SmoothStep(0, 1, percent);
-
-        //        // 2. Cập nhật vị trí cho Target
-        //        target.position = Vector3.Lerp(startPos, targetPos, curve);
-
-        //        // 3. ÉP CẬP NHẬT (Force Update)
-        //        // Thay vì UpdateComponent, ta sử dụng thuộc tính weight để đánh dấu "Dirty"
-        //        // Hoặc gọi trực tiếp UpdateManager của IKManager2D
-        //        ik.UpdateManager();
-        //        Debug.Log($"MoveTargetToPointAsync={target.position}");
-        //        // 4. Đợi khung hình tiếp theo tại nhịp LateUpd ate
-        //        // Đây là nơi IK 2D của Unity thường thực hiện việc Resolve
-        //        await UniTask.Yield(PlayerLoopTiming.LastUpdate, token);
-
-        //        // Sau khi đợi, gán lại một lần nữa để chống Animator ghi đè
-        //        target.position = Vector3.Lerp(startPos, targetPos, curve);
-        //    }
-
-        //    // 5. Kết thúc
-        //    target.position = targetPos;
-        //    ik.UpdateManager();
-        //}
-        //public static async UniTask MoveTargetToPointAsync(this IKManager2D ik, Transform target, Vector2 pos, float duration = 1f, CancellationToken token = default)
-        //{
-        //    // 1. Kiểm tra an toàn
-        //    if (target == null || ik == null) return;
-        //    var solver = ik.solvers.Find(s => s.GetChain(0).target == target);
-
-        //    // Ép Solver tính toán lại từ đầu
-        //    if (solver != null) solver.Initialize();
-        //    Vector3 startPos = target.position;
-        //    // Giữ nguyên Z để không làm hỏng tính toán của Solver 2D
-        //    Vector3 targetPos = new Vector3(pos.x, pos.y, target.position.z);
-        //    float elapsed = 0f;
-
-        //    while (elapsed < duration)
-        //    {
-        //        if (token.IsCancellationRequested) return;
-
-        //        elapsed += Time.deltaTime;
-        //        float percent = Mathf.Clamp01(elapsed / duration);
-        //        float curve = Mathf.SmoothStep(0, 1, percent);
-        //        target.gameObject.transform.hasChanged = false;
-        //        // 2. Cập nhật vị trí
-        //        target.position = Vector3.Lerp(startPos, targetPos, curve);
-
-        //        // 3. Cập nhật IK - Đây là phần quan trọng
-        //        // Đôi khi UpdateManager không đủ, ta cần đảm bảo các solver được đánh dấu là "bẩn" (dirty)
-        //        ik.UpdateManager();
-
-        //        // 4. Chờ đến LastUpdate - Đây là thời điểm VÀNG
-        //        // Nó chạy SAU Animator nhưng TRƯỚC khi Render
-        //        await UniTask.Yield(PlayerLoopTiming.LastUpdate, token);
-
-        //        // Nếu sau khi Yield mà thấy target bị Animator kéo lại, 
-        //        // ta gán lại một lần nữa ngay tại đây.
-        //        target.position = Vector3.Lerp(startPos, targetPos, curve);
-        //    }
-
-        //    // 5. Đảm bảo kết thúc chính xác
-        //    target.position = targetPos;
-        //    ik.UpdateManager();
-        //}
+        
     }
     public static class ImageExt
     {
         public static void ShowAtUIPosition(this Image virtualCursor, Vector2 screenPosition)
         {
+            virtualCursor.enabled = true;
             virtualCursor.gameObject.SetActive(true);
             screenPosition.x = Mathf.Clamp(screenPosition.x, 0, Screen.width);
             screenPosition.y = Mathf.Clamp(screenPosition.y, 0, Screen.height);
 
             virtualCursor.rectTransform.position = screenPosition;
+            if(virtualCursor.GetComponent<CanvasGroup>()!=null)
+            {
+                virtualCursor.GetComponent<CanvasGroup>().alpha = 1.0f;
+            }
+        }
+        public static void HideImage(this Image virtualCursor)
+        {
+            virtualCursor.enabled = false;
+            virtualCursor.gameObject.SetActive(false);
+            if (virtualCursor.GetComponent<CanvasGroup>() != null)
+            {
+                virtualCursor.GetComponent<CanvasGroup>().alpha = 0f;
+            }
+        }
+        public static void ShowImage(this Image virtualCursor)
+        {
+            virtualCursor.enabled = true;
+            virtualCursor.gameObject.SetActive(true);
+            if (virtualCursor.GetComponent<CanvasGroup>() != null)
+            {
+                virtualCursor.GetComponent<CanvasGroup>().alpha = 1f;
+            }
         }
     }
 

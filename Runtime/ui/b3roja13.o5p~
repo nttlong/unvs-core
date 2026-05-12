@@ -270,21 +270,12 @@ namespace unvs.ui
             this._lstItem.Remove(item);
 
         }
-        public void HideInteracIconOfItem()
+
+        public async UniTask ShowInteracItem(Vector2 centerPoint)
         {
-            Cts = Cts.Refresh();
-            virtualCursor.HideImage();
-        }
-        public async UniTask ShowIconOfInteracItem(Vector2 centerPoint)
-        {
-            if(UnvsDialog.Instance.DialogShowingTask!=null && UnvsDialog.Instance.DialogShowingTask.Task.Status == UniTaskStatus.Pending)
-            {
-                virtualCursor.HideImage();
-                return;
-            }
             if (_lstItem == null || _lstItem.Count == 0)
             {
-               virtualCursor.HideImage();
+                UnvsInteractUI.Instance.virtualCursor.HideImage();
                 return;
             }
 

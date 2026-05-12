@@ -291,7 +291,18 @@ namespace unvs.controllers.inputs
                 component.OnDestroying += () => input.performed -= performed;
             }
         }
-        
+
+        public static void ExitGame(bool IsEditorMode)
+        {
+            Application.Quit();
+            System.Diagnostics.Process.GetCurrentProcess().Kill();
+
+        }
+
+        public static void EditorExitGame()
+        {
+            UnityEditor.EditorApplication.isPlaying = false;
+        }
     }
     public struct ActionSender
     {

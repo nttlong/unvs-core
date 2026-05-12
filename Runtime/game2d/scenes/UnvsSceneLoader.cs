@@ -159,6 +159,8 @@ namespace unvs.game2d.scenes
         }
         public async UniTask<UnvsScene> LoadInteriorAsync(AssetReference sceneRef, string spawnName, UnvsScene fromScene)
         {
+            UnvsInteractUI.Instance.ClearInteractItemList();
+            UnvsInteractUI.Instance.HideInteracIconOfItem();
             UnvsCinema.Instance.requestInvalidateBoundingShapeCache = true;
             if (UnvsCinema.Instance != null)
             {

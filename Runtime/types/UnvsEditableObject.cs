@@ -88,6 +88,7 @@ namespace unvs.types
         // Hàm lấy sprite tại thời điểm hiện tại
         public Sprite GetFrame(float time)
         {
+            if (!Application.isPlaying) return null;
             if (sprites == null || sprites.Length == 0) return null;
             if (sprites.Length == 1) return sprites[0];
             int index = Mathf.FloorToInt(time * frameRate) % sprites.Length;
@@ -95,6 +96,7 @@ namespace unvs.types
         }
         public async UniTask PlayAnimAsync(UnityEngine.UI.Image virtualCursor, System.Threading.CancellationToken token)
         {
+           
             if (sprites.Length == 1)
             {
                 virtualCursor.sprite = sprites[0];
@@ -130,6 +132,7 @@ namespace unvs.types
         public async UniTask ShowAtAsync(Vector2 worldPos, UnityEngine.UI.Image virtualCursor, System.Threading.CancellationToken token)
         {
             virtualCursor.ShowAtUIPosition(worldPos.ToScreen());
+            
             await PlayAnimAsync(virtualCursor, token);
         }
     }

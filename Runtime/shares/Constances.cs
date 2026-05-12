@@ -29,6 +29,9 @@ namespace unvs.shares
             public const string STAIR = "STAIR";
 
             public const string RIGID_BOX = "RIGID-BOX";
+
+            public const string PLAYER = "PLAYER";
+            public const string PLAYER_SCANER = "PLAYER-SCANER";
         }
 
         public class CinemachineDefaut

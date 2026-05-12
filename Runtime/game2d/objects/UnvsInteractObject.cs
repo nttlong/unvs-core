@@ -4,24 +4,22 @@ using unvs.shares;
 using UnityEngine;
 using Unity.VisualScripting;
 using System;
-using System.Threading.Tasks;
+
 using Cysharp.Threading.Tasks;
 using System.Threading;
 using unvs.actions;
-using UnityEngine.Rendering;
-using unvs.unvsobjects;
+
 using unvs.components;
 using unvs.ext.physical2d;
-using unvs.ui;
-using unvs.components;
-using unvs.game2d.actors;
+
 using unvs.data;
+using unvs.ui;
 namespace unvs.game2d.objects
 {
 
     [ExecuteAlways]
     [RequireComponent(typeof(BoxCollider2D))]
-  
+
     public partial class UnvsInteractObject : UnvsComponent
     {
         [Header("Visualize")]
@@ -46,16 +44,16 @@ namespace unvs.game2d.objects
         /// <summary>
         /// This event is called only once when the object is interacted for the first time.
         /// </summary>
-        public Func<ActionBaseSender,UniTask> OnFirstTimeInteract;
+        public Func<ActionBaseSender, UniTask> OnFirstTimeInteract;
         /// <summary>
         /// This event is called when the object is interacted for the last time.
         /// </summary>
-        public Func<ActionBaseSender,UniTask> OnCompletedAsync;
+        public Func<ActionBaseSender, UniTask> OnCompletedAsync;
         /// <summary>
         /// This event is called every time the object is interacted.
         /// </summary>
-        public Func<ActionBaseSender,UniTask> OnStartInteract;
-        
+        public Func<ActionBaseSender, UniTask> OnStartInteract;
+
         public override void InitRuntime()
         {
 
@@ -66,8 +64,8 @@ namespace unvs.game2d.objects
 
         public virtual Vector2 GetPosition(string Layer = Constants.Layers.WORLD_GROUND, params string[] extra)
         {
-           
-            if(coll.GetHit(out var hit,Vector2.down,float.PositiveInfinity,Layer,extra))
+
+            if (coll.GetHit(out var hit, Vector2.down, float.PositiveInfinity, Layer, extra))
             {
                 return hit.point;
             }
@@ -76,13 +74,13 @@ namespace unvs.game2d.objects
 
         public virtual async UniTask<ActionBaseSender> ExecuteAsync(MonoBehaviour target, CancellationTokenSource cts)
         {
-            
-          
+
+
             var sender = new ActionBaseSender()
             {
                 Target = target,
-                Source=this,
-                Cts= cts
+                Source = this,
+                Cts = cts
             };
             if (OnFirstTimeInteract != null)
             {
@@ -105,9 +103,9 @@ namespace unvs.game2d.objects
             //sender.Cts = sender.Cts.Refresh();
             foreach (var item in Data.actions)
             {
-                if(item==null) continue;
+                if (item == null) continue;
                 await item.ExecuteAsync(sender);
-                if (sender.IsCancel ) return sender;
+                if (sender.IsCancel) return sender;
             }
             if (OnCompletedAsync != null)
             {
@@ -115,7 +113,41 @@ namespace unvs.game2d.objects
             }
             return sender;
         }
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            
+            // Only trigger if the Player enters the zone
+            if (other.CompareTag(Constants.Tags.PLAYER_SCANER))
+            {
 
+                if (UnvsApp.Instance.InteractingTask.Status == UniTaskStatus.Pending)
+                {
+                    UnvsInteractUI.Instance.ClearInteractItemList();
+                    return;
+                }
+                UnvsInteractUI.Instance.AddInteractItem(this);
+                UnvsInteractUI.Instance.ShowIconOfInteracItem(GetComponent<Collider2D>().bounds.center).Forget();
+
+            }
+        }
+
+        private void OnTriggerExit2D(Collider2D other)
+        {
+            if (UnvsApp.Instance.InteractingTask.Status == UniTaskStatus.Pending) return;
+            if (other.CompareTag(Constants.Tags.PLAYER_SCANER))
+            {
+                
+                if (UnvsApp.Instance.InteractingTask.Status == UniTaskStatus.Pending)
+                {
+                    UnvsInteractUI.Instance.ClearInteractItemList();
+                    return;
+                }
+                UnvsInteractUI.Instance.RemoveInteractItem(this);
+                UnvsInteractUI.Instance.ShowIconOfInteracItem(GetComponent<Collider2D>().bounds.center).Forget();
+               
+
+            }
+        }
         public Vector2 GetCenterPos()
         {
             return this.coll.bounds.center;

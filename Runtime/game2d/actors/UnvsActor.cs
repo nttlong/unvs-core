@@ -14,6 +14,8 @@ using UnityEngine;
 using Unity.VisualScripting;
 using System.Threading;
 using UnityEngine.Rendering;
+using unvs.game2d.objects;
+
 
 
 
@@ -150,7 +152,8 @@ namespace unvs.game2d.actors
             {
                 this.coll = GetComponentInChildren<CompositeCollider2D>();
                 player = GetComponent<UnvsPlayer>();
-               
+                this.SetMeOnTag(Constants.Tags.PLAYER);
+                this.scanerBound.SetMeOnTag(Constants.Tags.PLAYER_SCANER);
 
             }
 
@@ -222,6 +225,7 @@ namespace unvs.game2d.actors
                 this.scanerBound.size = this.GetComponent<Collider2D>().bounds.size;
 
             }
+            //this.scanerBound.AddComponentIfNotExist<UnvsInteractScaner>();
             this.scanerBound.SetMeOnLayer(Constants.Layers.INTERACT_SCANER);
             this.scanerBound.SetMeOnTag(Constants.Tags.INTERACT_SCANER);
             this.scanerBound.isTrigger = true;

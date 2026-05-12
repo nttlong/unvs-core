@@ -81,7 +81,7 @@ namespace unvs.components
             InitProperties();
         }
         [UnvsButton]
-        public void AddSoringGroup()
+        public void EditorAddSoringGroup()
         {
             foreach (var item in GetComponentsInChildren<SpriteRenderer>(true))
             {
@@ -91,7 +91,7 @@ namespace unvs.components
 
         }
         [UnvsButton]
-        public void RemoveSortingGroup()
+        public void EditorRemoveSortingGroup()
         {
             foreach (var item in GetComponentsInChildren<SpriteRenderer>(true))
             {
