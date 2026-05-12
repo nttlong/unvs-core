@@ -28,10 +28,10 @@ namespace unvs.ui
         //[SerializeField]
         //public types.IconInfo DefaultIcon;
         public UnvsCursor DefaultCursor;
-       
-        [SerializeField] float gamepadSensitivity = 1000f;
-        private float _animTimer;
-        
+
+
+        //private float _animTimer;
+
 
         /// <summary>
         /// THis UI allow showing when game playing, so no need to hide or show player
@@ -47,7 +47,7 @@ namespace unvs.ui
         public event Action<Vector2, Image, GameObject> OnHoverInteractObject;
         public override void InitEvents()
         {
-
+            //if (!UnvsApp.Instance.Settings.UseLookNavigator) return;
             UnvsGlobalInput.OnUIInputReady += () =>
             {
                 this.look = UnvsGlobalInput.NewMapUIAction(this, "Look", action =>
@@ -55,42 +55,44 @@ namespace unvs.ui
                     action.performed += ctx =>
                     {
                         _virtualMousePos = ctx.ReadValue<Vector2>();
-                        UnvsApp.SayText($"pos={_virtualMousePos}");
-                      
-                      
                         updateCursor();
                     };
                 });
             };
         }
-        
+
         public override void InitRunTime()
         {
             base.InitRunTime();
             InitUI();
-            
+
         }
-        
+
         private void InitUI()
         {
             canvas.SetMeOnLayer(Constants.Layers.TOP_UI);
             canvas.UIFullSize();
             canvas.SetMeOnLayer(Constants.Layers.UI);
             canvas.sortingOrder = 1024;
+
             virtualCursor = canvas.transform.AddChildComponentIfNotExist<Image>("cursor");
-           
+            if (UnvsApp.Instance.Settings.UseLookNavigator)
+            {
+                virtualCursor.gameObject.SetActive(false);
+            }
+
             Cursor.visible = false;
-          
+
         }
         public void ChangeIcon(UnvsCursor cursorData)
         {
-            this.Cts=this.Cts.Refresh();
+            this.Cts = this.Cts.Refresh();
             var c = cursorData ?? DefaultCursor;
-            if(c == null)
+            if (c == null)
             {
                 return;
             }
-            if (c.icon.sprites.Length>0)
+            if (c.icon.sprites.Length > 0)
             {
                 _currentCursor = cursorData.icon;
                 if (cursorData.icon.size != Vector2.zero)
@@ -98,7 +100,7 @@ namespace unvs.ui
                 virtualCursor.rectTransform.anchoredPosition = cursorData.icon.Pivot;
                 UpdateCursorPosition();
             }
-          
+
         }
         public void RestoreDefaultIcon()
         {
@@ -107,26 +109,25 @@ namespace unvs.ui
         void UpdateCursorPosition()
         {
             if (virtualCursor == null) return;
-            
-           
-            _virtualMousePos.x = Mathf.Clamp(_virtualMousePos.x, 0, Screen.width);
-            _virtualMousePos.y = Mathf.Clamp(_virtualMousePos.y, 0, Screen.height);
+            unvs.ext.ImageExt.ShowAtUIPosition(virtualCursor, _virtualMousePos);
 
-            virtualCursor.rectTransform.position = _virtualMousePos;
+
+
         }
-        bool _isInitCursor=false;
+        bool _isInitCursor = false;
         private MapAction look;
-        private CancellationTokenSource Cts=new CancellationTokenSource();
+        private CancellationTokenSource Cts = new CancellationTokenSource();
+        private UnvsInteractObject _lastCheck;
 
         void updateCursor()
         {
-            if(Locked) return;
-            if(!_isInitCursor)
+            if (Locked) return;
+            if (!_isInitCursor)
             {
                 _currentCursor = DefaultCursor.icon;
                 _isInitCursor = true;
             }
-            if(UnvsCinema.Instance==null) return;
+            if (UnvsCinema.Instance == null) return;
             //if (UnvsCinema.Instance.IsInUpdateState) return;
             if (virtualCursor == null) return;
             UpdateCursorPosition();
@@ -150,34 +151,63 @@ namespace unvs.ui
 
             if (interactObject != null)
             {
-                if (interactObject.CursorData!=null)
+                if (interactObject.CursorData != null)
                 {
-                  
+
                     ChangeIcon(interactObject.CursorData);
-                   
-                } else
+
+                }
+                else
                 {
-                  
+
                     ChangeIcon(DefaultCursor);
-                   
-                   
+
+
                 }
             }
             else
             {
-                
+
                 ChangeIcon(DefaultCursor);
 
 
             }
-            _animTimer += Time.unscaledDeltaTime;
-            _currentCursor.PlayAnimAsync(virtualCursor,this.Cts.Token).Forget();
-           
+            //_animTimer += Time.unscaledDeltaTime;
+            _currentCursor.PlayAnimAsync(virtualCursor, this.Cts.Token).Forget();
+
             UpdateCursorPosition();
-            
+
+        }
+        private void LateUpdate()
+        {
+            if (UnvsApp.Instance == null) return;
+            if (UnvsApp.Instance.Settings.UseLookNavigator) return;
+            if (UnvsApp.Instance.currentActor == null) return;
+            var check = UnvsApp.Instance.currentActor.ScanObject<UnvsInteractObject>();
+            if (check != null && check.CursorData != null)
+            {
+                if (UnvsApp.Instance.InteractingTask.Status != UniTaskStatus.Pending)
+                {
+                    if (_lastCheck != check)
+                    {
+                        this.Cts = this.Cts.Refresh();
+                        check.CursorData.icon.ShowAtAsync(worldPos: check.GetCenterPos(), virtualCursor, this.Cts.Token).Forget();
+                    }
+                } else
+                {
+                    this.Cts = this.Cts.Refresh();
+                    virtualCursor.gameObject.SetActive(false);
+                }
+
+            }
+            else
+            {
+                this.Cts = this.Cts.Refresh();
+                virtualCursor.gameObject.SetActive(false);
+            }
+            _lastCheck = check;
         }
 
-        
     }
 #if UNITY_EDITOR
     public partial class UnvsInteractUI : UnvsUIComponentInstance<UnvsInteractUI>
@@ -186,7 +216,7 @@ namespace unvs.ui
         public void Generate()
         {
             canvas = this.AddChildComponentIfNotExist<Canvas>("canvas");
-            
+
 
 
         }
@@ -207,8 +237,8 @@ namespace unvs.ui
             if (!await unvs.editor.utils.UnvsPythonCall.HealthCheck()) return;
             var dataLayer = unvs.editor.utils.PsdFile.Createlayers(file_path);
             dataLayer.AddBox("default-icon", 64, 64);
-           
-          
+
+
             await unvs.editor.utils.UnvsPythonCall.Call("UnvsPsd", "create_dumny_actor_psd", dataLayer);
 
         }

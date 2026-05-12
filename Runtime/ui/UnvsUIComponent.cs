@@ -1,9 +1,15 @@
+using System;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using unvs.components;
 using unvs.components;
 using unvs.controllers.inputs;
 using unvs.ext;
-using unvs.components;
+using unvs.game2d.objects.editor;
 using unvs.game2d.scenes;
 
 namespace unvs.ui
@@ -14,7 +20,10 @@ namespace unvs.ui
         [Header("Feedback audio")]
         public types.AudioInfo AudioOpen;
         public types.AudioInfo AudioClose;
-
+        [Header("Visualize")]
+        [SerializeField]
+        public types.UINavigateSettings navigateSettings;
+        
         public Canvas canvas;
         public bool IsShow;
         public abstract void InitEvents();
@@ -43,7 +52,7 @@ namespace unvs.ui
                 canvas.enabled = false;
                 canvas.gameObject.SetActive(false);
             }
-            IsShow = false;
+           
             if (UnvsGlobalInput.Player != null)
             {
                 if (EnablePlayerInput)
@@ -52,11 +61,31 @@ namespace unvs.ui
                 }
 
             }
-            //UnvsSceneLoader.GameShow();
+            IsShow = false;
         }
 
-
-
+        public virtual void ApplyNaviagatorButtons()
+        {
+            
+            foreach (var b in navigateSettings.items)
+            {
+                if(b.gameObject!=null && !b.gameObject.IsDestroyed() && b.defaultSelected)
+                {
+                    EventSystem.current.SetSelectedGameObject(null);
+                    EventSystem.current.SetSelectedGameObject(b.gameObject);
+                }
+            }
+        }
+        public virtual void Toggle()
+        {
+            if(!IsShow)
+            {
+                Show();
+            } else
+            {
+                Hide();
+            }
+        }
         public virtual void Show()
         {
             this.enabled = true;
@@ -73,8 +102,8 @@ namespace unvs.ui
                 canvas.gameObject.SetActive(true);
             }
 
-            this.ApplyNavigate<Button>();
-            IsShow = true;
+          
+           
             if (UnvsGlobalInput.Player != null)
             {
                 if (DisablePlayerInput)
@@ -82,6 +111,7 @@ namespace unvs.ui
                     UnvsGlobalInput.PlayerDisable();
                 }
             }
+            IsShow = true;
         }
         public virtual void Activate()
         {
@@ -121,5 +151,18 @@ namespace unvs.ui
                 InitEvents();
             }
         }
+#if UNITY_EDITOR
+        [UnvsButton("navigate settings")]
+        public void InitnavigateSettings()
+        {
+            this.navigateSettings.items = this.GetComponentsInChildren<Button>().Select(p => new types.UINavigateItem
+            {
+                gameObject=p.gameObject,
+                defaultSelected=false
+            }).ToArray();
+        }
+
+        
+#endif
     }
 }

@@ -23,7 +23,7 @@ namespace unvs.ui
        
         public Action OnMainMenu;
         public Action OnExit;
-        private InputAction actionPause;
+       
         private bool isShow;
 
         public override bool DisablePlayerInput => true;
@@ -36,21 +36,19 @@ namespace unvs.ui
             base.InitRunTime();
             this.panel.DockFull();
         }
+        
         public override void Show()
         {
             base.Show();
             this.AudioOpen.Play(this.GetComponent<AudioSource>());
+            this.ApplyNaviagatorButtons();
+            this.IsShow = true;
         }
         public override void Hide()
         {
             base.Hide();
             this.AudioClose.Play(this.GetComponent<AudioSource>());
-        }
-        public virtual void Toggle()
-        {
-            isShow = !isShow;
-            if(isShow ) Show();
-            else Hide();
+            this.IsShow = false;
         }
         
         

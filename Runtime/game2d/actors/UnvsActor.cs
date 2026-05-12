@@ -132,10 +132,11 @@ namespace unvs.game2d.actors
 
 
 
-        public T ScanObject<T>(params string[] layers)
+        public T ScanObject<T>(params string[] layers) where T : Component
         {
-            var coll = GetComponent<Collider2D>();
-            return coll.bounds.center.ScanObject<T>(this.scanerBound.size, layers);
+           return  scanerBound.DetectObject<T>(0, 0, Constants.Layers.INTERACT_OBJECT, layers);
+        
+           
         }
         public T ScanObjectFromPont<T>(Vector2 pos, params string[] layers)
         {

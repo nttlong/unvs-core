@@ -90,16 +90,19 @@ namespace unvs.controllers
 
         private void Interact_started(InputAction.CallbackContext obj)
         {
+            
             if (obj.control.device is Mouse) return;
             var go = actor.scanerBound.ScanObject(0, 0, Constants.Layers.INTERACT_OBJECT);
             if (go == null) return;
             UnvsInteractObject ret = go.GetComponent<UnvsInteractObject>();
             if (ret == null) return;
             this.actor.CurrentSkill.Direction = new Vector2(this.actor.coll.bounds.center.GetDirectionTo(ret.GetPosition()), 0);
+            //public UniTask CamChangeFollowOffsetTask
+            UnvsApp.Instance.InteractingTask =
             ret.ExecuteAsync(this.actor, actor.RefreshToken()).ContinueWith(p =>
             {
 
-            }).Forget();
+            });
         }
 
         private void Crouch_canceled(InputAction.CallbackContext obj)

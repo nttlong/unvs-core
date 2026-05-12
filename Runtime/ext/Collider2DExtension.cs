@@ -11,9 +11,15 @@ namespace unvs.ext
 {
     public static class Collider2DExtension
     {
-        public static GameObject ScanObject(this Collider2D coll, float ExpandWidth, float ExpandHeight, params string[] Layers)
+        public static GameObject ScanObject(this Collider2D coll, float ExpandWidth, float ExpandHeight,string Layer=Constants.Layers.INTERACT_OBJECT, params string[] Layers)
         {
-            return coll.ScanObject(ExpandWidth, ExpandHeight, LayerMask.GetMask(Layers));
+            return coll.ScanObject(ExpandWidth, ExpandHeight, LayerMask.GetMask(Layer)| LayerMask.GetMask(Layers));
+        }
+        public static T DetectObject<T>(this Collider2D coll, float ExpandWidth, float ExpandHeight, string Layer = Constants.Layers.INTERACT_OBJECT, params string[] Layers) where T : Component
+        {
+            var obj= coll.ScanObject(ExpandWidth, ExpandHeight, LayerMask.GetMask(Layer) | LayerMask.GetMask(Layers));
+            if(obj==null) return null;
+            return obj.GetComponent<T>();
         }
         public static GameObject ScanObject(this Collider2D coll, float ExpandWidth, float ExpandHeight, int interactableLayer)
         {

@@ -156,15 +156,20 @@ namespace unvs.ext
         }
         public static void ApplyNavigate<T>(this MonoBehaviour gameObject) where T : Component
         {
+            if(gameObject==null||gameObject.IsDestroyed()) return;
             if (EventSystem.current == null)
             {
-                Debug.LogWarning("Open scene then add SystemEvent");
+                Debug.LogError("Open scene then add SystemEvent");
                 return;
             }
             EventSystem.current.SetSelectedGameObject(null);
             var firstElement = gameObject.GetComponentInChildren<T>();
-            if(firstElement!=null) 
-            EventSystem.current.SetSelectedGameObject(firstElement.gameObject);
+            if(firstElement!=null && !firstElement.IsDestroyed() && firstElement.gameObject!=null && !firstElement.gameObject.IsDestroyed())
+            {
+                EventSystem.current.SetSelectedGameObject(firstElement.gameObject);
+                Debug.Log($"ApplyNavigate={firstElement.gameObject.name} in {gameObject.name}");
+            }
+           
         }
         public static SpriteRenderer Off(this SpriteRenderer gameObject)
         {

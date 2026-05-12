@@ -2,9 +2,9 @@
 using System;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using UnityEngine.Playables;
+
 using unvs.components;
-using unvs.components;
+using unvs.ext;
 using unvs.ui;
 
 namespace unvs.types
@@ -126,6 +126,12 @@ namespace unvs.types
                 // Handle cancellation gracefully if needed
             }
         }
+
+        public async UniTask ShowAtAsync(Vector2 worldPos, UnityEngine.UI.Image virtualCursor, System.Threading.CancellationToken token)
+        {
+            virtualCursor.ShowAtUIPosition(worldPos.ToScreen());
+            await PlayAnimAsync(virtualCursor, token);
+        }
     }
    
     [Serializable]
@@ -173,5 +179,17 @@ namespace unvs.types
             if(this.IsEmpty()) return;
             audioSource.PlayOneShot(this.Clip);
         }
+    }
+    [Serializable]
+    public struct UINavigateSettings
+    {
+        [SerializeField]
+        public UINavigateItem[] items;
+    }
+    [Serializable]
+    public struct UINavigateItem
+    {
+        public GameObject gameObject;
+        public bool defaultSelected;
     }
 }

@@ -1,5 +1,6 @@
 
 using Cysharp.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using unvs.actor.player;
@@ -18,7 +19,7 @@ namespace unvs.controllers
             action.started += ctx =>
             {
                 if (!Application.isPlaying) return;
-                if(ctx.control.device is Mouse)
+                if(ctx.control.device is Mouse && UnvsApp.Instance.Settings.UseLookNavigator)
                 {
                    
                     
@@ -54,7 +55,8 @@ namespace unvs.controllers
             };
             action.canceled += ctx =>
             {
-                if (ctx.control.device is Mouse)
+                if (this.actor.coll == null || this.actor.coll.IsDestroyed()) return;
+                if (ctx.control.device is Mouse && UnvsApp.Instance.Settings.UseLookNavigator)
                 {
                     
                     //this.actor.RefreshToken();

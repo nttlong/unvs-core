@@ -143,6 +143,20 @@ namespace unvs.game2d.scenes
         }
         public virtual void InitEvents()
         {
+            UnvsGlobalInput.OnUIInputReady += () =>
+            {
+                UnvsGlobalInput.NewMapUIAction(this, "Pause", action =>
+                {
+                    
+                    action.performed += ctx =>
+                    {
+                        UnvsApp.SayText("Pause-performed");
+                        //if (MainMenu.IsShow) return;
+                        this.PauseMenu.Toggle();
+                        //UnvsPauseMenu.Instance.Toggle();
+                    };
+                });
+            };
             MainMenu.btnStart.onClick.AddListener(() =>
             {
                 MainMenu.Hide();
@@ -152,15 +166,12 @@ namespace unvs.game2d.scenes
             MainMenu.btnExit.onClick.AddListener(() =>
             {
                 this.ExitGame();
-                //SceneLoader.LoadNewAsync(this.startScene, "", false).ContinueWith(s =>
-                //{
-                //    MainMenu.Hide();
-                //}).Forget();
+            
             });
             container.gameObject.SetActive(true);
-            InteractUI.Activate();
-            var back = UnvsGlobalInput.UI["Pause"];
-            back.started += Back_started;
+            //InteractUI.Activate();
+            //var back = UnvsGlobalInput.UI["Pause"];
+            //back.started += Back_started;
         }
         private void OnDisable()
         {
@@ -170,11 +181,7 @@ namespace unvs.game2d.scenes
         {
             this.uiInputs.ControlEnable();
         }
-        private void Back_started(InputAction.CallbackContext obj)
-        {
-            if (MainMenu.IsShow) return;
-            UnvsPauseMenu.Instance.Toggle();
-        }
+       
 
         public event Action<UnvsScene> OnScenseDestroying;
         public void RaiseEventScenseDestroying(UnvsScene unvsScene)
@@ -191,7 +198,7 @@ namespace unvs.game2d.scenes
         private UnvsScene _LastScene;
         private UnvsScene _LastExitScene;
         private CheckPintInfo restartCheckPoint;
-     
+        public UniTask InteractingTask;
 
         public void RaiseResart(CheckPintInfo value)
         {
@@ -282,6 +289,11 @@ namespace unvs.game2d.scenes
             {
                
             }).Forget();
+            if (!Settings.UseLookNavigator)
+            {
+                Cursor.visible= false;
+                Cursor.lockState= CursorLockMode.Locked;
+            }
         }
 
 #if UNITY_EDITOR

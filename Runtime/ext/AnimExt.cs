@@ -19,6 +19,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.U2D.Animation;
 using UnityEngine.U2D.IK;
+using UnityEngine.UI;
 using UnityEngine.XR;
 using unvs.shares;
 
@@ -472,5 +473,17 @@ namespace unvs.ext
         //    ik.UpdateManager();
         //}
     }
+    public static class ImageExt
+    {
+        public static void ShowAtUIPosition(this Image virtualCursor, Vector2 screenPosition)
+        {
+            virtualCursor.gameObject.SetActive(true);
+            screenPosition.x = Mathf.Clamp(screenPosition.x, 0, Screen.width);
+            screenPosition.y = Mathf.Clamp(screenPosition.y, 0, Screen.height);
+
+            virtualCursor.rectTransform.position = screenPosition;
+        }
+    }
+
 }
 

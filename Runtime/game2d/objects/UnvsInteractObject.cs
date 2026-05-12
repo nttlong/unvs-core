@@ -116,7 +116,10 @@ namespace unvs.game2d.objects
             return sender;
         }
 
-        
+        public Vector2 GetCenterPos()
+        {
+            return this.coll.bounds.center;
+        }
     }
 #if UNITY_EDITOR
     public partial class UnvsInteractObject : UnvsComponent

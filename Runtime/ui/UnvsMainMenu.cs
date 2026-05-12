@@ -9,6 +9,7 @@ using unvs.game2d.objects.editor;
 using unvs.shares;
 using unvs.ui;
 using unvs.game2d.scenes;
+using unvs.controllers.inputs;
 
 namespace unvs.ui
 {
@@ -28,6 +29,16 @@ namespace unvs.ui
 
         public override void InitEvents()
         {
+            //UnvsGlobalInput.OnUIInputReady += () =>
+            //{
+            //    UnvsGlobalInput.NewMapUIAction(this, "Click", action =>
+            //    {
+            //        action.started += ctx =>
+            //        {
+            //            base.ApplyNaviagatorButtons();
+            //        };
+            //    });
+            //};
             btnStart.onClick.AddListener(() =>
             {
                 OnStart?.Invoke();
@@ -39,8 +50,11 @@ namespace unvs.ui
         }
         public override void Show()
         {
-            base.Show();
+           
             this.AudioOpen.Play(this.GetComponent<AudioSource>());
+            base.Show();
+            base.ApplyNaviagatorButtons();
+
         }
         public override void Hide()
         {
@@ -52,7 +66,7 @@ namespace unvs.ui
             
             this.canvas.UIFullSize();
             this.panel.DockFull();
-            GameObjectExtension.ApplyNavigate<Button>(this.gameObject);
+            //GameObjectExtension.ApplyNavigate<Button>(this.gameObject);
         }
 #if UNITY_EDITOR
         [UnvsButton]

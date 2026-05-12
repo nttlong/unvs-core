@@ -15,7 +15,7 @@ namespace unvs.data
         public float FadeTimeStartGame = 0.5f;
         public float DefaultFadeTimeLoadScene = 0;
         public int DelayFrameBeforeInteriorSceneShow = 15;
-        public bool DisplayCursoe = true;
+        //public bool DisplayCursor = true;
         [SerializeField]
         public Vector2 PCUIScreenSize = new Vector2(1920f, 1080f);
         [Header("Performance")]
@@ -30,6 +30,8 @@ namespace unvs.data
         [Header("Cinema light")]
         public float DurationTimeSmoothChangeSate = 1.5f;
         public int MaintainGlobalLightNumber = 5;
-        
+        [Header("Game play")]
+        public bool UseLookNavigator = false;
+       
     }
 }
