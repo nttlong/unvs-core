@@ -20,13 +20,17 @@ using unvs.shares;
 
 namespace unvs.ui
 {
-
+    /// <summary>
+    /// CAUTION!: Trong input_system cua UI  phai set ActionType cua Look la Pass Throught
+    /// CAUTION!: input_system.Look.ActionType mus be Pass Throught
+    /// </summary>
     public partial class UnvsInteractUI : UnvsUIComponentInstance<UnvsInteractUI>
     {
 
         public Image virtualCursor;
         private types.IconInfo _currentCursor;
-        private Vector2 _virtualMousePos;
+        
+        public Vector2 virtualMousePos;
 
         public UnvsCursor DefaultCursor;
         public UnvsInteractObject lastInteractObject;
@@ -57,13 +61,34 @@ namespace unvs.ui
             this.virtualCursor.ShowImage();
             UnvsGlobalInput.OnUIInputReady += () =>
             {
+                
                 this.look = UnvsGlobalInput.NewMapUIAction(this, "Look", action =>
                 {
                     action.performed += ctx =>
                     {
-                        _virtualMousePos = ctx.ReadValue<Vector2>();
-                        updateCursor();
+                        
+                        
+                        if (ctx.control.device is Mouse)
+                        {
+                            this.lookPositionWatchSource = this.lookPositionWatchSource.Refresh();
+                            virtualMousePos = ctx.ReadValue<Vector2>();
+                            updateCursor();
+                        } else
+                        {
+                            
+                            this.StartWatch(
+                                () => virtualMousePos,
+                                (val) => virtualMousePos = val,
+                                () => ctx.ReadValue<Vector2>(), // Biến này được cập nhật ở performed/canceled
+                                updateCursor,
+                                UnvsApp.Instance.Settings.GamepadLookCursorSpeed,
+                                this.lookPositionWatchSource.Token
+                            ).Forget(); // Chạy và quên nó đi (UniTask sẽ tự quản lý)
+                        }
+
+                         
                     };
+                    
                 });
             };
         }
@@ -91,6 +116,7 @@ namespace unvs.ui
             else
             {
                 virtualCursor.ShowImage();
+                _currentCursor = DefaultCursor.icon;
             }
 
             Cursor.visible = false;
@@ -121,15 +147,17 @@ namespace unvs.ui
         void UpdateCursorPosition()
         {
             if (virtualCursor == null) return;
-            unvs.ext.ImageExt.ShowAtUIPosition(virtualCursor, _virtualMousePos);
+            unvs.ext.ImageExt.ShowAtUIPosition(virtualCursor, virtualMousePos);
 
 
 
         }
         bool _isInitCursor = false;
+        private MapAction playerLook;
+        private MapAction interact;
         private MapAction look;
         public CancellationTokenSource Cts = new CancellationTokenSource();
-
+        private CancellationTokenSource lookPositionWatchSource = new CancellationTokenSource();
 
         void updateCursor()
         {
@@ -144,7 +172,7 @@ namespace unvs.ui
             if (virtualCursor == null) return;
             UpdateCursorPosition();
 
-            var pos = (Vector2)_virtualMousePos;
+            var pos = (Vector2)virtualMousePos;
             Camera cam = Camera.main; // Đảm bảo lấy đúng camera đang dùng
 
             if (cam == null) return;
@@ -318,6 +346,7 @@ namespace unvs.ui
 
         public void ClearInteractItemList()
         {
+            if(_lstItem==null ) _lstItem = new List<UnvsInteractObject> ();
             _lstItem.Clear();
         }
     }

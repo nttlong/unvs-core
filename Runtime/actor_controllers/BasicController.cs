@@ -3,12 +3,14 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using unvs.actor.player;
 using unvs.actor.skills;
+using unvs.controllers.inputs;
 using unvs.ext;
 using unvs.ext.physical2d;
 using unvs.game2d.actors;
 using unvs.game2d.objects;
 using unvs.game2d.scenes;
 using unvs.shares;
+using unvs.ui;
 using UNVS.Core.Actors.Skills;
 //using static UnityEditor.PlayerSettings;
 
@@ -90,7 +92,22 @@ namespace unvs.controllers
 
         private void Interact_started(InputAction.CallbackContext obj)
         {
-            
+            if (UnvsApp.Instance.Settings.UseLookNavigator)
+            {
+                
+                var detectResult = UnvsInteractUI.Instance.virtualMousePos.ToWorld().DetectObject<UnvsInteractObject>(Constants.Layers.INTERACT_OBJECT);
+                if (detectResult != null)
+                {
+                    
+                    UnvsApp.Instance.InteractingTask =
+                     detectResult.ExecuteAsync(this.actor, actor.RefreshToken()).ContinueWith(p =>
+                     {
+
+                     });
+                    return;
+                }
+                
+            }
             if (obj.control.device is Mouse) return;
             var go = actor.scanerBound.ScanObject(0, 0, Constants.Layers.INTERACT_OBJECT);
             if (go == null) return;

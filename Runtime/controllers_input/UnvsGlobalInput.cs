@@ -292,17 +292,19 @@ namespace unvs.controllers.inputs
             }
         }
 
-        public static void ExitGame(bool IsEditorMode)
+        public static void ExitGame()
         {
             Application.Quit();
             System.Diagnostics.Process.GetCurrentProcess().Kill();
 
         }
 
+#if UNITY_EDITOR
         public static void EditorExitGame()
         {
             UnityEditor.EditorApplication.isPlaying = false;
-        }
+        } 
+#endif
     }
     public struct ActionSender
     {

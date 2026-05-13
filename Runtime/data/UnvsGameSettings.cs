@@ -32,6 +32,6 @@ namespace unvs.data
         public int MaintainGlobalLightNumber = 5;
         [Header("Game play")]
         public bool UseLookNavigator = false;
-       
+        public float GamepadLookCursorSpeed = 10f;
     }
 }

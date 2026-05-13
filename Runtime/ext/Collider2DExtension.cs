@@ -21,6 +21,38 @@ namespace unvs.ext
             if(obj==null) return null;
             return obj.GetComponent<T>();
         }
+        public static T DetectObject<T>(this Vector2 scanPoint,  string Layer = Constants.Layers.INTERACT_OBJECT, params string[] Layers) where T : Component
+        {
+            var obj = scanPoint.ScanObject(LayerMask.GetMask(Layer) | LayerMask.GetMask(Layers));
+            if (obj == null) return null;
+            return obj.GetComponent<T>();
+        }
+        public static GameObject ScanObject(this Vector2 scanPoint, int interactableLayer)
+        {
+
+            // 1. Lấy vị trí tâm của nhân vật (hoặc một điểm phía trước mặt nhân vật)
+            
+
+            
+            // 2. Quét tất cả các Collider2D nằm trong vùng hình hộp và thuộc LayerMask
+            Collider2D[] results = Physics2D.OverlapBoxAll(scanPoint, new Vector2(0.1f,0.1f), 0f, interactableLayer);
+
+
+
+            // 3. Xử lý các đối tượng tìm được
+            if (results.Length > 0)
+            {
+                // Thường chúng ta sẽ lấy vật thể gần nhất
+                GameObject closestGO = scanPoint.GetClosestTarget(results);
+                return closestGO;
+
+            }
+            else if (results.Length == 1)
+            {
+                return results[0].gameObject;
+            }
+            return null;
+        }
         public static GameObject ScanObject(this Collider2D coll, float ExpandWidth, float ExpandHeight, int interactableLayer)
         {
 

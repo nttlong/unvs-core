@@ -15,6 +15,9 @@ using unvs.game2d.actors;
 using unvs.shares;
 using static UnityEngine.LowLevelPhysics2D.PhysicsLayers;
 using unvs.ui;
+using Cysharp.Threading.Tasks;
+using System.Runtime.CompilerServices;
+using System.Threading;
 
 
 
@@ -362,7 +365,55 @@ namespace unvs.ext
             var hits = Physics2D.Raycast(pos, direction, distance, layer);
             return hits;
         }
-        
+
+        public static Vector2 ConvertToMousePos(this Vector2 _virtualMousePos, Vector2 analogDelta,float cursorSpeed=1000f)
+        {
+            // 1. Cộng dồn giá trị Analog vào vị trí hiện tại
+            // analogDelta thường từ -1 đến 1, nhân với speed và Time.deltaTime để mượt mà
+            _virtualMousePos += analogDelta * cursorSpeed * Time.unscaledDeltaTime;
+
+            // 2. Giới hạn con trỏ không bay ra khỏi màn hình (Clamping)
+            _virtualMousePos.x = Mathf.Clamp(_virtualMousePos.x, 0, Screen.width);
+            _virtualMousePos.y = Mathf.Clamp(_virtualMousePos.y, 0, Screen.height);
+
+            return _virtualMousePos;
+        }
+        public static async UniTask StartWatch(
+            this UnityEngine.Object owner,
+             Func<Vector2> getPosition,       // Dùng delegate để lấy giá trị thực tế
+            Action<Vector2> setPosition,          // Dùng delegate để cập nhật lại giá trị
+            Func<Vector2> getInput,               // Lấy input từ Gamepad liên tục
+            Action OnWatching,
+            float cursorSpeed,
+            CancellationToken ctk)
+        {
+            if (getInput == null) return;
+            while (!ctk.IsCancellationRequested)
+            {
+                Vector2 input = getInput();
+
+                if (input != Vector2.zero)
+                {
+                    Vector2 currentPos = getPosition();
+
+                    // Tính toán cộng dồn
+                    Vector2 nextPos = currentPos.ConvertToMousePos(
+                        input,
+                        cursorSpeed
+                    );
+
+                    // Cập nhật lại vị trí mới
+                    setPosition(nextPos);
+
+                    // Gọi callback để update UI/Cursor
+                    OnWatching();
+                }
+
+                // QUAN TRỌNG: Chờ đến frame tiếp theo (giống hệt Update)
+                // PlayerLoopTiming.Update đảm bảo nó chạy cùng nhịp với game
+                await UniTask.Yield(PlayerLoopTiming.Update, ctk);
+            }
+        }
     }
     public static class Vector2dExtesion
     {
@@ -657,7 +708,7 @@ namespace unvs.ext
         {
             return ScanObject<T>((Vector2)scanPoint, Scope, layers);
         }
-        public static T ScanObject<T>(this Vector2 scanPoint,Vector2 Scope, string[] layers)
+        public static T ScanObject<T>(this Vector2 scanPoint,Vector2 Scope, params string[] layers)
         {
             // 1. Lấy vị trí tâm của nhân vật (hoặc một điểm phía trước mặt nhân vật)
             

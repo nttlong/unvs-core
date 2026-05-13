@@ -24,7 +24,10 @@ using unvs.sys;
 #endif
 using static UnityEngine.InputSystem.InputAction;
 namespace unvs.actor.player {
-    
+    /// <summary>
+    /// CAUTION!: Trong input_system cua Player phai set ActionType cua Look la Value
+    /// CAUTION!: input_system.Look.ActionType mus be Value
+    /// </summary>
     public abstract class UnvsPlayer : UnvsBaseComponent
     {
         public InputAction Look;

@@ -18,8 +18,10 @@ namespace unvs.controllers
         {
             action.started += ctx =>
             {
+               
                 if (!Application.isPlaying) return;
-                if(ctx.control.device is Mouse && UnvsApp.Instance.Settings.UseLookNavigator)
+                if (ctx.control.device is not Mouse) return;
+                if (ctx.control.device is Mouse && UnvsApp.Instance.Settings.UseLookNavigator)
                 {
                    
                     
@@ -55,6 +57,7 @@ namespace unvs.controllers
             };
             action.canceled += ctx =>
             {
+                if (ctx.control.device is not Mouse) return;
                 if (this.actor.coll == null || this.actor.coll.IsDestroyed()) return;
                 if (ctx.control.device is Mouse && UnvsApp.Instance.Settings.UseLookNavigator)
                 {

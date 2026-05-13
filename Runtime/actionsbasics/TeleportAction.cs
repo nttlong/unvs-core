@@ -23,7 +23,7 @@ namespace unvs.actionsbasics
         public AudioInfo CloseSound;
         public async override UniTask ExecuteAsync(ActionBaseSender Sender)
         {
-
+           
             if (Sender.Source.IsDestroyed())
             {
                 Sender.Cancel();
@@ -32,42 +32,42 @@ namespace unvs.actionsbasics
             var teleportObject = Sender.Source.GetComponent<UnvsTeleport>();
             if (teleportObject == null)
             {
+               
                 Sender.Cancel();
                 return;
             }
             var actor = Sender.GetTargetComponent<UnvsActor>();
             if (actor == null)
             {
+              
                 Sender.Cancel();
                 return;
             }
-            if (string.IsNullOrEmpty(teleportObject.TargetPath))
-            {
-                actor.speaker?.SayIThisDoesNotDoAnything();
-
-                Sender.Cancel();
-                return;
-            }
+            
             UnvsCinema.Instance.audioSource = new AudioSource();
 
             teleportObject.OpenSound.PlayBetterAudioClipAsync(OpenSound).Forget();
             if (teleportObject.TeleportType == types.TeleportType.NewScene)
             {
+               
                 await UnvsSceneLoader.Instance.LoadNewAsync(teleportObject.Target, teleportObject.SpawnName, false);
 
 
             }
             else if (teleportObject.TeleportType == types.TeleportType.Interior)
             {
+                
                 var fromScene = Sender.Source.GetComponentInParent<UnvsScene>();
                 await UnvsSceneLoader.Instance.LoadInteriorAsync(teleportObject.Target, teleportObject.SpawnName, fromScene);
             }
             else if (teleportObject.TeleportType == types.TeleportType.TempScene)
             {
+                
                 await UnvsSceneLoader.Instance.LoadTempSceneAsync(teleportObject.Target, teleportObject, teleportObject.SpawnName);
             }
             else if (teleportObject.TeleportType == types.TeleportType.ReturnToScene)
             {
+               
                 await UnvsSceneLoader.Instance.ReturnFromTempScene(teleportObject,teleportObject.SpawnName);
             }
 
