@@ -39,6 +39,7 @@ namespace unvs.controllers
                     }
                     else
                     {
+                        actor.RefreshToken();
                         if (this.actor.CurrentSkill is ActorMouseInteractSkill mouseSkill)
                         {
                             mouseSkill.CurrentSpeed = mouseSkill.MoveSpeed;

@@ -5,6 +5,7 @@ using UnityEngine.AddressableAssets;
 
 using unvs.components;
 using unvs.ext;
+using unvs.game2d.scenes;
 using unvs.ui;
 
 namespace unvs.types
@@ -49,20 +50,20 @@ namespace unvs.types
     }
     public enum TeleportType
     {
-        Interior=0,
-        NewScene=1,
-        TempScene=2,
+        Interior = 0,
+        NewScene = 1,
+        TempScene = 2,
         [HideInInspector]
         ReturnToScene = 3
     }
     public enum DockType
     {
         None = 0,
-        Top=1,
-        Bottom=2,
-        Left=3,
-        Right=4,
-        Full=5
+        Top = 1,
+        Bottom = 2,
+        Left = 3,
+        Right = 4,
+        Full = 5
     }
     [Serializable]
     public abstract class UnvsEditableProperty
@@ -70,9 +71,9 @@ namespace unvs.types
 
     }
     [Serializable]
-    public class UnvsProperty<T>: UnvsEditableProperty where T : UnvsBaseComponent
+    public class UnvsProperty<T> : UnvsEditableProperty where T : UnvsBaseComponent
     {
-       
+
         public T Owner;
     }
     [Serializable]
@@ -96,7 +97,16 @@ namespace unvs.types
         }
         public async UniTask PlayAnimAsync(UnityEngine.UI.Image virtualCursor, System.Threading.CancellationToken token)
         {
-           
+
+            if (size != Vector2.zero)
+                virtualCursor.rectTransform.sizeDelta = size;
+            else
+                virtualCursor.rectTransform.sizeDelta = UnvsApp.Instance.Settings.DefaultCursorSize;
+            if (Pivot != Vector2.zero)
+                virtualCursor.rectTransform.anchoredPosition = Pivot;
+            else
+                virtualCursor.rectTransform.anchoredPosition = UnvsApp.Instance.Settings.DefaultCursorPivot;
+            UnvsApp.SayText($"virtualCursor.rectTransform.sizeDelta={virtualCursor.rectTransform.sizeDelta},pivot={virtualCursor.rectTransform.anchoredPosition}");
             if (sprites.Length == 1)
             {
                 virtualCursor.sprite = sprites[0];
@@ -105,6 +115,10 @@ namespace unvs.types
             if (sprites == null || sprites.Length <= 1) return;
 
             float startTime = Time.time;
+
+
+
+
 
             try
             {
@@ -116,7 +130,7 @@ namespace unvs.types
                     // Here you would typically apply the sprite to a target UI Image or Renderer.
                     // Since this is a struct, we assume the caller handles the display 
                     // or you could pass an Action<Sprite> to this method.
-                   
+
                     virtualCursor.sprite = GetFrame(elapsedTime);
                     // Wait for the next frame to save performance (approx 1/FPS)
                     // Using PlayerLoop.Update ensures it stays in sync with Unity's frame rate
@@ -132,18 +146,18 @@ namespace unvs.types
         public async UniTask ShowAtAsync(Vector2 worldPos, UnityEngine.UI.Image virtualCursor, System.Threading.CancellationToken token)
         {
             virtualCursor.ShowAtUIPosition(worldPos.ToScreen());
-            
+
             await PlayAnimAsync(virtualCursor, token);
         }
     }
-   
+
     [Serializable]
     public struct SceneLinkingData
     {
         public AssetReference LeftScene;
         public AssetReference RightScene;
     }
-    
+
 
 
     [Serializable]
@@ -171,15 +185,15 @@ namespace unvs.types
         {
             foreach (var item in feedBack)
             {
-                if(!item.IsEmpty()) return item;
+                if (!item.IsEmpty()) return item;
             }
             return this;
         }
 
         public void Play(AudioSource audioSource)
         {
-            if(audioSource == null) return;
-            if(this.IsEmpty()) return;
+            if (audioSource == null) return;
+            if (this.IsEmpty()) return;
             audioSource.PlayOneShot(this.Clip);
         }
     }

@@ -396,16 +396,12 @@ namespace unvs.ext
     {
         public static void ShowAtUIPosition(this Image virtualCursor, Vector2 screenPosition)
         {
-            virtualCursor.enabled = true;
-            virtualCursor.gameObject.SetActive(true);
+           
             screenPosition.x = Mathf.Clamp(screenPosition.x, 0, Screen.width);
             screenPosition.y = Mathf.Clamp(screenPosition.y, 0, Screen.height);
 
             virtualCursor.rectTransform.position = screenPosition;
-            if(virtualCursor.GetComponent<CanvasGroup>()!=null)
-            {
-                virtualCursor.GetComponent<CanvasGroup>().alpha = 1.0f;
-            }
+            virtualCursor.ShowImage();
         }
         public static void HideImage(this Image virtualCursor)
         {

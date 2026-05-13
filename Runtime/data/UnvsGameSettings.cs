@@ -13,7 +13,7 @@ namespace unvs.data
     {
         [Header("Visual loading")]
         public float FadeTimeStartGame = 0.5f;
-        public float DefaultFadeTimeLoadScene = 0;
+        public float DefaultFadeTimeLoadScene = 0.25f;
         public int DelayFrameBeforeInteriorSceneShow = 15;
         //public bool DisplayCursor = true;
         [SerializeField]
@@ -33,5 +33,7 @@ namespace unvs.data
         [Header("Game play")]
         public bool UseLookNavigator = false;
         public float GamepadLookCursorSpeed = 10f;
+        public Vector2 DefaultCursorSize=new Vector2(48,48);
+        public Vector2 DefaultCursorPivot=new Vector2(0,0);
     }
 }
