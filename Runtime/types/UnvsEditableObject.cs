@@ -106,7 +106,7 @@ namespace unvs.types
                 virtualCursor.rectTransform.anchoredPosition = Pivot;
             else
                 virtualCursor.rectTransform.anchoredPosition = UnvsApp.Instance.Settings.DefaultCursorPivot;
-            UnvsApp.SayText($"virtualCursor.rectTransform.sizeDelta={virtualCursor.rectTransform.sizeDelta},pivot={virtualCursor.rectTransform.anchoredPosition}");
+          
             if (sprites.Length == 1)
             {
                 virtualCursor.sprite = sprites[0];

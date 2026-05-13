@@ -20,7 +20,7 @@ using unvs.ui;
 
 namespace unvs.game2d.scenes
 {
-    public partial class UnvsSceneLoader : UnvsUIComponentInstance<UnvsSceneLoader>
+    public partial class UnvsSceneLoader : UnvsNonUIComponentInstance<UnvsSceneLoader>
     {
         public Transform chunks;
         public Transform buffer;
@@ -36,9 +36,7 @@ namespace unvs.game2d.scenes
         private UniTask<UnvsScene> _leftLoadingTask ;
         private UniTask<UnvsScene> _rightLoadingTask ;
 
-        public override bool DisablePlayerInput => false;
-
-        public override bool EnablePlayerInput => false;
+       
 
         public static void GameShow()
         {
@@ -53,8 +51,9 @@ namespace unvs.game2d.scenes
             Instance.gameObject.SetActive(false);
             _isShow = false;
         }
-        public override void InitEvents()
+        public override void InitRunTime()
         {
+            base.InitRunTime();
             this.buffer.gameObject.SetActive(false);
         }
         public async UniTask ReturnFromTempScene(UnvsTeleport tmpTeleportObject, string spawnName)
@@ -114,10 +113,7 @@ namespace unvs.game2d.scenes
             {
                 this._tmpLoadScene = this.AddChildComponentIfNotExist<Transform>("_tmpLoadScene");
             }
-            //foreach(var scene in this.chunks.GetComponentsInChildren<UnvsScene>())
-            //{
-            //    scene.transform.SetParent(this._chunksBackupForTempLoadScene, true);
-            //}
+           
             this.interior.gameObject.SetActive(false);
             this.chunks.gameObject.SetActive(false);
            
@@ -511,7 +507,7 @@ namespace unvs.game2d.scenes
 
     }
 #if UNITY_EDITOR
-    public partial class UnvsSceneLoader : UnvsUIComponentInstance<UnvsSceneLoader>
+    public partial class UnvsSceneLoader : UnvsNonUIComponentInstance<UnvsSceneLoader>
     {
 
         [UnvsButton("Generate")]

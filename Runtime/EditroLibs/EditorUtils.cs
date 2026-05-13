@@ -1,23 +1,32 @@
 #if UNITY_EDITOR
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
+
 using System.IO;
 using System.Linq;
-using System.Net;
+
 using System.Reflection;
+
 using UnityEditor;
-using UnityEditor;
+
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.Animations;
 using UnityEditor.SceneManagement;
+
 using UnityEngine;
-using UnityEngine;
+
 using UnityEngine.AddressableAssets;
 using UnityEngine.Rendering;
 
+
+
 using unvs.components;
+using unvs.game2d.scenes;
+using unvs.shares;
 using unvs.types;
+using unvs.ui;
 using static System.Net.WebRequestMethods;
 namespace unvs.editor.utils
 {
@@ -615,6 +624,79 @@ namespace unvs.editor.utils
             }
 
             EditorUtility.SetDirty(mat);
+        }
+        /// <summary>
+        /// This function will load scene as editor mode and add goScene to scene
+        /// Before add, clean all object in scene
+        /// Note: function just serve for editor who woul like to review goScene beneath Cam, Light,...
+        /// </summary>
+        /// <param name="testSceneAssetPath"></param>
+        /// <param name="sceneName"></param>
+        /// <param name="unvsScene"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        public static async UniTask EditorReview(string testSceneAssetPath, string sceneName,  AssetReference selRef)
+        {
+           
+            var scenePath = $"{testSceneAssetPath}/{sceneName}.unity";
+            // 1. Kiểm tra file scene có tồn tại không
+            if (string.IsNullOrEmpty(testSceneAssetPath) || AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath) == null)
+            {
+               
+                Dialogs.Show($"[EditorReview] Can not find scene at: {scenePath}");
+                return;
+            }
+
+            // 2. Mở Scene ở chế độ Single (đóng các scene hiện tại)
+            // Dùng OpenSceneMode.Single để đảm bảo môi trường sạch
+            UnityEngine.SceneManagement.Scene testScene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
+
+            if (!testScene.IsValid())
+            {
+                Dialogs.Show($"[EditorReview] Can not create or initialize scene {sceneName}");
+                return;
+            }
+
+            // 3. Dọn dẹp tất cả các đối tượng cũ trong Scene
+            // Chúng ta duyệt qua các root objects để xóa
+            GameObject root = testScene.GetRootGameObjects().FirstOrDefault(p=>p.name=="root");
+            if(root == null)
+            {
+                Dialogs.Show($"[EditorReview] {sceneName} do not have root");
+                return;
+            }
+            var rootObjects =root.GetComponentsInChildren<Transform>();
+            foreach (var obj in rootObjects)
+            {
+                // Lưu ý: Chỉ xóa các object không phải là hệ thống quan trọng nếu cần
+                // Ở đây xóa tất cả theo yêu cầu "clean all object in scene"
+                UnityEngine.Object.DestroyImmediate(obj);
+            }
+            var goScene = await Commons.LoadPrefabsAsync<UnvsInteractUI>(selRef, root.transform, true);
+            // 4. Instantiate goScene vào Scene vừa mở
+            if (goScene != null)
+            {
+                // Tạo bản sao của goScene vào Scene hiện tại
+                //GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(goScene, testScene);
+
+                //if (instance == null)
+                //{
+                //    // Nếu không phải prefab, dùng Instantiate thông thường
+                //    instance = UnityEngine.Object.Instantiate(goScene);
+                //    SceneManager.MoveGameObjectToScene(instance, testScene);
+                //}
+
+                //instance.name = $"[Review] {goScene.name}";
+                //instance.transform.position = Vector3.zero;
+
+                // 5. Đánh dấu Scene đã thay đổi (nhưng không lưu để tránh hỏng file gốc)
+                //EditorSceneManager.MarkSceneDirty(testScene);
+
+                Debug.Log($"[EditorReview] Đã chuẩn bị xong vùng Review cho: {sceneName}");
+
+                // Focus vào object mới trong Scene View
+                //Selection.activeGameObject = instance;
+                //SceneView.FrameLastActiveSceneView();
+            }
         }
     }
 

@@ -2,18 +2,19 @@
 #if UNITY_EDITOR
 using Cysharp.Threading.Tasks;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
+using UnityEngine.Rendering;
+using unvs.data;
 using unvs.editor.components;
 using unvs.game2d.scenes;
-using System.Linq;
-
-using UnityEngine.Rendering;
-using System.Collections.Generic;
 
 namespace unvs.editor.utils
 {
@@ -398,6 +399,78 @@ namespace unvs.editor.utils
                     }
                 }
             }
+            return null;
+        }
+
+        public static void ApplyCastShadows2Side(GameObject gameObject)
+        {
+            var list = new List<SpriteRenderer>();
+            var sp = gameObject.GetComponent<SpriteRenderer>();
+            if (sp != null)
+                list.Add(sp);
+
+            list.AddRange(gameObject.GetComponentsInChildren<SpriteRenderer>(true));
+
+            foreach (var s in list)
+            {
+                // Sử dụng Reflection để truy cập thuộc tính shadowCastingMode từ lớp cha Renderer
+                PropertyInfo shadowProperty = typeof(SpriteRenderer).GetProperty("shadowCastingMode", BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+
+                if (shadowProperty != null)
+                {
+                    // Thiết lập giá trị là TwoSided (tương đương với giá trị 2 trong Debug mode)
+                    shadowProperty.SetValue(s, ShadowCastingMode.TwoSided);
+
+                    // Đánh dấu Object có thay đổi để Unity không bỏ qua khi Save Scene/Prefab
+                    UnityEditor.EditorUtility.SetDirty(s);
+                }
+            }
+
+            Debug.Log($"Đã chuyển đổi {list.Count} SpriteRenderer sang Cast Shadows: Two Sided.");
+        }
+    }
+    public static class SceneReviewUtility
+    {
+        public static UnvsScenePreviewSettings FindSettingsUpwards(string startPath)
+        {
+            // Đảm bảo đường dẫn bắt đầu bằng Assets
+            if (!startPath.StartsWith("Assets"))
+            {
+                Debug.LogError("Path must start with 'Assets'");
+                return null;
+            }
+
+            // Nếu startPath là đường dẫn đến file, lấy thư mục cha của nó
+            string currentFolder = AssetDatabase.IsValidFolder(startPath)
+                ? startPath
+                : Path.GetDirectoryName(startPath);
+
+            while (!string.IsNullOrEmpty(currentFolder))
+            {
+                // Tìm tất cả asset có kiểu UnvsScenePreviewSettings trong thư mục hiện tại
+                // "t:UnvsScenePreviewSettings" là cú pháp lọc của AssetDatabase
+                string[] guids = AssetDatabase.FindAssets("t:UnvsScenePreviewSettings", new[] { currentFolder });
+
+                foreach (string guid in guids)
+                {
+                    string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+
+                    // Kiểm tra chính xác asset có nằm TRỰC TIẾP trong thư mục này không 
+                    // (để tránh lấy nhầm asset ở thư mục con sâu hơn)
+                    if (Path.GetDirectoryName(assetPath).Replace("\\", "/") == currentFolder.Replace("\\", "/"))
+                    {
+                        return AssetDatabase.LoadAssetAtPath<UnvsScenePreviewSettings>(assetPath);
+                    }
+                }
+
+                // Thoát nếu đã lên đến thư mục Assets
+                if (currentFolder == "Assets") break;
+
+                // Di chuyển lên thư mục cha
+                currentFolder = Path.GetDirectoryName(currentFolder).Replace("\\", "/");
+            }
+
+            Debug.LogWarning("No UnvsScenePreviewSettings found in the hierarchy.");
             return null;
         }
     }

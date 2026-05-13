@@ -63,6 +63,7 @@ namespace unvs.game2d.scenes
         public AssetReference refFadeScreen;
         public AssetReference refDialog;
         
+        public AssetReference refCinemaSub;
         [Header("Sart Path")]
         public string startScenePath;
         public AssetReference startScene;
@@ -80,12 +81,12 @@ namespace unvs.game2d.scenes
         public UnvsDialog dialog;
         public UnvsInteractUI InteractUI;
         public UnvsActorDialogue ActorDialogue;
+        public UnvsCinemaSub CinemaSub;
 
 
-       
-       
-       
-       
+
+
+
         public UnvsActor currentActor;
         public static UnvsApp Instance { get; private set; }
         public event Action<UnvsScene> OnEnterScene;
@@ -123,7 +124,8 @@ namespace unvs.game2d.scenes
             ActorDialogue = await Commons.LoadPrefabsAsync<UnvsActorDialogue>(refActorDialogue, container, true);
             fadeScreen = await Commons.LoadPrefabsAsync<UnvsFadeScreen>(refFadeScreen, container, true);
             UiInventory = await Commons.LoadPrefabsAsync<UnvsUIInventory>(refUiInventory, container, true);
-         
+            CinemaSub = await Commons.LoadPrefabsAsync<UnvsCinemaSub>(refCinemaSub, container, true);
+
 
             InitEvents();
             uiInputs.StartInputController();
@@ -202,6 +204,7 @@ namespace unvs.game2d.scenes
         private UnvsScene _LastExitScene;
         private CheckPintInfo restartCheckPoint;
         public UniTask InteractingTask;
+        
 
         public void RaiseResart(CheckPintInfo value)
         {
@@ -411,8 +414,15 @@ namespace unvs.game2d.scenes
             this.refUiInventory = unvs.editor.utils.UnvsEditorUtils.CreateAssetReference(r.PrefabPath);
         }
 
-        
 
+        [UnvsButton("Generate Cinema sub")]
+        public void GenerateCinemaSub()
+        {
+            var r = this.EditorCreatePrefab<UnvsCinemaSub>("UnvsCinemaSub");
+            this.CinemaSub = r.value;
+
+            this.refCinemaSub = unvs.editor.utils.UnvsEditorUtils.CreateAssetReference(r.PrefabPath);
+        }
 
 
 

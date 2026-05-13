@@ -127,6 +127,11 @@ namespace unvs.game2d.objects
                 this.TargetPath = Target.EditorGetAddressPath();
             }
         }
+        [UnvsButton("Shadow 2 sides")]
+        public void EditorShadow2Side()
+        {
+            unvs.editor.utils.SpriteTools.ApplyCastShadows2Side(this.gameObject);
+        }
     }
 #endif
 

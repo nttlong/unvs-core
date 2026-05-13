@@ -22,7 +22,7 @@ using unvs.ui;
 
 namespace unvs.game2d.scenes
 {
-    public class UnvsCinema : UnvsUIComponentInstance<UnvsCinema>
+    public class UnvsCinema : UnvsNonUIComponentInstance<UnvsCinema>
     {
         public UniTask CamChangeFollowOffsetTask;
         /// <summary>
@@ -60,7 +60,7 @@ namespace unvs.game2d.scenes
 
         [SerializeField] public AudioSource audioSource;
 
-
+        
         public void ChangeCameraState(List<UnvsScene> s, bool Imediately)
         {
 
@@ -259,10 +259,10 @@ namespace unvs.game2d.scenes
             this._lights.Clear();
 
         }
-        public override void InitEvents()
-        {
-            //throw new System.NotImplementedException();
-        }
+        //public override void InitEvents()
+        //{
+        //    //throw new System.NotImplementedException();
+        //}
         public event Action OnCameraMove;
         public event Action OnCameraStop;
 
@@ -270,9 +270,9 @@ namespace unvs.game2d.scenes
         bool _wasMoving;
 
 
-        public override bool DisablePlayerInput => false;
+        //public override bool DisablePlayerInput => false;
 
-        public override bool EnablePlayerInput => false;
+        //public override bool EnablePlayerInput => false;
 
         float getValue(float x)
         {
@@ -283,6 +283,7 @@ namespace unvs.game2d.scenes
             base.InitRunTime();
             _lastPosition = getValue(cam.transform.position.x);
             audioSource = this.GetComponentInChildren<AudioSource>(true);
+            this.vcam.Priority = 1000;
 
 
 

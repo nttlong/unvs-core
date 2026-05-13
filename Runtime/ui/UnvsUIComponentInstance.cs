@@ -15,4 +15,17 @@ namespace unvs.ui
         }
 
     }
+    public abstract class UnvsNonUIComponentInstance<T> : UnvsNonUIComponent where T : Component
+    {
+
+        public static T Instance;
+        public override void InitRunTime()
+        {
+            Instance = this as T;
+
+
+
+        }
+
+    }
 }

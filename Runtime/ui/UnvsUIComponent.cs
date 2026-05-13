@@ -14,16 +14,29 @@ using unvs.game2d.scenes;
 
 namespace unvs.ui
 {
+    public abstract class UnvsNonUIComponent : UnvsBaseComponent
+    {
+        public virtual void Awake()
+        {
+
+            if (Application.isPlaying)
+            {
+                InitRunTime();
+            }
+        }
+
+        public abstract void InitRunTime();
+    }
     public abstract class UnvsUIComponent : UnvsBaseComponent
     {
 
         [Header("Feedback audio")]
         public types.AudioInfo AudioOpen;
         public types.AudioInfo AudioClose;
+
         [Header("Visualize")]
         [SerializeField]
         public types.UINavigateSettings navigateSettings;
-        
         public Canvas canvas;
         public bool IsShow;
         public abstract void InitEvents();

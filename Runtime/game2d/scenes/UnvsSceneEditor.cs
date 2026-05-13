@@ -30,11 +30,27 @@ using unvs.game2d.objects.editor;
 
 
 using unvs.editor.components;
+using unvs.data;
 namespace unvs.game2d.scenes
 {
     
     public partial class UnvsScene : UnvsComponent
     {
+        public string FolderPath;
+        public UnvsScenePreviewSettings sceneReviewData;
+        public string testSceneAssetPath;
+
+        [UnvsButton("Review")]
+        public async UniTask EditorPreviewInScene()
+        {
+            FolderPath = unvs.editor.utils.UnvsEditorUtils.EditorGetTrueAssetPath(this);
+            this.sceneReviewData =  unvs.editor.utils.SceneReviewUtility.FindSettingsUpwards(FolderPath);
+            this.testSceneAssetPath = unvs.editor.utils.UnvsEditorUtils.EditorGetTrueAssetPath(sceneReviewData.TestScene);
+            await unvs.editor.utils.UnvsEditorUtils.EditorReview(
+                testSceneAssetPath: this.testSceneAssetPath, 
+                sceneName: this.sceneReviewData.sceneName,
+                this.selRef);
+        }
         [Header("Editor tools")]
         [SerializeField] public unvs_psd_export psdFileExport;
         [UnvsButton("Create check point")]
@@ -228,10 +244,7 @@ namespace unvs.game2d.scenes
             {
                  this.cinemachineFollow.FollowOffset= this.followOffset;
             }
-            //if (this.Links.LeftScene != null)
-            //    this.SceneLeft = unvs.editor.utils.UnvsEditorUtils.EditorGetAddressPath(this.Links.LeftScene);
-            //if (this.Links.RightScene != null)
-            //    this.SceneRight = unvs.editor.utils.UnvsEditorUtils.EditorGetAddressPath(this.Links.RightScene);
+            
         }
        
         private void OnDrawGizmos()
