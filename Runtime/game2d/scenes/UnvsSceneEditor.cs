@@ -235,8 +235,9 @@ namespace unvs.game2d.scenes
             return this.JoinInfo != null;
         }
 
-        private void OnValidate()
+        public override void OnValidate()
         {
+            base.OnValidate();
             this.selRef = unvs.editor.utils.UnvsEditorUtils.EditorGetAssetReference(gameObject);
             if (this.vcam!=null)
             //this.vcam.SetOrthoSizeImmediate(this.OrthographicSize);
@@ -247,7 +248,7 @@ namespace unvs.game2d.scenes
             
         }
        
-        private void OnDrawGizmos()
+        public override void OnDrawGizmos()
         {
            
 

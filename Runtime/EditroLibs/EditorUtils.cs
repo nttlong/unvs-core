@@ -599,9 +599,9 @@ namespace unvs.editor.utils
             }
 
             AssetDatabase.SaveAssets();
-            Debug.Log($"Đã xử lý {allMaterials.Count} materials.");
+            Dialogs.Show($"Đã xử lý {allMaterials.Count} materials.");
         }
-        static void ProcessMaterial(Material mat)
+        public static void ProcessMaterial(Material mat)
         {
             // 1. Thiết lập ghi chiều sâu
             mat.SetInt("_ZWrite", 1);
@@ -625,6 +625,7 @@ namespace unvs.editor.utils
 
             EditorUtility.SetDirty(mat);
         }
+      
         /// <summary>
         /// This function will load scene as editor mode and add goScene to scene
         /// Before add, clean all object in scene
@@ -697,6 +698,63 @@ namespace unvs.editor.utils
                 //Selection.activeGameObject = instance;
                 //SceneView.FrameLastActiveSceneView();
             }
+        }
+        public static void FullRestoreMaterials()
+        {
+            string[] guids = AssetDatabase.FindAssets("t:Material");
+            List<Material> allMaterials = new List<Material>();
+
+            foreach (string guid in guids)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                Material mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+                if (mat != null) allMaterials.Add(mat);
+            }
+
+            Undo.RecordObjects(allMaterials.ToArray(), "Full Restore Materials");
+
+            foreach (var mat in allMaterials)
+            {
+                // 1. Khôi phục thông số cơ bản
+                if (mat.HasProperty("_DepthBias")) mat.SetFloat("_DepthBias", 0.0f);
+
+                // Trả về mặc định của Shader (Opaque thường là 2000)
+                mat.renderQueue = -1;
+
+                // 2. Đưa Surface Type về Opaque (Giá trị 0)
+                if (mat.HasProperty("_Surface")) mat.SetFloat("_Surface", 0);
+                if (mat.HasProperty("_Blend")) mat.SetFloat("_Blend", 0);
+
+                // 3. Tắt Alpha Clip (Thứ gây rắc rối cho bóng đổ nếu không setup đúng)
+                if (mat.HasProperty("_AlphaClip"))
+                {
+                    mat.SetFloat("_AlphaClip", 0);
+                    mat.DisableKeyword("_ALPHATEST_ON");
+                }
+
+                // 4. Thiết lập Z-Buffer chuẩn cho vật thể 3D
+                mat.SetInt("_ZWrite", 1);
+                mat.SetInt("_ZTest", (int)CompareFunction.LessEqual);
+
+                // 5. KHÔI PHỤC KEYWORDS (Rất quan trọng)
+                // Tắt các keyword do hàm cũ ép vào
+                mat.DisableKeyword("_SURFACE_TYPE_TRANSPARENT");
+
+                // Kích hoạt lại các keyword mặc định của Opaque nếu cần
+                // (Unity sẽ tự động cập nhật lại dựa trên các SetFloat ở trên khi gọi Reset)
+
+                // 6. ÉP UNITY UPDATE LẠI MATERIAL UI VÀ INTERNAL STATE
+                // Điều này giúp Inspector hiển thị đúng các mục đã bị script cũ ẩn đi
+                if (mat.shader.name.Contains("Universal Render Pipeline/Lit"))
+                {
+                    mat.SetOverrideTag("RenderType", "Opaque");
+                }
+
+                EditorUtility.SetDirty(mat);
+            }
+
+            AssetDatabase.SaveAssets();
+            Dialogs.Show($"Đã khôi phục hoàn toàn {allMaterials.Count} materials. Hãy thử tạo Cube mới để test bóng.");
         }
     }
 

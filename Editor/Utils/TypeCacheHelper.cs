@@ -43,10 +43,15 @@ namespace unvs.editor.utils
 
 public class ForceZWriteTool
     {
-        [MenuItem("UNVS/Force Enable ZWrite for all Materials")]
+        [MenuItem("Unvs/Material/Force Enable ZWrite for all Materials")]
         public static void ForceEnableZWrite()
         {
             unvs.editor.utils.UnvsEditorUtils.ForceEnableZWriteAllMaterial();
+        }
+        [MenuItem("Unvs/Material/Recover All Materials")]
+        public static void FullRestoreMaterials()
+        {
+            unvs.editor.utils.UnvsEditorUtils.FullRestoreMaterials();
         }
     }
 }

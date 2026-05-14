@@ -50,7 +50,7 @@ namespace unvs.game2d.objects
             OnBeginTransition?.Invoke();
             // 2. Thực hiện Tween
             // Sử dụng DOMove của Rigidbody thay vì Transform để Unity xử lý vật lý mượt hơn
-            rb.DOMove(targetPosition, duration) // 1f là thời gian di chuyển, bạn có thể biến nó thành tham số
+            rb.transform.DOMove(targetPosition, duration) // 1f là thời gian di chuyển, bạn có thể biến nó thành tham số
               .SetEase(Ease.InOutQuad)     // Khởi đầu và kết thúc mượt mà (rất hợp với game Horror)
               .SetUpdate(UpdateType.Normal) // QUAN TRỌNG: Buộc Tween chạy trong FixedUpdate để đồng bộ với vật lý
               .OnUpdate(() => {
