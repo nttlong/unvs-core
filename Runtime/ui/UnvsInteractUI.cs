@@ -16,6 +16,7 @@ using unvs.game2d.objects;
 using unvs.game2d.objects.editor;
 using unvs.game2d.scenes;
 using unvs.shares;
+using unvs.types;
 
 
 namespace unvs.ui
@@ -158,6 +159,7 @@ namespace unvs.ui
         private MapAction look;
         public CancellationTokenSource Cts = new CancellationTokenSource();
         private CancellationTokenSource lookPositionWatchSource = new CancellationTokenSource();
+        private IconInfo _tmpBackupIcon;
 
         void updateCursor()
         {
@@ -261,6 +263,26 @@ namespace unvs.ui
             DoShowIconOfInteractableItemAsync(check).Forget();
         }
 
+        public void SwitchDefautIcon()
+        {
+            if (!UnvsApp.Instance.Settings.UseLookNavigator) return;
+            _tmpBackupIcon = _currentCursor;
+            _currentCursor = DefaultCursor.icon;
+           
+            this.Cts= this.Cts.Refresh();
+            _currentCursor.PlayAnimAsync(virtualCursor, this.Cts.Token).Forget();
+            UpdateCursorPosition();
+        }
+
+        public void RestorePreviousIcon()
+        {
+            if (!UnvsApp.Instance.Settings.UseLookNavigator) return;
+            _currentCursor = _tmpBackupIcon;
+          
+            this.Cts = this.Cts.Refresh();
+            _currentCursor.PlayAnimAsync(virtualCursor, this.Cts.Token).Forget();
+            UpdateCursorPosition();
+        }
     }
     public partial class UnvsInteractUI : UnvsUIComponentInstance<UnvsInteractUI>
     {

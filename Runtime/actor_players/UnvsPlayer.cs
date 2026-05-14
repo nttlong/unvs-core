@@ -127,17 +127,21 @@ namespace unvs.actor.player {
             }
         }
 
-        public virtual void OnDestroy()
+        public override void OnDestroy()
         {
-            ClearAllEvents();
+            clearAllEvents();
         }
 
         public virtual void OnDisable()
         {
-            ClearAllEvents();
+            clearAllEvents();
+        }
+        public virtual void OnEnable()
+        {
+            loadAllEvents();
         }
 
-        private void ClearAllEvents()
+        private void clearAllEvents()
         {
             // Sử dụng cơ chế an toàn hơn khi truy cập Global Input
             if (_started != null)
@@ -168,7 +172,37 @@ namespace unvs.actor.player {
                 }
             }
         }
+        private void loadAllEvents()
+        {
+            // Sử dụng cơ chế an toàn hơn khi truy cập Global Input
+            if (_started != null)
+            {
+                foreach (var item in _started)
+                {
+                    if (UnvsGlobalInput.Player.TryGetValue(item.Key, out var inputAction))
+                        inputAction.started += item.Value;
+                }
+                _started.Clear();
+            }
 
+            if (_canceled != null)
+            {
+                foreach (var item in _canceled)
+                {
+                    if (UnvsGlobalInput.Player.TryGetValue(item.Key, out var inputAction))
+                        inputAction.canceled += item.Value;
+                }
+                _canceled.Clear();
+            }
+            if (_performed != null)
+            {
+                foreach (var item in _performed)
+                {
+                    if (UnvsGlobalInput.Player.TryGetValue(item.Key, out var inputAction))
+                        inputAction.performed += item.Value;
+                }
+            }
+        }
         public void ControlDisable()
         {
             _disableEvent = true;

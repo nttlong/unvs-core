@@ -15,16 +15,8 @@ using Unity.VisualScripting;
 using System.Threading;
 using UnityEngine.Rendering;
 using unvs.game2d.objects;
-
-
-
-
-
-
-
-
-
-
+using unvs.data;
+using unvs.game2d.scenes;
 
 
 
@@ -49,6 +41,7 @@ namespace unvs.game2d.actors
 
     public partial class UnvsActor : UnvsBaseComponent
     {
+       
         public bool IsActivePlayer = true;
        
         [SerializeField]
@@ -196,6 +189,7 @@ namespace unvs.game2d.actors
                 //body
                 this.CurrentSkill.OnUpdate();
             }
+           
         }
     }
 #if UNITY_EDITOR

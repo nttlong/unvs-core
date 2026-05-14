@@ -38,8 +38,7 @@ namespace unvs.controllers
 
         public override MapAction OnMapConrrol(string name)
         {
-            //_actor = GetComponent<UnvsActor>();
-            //if (name == "interact") return this.interact;
+            
             if (name == "look") return this.look;
             if (name == "move") return this.move;
             if (name == "jump") return this.jump;
@@ -234,6 +233,7 @@ namespace unvs.controllers
 
         private void Move_performed(InputAction.CallbackContext obj)
         {
+           
             if (actor.CurrentSkill == null) return;
             _isMove = true;
             var skill = actor.CurrentSkill.Cast<ActorDefaultSkill>();

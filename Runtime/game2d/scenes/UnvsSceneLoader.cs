@@ -35,8 +35,7 @@ namespace unvs.game2d.scenes
         private Transform _tmpLoadScene;
         private UniTask<UnvsScene> _leftLoadingTask ;
         private UniTask<UnvsScene> _rightLoadingTask ;
-
-       
+        
 
         public static void GameShow()
         {
@@ -503,8 +502,23 @@ namespace unvs.game2d.scenes
             
             this.bufferDelete.SafeDestroyChildrenAsync().Forget();
         }
+        bool _chunkSceneStatus;
+        bool _interiorSceneStatus;
+        //public void HideScene()
+        //{
+        //    _chunkSceneStatus = this.chunks.gameObject.activeSelf;
+        //    _interiorSceneStatus = this.interior.gameObject.activeSelf;
+        //    this.chunks.gameObject.SetActive(false);
+        //    this.interior.gameObject.SetActive(false);
+        //    UnvsApp.Instance.currentActor.gameObject.SetActive(false);
+        //}
 
-
+        //public void ShowScene()
+        //{
+        //    this.chunks.gameObject.SetActive(_chunkSceneStatus);
+        //    this.interior.gameObject.SetActive(_interiorSceneStatus);
+        //    UnvsApp.Instance.currentActor.gameObject.SetActive(true);
+        //}
     }
 #if UNITY_EDITOR
     public partial class UnvsSceneLoader : UnvsNonUIComponentInstance<UnvsSceneLoader>
