@@ -27,12 +27,10 @@ namespace unvs.ui
     /// </summary>
     public partial class UnvsInteractUI : UnvsUIComponentInstance<UnvsInteractUI>
     {
-        [Header("Visualize")]
-        public UnvsCursor currentCursor = null;
-        public UnvsCursor lastCursor;
-        public Image virtualCursor;
-        //private types.IconInfo _currentCursor;
 
+        public Image virtualCursor;
+        private types.IconInfo _currentCursor;
+        private UnvsCursor lastCursorData;
         public Vector2 virtualMousePos;
 
         //public UnvsCursor DefaultCursor;
@@ -51,7 +49,6 @@ namespace unvs.ui
         public override bool EnablePlayerInput => false;
 
         public bool Locked { get; internal set; }
-        public bool IsUIShowing { get; internal set; }
 
         public event Action<Vector2, Image, GameObject> OnHoverInteractObject;
         public override void InitEvents()
@@ -61,32 +58,25 @@ namespace unvs.ui
                 this.virtualCursor.Hide();
                 return;
             }
-            else
-            {
-                currentCursor = UnvsApp.Instance.Settings.DefautUICursor;
-                
-            }
-
-
+            _currentCursor = UnvsApp.Instance.Settings.DefauSceneCursor.icon;
             this.virtualCursor.ShowImage();
             UnvsGlobalInput.OnUIInputReady += () =>
             {
-
+               
                 this.look = UnvsGlobalInput.NewMapUIAction(this, "Look", action =>
                 {
                     action.performed += ctx =>
                     {
-
-
+                        
+                        
                         if (ctx.control.device is Mouse)
                         {
                             this.lookPositionWatchSource = this.lookPositionWatchSource.Refresh();
                             virtualMousePos = ctx.ReadValue<Vector2>();
                             updateCursor();
-                        }
-                        else
+                        } else
                         {
-
+                            
                             this.StartWatch(
                                 () => virtualMousePos,
                                 (val) => virtualMousePos = val,
@@ -97,9 +87,9 @@ namespace unvs.ui
                             ).Forget(); // Chạy và quên nó đi (UniTask sẽ tự quản lý)
                         }
 
-
+                         
                     };
-
+                    
                 });
             };
         }
@@ -108,7 +98,7 @@ namespace unvs.ui
         {
             base.InitRunTime();
             InitUI();
-            //lastCursorData = UnvsApp.Instance.Settings.DefautUICursor;
+            lastCursorData = UnvsApp.Instance.Settings.DefautUICursor;
 
         }
 
@@ -128,16 +118,34 @@ namespace unvs.ui
             else
             {
                 virtualCursor.ShowImage();
-                currentCursor = UnvsApp.Instance.Settings.DefautUICursor;
-              
-                Cts = Cts.Refresh();
-                currentCursor.icon.PlayAnimAsync(this.virtualCursor, Cts.Token).Forget();
+                _currentCursor = UnvsApp.Instance.Settings.DefautUICursor.icon;
             }
 
             UnityEngine.Cursor.visible = false;
 
         }
+        public void ChangeIcon(UnvsCursor cursorData)
+        {
+            this.Cts = this.Cts.Refresh();
+            var c = cursorData ?? UnvsApp.Instance.Settings.DefauSceneCursor;
+            if (c == null)
+            {
+                return;
+            }
+            if (c.icon.sprites.Length > 0)
+            {
+                _currentCursor = cursorData.icon;
+                if (cursorData.icon.size != Vector2.zero)
+                    virtualCursor.rectTransform.sizeDelta = cursorData.icon.size;
+                virtualCursor.rectTransform.anchoredPosition = cursorData.icon.Pivot;
+                UpdateCursorPosition();
+            }
 
+        }
+        public void RestoreDefaultIcon()
+        {
+            ChangeIcon(UnvsApp.Instance.Settings.DefauSceneCursor);
+        }
         void UpdateCursorPosition()
         {
             if (virtualCursor == null) return;
@@ -153,33 +161,28 @@ namespace unvs.ui
         public CancellationTokenSource Cts = new CancellationTokenSource();
         private CancellationTokenSource lookPositionWatchSource = new CancellationTokenSource();
         private IconInfo _tmpBackupIcon;
-
-       
-
-        public void SetCursor(UnvsCursor cursor)
+        public void SetCurrentCursorIcon(UnvsCursor cursor)
         {
-            if (currentCursor != cursor)
+            if(lastCursorData!= cursor)
             {
                 this.Cts = this.Cts.Refresh();
-                //_currentCursor = cursor.icon;
-                
-                cursor.icon.PlayAnimAsync(this.virtualCursor, Cts.Token).Forget();
-                currentCursor = cursor;
-                lastCursor = cursor;
+                _currentCursor = cursor.icon;
+                lastCursorData = cursor;
+                _currentCursor.PlayAnimAsync(this.virtualCursor,Cts.Token).Forget();
             }
+            
+            
         }
-        
-
         void updateCursor()
         {
-            if (Locked ) return;
-            if (IsUIShowing)
+            if (Locked) return;
+            if (!_isInitCursor)
             {
-                UpdateCursorPosition();
-                return;
+                _currentCursor = lastCursorData.icon; // DefaultCursor.icon;
+                _isInitCursor = true;
             }
             if (UnvsCinema.Instance == null) return;
-
+            //if (UnvsCinema.Instance.IsInUpdateState) return;
             if (virtualCursor == null) return;
             UpdateCursorPosition();
 
@@ -188,41 +191,33 @@ namespace unvs.ui
 
             if (cam == null) return;
 
-
+            
             Rect safeRect = cam.pixelRect;
 
-
+            if (!safeRect.Contains(pos))
+            {
+                ChangeIcon(lastCursorData);
+                //_currentCursor = DefaultIcon.;
+                //cursor.sprite = this.DefaultIcon.srpite;
+                return;
+            }
             var interactObject = pos.GetHitCollider<UnvsInteractObject>(Constants.Layers.INTERACT_OBJECT);
 
             if (interactObject != null)
             {
-                var cursor = interactObject.CursorData ?? ((interactObject.InteractData != null) ? interactObject.InteractData.cursors.Explorer:null );
-                //BackupLastCursor();
+                var cursor = interactObject.CursorData ?? ((interactObject.InteractData != null) ? interactObject.InteractData.cursors.Explorer : lastCursorData);
                
-               
-              
-                if (currentCursor != cursor)
-                {
-                    lastCursor = currentCursor;
-                    Cts = Cts.Refresh();
-                    cursor.icon.PlayAnimAsync(virtualCursor, Cts.Token).Forget();
-                    currentCursor = cursor;
-                }
-
+                ChangeIcon(cursor);
             }
             else
             {
-                if (currentCursor != UnvsApp.Instance.Settings.DefauSceneCursor)
-                {
-                    Cts = Cts.Refresh();
-                    UnvsApp.Instance.Settings.DefauSceneCursor.icon.PlayAnimAsync(virtualCursor, Cts.Token).Forget();
-                    lastCursor = UnvsApp.Instance.Settings.DefauSceneCursor;
-                    currentCursor= UnvsApp.Instance.Settings.DefauSceneCursor;
-                }
-                //Cts = Cts.Refresh();
-                
+
+                ChangeIcon(lastCursorData);
+
+
             }
-           
+            //_animTimer += Time.unscaledDeltaTime;
+            _currentCursor.PlayAnimAsync(virtualCursor, this.Cts.Token).Forget();
 
             UpdateCursorPosition();
 
@@ -270,28 +265,37 @@ namespace unvs.ui
             DoShowIconOfInteractableItemAsync(check).Forget();
         }
 
-        public void RestoreCursorForSceneInteract()
+        public void SwitchDefautIcon()
         {
-            this.Cts = this.Cts.Refresh();
-            lastCursor?.icon.PlayAnimAsync(virtualCursor, this.Cts.Token).Forget();
+            if (!UnvsApp.Instance.Settings.UseLookNavigator) return;
+            _tmpBackupIcon = _currentCursor;
+            _currentCursor = UnvsApp.Instance.Settings.DefauSceneCursor.icon;
+           
+            this.Cts= this.Cts.Refresh();
+            _currentCursor.PlayAnimAsync(virtualCursor, this.Cts.Token).Forget();
+            UpdateCursorPosition();
         }
 
+        public void RestorePreviousIcon()
+        {
+            if (!UnvsApp.Instance.Settings.UseLookNavigator) return;
+            _currentCursor = _tmpBackupIcon;
+          
+            this.Cts = this.Cts.Refresh();
+            _currentCursor.PlayAnimAsync(virtualCursor, this.Cts.Token).Forget();
+            UpdateCursorPosition();
+        }
 
-
-
-
-        //public void RestoreLastCursor()
-        //{
-        //    if(_cursorStack.Count>0)
-        //    lastCursorData= _cursorStack.Pop();
-        //}
-        //Stack<UnvsCursor> _cursorStack=new Stack<UnvsCursor>();
-        //public void BackupLastCursor()
-        //{
-        //    _cursorStack.Push(lastCursorData);
-        //}
-
-
+        public void RestoreLastCursor()
+        {
+            if(_cursorStack.Count>0)
+            lastCursorData= _cursorStack.Pop();
+        }
+        Stack<UnvsCursor> _cursorStack=new Stack<UnvsCursor>();
+        public void BackupLastCursor()
+        {
+            _cursorStack.Push(lastCursorData);
+        }
     }
     public partial class UnvsInteractUI : UnvsUIComponentInstance<UnvsInteractUI>
     {
@@ -336,18 +340,18 @@ namespace unvs.ui
         }
         public async UniTask ShowIconOfInteracItem(Vector2 centerPoint)
         {
-            if (UnvsDialog.Instance.DialogShowingTask != null && UnvsDialog.Instance.DialogShowingTask.Task.Status == UniTaskStatus.Pending)
+            if(UnvsDialog.Instance.DialogShowingTask!=null && UnvsDialog.Instance.DialogShowingTask.Task.Status == UniTaskStatus.Pending)
             {
                 virtualCursor.HideImage();
                 return;
             }
             if (_lstItem == null || _lstItem.Count == 0)
             {
-                virtualCursor.HideImage();
+               virtualCursor.HideImage();
                 return;
             }
 
-
+            
             UnvsInteractObject nearsetItem = null;
             float minSqrDistance = float.MaxValue;
 
@@ -377,7 +381,7 @@ namespace unvs.ui
 
         public void ClearInteractItemList()
         {
-            if (_lstItem == null) _lstItem = new List<UnvsInteractObject>();
+            if(_lstItem==null ) _lstItem = new List<UnvsInteractObject> ();
             _lstItem.Clear();
         }
     }

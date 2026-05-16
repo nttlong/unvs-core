@@ -51,7 +51,7 @@ namespace unvs.game2d.scenes
         public Transform centerWatch;
         CancellationTokenSource ctsChangeOffset;
         CancellationTokenSource ctsChangeOrthoSize;
-        public Transform sceneLoaderTracing;
+        public Transform sceneLoaderTracking;
         public BoxCollider2D centerCamTracing;
         public Light2D globalLight;
 
@@ -80,7 +80,7 @@ namespace unvs.game2d.scenes
 
 
                 vcam.UpdateFollowOffset(s[0].followOffset);
-                camColl.size = cam.GetCameraWorldSize();
+                camColl.size = cam.GetCameraWorldSize(vcam);
                 return false;
             }
             nearset = CalculateNearestScene(s);
@@ -94,7 +94,7 @@ namespace unvs.game2d.scenes
             var tsk =
             vcam.ChangeFollowOffsetSmoothAsync(OnChange, nearset.followOffset, ctsChangeOffset.Token, 3).ContinueWith(() =>
             {
-                camColl.size = cam.GetCameraWorldSize();
+                camColl.size = cam.GetCameraWorldSize(vcam);
                 //this._isFollwingOffsetChanging = false;
             }).Preserve();
             //tsk.Forget();
@@ -110,7 +110,7 @@ namespace unvs.game2d.scenes
             ctsChangeOrthoSize = ctsChangeOrthoSize.Refresh();
             await vcam.ChangeFollowOffsetSmoothAsync(() =>
             {
-                camColl.size = cam.GetCameraWorldSize();
+                camColl.size = cam.GetCameraWorldSize(vcam);
             }, nearset.followOffset, ctsChangeOffset.Token);
 
 
@@ -316,7 +316,7 @@ namespace unvs.game2d.scenes
         private void updateingLightSource()
         {
             if (this.centerWatch == null) return;
-            this.sceneLoaderTracing.transform.position = new Vector3(this.cam.transform.position.x, this.cam.transform.position.y, 0);
+            this.sceneLoaderTracking.transform.position = new Vector3(this.cam.transform.position.x, this.cam.transform.position.y, 0);
             this.centerWatch.transform.position = new Vector3(this.camColl.bounds.center.x, this.camColl.bounds.center.y, 0);
             var data = Light2DExtension.MixGlobalLightSources(this.camColl.bounds.center, _lights);
             this.globalLight.intensity = data.Intensity;
@@ -383,12 +383,12 @@ namespace unvs.game2d.scenes
             this.vcam.PreviousStateIsValid = false;
             vcam.GetComponent<CinemachineFollow>().FollowOffset = followOfsset;
 
-            UnvsCinema.Instance.camColl.size = UnvsCinema.Instance.cam.GetCameraWorldSize();
+            UnvsCinema.Instance.camColl.size = UnvsCinema.Instance.cam.GetCameraWorldSize(vcam);
         }
 
         public void UpdateLoadChunkSceneTrackerSizeByCurrentFollowOffset()
         {
-            UnvsCinema.Instance.camColl.size = UnvsCinema.Instance.cam.GetCameraWorldSize();
+            UnvsCinema.Instance.camColl.size = UnvsCinema.Instance.cam.GetCameraWorldSize(vcam);
         }
 
 
@@ -429,7 +429,7 @@ namespace unvs.game2d.scenes
             cinema.cam = cinema.AddChildComponentIfNotExist<Camera>("Main Camera");
             this.physics2DRaycaster = cinema.cam.AddComponentIfNotExist<Physics2DRaycaster>();
             cinema.cam.tag = "MainCamera";
-            cinema.cam.orthographic = true;
+            cinema.cam.orthographic = false;
             cinema.cam.AddComponentIfNotExist<CinemachineBrain>();
             cinema.cam.AddComponentIfNotExist<AudioListener>();
             cinema.vcam = cinema.AddChildComponentIfNotExist<CinemachineCamera>("VCam");
@@ -447,8 +447,8 @@ namespace unvs.game2d.scenes
             cinema.worldBoundCollider2d.transform.SetParent(cinema.compositeCollider2D.transform);
             cinema.compositeCollider2D.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
             cinema.compositeCollider2D.isTrigger = true;
-            this.sceneLoaderTracing = this.AddChildComponentIfNotExist<Transform>("sceneLoaderTracing");
-            var b = this.sceneLoaderTracing.AddComponentIfNotExist<Rigidbody2D>();
+            this.sceneLoaderTracking = this.AddChildComponentIfNotExist<Transform>("sceneLoaderTracking");
+            var b = this.sceneLoaderTracking.AddComponentIfNotExist<Rigidbody2D>();
             b.bodyType = RigidbodyType2D.Kinematic;
             b.gravityScale = 0;
             b.angularDamping = 0;
@@ -456,7 +456,7 @@ namespace unvs.game2d.scenes
             c.SetMeOnTag(Constants.Tags.TRIGGER_LOAD_SCENE);
             c.isTrigger = true;
             camColl = c;
-            c.size = cam.GetCameraWorldSize();
+            c.size = cam.GetCameraWorldSize(vcam);
             this.centerWatch = this.AddChildComponentIfNotExist<Transform>("center-watch");
             var rb = this.centerWatch.AddComponentIfNotExist<Rigidbody2D>();
             rb.bodyType = RigidbodyType2D.Kinematic;

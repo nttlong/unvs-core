@@ -418,10 +418,10 @@ namespace unvs.shares
             return new Vector2(width, height);
         }
 #endif
-        public static Vector2 GetCameraWorldSize(this Camera cam)
+        public static Vector2 GetCameraWorldSize(this Camera cam,CinemachineCamera vcam)
         {
            
-            var follow = UnvsCinema.Instance.vcam;
+            var follow = vcam;
             var followOffset = follow.GetComponent<CinemachineFollow>().FollowOffset;
 
             // NOTE: followOffset.z lúc này là DESIGN camera distance của scene

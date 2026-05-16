@@ -105,7 +105,7 @@ namespace unvs.ext
                     var state = stateInMachine.state;
                     if (state.motion is BlendTree blendTree)
                     {
-                        extractBlendTree( anim, ret, i, j, layer, blendTree);
+                        extractBlendTree(anim, ret, i, j, layer, blendTree);
 
                     }
 
@@ -115,54 +115,56 @@ namespace unvs.ext
             return ret;
         }
 
-        private static void extractBlendTree(Animator anim, List<AnimStateInfo> ret,int layerIndex, int blendIndex, AnimatorControllerLayer layer, BlendTree blendTree)
+        private static void extractBlendTree(Animator anim, List<AnimStateInfo> ret, int layerIndex, int blendIndex, AnimatorControllerLayer layer, BlendTree blendTree)
         {
             foreach (var child in blendTree.children)
             {
                 var obj = new AnimStateInfo($"{layer.name}-{blendTree.name}-{child.motion.name}", anim); //motionObjs.AddChildComponentIfNotExist<AnimStateInfo>($"{layer.name}-{blendTree.name}-{child.motion.name}");
                 obj.blendName = blendTree.name;
                 obj.blendIndex = blendIndex;
-                obj.motionName= child.motion.name;
-                obj.layerName= layer.name;
-                obj.layerIndex= layerIndex;
+                obj.motionName = child.motion.name;
+                obj.layerName = layer.name;
+                obj.layerIndex = layerIndex;
                 obj.paramName = blendTree.blendParameter;
                 //obj.name = $"{layer.name}-{blendTree.name}-{child.motion.name}";
                 //obj.animationController = anim;
                 obj.value = child.threshold;
                 obj.clip = child.motion;
                 ret.Add(obj);
-                
+
             }
         }
 
         public static List<AnimStateInfo> EditorExtractAllMotions(this Animator anim)
         {
-           
+
             AnimatorController controller = null;
             var ret = new List<AnimStateInfo>();
             if (anim.runtimeAnimatorController is AnimatorOverrideController oController)
             {
                 controller = oController.runtimeAnimatorController as AnimatorController;
-                
-            } else {
+
+            }
+            else
+            {
                 controller = anim.runtimeAnimatorController as AnimatorController;
             }
-            for (var i=0;i<controller.layers.Length;i++)
+            for (var i = 0; i < controller.layers.Length; i++)
             {
-               var layer = controller.layers[i];
-                var j=0;
+                var layer = controller.layers[i];
+                var j = 0;
                 foreach (var stateInMachine in layer.stateMachine.states)
                 {
                     var state = stateInMachine.state;
                     if (state.motion is BlendTree tree)
                     {
-                        
+
                         extractBlendTree(anim, ret, i, j, layer, tree);
                         continue;
 
                     }
-                    
-                        if (state is AnimatorState animSt)
+
+                    if (state is AnimatorState animSt)
                     {
 
                         var motion = new AnimStateInfo($"{layer.name}-{animSt.name}", anim);//  motionObjs.AddChildComponentIfNotExist<AnimStateInfo>($"{layer.name}-{animSt.name}");
@@ -171,18 +173,18 @@ namespace unvs.ext
                         motion.layerName = layer.name;
                         //motion.animationController = anim;
                         motion.layerIndex = i;
-                        motion.clip= state.motion;
+                        motion.clip = state.motion;
                         ret.Add(motion);
                     }
                 }
-               
+
             }
             return ret;
         }
 
 #endif
 
-      
+
         public static void CreateAllSortingGroup(this Animator anim, string sortingLayerName)
         {
 
@@ -237,8 +239,8 @@ namespace unvs.ext
             Func<bool> onPlay = null,
             Action onStart = null
             )
-                {
-            if(animator==null || animator.IsDestroyed() || animator.gameObject.IsDestroyed()) return;
+        {
+            if (animator == null || animator.IsDestroyed() || animator.gameObject.IsDestroyed()) return;
 
             animator.ResetAllOverideLayers();
             animator.SetLayerWeight(layer, 1f);
@@ -252,9 +254,9 @@ namespace unvs.ext
             {
                 if (onPlay != null)
                 {
-                   if(!onPlay())
+                    if (!onPlay())
                     {
-                        return  true; // muon stop anim ngay tai day
+                        return true; // muon stop anim ngay tai day
                     }
                 }
                 if (animator == null || animator.IsDestroyed() || animator.gameObject.IsDestroyed()) return true;
@@ -390,13 +392,13 @@ namespace unvs.ext
             target.position = targetPos;
             ik.UpdateManager();
         }
-        
+
     }
     public static class ImageExt
     {
         public static void ShowAtUIPosition(this Image virtualCursor, Vector2 screenPosition)
         {
-           
+
             screenPosition.x = Mathf.Clamp(screenPosition.x, 0, Screen.width);
             screenPosition.y = Mathf.Clamp(screenPosition.y, 0, Screen.height);
 
@@ -421,7 +423,49 @@ namespace unvs.ext
                 virtualCursor.GetComponent<CanvasGroup>().alpha = 1f;
             }
         }
-    }
 
+        internal static void Scale(this Image image, Vector2 targetSize)
+        {
+            // 1. Kiểm tra điều kiện an toàn
+            if (image == null || image.sprite == null)
+            {
+               
+                return;
+            }
+
+            // 2. Lấy kích thước thực tế của ảnh gốc trong Sprite
+            float originalWidth = image.sprite.rect.width;
+            float originalHeight = image.sprite.rect.height;
+
+            // Nếu ảnh gốc bị lỗi kích thước bằng 0 thì bỏ qua để tránh lỗi chia cho 0
+            if (originalWidth <= 0 || originalHeight <= 0) return;
+
+            // 3. Tính tỷ lệ Aspect Ratio (Width / Height) của ảnh gốc và khung mục tiêu
+            float spriteAspect = originalWidth / originalHeight;
+            float targetAspect = targetSize.x / targetSize.y;
+
+            float finalWidth;
+            float finalHeight;
+
+            // 4. So sánh tỷ lệ để quyết định scale dựa theo cạnh nào
+            if (spriteAspect > targetAspect)
+            {
+                // Nếu ảnh quá rộng (ngang dài hơn dọc so với khung): Ép chiều rộng theo target, chiều cao co theo
+                finalWidth = targetSize.x;
+                finalHeight = finalWidth / spriteAspect;
+            }
+            else
+            {
+                // Nếu ảnh quá cao (dọc dài hơn ngang so với khung): Ép chiều cao theo target, chiều rộng co theo
+                finalHeight = targetSize.y;
+                finalWidth = finalHeight * spriteAspect;
+            }
+
+            // 5. Gán kích thước chuẩn cuối cùng cho RectTransform
+            image.rectTransform.sizeDelta = new Vector2(finalWidth, finalHeight);
+        }
+    }
 }
+
+
 

@@ -43,7 +43,7 @@ namespace unvs.ui
             this.AudioOpen.Play(this.GetComponent<AudioSource>());
             this.ApplyNaviagatorButtons();
             this.IsShow = true;
-            UnvsInteractUI.Instance?.SwitchDefautIcon();
+           
             UnvsSceneLoader.Instance.gameObject.SetActive(false);
         }
         public override void Hide()
@@ -51,7 +51,7 @@ namespace unvs.ui
             base.Hide();
             this.AudioClose.Play(this.GetComponent<AudioSource>());
             this.IsShow = false;
-            UnvsInteractUI.Instance?.RestorePreviousIcon();
+           
             UnvsSceneLoader.Instance.gameObject.SetActive(true);
         }
         

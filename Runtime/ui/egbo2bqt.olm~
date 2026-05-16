@@ -28,8 +28,7 @@ namespace unvs.ui
     public partial class UnvsInteractUI : UnvsUIComponentInstance<UnvsInteractUI>
     {
         [Header("Visualize")]
-        public UnvsCursor currentCursor = null;
-        public UnvsCursor lastCursor;
+      
         public Image virtualCursor;
         //private types.IconInfo _currentCursor;
 
@@ -51,7 +50,6 @@ namespace unvs.ui
         public override bool EnablePlayerInput => false;
 
         public bool Locked { get; internal set; }
-        public bool IsUIShowing { get; internal set; }
 
         public event Action<Vector2, Image, GameObject> OnHoverInteractObject;
         public override void InitEvents()
@@ -158,26 +156,20 @@ namespace unvs.ui
 
         public void SetCursor(UnvsCursor cursor)
         {
-            if (currentCursor != cursor)
-            {
-                this.Cts = this.Cts.Refresh();
-                //_currentCursor = cursor.icon;
-                
-                cursor.icon.PlayAnimAsync(this.virtualCursor, Cts.Token).Forget();
-                currentCursor = cursor;
-                lastCursor = cursor;
-            }
+            this.Cts = this.Cts.Refresh();
+            //_currentCursor = cursor.icon;
+
+            cursor.icon.PlayAnimAsync(this.virtualCursor, Cts.Token).Forget();
+            currentCursor = cursor;
+            _lastCursor = cursor;
         }
-        
+        UnvsCursor currentCursor = null;
+        private UnvsCursor _lastCursor;
 
         void updateCursor()
         {
-            if (Locked ) return;
-            if (IsUIShowing)
-            {
-                UpdateCursorPosition();
-                return;
-            }
+            if (Locked) return;
+
             if (UnvsCinema.Instance == null) return;
 
             if (virtualCursor == null) return;
@@ -203,7 +195,7 @@ namespace unvs.ui
               
                 if (currentCursor != cursor)
                 {
-                    lastCursor = currentCursor;
+                    _lastCursor = currentCursor;
                     Cts = Cts.Refresh();
                     cursor.icon.PlayAnimAsync(virtualCursor, Cts.Token).Forget();
                     currentCursor = cursor;
@@ -216,13 +208,14 @@ namespace unvs.ui
                 {
                     Cts = Cts.Refresh();
                     UnvsApp.Instance.Settings.DefauSceneCursor.icon.PlayAnimAsync(virtualCursor, Cts.Token).Forget();
-                    lastCursor = UnvsApp.Instance.Settings.DefauSceneCursor;
+                    _lastCursor = UnvsApp.Instance.Settings.DefauSceneCursor;
                     currentCursor= UnvsApp.Instance.Settings.DefauSceneCursor;
                 }
                 //Cts = Cts.Refresh();
                 
             }
-           
+            //_animTimer += Time.unscaledDeltaTime;
+            //lastCursorData.icon.PlayAnimAsync(virtualCursor, this.Cts.Token).Forget();
 
             UpdateCursorPosition();
 
@@ -273,7 +266,7 @@ namespace unvs.ui
         public void RestoreCursorForSceneInteract()
         {
             this.Cts = this.Cts.Refresh();
-            lastCursor?.icon.PlayAnimAsync(virtualCursor, this.Cts.Token).Forget();
+            _lastCursor?.icon.PlayAnimAsync(virtualCursor, this.Cts.Token).Forget();
         }
 
 

@@ -80,7 +80,8 @@ namespace unvs.ui
             IsShow = false;
             if(DisablePlayerInput && UnvsInteractUI.Instance != null)
             {
-                UnvsInteractUI.Instance.RestoreLastCursor();
+                UnvsInteractUI.Instance.RestoreCursorForSceneInteract();
+                UnvsInteractUI.Instance.IsUIShowing = false;
             }
         }
 
@@ -135,8 +136,10 @@ namespace unvs.ui
             if (DisablePlayerInput && UnvsInteractUI.Instance != null)
             {
                 var cursor = this.UICursor ?? UnvsApp.Instance.Settings.DefautUICursor;
-                UnvsInteractUI.Instance.BackupLastCursor();
-                UnvsInteractUI.Instance.SetCurrentCursorIcon(cursor);
+                //UnvsInteractUI.Instance.BackupLastCursor();
+                UnvsInteractUI.Instance.SetCursor(cursor);
+                UnvsInteractUI.Instance.IsUIShowing = true;
+
             }
         }
         public virtual void Activate()

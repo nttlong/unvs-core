@@ -113,6 +113,7 @@ namespace unvs.game2d.scenes
             
             container = transform.CreateIfNoExist<Transform>("container");
             container.gameObject.SetActive(false);
+            InteractUI = await Commons.LoadPrefabsAsync<UnvsInteractUI>(refInteractUI, container, true);
             SceneLoader = await refSceneLoader.LoadPrefabsAsync<UnvsSceneLoader>(container, true); 
             cinema = await refCinema.LoadPrefabsAsync<UnvsCinema>(container, true);
             MainMenu = await refMainMenu.LoadPrefabsAsync<UnvsMainMenu>(container, true);
@@ -120,7 +121,7 @@ namespace unvs.game2d.scenes
            
             dialog = await Commons.LoadPrefabsAsync<UnvsDialog>(refDialog, container, true);
             playerInput = await Commons.LoadPrefabsAsync<UnvsPlayerInput>(refPlayerInput, container, true);
-            InteractUI = await Commons.LoadPrefabsAsync<UnvsInteractUI>(refInteractUI, container, true);
+            
             ActorDialogue = await Commons.LoadPrefabsAsync<UnvsActorDialogue>(refActorDialogue, container, true);
             fadeScreen = await Commons.LoadPrefabsAsync<UnvsFadeScreen>(refFadeScreen, container, true);
             UiInventory = await Commons.LoadPrefabsAsync<UnvsUIInventory>(refUiInventory, container, true);
@@ -176,6 +177,7 @@ namespace unvs.game2d.scenes
             //InteractUI.Activate();
             //var back = UnvsGlobalInput.UI["Pause"];
             //back.started += Back_started;
+            MainMenu.Show();
         }
         private void OnDisable()
         {

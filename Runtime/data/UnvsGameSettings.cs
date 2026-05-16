@@ -12,8 +12,8 @@ namespace unvs.data
     public partial class UnvsGameSettings : UnvsScriptObject
     {
         [Header("Visual loading")]
-        public UnvsCursor SceneCursor;
-        public UnvsCursor DefautCursor;
+        public UnvsCursor DefauSceneCursor;
+        //public UnvsCursor DefautCursor;
         public UnvsCursor DefautUICursor;
         public float FadeTimeStartGame = 0.5f;
         public float DefaultFadeTimeLoadScene = 0.25f;

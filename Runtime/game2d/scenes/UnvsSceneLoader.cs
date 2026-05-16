@@ -266,8 +266,9 @@ namespace unvs.game2d.scenes
             var ret = await Commons.LoadPrefabsAsync<UnvsScene>(sceneRef, this.buffer);
             if(UnvsApp.Instance.Settings.UseLookNavigator)
             {
-                var cursor = (ret.Cursor ?? UnvsApp.Instance.Settings.SceneCursor) ?? UnvsApp.Instance.Settings.DefautCursor;
-                UnvsInteractUI.Instance.SetCurrentCursorIcon(cursor);
+                var cursor = (ret.Cursor ?? UnvsApp.Instance.Settings.DefauSceneCursor);
+                UnvsInteractUI.Instance.SetCursor(cursor);
+                
             }
             if (ret.followOffset == Vector3.zero)
             {
@@ -305,21 +306,34 @@ namespace unvs.game2d.scenes
             
           
             
+           
+            UnvsCinema.Instance.UpdateWorld(ret, true, UpdateWorldEmun.New);
+            UnvsCinema.Instance.vcam.UpdateByUnvsScene(ret);
             if (actor != null)
             {
                 actor.StandBy(ret.GetStartPosition(spawnName));
 
                 UnvsCinema.Instance.vcam.Watch(actor.camWatcher);
                 UnvsApp.Instance.currentActor = actor;
-            } else
+            }
+            else
             {
                 UnvsCinema.Instance.vcam.Watch(ret.defaulCamWatcher);
             }
-            UnvsCinema.Instance.UpdateWorld(ret, true, UpdateWorldEmun.New);
-            UnvsCinema.Instance.vcam.UpdateByUnvsScene(ret);
             ret.gameObject.SetActive(true);
+            //await UnvsFadeScreen.Instance.FadeOutAsync(UnvsApp.Instance.Settings.DefaultFadeTimeLoadScene);
+            //UnvsApp.Instance.RaiseEnterScene(ret, true);
+
+
+
+           
+           
+            UnvsCinema.Instance.compositeCollider2D.GenerateGeometry();
+            UnvsCinema.Instance.confiner.InvalidateBoundingShapeCache();
+            await UniTask.DelayFrame(UnvsApp.Instance.Settings.DelayFrameBeforeInteriorSceneShow);
             await UnvsFadeScreen.Instance.FadeOutAsync(UnvsApp.Instance.Settings.DefaultFadeTimeLoadScene);
-            UnvsApp.Instance.RaiseEnterScene(ret, true);
+            UnvsApp.Instance.RaiseEnterScene(ret);
+            UnvsCinema.Instance.requestInvalidateBoundingShapeCache = false;
             return ret;
         }
         public async UniTask<UnvsScene> LoadChunkLeftAsync(UnvsScene fromScene, AssetReference sceneRef)

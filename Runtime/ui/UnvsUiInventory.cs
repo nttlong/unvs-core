@@ -105,13 +105,13 @@ namespace unvs.ui
                 {
                     UnvsInteractUI.Instance.Locked=true;
                     if(collectableItem.CursorData!=null)
-                    UnvsInteractUI.Instance.ChangeIcon(collectableItem.CursorData);
+                    //UnvsInteractUI.Instance.ChangeIcon(collectableItem.CursorData);
                     UnvsGlobalInput.PlayerDisable();
                 }
                 else
                 {
                     UnvsInteractUI.Instance.Locked = false;
-                    UnvsInteractUI.Instance.RestoreDefaultIcon();
+                    //UnvsInteractUI.Instance.RestoreDefaultIcon();
                     UnvsGlobalInput.PlayerEnable();
                 }
             } else
