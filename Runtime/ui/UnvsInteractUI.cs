@@ -30,10 +30,10 @@ namespace unvs.ui
 
         public Image virtualCursor;
         private types.IconInfo _currentCursor;
-        
+        private UnvsCursor lastCursorData;
         public Vector2 virtualMousePos;
 
-        public UnvsCursor DefaultCursor;
+        //public UnvsCursor DefaultCursor;
         public UnvsInteractObject lastInteractObject;
 
         //private float _animTimer;
@@ -58,11 +58,11 @@ namespace unvs.ui
                 this.virtualCursor.Hide();
                 return;
             }
-            _currentCursor = DefaultCursor.icon;
+            _currentCursor = UnvsApp.Instance.Settings.DefautCursor.icon;
             this.virtualCursor.ShowImage();
             UnvsGlobalInput.OnUIInputReady += () =>
             {
-                
+               
                 this.look = UnvsGlobalInput.NewMapUIAction(this, "Look", action =>
                 {
                     action.performed += ctx =>
@@ -98,6 +98,7 @@ namespace unvs.ui
         {
             base.InitRunTime();
             InitUI();
+            lastCursorData = UnvsApp.Instance.Settings.DefautCursor;
 
         }
 
@@ -109,7 +110,7 @@ namespace unvs.ui
             canvas.sortingOrder = 1024;
             virtualCursor = canvas.transform.AddChildComponentIfNotExist<Image>("cursor");
 
-            if (UnvsApp.Instance.Settings.UseLookNavigator)
+            if (!UnvsApp.Instance.Settings.UseLookNavigator)
             {
 
                 virtualCursor.HideImage();
@@ -117,16 +118,16 @@ namespace unvs.ui
             else
             {
                 virtualCursor.ShowImage();
-                _currentCursor = DefaultCursor.icon;
+                _currentCursor = UnvsApp.Instance.Settings.DefautCursor.icon;
             }
 
-            Cursor.visible = false;
+            UnityEngine.Cursor.visible = false;
 
         }
         public void ChangeIcon(UnvsCursor cursorData)
         {
             this.Cts = this.Cts.Refresh();
-            var c = cursorData ?? DefaultCursor;
+            var c = cursorData ?? UnvsApp.Instance.Settings.DefautCursor;
             if (c == null)
             {
                 return;
@@ -143,7 +144,7 @@ namespace unvs.ui
         }
         public void RestoreDefaultIcon()
         {
-            ChangeIcon(DefaultCursor);
+            ChangeIcon(UnvsApp.Instance.Settings.DefautCursor);
         }
         void UpdateCursorPosition()
         {
@@ -160,13 +161,24 @@ namespace unvs.ui
         public CancellationTokenSource Cts = new CancellationTokenSource();
         private CancellationTokenSource lookPositionWatchSource = new CancellationTokenSource();
         private IconInfo _tmpBackupIcon;
-
+        public void SetCurrentCursorIcon(UnvsCursor cursor)
+        {
+            if(lastCursorData!= cursor)
+            {
+                this.Cts = this.Cts.Refresh();
+                _currentCursor = cursor.icon;
+                lastCursorData = cursor;
+                _currentCursor.PlayAnimAsync(this.virtualCursor,Cts.Token).Forget();
+            }
+            
+            
+        }
         void updateCursor()
         {
             if (Locked) return;
             if (!_isInitCursor)
             {
-                _currentCursor = DefaultCursor.icon;
+                _currentCursor = lastCursorData.icon; // DefaultCursor.icon;
                 _isInitCursor = true;
             }
             if (UnvsCinema.Instance == null) return;
@@ -184,7 +196,7 @@ namespace unvs.ui
 
             if (!safeRect.Contains(pos))
             {
-                ChangeIcon(DefaultCursor);
+                ChangeIcon(lastCursorData);
                 //_currentCursor = DefaultIcon.;
                 //cursor.sprite = this.DefaultIcon.srpite;
                 return;
@@ -202,7 +214,7 @@ namespace unvs.ui
                 else
                 {
 
-                    ChangeIcon(DefaultCursor);
+                    ChangeIcon(lastCursorData);
 
 
                 }
@@ -210,7 +222,7 @@ namespace unvs.ui
             else
             {
 
-                ChangeIcon(DefaultCursor);
+                ChangeIcon(lastCursorData);
 
 
             }
@@ -267,7 +279,7 @@ namespace unvs.ui
         {
             if (!UnvsApp.Instance.Settings.UseLookNavigator) return;
             _tmpBackupIcon = _currentCursor;
-            _currentCursor = DefaultCursor.icon;
+            _currentCursor = UnvsApp.Instance.Settings.DefautCursor.icon;
            
             this.Cts= this.Cts.Refresh();
             _currentCursor.PlayAnimAsync(virtualCursor, this.Cts.Token).Forget();
@@ -282,6 +294,17 @@ namespace unvs.ui
             this.Cts = this.Cts.Refresh();
             _currentCursor.PlayAnimAsync(virtualCursor, this.Cts.Token).Forget();
             UpdateCursorPosition();
+        }
+
+        public void RestoreLastCursor()
+        {
+            if(_cursorStack.Count>0)
+            lastCursorData= _cursorStack.Pop();
+        }
+        Stack<UnvsCursor> _cursorStack=new Stack<UnvsCursor>();
+        public void BackupLastCursor()
+        {
+            _cursorStack.Push(lastCursorData);
         }
     }
     public partial class UnvsInteractUI : UnvsUIComponentInstance<UnvsInteractUI>

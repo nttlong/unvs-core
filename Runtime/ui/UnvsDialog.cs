@@ -9,6 +9,7 @@ using UnityEngine.Localization;
 using UnityEngine.UI;
 using unvs.actor.player;
 using unvs.controllers.inputs;
+using unvs.data;
 using unvs.ext;
 using unvs.game2d.objects.editor;
 using unvs.game2d.scenes;
@@ -29,7 +30,7 @@ namespace unvs.ui {
         private MapAction CloseAny;
         [SerializeField]
         public Vector2 Size;
-
+       
         public override bool DisablePlayerInput => true;
 
         public override bool EnablePlayerInput => true;

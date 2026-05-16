@@ -400,9 +400,27 @@ namespace unvs.shares
             float width = height * cam.aspect; // cam.aspect = Screen.width / Screen.height
             return new Vector2(width, height);
         }
-      
+#if UNITY_EDITOR
+        public static Vector2 EditorGetCameraWorldSize(this Camera cam)
+        {
+
+            //var follow = cam;
+            //var followOffset = follow.GetComponent<CinemachineFollow>().FollowOffset;
+
+            // NOTE: followOffset.z lúc này là DESIGN camera distance của scene
+            float distance = Mathf.Max(0.01f, 0);
+
+            float halfFov = cam.fieldOfView * 0.5f * Mathf.Deg2Rad;
+
+            float height = 2f * distance * Mathf.Tan(halfFov);
+            float width = height * cam.aspect;
+
+            return new Vector2(width, height);
+        }
+#endif
         public static Vector2 GetCameraWorldSize(this Camera cam)
         {
+           
             var follow = UnvsCinema.Instance.vcam;
             var followOffset = follow.GetComponent<CinemachineFollow>().FollowOffset;
 

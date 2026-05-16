@@ -12,14 +12,18 @@ namespace unvs.data
     public partial class UnvsGameSettings : UnvsScriptObject
     {
         [Header("Visual loading")]
+        public UnvsCursor SceneCursor;
+        public UnvsCursor DefautCursor;
+        public UnvsCursor DefautUICursor;
         public float FadeTimeStartGame = 0.5f;
         public float DefaultFadeTimeLoadScene = 0.25f;
         public int DelayFrameBeforeInteriorSceneShow = 15;
+       
         //public bool DisplayCursor = true;
         [SerializeField]
         public Vector2 PCUIScreenSize = new Vector2(1920f, 1080f);
         [Header("Performance")]
-        public int ChunLenght = 3;
+        public int ChunkLength = 3;
         public int fps = 120;
         public int FrequencyOfWorldBoundUpdating = 120;
         public bool useAssetReferenceAssetGUIDForName = true;
@@ -35,5 +39,6 @@ namespace unvs.data
         public float GamepadLookCursorSpeed = 10f;
         public Vector2 DefaultCursorSize=new Vector2(48,48);
         public Vector2 DefaultCursorPivot=new Vector2(0,0);
+        
     }
 }

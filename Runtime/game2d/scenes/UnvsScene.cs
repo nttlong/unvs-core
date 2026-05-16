@@ -15,6 +15,7 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.Rendering.Universal;
 using unvs.actions;
 using unvs.components;
+using unvs.data;
 using unvs.ext;
 using unvs.game2d.actors;
 using unvs.game2d.objects;
@@ -26,7 +27,8 @@ namespace unvs.game2d.scenes
     
     public partial class UnvsScene : UnvsComponent
     {
-        
+        [Header("Visualize")]
+        public UnvsCursor Cursor;
         [Header("Sene game world info")]
         public Transform checkPoints;
         public WorldJoinInfo JoinInfo = new WorldJoinInfo();
@@ -79,10 +81,11 @@ namespace unvs.game2d.scenes
         private Transform pickableItems;
         public PolygonCollider2D groundThickness;
        
+
         public bool IsDestroying { get; private set; }
         
 
-        public event Action<UnvsScene> OnDestroying;
+        public new event Action<UnvsScene> OnDestroying;
         async UniTask initAsync()
         {
             await UniTask.Yield();

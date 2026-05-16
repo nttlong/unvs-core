@@ -145,8 +145,8 @@ namespace unvs.game2d.actors
             {
                 this.coll = GetComponentInChildren<CompositeCollider2D>();
                 player = GetComponent<UnvsPlayer>();
-                this.SetMeOnTag(Constants.Tags.PLAYER);
-                this.scanerBound.SetMeOnTag(Constants.Tags.PLAYER_SCANER);
+               
+              
 
             }
 
@@ -236,10 +236,11 @@ namespace unvs.game2d.actors
             base.OnValidate();
             this.SetMeOnTag(Constants.Tags.ACTOR);
 
-
+             this.SetMeOnTag(Constants.Tags.PLAYER);
             //accessories.owner = this as MonoBehaviour;
-
+            this.scanerBound?.SetMeOnTag(Constants.Tags.PLAYER_SCANER);
            
+
         }
         [UnvsButton]
         public void EditorCreateBagger()

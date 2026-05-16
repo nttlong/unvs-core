@@ -7,8 +7,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using unvs.components;
 using unvs.game2d.objects.editor;
-using unvs.game2d.scenes;
-using static UnityEngine.InputSystem.DefaultInputActions;
+
+
 
 namespace unvs.controllers.inputs
 {

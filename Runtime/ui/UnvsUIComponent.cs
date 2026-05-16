@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using unvs.components;
 using unvs.components;
 using unvs.controllers.inputs;
+using unvs.data;
 using unvs.ext;
 using unvs.game2d.objects.editor;
 using unvs.game2d.scenes;
@@ -35,6 +36,8 @@ namespace unvs.ui
         public types.AudioInfo AudioClose;
 
         [Header("Visualize")]
+       
+        public UnvsCursor UICursor;
         [SerializeField]
         public types.UINavigateSettings navigateSettings;
         public Canvas canvas;
@@ -75,6 +78,10 @@ namespace unvs.ui
 
             }
             IsShow = false;
+            if(DisablePlayerInput && UnvsInteractUI.Instance != null)
+            {
+                UnvsInteractUI.Instance.RestoreLastCursor();
+            }
         }
 
         public virtual void ApplyNaviagatorButtons()
@@ -125,6 +132,12 @@ namespace unvs.ui
                 }
             }
             IsShow = true;
+            if (DisablePlayerInput && UnvsInteractUI.Instance != null)
+            {
+                var cursor = this.UICursor ?? UnvsApp.Instance.Settings.DefautUICursor;
+                UnvsInteractUI.Instance.BackupLastCursor();
+                UnvsInteractUI.Instance.SetCurrentCursorIcon(cursor);
+            }
         }
         public virtual void Activate()
         {

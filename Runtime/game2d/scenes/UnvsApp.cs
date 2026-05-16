@@ -125,8 +125,7 @@ namespace unvs.game2d.scenes
             fadeScreen = await Commons.LoadPrefabsAsync<UnvsFadeScreen>(refFadeScreen, container, true);
             UiInventory = await Commons.LoadPrefabsAsync<UnvsUIInventory>(refUiInventory, container, true);
             CinemaSub = await Commons.LoadPrefabsAsync<UnvsCinemaSub>(refCinemaSub, container, true);
-
-
+          
             InitEvents();
             uiInputs.StartInputController();
 
@@ -290,6 +289,14 @@ namespace unvs.game2d.scenes
         public override void InitRuntime()
         {
             Instance = this;
+#if UNITY_EDITOR
+            if (this.Settings == null)
+            {
+                unvs.editor.utils.Dialogs.Show("Please,right click Create/Data/Game Settings ");
+                
+                return;
+            }
+#endif
             Application.targetFrameRate = this.Settings.fps;
             InitRuntimeAsync().ContinueWith(() =>
             {

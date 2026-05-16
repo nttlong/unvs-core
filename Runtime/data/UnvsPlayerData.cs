@@ -12,11 +12,7 @@ namespace unvs.data
     {
 
         public UnvsActor Owner;
-        private void OnEnable()
-        {
-            Owner=this.GetComponentInParent<UnvsActor>();
-        }
-
+       
 
 
     }

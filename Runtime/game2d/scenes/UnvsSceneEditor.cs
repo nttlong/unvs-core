@@ -189,7 +189,7 @@ namespace unvs.game2d.scenes
             this.confiner = this.vcam.GetOrAddComponent<CinemachineConfiner2D>();
             this.cinemachineFollow = this.vcam.GetOrAddComponent<CinemachineFollow>();
             this.vcam.Follow = this.defaulCamWatcher;
-            this.JoinInfo.Size = this.cam.GetCameraWorldSize();
+            this.JoinInfo.Size = this.cam.EditorGetCameraWorldSize();
             //this.edgesWorldBound = this.AddChildComponentIfNotExist<EdgeCollider2D>("edgesWorldBound");
             this.startPoint = this.support.AddChildComponentIfNotExist<Transform>("start-point");
             this.startPoint.transform.position = new Vector3(this.JoinInfo.Size.x / 2, 0, -10);

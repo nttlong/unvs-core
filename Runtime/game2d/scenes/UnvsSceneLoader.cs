@@ -264,6 +264,11 @@ namespace unvs.game2d.scenes
             }
             UnvsCinema.Instance.ClearWorlds();
             var ret = await Commons.LoadPrefabsAsync<UnvsScene>(sceneRef, this.buffer);
+            if(UnvsApp.Instance.Settings.UseLookNavigator)
+            {
+                var cursor = (ret.Cursor ?? UnvsApp.Instance.Settings.SceneCursor) ?? UnvsApp.Instance.Settings.DefautCursor;
+                UnvsInteractUI.Instance.SetCurrentCursorIcon(cursor);
+            }
             if (ret.followOffset == Vector3.zero)
             {
                 if (UnvsCinema.Instance != null)
@@ -453,7 +458,7 @@ namespace unvs.game2d.scenes
         private async UniTask clearChunkLeftIfExeedeAsync()
         {
             var len = this.chunks.GetComponentsInChildren<UnvsScene>().Length;
-            if (len >= UnvsApp.Instance.Settings.ChunLenght)
+            if (len >= UnvsApp.Instance.Settings.ChunkLength)
             {
                 var deleteScene = this.chunks.GetComponentsInChildren<UnvsScene>()[0];
                 if (deleteScene.rightScene != null)
@@ -467,9 +472,9 @@ namespace unvs.game2d.scenes
         private async UniTask clearChunkRightIfExeedeAsync()
         {
             var len = this.chunks.GetComponentsInChildren<UnvsScene>().Length;
-            if (len >= UnvsApp.Instance.Settings.ChunLenght)
+            if (len >= UnvsApp.Instance.Settings.ChunkLength)
             {
-                var deleteScene = this.chunks.GetComponentsInChildren<UnvsScene>()[UnvsApp.Instance.Settings.ChunLenght - 1];
+                var deleteScene = this.chunks.GetComponentsInChildren<UnvsScene>()[UnvsApp.Instance.Settings.ChunkLength - 1];
                 if (deleteScene.leftScene != null)
                 {
                     deleteScene.leftScene.TurnOnRight();

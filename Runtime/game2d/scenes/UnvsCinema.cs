@@ -315,6 +315,7 @@ namespace unvs.game2d.scenes
 
         private void updateingLightSource()
         {
+            if (this.centerWatch == null) return;
             this.sceneLoaderTracing.transform.position = new Vector3(this.cam.transform.position.x, this.cam.transform.position.y, 0);
             this.centerWatch.transform.position = new Vector3(this.camColl.bounds.center.x, this.camColl.bounds.center.y, 0);
             var data = Light2DExtension.MixGlobalLightSources(this.camColl.bounds.center, _lights);

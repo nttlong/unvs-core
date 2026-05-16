@@ -84,7 +84,7 @@ namespace unvs.types
         [SerializeField]
         public Vector2 size;
         [SerializeField] public Vector2 Pivot;
-
+        public bool IsUICursor;
         [SerializeField] public float frameRate; // Tốc độ animation (FPS)
         // Hàm lấy sprite tại thời điểm hiện tại
         public Sprite GetFrame(float time)
@@ -97,7 +97,8 @@ namespace unvs.types
         }
         public async UniTask PlayAnimAsync(UnityEngine.UI.Image virtualCursor, System.Threading.CancellationToken token)
         {
-
+          
+            if (virtualCursor == null || virtualCursor.IsDestroyed()) return;
             if (size != Vector2.zero)
                 virtualCursor.rectTransform.sizeDelta = size;
             else
@@ -116,8 +117,8 @@ namespace unvs.types
 
             float startTime = Time.time;
 
-
-
+            virtualCursor.transform.gameObject.SetActive(true);
+            virtualCursor.transform.localScale = new Vector3(1, 1, 0);
 
 
             try
@@ -126,11 +127,24 @@ namespace unvs.types
                 while (!token.IsCancellationRequested)
                 {
                     float elapsedTime = Time.time - startTime;
-
+                    if (virtualCursor == null || virtualCursor.IsDestroyed()) return;
                     // Here you would typically apply the sprite to a target UI Image or Renderer.
                     // Since this is a struct, we assume the caller handles the display 
                     // or you could pass an Action<Sprite> to this method.
-
+                    if(UnvsApp.Instance != null)
+                    {
+                        if(!IsUICursor && UnvsApp.Instance.currentActor!= null)
+                        {
+                            var actorPos = UnvsApp.Instance.currentActor.coll.bounds.center.ToScreen();
+                            if (virtualCursor.transform.position.x > actorPos.x)
+                            {
+                                virtualCursor.transform.localScale = new Vector3(1 ,1, 0);
+                            } else
+                            {
+                                virtualCursor.transform.localScale = new Vector3(-1, 1, 0);
+                            }
+                        }
+                    }
                     virtualCursor.sprite = GetFrame(elapsedTime);
                     // Wait for the next frame to save performance (approx 1/FPS)
                     // Using PlayerLoop.Update ensures it stays in sync with Unity's frame rate
