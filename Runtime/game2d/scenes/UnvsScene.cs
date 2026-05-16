@@ -217,7 +217,7 @@ namespace unvs.game2d.scenes
             var tr = this.GetComponentInChildrenByName<Transform>(spawnName);
             if(tr == null) return false;
             var teleport= tr.AddComponentIfNotExist<UnvsTeleport>();
-            teleport.Data = tmpTeleportObject.Data;
+            teleport.InteractData = tmpTeleportObject.InteractData;
             teleport.Target = tmpTeleportObject.GetComponentInParent<UnvsScene>(true).selRef;
             teleport.SpawnName = tmpTeleportObject.name;
             teleport.TeleportType = TeleportType.ReturnToScene;

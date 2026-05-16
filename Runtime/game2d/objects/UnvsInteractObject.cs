@@ -39,7 +39,7 @@ namespace unvs.game2d.objects
         [Tooltip("The icon when gamer show in inventory if it's null use SpriteRenderer instead")]
         [SerializeField]
         public Sprite ViewIcon;
-        public InteractionDefinition Data;
+        public UnsvInteractableData InteractData;
         //public UnvsObjectAttributesData ObjectDefinition;
         /// <summary>
         /// This event is called only once when the object is interacted for the first time.
@@ -94,14 +94,14 @@ namespace unvs.game2d.objects
                 await OnStartInteract(sender);
                 if (sender.IsCancel) return sender;
             }
-            if (Data == null)
+            if (InteractData == null)
             {
                 sender.Cancel();
                 return sender;
 
             }
             //sender.Cts = sender.Cts.Refresh();
-            foreach (var item in Data.actions)
+            foreach (var item in InteractData.definition.actions)
             {
                 if (item == null) continue;
                 await item.ExecuteAsync(sender);

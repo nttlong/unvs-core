@@ -205,19 +205,8 @@ namespace unvs.ui
 
             if (interactObject != null)
             {
-                if (interactObject.CursorData != null)
-                {
-
-                    ChangeIcon(interactObject.CursorData);
-
-                }
-                else
-                {
-
-                    ChangeIcon(lastCursorData);
-
-
-                }
+                var cursor = interactObject.CursorData ?? ((interactObject.InteractData != null) ? interactObject.InteractData.cursors.Explorer : lastCursorData);
+                ChangeIcon(cursor);
             }
             else
             {

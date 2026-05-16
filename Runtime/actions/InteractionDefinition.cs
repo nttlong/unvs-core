@@ -4,6 +4,7 @@
 using System;
 
 using UnityEngine;
+using unvs.data;
 
 namespace unvs.actions
 {
@@ -22,12 +23,12 @@ namespace unvs.actions
     }
     // Dùng để đánh dấu hàm nào được phép chọn trong Inspector
 
+   
 
-
-
-    [CreateAssetMenu(fileName = "Interaciondata", menuName = "Systems/Interaction Data")]
+    [CreateAssetMenu(fileName = "Interaciondata", menuName = "Unvs/Data/Interaction Data")]
     public class InteractionDefinition : ScriptableObject
     {
+        
         [SerializeReference]
         public ActionBase[] actions;
 

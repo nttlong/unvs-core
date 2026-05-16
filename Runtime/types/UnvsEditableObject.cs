@@ -146,6 +146,11 @@ namespace unvs.types
                         }
                     }
                     virtualCursor.sprite = GetFrame(elapsedTime);
+                    if (size != Vector2.zero)
+                        virtualCursor.rectTransform.sizeDelta = size;
+                    else
+                        virtualCursor.rectTransform.sizeDelta = UnvsApp.Instance.Settings.DefaultCursorSize;
+                 
                     // Wait for the next frame to save performance (approx 1/FPS)
                     // Using PlayerLoop.Update ensures it stays in sync with Unity's frame rate
                     await UniTask.Yield(PlayerLoopTiming.Update, token);

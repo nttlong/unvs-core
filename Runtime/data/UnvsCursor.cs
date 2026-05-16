@@ -1,12 +1,11 @@
 namespace unvs.data
 {
- 
+    using System;
     using System.Linq;
     using Unity.VisualScripting;
     using UnityEngine;
     using UnityEngine.U2D;
-
-    
+    using unvs.actions;
 
     [CreateAssetMenu(fileName = "Cursor", menuName = "Unvs/Data/Cursor")]
     public partial class UnvsCursor : UnvsScriptObject
@@ -34,6 +33,15 @@ namespace unvs.data
             names = allSprites.Select(p => p.name).ToArray();
             icon.sprites = allSprites.Select(p => unvs.editor.utils.SpriteTools.GetOriginalSprite(p, FolderPath)).ToArray();
         }
-    } 
+    }
 #endif
+
+    [Serializable]
+    public struct Cursors
+    {
+        [SerializeField]
+        public UnvsCursor Explorer;
+        [SerializeField]
+        public UnvsCursor Interact;
+    }
 }
