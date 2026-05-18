@@ -17,9 +17,11 @@ using unvs.game2d.objects;
 using unvs.game2d.objects.editor;
 using unvs.shares;
 using unvs.ui;
-
 namespace unvs.game2d.scenes
 {
+    /// <summary>
+    /// Scene load, load chunk, load new and load interior
+    /// </summary>
     public partial class UnvsSceneLoader : UnvsNonUIComponentInstance<UnvsSceneLoader>
     {
         public Transform chunks;
